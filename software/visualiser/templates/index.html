@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Battery State Estimator Analytics — Real-time SOC and SOH estimation comparison between Extended Kalman Filter and Echo State Network algorithms.">
+
+    <title>Battery State Estimator — EKF vs. ESN</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="glass-bg"></div>
+
+    <div class="app-container">
+
+        <!-- ── Header ──────────────────────────────────────────── -->
+        <header class="main-header">
+            <div class="brand">
+                <div class="brand-icon-wrap">
+                    <img src="/static/images/logo.png" alt="Battery State Estimator Logo" class="brand-logo-img">
+                </div>
+                <div class="brand-text">
+                    <h1>Battery State Estimator</h1>
+                    <p>Extended Kalman Filter vs. Echo State Network — Real-time Analytics</p>
+                </div>
+            </div>
+
+            <div class="system-status">
+                <div class="status-indicator" id="sim-status-badge">
+                    <span class="dot pulse-red"></span>
+                    <span class="label">Simulator: Idle</span>
+                </div>
+                <div class="status-indicator" id="sim-port-badge">
+                    <span class="dot pulse-red"></span>
+                    <span class="label">Sim Service: Offline</span>
+                </div>
+                <div class="status-indicator" id="db-status-badge">
+                    <span class="dot pulse-amber"></span>
+                    <span class="label">MongoDB: Connecting…</span>
+                </div>
+                <div class="status-indicator" id="chem-status-badge">
+                    <i class="fa-solid fa-flask" style="color: var(--accent-teal); margin-right: 6px;"></i>
+                    <span class="label" id="val-chem-badge">Chemistry: --</span>
+                </div>
+                <div class="status-indicator" id="model-status-badge">
+                    <span class="dot pulse-red"></span>
+                    <span class="label">ESN Model: Checking…</span>
+                </div>
+                <div class="status-indicator" id="readout-mode-badge" style="display: none; background: var(--accent-blue-lt); border-color: rgba(29, 78, 216, 0.3);">
+                    <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-blue); margin-right: 4px;"></i>
+                    <span class="label" id="readout-mode-label" style="font-weight: 600; color: var(--accent-blue);">Live Mode</span>
+                    <button id="btn-resume-live" style="background: none; border: none; color: var(--accent-blue); cursor: pointer; padding: 0; margin-left: 8px; font-weight: 700; font-size: 11px; text-decoration: underline;" title="Resume Live Mode">Resume Live</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── Dashboard Grid ──────────────────────────────────── -->
+        <main class="dashboard-grid">
+
+            <!-- ── Sidebar ──────────────────────────────────────── -->
+            <aside class="sidebar-container">
+                <section class="dashboard-card control-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-sliders"></i> Estimator Parameters</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- ML Warning Banner -->
+                        <div id="ml-warning-banner" class="warning-banner hidden">
+                            <div class="banner-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="banner-text">
+                                <h3>Model Training Required</h3>
+                                <p>Trained ESN model weights were not found. Run training first:</p>
+                                <code>python training/train_rc.py</code>
+                            </div>
+                        </div>
+
+                        <!-- EKF Parameter Mismatch -->
+                        <div class="control-group">
+                            <label for="mismatch-select">EKF Parameter Mismatch</label>
+                            <div class="select-wrapper">
+                                <select id="mismatch-select">
+                                    <option value="1.0">0% (Perfect Tuning)</option>
+                                    <option value="1.2">+20% Mismatch</option>
+                                    <option value="0.8">-20% Mismatch</option>
+                                    <option value="1.5">+50% Mismatch</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+
+                        <!-- ESN Quantization Mode -->
+                        <div class="control-group">
+                            <label for="quantize-select">ML Quantization Precision</label>
+                            <div class="select-wrapper">
+                                <select id="quantize-select">
+                                    <option value="float32">Float32 (Standard)</option>
+                                    <option value="int16">INT16 Fixed-Point (Simulated)</option>
+                                    <option value="int8">INT8 Fixed-Point (Simulated)</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Simulator Live Status -->
+                <section class="dashboard-card control-card margin-top-md">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-tower-broadcast"></i> Simulator State</h2>
+                    </div>
+                    <div class="card-body font-sans" style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Connection Link:</span>
+                            <strong id="val-sim-port" class="text-rose">Offline</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Generator Status:</span>
+                            <strong id="val-sim-running" class="text-rose">Idle</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Active Chemistry:</span>
+                            <strong id="val-sim-chemistry" style="color: var(--accent-teal);">--</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Drive Excitation Cycle:</span>
+                            <strong id="val-sim-cycle">--</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Ambient Temperature:</span>
+                            <strong id="val-sim-ambient">25°C</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>Accelerated SOH Aging:</span>
+                            <strong id="val-sim-aging">Off</strong>
+                        </div>
+                        <div>
+                            <span style="font-weight: 600; display: block; margin-bottom: 6px;">Active Injected Faults:</span>
+                            <div style="display: flex; flex-direction: column; gap: 4px; padding-left: 8px;">
+                                <div id="status-injected-short" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Internal Micro-Short</div>
+                                <div id="status-injected-thermal" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Thermal Runaway Spike</div>
+                                <div id="status-injected-dropout" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Sensor Dropout Fault</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ESN Model Retraining Manager -->
+                <section class="dashboard-card control-card margin-top-md">
+                    <div class="card-header font-blue">
+                        <h2><i class="fa-solid fa-brain"></i> ESN Model Registry</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="model-meta-info font-mono">
+                            <div>SOC RMSE: <strong id="val-model-soc-rmse">--</strong></div>
+                            <div>SOH RMSE: <strong id="val-model-soh-rmse">--</strong></div>
+                        </div>
+                        <button id="btn-retrain" class="btn btn-primary w-full margin-top-sm" title="Retrain ESN reservoir computing weights">
+                            <i class="fa-solid fa-arrows-spin"></i> Retrain ESN Weights
+                        </button>
+                        
+                        <div class="control-divider"></div>
+                        
+                        <label>Asynchronous Training Terminal</label>
+                        <div class="console-log-box" id="train-console">Console ready. Click retrain to launch.</div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- ── Main Content Area ────────────────────────────── -->
+            <div class="main-content">
+
+                <!-- ── Analytics Dashboard View ────────────────── -->
+                <div id="dashboard-view">
+
+                    <!-- BMS Cyber-Physical Diagnostics Alerts Panel -->
+                    <section class="dashboard-card diagnostics-panel margin-bottom-md">
+                        <div class="card-header diag-card-header">
+                            <h2><i class="fa-solid fa-shield-halved"></i> Cyber-Physical BMS Diagnostics</h2>
+                            <div class="diag-env-badge-wrap">
+                                <span class="diag-env-label">Environment:</span>
+                                <span class="badge badge-blue" id="diag-env-temp">25.0°C Ambient</span>
+                            </div>
+                        </div>
+                        <div class="diag-card-body">
+                            <!-- System Health Ring + Status -->
+                            <div class="diag-status-wrap">
+                                <div id="diag-health-ring" class="diag-health-ring diag-ring-nominal">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="diag-status-title" id="diag-status-title">System Status: Nominal</h4>
+                                    <p class="diag-status-desc" id="diag-status-desc">All estimators running normally. No active fault anomalies.</p>
+                                </div>
+                            </div>
+
+                            <!-- Diagnostic Alarm Badges -->
+                            <div class="diag-badges-row">
+                                <div class="diag-alarm-badge" id="alarm-sensor">
+                                    <i class="fa-solid fa-ban"></i> SENSOR LOSS
+                                </div>
+                                <div class="diag-alarm-badge" id="alarm-short">
+                                    <i class="fa-solid fa-bolt-lightning"></i> MICRO-SHORT
+                                </div>
+                                <div class="diag-alarm-badge" id="alarm-thermal">
+                                    <i class="fa-solid fa-fire"></i> THERMAL RUNAWAY
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Metric Cards Row -->
+                    <section class="metrics-grid">
+                        <!-- Voltage -->
+                        <div class="metric-card voltage-metric">
+                            <div class="metric-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="metric-info">
+                                <h3>Terminal Voltage</h3>
+                                <div class="metric-val"><span id="val-voltage">0.00</span>&nbsp;<span class="unit">V</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Current -->
+                        <div class="metric-card current-metric">
+                            <div class="metric-icon"><i class="fa-solid fa-wave-square"></i></div>
+                            <div class="metric-info">
+                                <h3>Load Current</h3>
+                                <div class="metric-val"><span id="val-current">0.00</span>&nbsp;<span class="unit">A</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Temperature -->
+                        <div class="metric-card temp-metric">
+                            <div class="metric-icon"><i class="fa-solid fa-temperature-half"></i></div>
+                            <div class="metric-info">
+                                <h3>Cell Temperature</h3>
+                                <div class="metric-val"><span id="val-temp">0.0</span>&nbsp;<span class="unit">°C</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Simulation Time -->
+                        <div class="metric-card time-metric">
+                            <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="metric-info">
+                                <h3>Simulation Time</h3>
+                                <div class="metric-val"><span id="val-time">0</span>&nbsp;<span class="unit">s</span></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Advanced Estimations Row -->
+                    <section class="metrics-grid margin-top-md">
+                        <!-- State of Energy (SOE) -->
+                        <div class="metric-card soe-metric">
+                            <div class="metric-icon" style="background: var(--accent-emerald-lt); color: var(--accent-emerald);"><i class="fa-solid fa-battery-three-quarters"></i></div>
+                            <div class="metric-info">
+                                <h3>State of Energy (SOE)</h3>
+                                <div class="metric-val"><span id="val-ekf-soe">--</span>&nbsp;<span class="unit">%</span></div>
+                                <div class="sub-values" style="margin-top: 6px;">
+                                    <div style="flex: 1.2;">ESN: <strong id="val-esn-soe" style="color: var(--accent-blue);">--%</strong></div>
+                                    <div style="flex: 1.5;">Rem: <strong id="val-energy-rem" style="color: var(--text-primary);">-- Wh</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State of Power (SOP) -->
+                        <div class="metric-card sop-metric">
+                            <div class="metric-icon" style="background: var(--accent-teal-lt); color: var(--accent-teal);"><i class="fa-solid fa-plug"></i></div>
+                            <div class="metric-info">
+                                <h3>State of Power (SOP)</h3>
+                                <div class="metric-val" style="font-size: 19px; line-height: 24px; padding-bottom: 2px;">
+                                    Dischg: <span id="val-sop-discharge">--</span>&nbsp;<span class="unit">W</span>
+                                </div>
+                                <div class="sub-values" style="margin-top: 4px;">
+                                    <div>Chg Limit: <strong id="val-sop-charge" style="color: var(--accent-teal);">-- W</strong></div>
+                                    <div style="flex: 1.3;">Currents: <strong id="val-sop-currents" style="color: var(--text-muted); font-size: 10px;">-- A / -- A</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remaining Useful Life (RUL) -->
+                        <div class="metric-card rul-metric">
+                            <div class="metric-icon" style="background: var(--accent-rose-lt); color: var(--accent-rose);"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <div class="metric-info">
+                                <h3>Remaining Useful Life</h3>
+                                <div class="metric-val"><span id="val-ekf-rul">--</span>&nbsp;<span class="unit">Cycles</span></div>
+                                <div class="sub-values" style="margin-top: 6px;">
+                                    <div>ESN RUL: <strong id="val-esn-rul" style="color: var(--accent-violet);">-- cyc</strong></div>
+                                    <div>Status: <strong id="val-rul-status" style="color: var(--accent-emerald);">Good</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Real-Time Estimator Comparison Summary -->
+                    <section class="estimator-summary-grid margin-top-md">
+                        <!-- SOC Estimator Card -->
+                        <div class="summary-estimator-card soc-summary">
+                            <div class="summary-estimator-header">
+                                <h2>State of Charge (SOC) Estimation</h2>
+                                <span class="badge badge-green">Ground Truth: <strong id="val-true-soc-large">--%</strong></span>
+                            </div>
+                            <div class="summary-estimator-body">
+                                <div class="estimator-sub-row">
+                                    <div class="est-label">EKF + CC Estimation:</div>
+                                    <div style="text-align: right;">
+                                        <div class="est-val font-amber" id="val-ekf-soc">--%</div>
+                                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Error: <strong id="val-ekf-soc-error">--%</strong></div>
+                                    </div>
+                                </div>
+                                <div class="estimator-sub-row">
+                                    <div class="est-label">ESN Reservoir ML:</div>
+                                    <div style="text-align: right;">
+                                        <div class="est-val font-blue" id="val-esn-soc">--%</div>
+                                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Error: <strong id="val-esn-soc-error">--%</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SOH Estimator Card -->
+                        <div class="summary-estimator-card soh-summary">
+                            <div class="summary-estimator-header">
+                                <h2>State of Health (SOH) Estimation</h2>
+                                <span class="badge badge-green">Ground Truth: <strong id="val-true-soh-large">--%</strong></span>
+                            </div>
+                            <div class="summary-estimator-body">
+                                <div class="estimator-sub-row">
+                                    <div class="est-label">EKF resistance tracker:</div>
+                                    <div style="text-align: right;">
+                                        <div class="est-val font-amber" id="val-ekf-soh">--%</div>
+                                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Error: <strong id="val-ekf-soh-error">--%</strong></div>
+                                    </div>
+                                </div>
+                                <div class="estimator-sub-row">
+                                    <div class="est-label">ESN Reservoir ML:</div>
+                                    <div style="text-align: right;">
+                                        <div class="est-val font-violet" id="val-esn-soh">--%</div>
+                                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Error: <strong id="val-esn-soh-error">--%</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid-two margin-top-md">
+                        <section class="dashboard-card chart-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-chart-line"></i> SOC — EKF vs. ESN with True SOC Reference</h2>
+                            </div>
+                            <div class="card-body chart-container">
+                                <canvas id="chart-soc"></canvas>
+                            </div>
+                        </section>
+
+                        <section class="dashboard-card chart-card">
+                            <div class="card-header">
+                                <h2><i class="fa-solid fa-heart-pulse"></i> SOH — EKF vs. ESN with True SOH Reference</h2>
+                            </div>
+                            <div class="card-body chart-container">
+                                <canvas id="chart-soh"></canvas>
+                            </div>
+                        </section>
+                    </div>
+
+                </div>
+
+            </div><!-- /main-content -->
+        </main>
+
+        <footer class="main-footer">
+            <span><i class="fa-regular fa-copyright"></i> 2026 Advanced Battery State Estimator &mdash; EKF vs. ESN Evaluation Platform</span>
+        </footer>
+
+    </div><!-- /app-container -->
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

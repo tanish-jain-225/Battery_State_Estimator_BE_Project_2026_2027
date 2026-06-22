@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BMS Physical Simulator & Telemetry Generator</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Style Sheets -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="/static/images/logo.png" type="image/png">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+</head>
+
+<body>
+    <div class="glass-bg"></div>
+
+    <div class="simulator-container">
+        <!-- Header -->
+        <header class="sim-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="/static/images/logo.png" alt="BMS Simulator Logo" class="brand-logo-img">
+                </div>
+                <div class="brand-text">
+                    <h1>BMS Physical Simulator</h1>
+                    <p>Hardware-in-the-Loop Telemetry Generator &bull; Port 8000</p>
+                </div>
+            </div>
+
+            <div class="header-status">
+                <div class="status-indicator" id="gen-status">
+                    <span class="dot pulse-red"></span>
+                    <span class="label">Status: Idle</span>
+                </div>
+                <div class="status-indicator" id="db-status">
+                    <span class="dot pulse-amber"></span>
+                    <span class="label">MongoDB: Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <!-- Left Side: Controls -->
+            <div class="control-panel">
+                <section class="glass-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-circle-play"></i> Telemetry Playback</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Playback Action Buttons -->
+                        <div class="playback-grid">
+                            <button id="btn-start" class="btn btn-green" title="Start Telemetry Generation">
+                                <i class="fa-solid fa-play"></i> Start Generator
+                            </button>
+                            <button id="btn-pause" class="btn btn-amber" title="Pause Telemetry Generation" disabled>
+                                <i class="fa-solid fa-pause"></i> Pause Generator
+                            </button>
+                            <button id="btn-stop" class="btn btn-slate" title="Stop Telemetry Generation" disabled>
+                                <i class="fa-solid fa-stop"></i> Stop Generator
+                            </button>
+                            <button id="btn-reset" class="btn btn-red" title="Reset Simulation &amp; Purge Readings">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Generator
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card margin-top-md">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-sliders"></i> Configuration Profiles</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Chemistry Select -->
+                        <div class="input-group">
+                            <label for="chem-select">Battery Cell Chemistry</label>
+                            <div class="select-wrap">
+                                <select id="chem-select">
+                                    <option value="nmc">Li-ion NMC — 3S Pack (11.1 V)</option>
+                                    <option value="lfp">LiFePO₄ LFP — 3S Pack (9.6 V)</option>
+                                    <option value="lead_acid">Lead-Acid — 6S Pack (12 V)</option>
+                                    <option value="li_ion">Generic Li-ion — 3S Pack</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+
+                        <!-- Drive Cycle Select -->
+                        <div class="input-group margin-top-sm">
+                            <label for="cycle-select">Current Excitation Drive Cycle</label>
+                            <div class="select-wrap">
+                                <select id="cycle-select">
+                                    <option value="udds">Urban Driving Schedule (UDDS)</option>
+                                    <option value="hwfet">Highway Fuel Economy (HWFET)</option>
+                                    <option value="us06">Aggressive Spikes (US06)</option>
+                                    <option value="constant">Constant Current Discharge (-1C)</option>
+                                    <option value="charge">CC-CV Charge</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down select-arrow"></i>
+                            </div>
+                        </div>
+
+                        <!-- Accelerated Aging Toggle -->
+                        <div class="input-group switch-group margin-top-sm">
+                            <div class="switch-container">
+                                <span class="switch-label">Accelerated SOH Aging</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="aging-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="help-text">Arrhenius degradation is scaled by x1500 for testing capacity fade.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card margin-top-md">
+                    <div class="card-header" style="border-bottom: 1px solid rgba(239, 68, 68, 0.25);">
+                        <h2 style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"
+                                style="color: #ef4444;"></i> Environment &amp; Faults</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ambient Temperature -->
+                        <div class="input-group">
+                            <label for="temp-slider">Ambient Temperature: <strong id="val-ambient-temp"
+                                    class="font-mono" style="color: var(--accent-blue);">25</strong> &deg;C</label>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+                                <span style="font-size: 10px; color: var(--text-muted); font-weight: bold;">-20°C</span>
+                                <input type="range" id="temp-slider" min="-20" max="50" value="25" step="1"
+                                    style="flex: 1; accent-color: var(--accent-blue); height: 6px; border-radius: 3px; outline: none; cursor: pointer;">
+                                <span style="font-size: 10px; color: var(--text-muted); font-weight: bold;">50°C</span>
+                            </div>
+                        </div>
+
+                        <div class="control-divider"></div>
+
+                        <!-- Fault: Short Circuit -->
+                        <div class="input-group switch-group">
+                            <div class="switch-container">
+                                <span class="switch-label" style="color: #f87171;"><i class="fa-solid fa-bolt-lightning"
+                                        style="margin-right: 6px;"></i>Internal Micro-Short</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="fault-short-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="help-text">Injects 0.8A internal self-discharge short circuit bypass.</p>
+                        </div>
+
+                        <!-- Fault: Thermal Runaway -->
+                        <div class="input-group switch-group margin-top-xs">
+                            <div class="switch-container">
+                                <span class="switch-label" style="color: #f87171;"><i class="fa-solid fa-fire"
+                                        style="margin-right: 6px;"></i>Thermal Runaway Spike</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="fault-thermal-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="help-text">Injects exponential exothermic runaway heat generation.</p>
+                        </div>
+
+                        <!-- Fault: Sensor Dropout -->
+                        <div class="input-group switch-group margin-top-xs">
+                            <div class="switch-container">
+                                <span class="switch-label" style="color: #f87171;"><i class="fa-solid fa-ban"
+                                        style="margin-right: 6px;"></i>Sensor Dropout Fault</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="fault-dropout-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="help-text">Force output voltage and current to 0 (dropout simulation).</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Side: Status Feed -->
+            <div class="feed-panel">
+                <section class="glass-card status-card">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-wave-square"></i> Live Telemetry Feed</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Numerical stats -->
+                        <div class="telemetry-grid">
+                            <div class="tel-item">
+                                <span class="lbl">Elapsed Time</span>
+                                <span class="val font-mono"><strong id="val-time">0</strong>&nbsp;s</span>
+                            </div>
+                            <div class="tel-item">
+                                <span class="lbl">Terminal Voltage</span>
+                                <span class="val font-mono"><strong id="val-voltage">12.60</strong>&nbsp;V</span>
+                            </div>
+                            <div class="tel-item">
+                                <span class="lbl">Load Current</span>
+                                <span class="val font-mono"><strong id="val-current">0.00</strong>&nbsp;A</span>
+                            </div>
+                            <div class="tel-item">
+                                <span class="lbl">Cell Temp</span>
+                                <span class="val font-mono"><strong id="val-temp">25.0</strong>&nbsp;&deg;C</span>
+                            </div>
+                        </div>
+
+                        <div class="control-divider"></div>
+
+                        <!-- State metrics -->
+                        <div class="truth-grid">
+                            <div class="truth-item">
+                                <span>True SOC</span>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar green" id="bar-soc" style="width: 100%;"></div>
+                                </div>
+                                <span class="percentage" id="val-soc">100.0%</span>
+                            </div>
+                            <div class="truth-item">
+                                <span>True SOH</span>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar blue" id="bar-soh" style="width: 100%;"></div>
+                                </div>
+                                <span class="percentage" id="val-soh">100.0%</span>
+                            </div>
+                        </div>
+
+                        <div class="control-divider"></div>
+
+                        <!-- Readings count log -->
+                        <div class="log-info-box">
+                            <div class="log-line">
+                                <span>Pushed Telemetry Records:</span>
+                                <strong id="val-count" class="font-mono">0</strong>
+                            </div>
+                            <div class="log-line margin-top-xs">
+                                <span>Transmission Link:</span>
+                                <span class="badge" id="link-badge">Idle</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="sim-footer">
+            <p>&copy; 2026 Standalone BMS Physical Simulator App &bull; Cyber-Physical Battery Layer</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/generator.js"></script>
+</body>
+
+</html>

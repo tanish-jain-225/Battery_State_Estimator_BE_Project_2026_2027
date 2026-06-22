@@ -1,0 +1,86 @@
+# ── Environment Variables & Secrets ───────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# ── Vercel Deployment Secrets & Cache ─────────────────────────
+.vercel/
+
+# ── Python Bytecode & Cache ───────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# ── Virtual Environments ──────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ── IDEs & Editors ────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# ── Operating System Artifacts ────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]b.thumbs
+[Tt]humbs.db
+
+# ── Distribution & Packaging ──────────────────────────────────
+*.egg-info/
+dist/
+build/
+*.egg
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+develop-eggs/
+downloads/
+include/
+
+# ── Test & Coverage Outputs ──────────────────────────────────
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# ── Datasets & Binaries ───────────────────────────────────────
+# Ignore CSV datasets to prevent large file pushing
+datasets/*.csv
+# Ignore local scratchpad files or temporary logs
+scratch/
+temp/
+tmp/
