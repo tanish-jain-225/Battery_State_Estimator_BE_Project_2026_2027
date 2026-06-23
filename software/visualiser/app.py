@@ -329,6 +329,9 @@ def sync_simulation_locally():
             'current': -I_meas,
             'temperature': T_meas,
             'timestamp': datetime.utcnow().isoformat(),
+            'fault_short': fault_short,
+            'fault_thermal': fault_thermal,
+            'fault_dropout': fault_dropout,
             'true_soc': out['true_soc'],
             'true_soh': out['true_soh'],
             'true_v1': out['v1'],
@@ -511,6 +514,9 @@ def local_generator_loop():
                     'current': -I_meas,  # positive = discharge, negative = charge
                     'temperature': T_meas,
                     'timestamp': datetime.utcnow().isoformat(),
+                    'fault_short': fault_short,
+                    'fault_thermal': fault_thermal,
+                    'fault_dropout': fault_dropout,
                     
                     # True ground truth reference properties
                     'true_soc': out['true_soc'],
@@ -799,8 +805,8 @@ def get_status():
         fault_dropout = state.get('fault_dropout', False)
         fault_short = state.get('fault_short', False)
         
-        # Override with live port state if online
-        if port_online and port_data:
+        # Override with live port state if online (ONLY when database is NOT connected)
+        if port_online and port_data and not check_db_connected():
             sim_running = port_data.get('sim_running', sim_running)
             active_cycle = port_data.get('active_cycle', active_cycle)
             accelerated_aging = port_data.get('accelerated_aging', accelerated_aging)
@@ -810,31 +816,35 @@ def get_status():
             fault_dropout = port_data.get('fault_dropout', fault_dropout)
             fault_short = port_data.get('fault_short', fault_short)
             
-            # Sync back to local/database state
+            # Sync back to local/database state ONLY if we are not connected to a shared MongoDB.
+            # If MongoDB is connected, the DB is the single source of truth and the simulator
+            # already writes its status directly to it. Overwriting it here causes race conditions
+            # due to cached port status lag.
             config_changed = False
-            for key in ['chemistry', 'active_cycle', 'accelerated_aging', 'T_ambient', 'fault_thermal', 'fault_dropout', 'fault_short', 'sim_running']:
-                val = port_data.get(key)
-                if val is not None and state.get(key) != val:
-                    state[key] = val
-                    config_changed = True
-            
-            prog_changed = False
-            prog_mappings = {
-                'time': 'time',
-                'soc': 'soc',
-                'soh': 'soh',
-                'temperature': 'temperature',
-                'voltage': 'prev_voltage',
-                'current': 'prev_current'
-            }
-            for port_key, state_key in prog_mappings.items():
-                val = port_data.get(port_key)
-                if val is not None and state.get(state_key) != val:
-                    state[state_key] = val
-                    prog_changed = True
-                    
-            if config_changed or prog_changed:
-                save_sim_state(state)
+            if not check_db_connected():
+                for key in ['chemistry', 'active_cycle', 'accelerated_aging', 'T_ambient', 'fault_thermal', 'fault_dropout', 'fault_short', 'sim_running']:
+                    val = port_data.get(key)
+                    if val is not None and state.get(key) != val:
+                        state[key] = val
+                        config_changed = True
+                
+                prog_changed = False
+                prog_mappings = {
+                    'time': 'time',
+                    'soc': 'soc',
+                    'soh': 'soh',
+                    'temperature': 'temperature',
+                    'voltage': 'prev_voltage',
+                    'current': 'prev_current'
+                }
+                for port_key, state_key in prog_mappings.items():
+                    val = port_data.get(port_key)
+                    if val is not None and state.get(state_key) != val:
+                        state[state_key] = val
+                        prog_changed = True
+                        
+                if config_changed or prog_changed:
+                    save_sim_state(state)
             if config_changed:
                 # Invalidate telemetry cache so next GET /api/telemetry updates configs
                 _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
@@ -850,6 +860,7 @@ def get_status():
             'ekf_mismatch': state.get('ekf_mismatch', 1.0),
             'quantize_mode': state.get('quantize_mode', 'float32'),
             'simulator_port_online': port_online,
+            'simulator_url': Config.SIMULATOR_URL,
             'T_ambient': T_ambient,
             'fault_thermal': fault_thermal,
             'fault_dropout': fault_dropout,
@@ -882,8 +893,14 @@ def control_simulation():
             if key in data:
                 if key == 'T_ambient':
                     state[key] = float(data[key])
-                elif key in ['accelerated_aging', 'fault_thermal', 'fault_dropout', 'fault_short']:
+                elif key in ['accelerated_aging', 'fault_dropout', 'fault_short']:
                     state[key] = bool(data[key])
+                elif key == 'fault_thermal':
+                    was_thermal = state.get('fault_thermal', False)
+                    is_thermal = bool(data[key])
+                    state['fault_thermal'] = is_thermal
+                    if was_thermal and not is_thermal:
+                        state['temperature'] = state.get('T_ambient', 25.0)
                 else:
                     state[key] = data[key]
         if 'cycle_type' in data:
@@ -953,12 +970,13 @@ def control_simulation():
                     if response.status == 200:
                         sim_resp = json.loads(response.read().decode())
                         # Update cache with the simulator's updated status values
-                        global _cached_port_data
-                        _cached_port_data = {
+                        global _simulator_port_online, _simulator_port_data
+                        _simulator_port_online = True
+                        _simulator_port_data = {
                             'sim_running': sim_resp.get('sim_running', False),
+                            'chemistry': sim_resp.get('chemistry', 'li_ion'),
                             'active_cycle': sim_resp.get('active_cycle', 'udds'),
                             'accelerated_aging': sim_resp.get('accelerated_aging', False),
-                            'chemistry': sim_resp.get('chemistry', 'li_ion'),
                             'T_ambient': sim_resp.get('T_ambient', 25.0),
                             'fault_thermal': sim_resp.get('fault_thermal', False),
                             'fault_dropout': sim_resp.get('fault_dropout', False),
@@ -1093,7 +1111,10 @@ def get_telemetry():
                 T_meas=record['temperature'],
                 dt=dt,
                 quantize_mode=quantize_mode,
-                dataset_dt=Config.DATASET_TIME_STEP
+                dataset_dt=Config.DATASET_TIME_STEP,
+                fault_short=record.get('fault_short', False),
+                fault_thermal=record.get('fault_thermal', False),
+                fault_dropout=record.get('fault_dropout', False)
             )
 
             processed_record = record.copy()

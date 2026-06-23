@@ -198,6 +198,9 @@ def generator_loop():
                     'current': -I_meas,  # positive = discharge, negative = charge
                     'temperature': T_meas,
                     'timestamp': datetime.utcnow().isoformat(),
+                    'fault_short': fault_short,
+                    'fault_thermal': fault_thermal,
+                    'fault_dropout': fault_dropout,
                     
                     # True ground truth reference properties
                     'true_soc': out['true_soc'],
@@ -350,6 +353,9 @@ def sync_simulation_on_demand():
             'current': -I_meas,
             'temperature': T_meas,
             'timestamp': datetime.utcnow().isoformat(),
+            'fault_short': fault_short,
+            'fault_thermal': fault_thermal,
+            'fault_dropout': fault_dropout,
             'true_soc': out['true_soc'],
             'true_soh': out['true_soh'],
             'true_v1': out['v1'],
@@ -488,7 +494,11 @@ def post_control():
             state['T_ambient'] = float(T_ambient)
 
         if fault_thermal is not None:
-            state['fault_thermal'] = bool(fault_thermal)
+            was_thermal = state.get('fault_thermal', False)
+            is_thermal = bool(fault_thermal)
+            state['fault_thermal'] = is_thermal
+            if was_thermal and not is_thermal:
+                state['temperature'] = state.get('T_ambient', 25.0)
 
         if fault_dropout is not None:
             state['fault_dropout'] = bool(fault_dropout)
@@ -646,7 +656,7 @@ if __name__ == '__main__':
             pass
 
     print("\nBMS Physical Simulator")
-    print(f"Hardware-in-the-Loop Telemetry Generator • Port {Config.PORT}\n")
+    print(f"Hardware-in-the-Loop Telemetry Generator • http://localhost:{Config.PORT}\n")
     sim_status = "Running" if local_state.get('sim_running') else "Idle"
     print(f"Simulator: {sim_status}")
     if _mongodb_connected:

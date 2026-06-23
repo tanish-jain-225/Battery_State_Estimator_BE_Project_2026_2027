@@ -121,10 +121,7 @@
                         <h2><i class="fa-solid fa-tower-broadcast"></i> Simulator State</h2>
                     </div>
                     <div class="card-body font-sans" style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
-                            <span>Connection Link:</span>
-                            <strong id="val-sim-port" class="text-rose">Offline</strong>
-                        </div>
+
                         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
                             <span>Generator Status:</span>
                             <strong id="val-sim-running" class="text-rose">Idle</strong>
@@ -151,6 +148,7 @@
                                 <div id="status-injected-short" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Internal Micro-Short</div>
                                 <div id="status-injected-thermal" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Thermal Runaway Spike</div>
                                 <div id="status-injected-dropout" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Sensor Dropout Fault</div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -182,42 +180,6 @@
 
                 <!-- ── Analytics Dashboard View ────────────────── -->
                 <div id="dashboard-view">
-
-                    <!-- BMS Cyber-Physical Diagnostics Alerts Panel -->
-                    <section class="dashboard-card diagnostics-panel margin-bottom-md">
-                        <div class="card-header diag-card-header">
-                            <h2><i class="fa-solid fa-shield-halved"></i> Cyber-Physical BMS Diagnostics</h2>
-                            <div class="diag-env-badge-wrap">
-                                <span class="diag-env-label">Environment:</span>
-                                <span class="badge badge-blue" id="diag-env-temp">25.0°C Ambient</span>
-                            </div>
-                        </div>
-                        <div class="diag-card-body">
-                            <!-- System Health Ring + Status -->
-                            <div class="diag-status-wrap">
-                                <div id="diag-health-ring" class="diag-health-ring diag-ring-nominal">
-                                    <i class="fa-solid fa-check"></i>
-                                </div>
-                                <div>
-                                    <h4 class="diag-status-title" id="diag-status-title">System Status: Nominal</h4>
-                                    <p class="diag-status-desc" id="diag-status-desc">All estimators running normally. No active fault anomalies.</p>
-                                </div>
-                            </div>
-
-                            <!-- Diagnostic Alarm Badges -->
-                            <div class="diag-badges-row">
-                                <div class="diag-alarm-badge" id="alarm-sensor">
-                                    <i class="fa-solid fa-ban"></i> SENSOR LOSS
-                                </div>
-                                <div class="diag-alarm-badge" id="alarm-short">
-                                    <i class="fa-solid fa-bolt-lightning"></i> MICRO-SHORT
-                                </div>
-                                <div class="diag-alarm-badge" id="alarm-thermal">
-                                    <i class="fa-solid fa-fire"></i> THERMAL RUNAWAY
-                                </div>
-                            </div>
-                        </div>
-                    </section>
 
                     <!-- Metric Cards Row -->
                     <section class="metrics-grid">

@@ -538,15 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusInjectedThermal = document.getElementById('status-injected-thermal');
         const statusInjectedDropout = document.getElementById('status-injected-dropout');
 
-        if (valSimPort) {
-            if (status.simulator_port_online) {
-                valSimPort.textContent = 'Online';
-                valSimPort.className = 'font-blue';
-            } else {
-                valSimPort.textContent = 'Offline';
-                valSimPort.className = 'text-rose';
-            }
-        }
+
 
         if (valSimRunning) {
             if (status.sim_running) {
@@ -585,14 +577,50 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusInjectedShort) {
             statusInjectedShort.style.color = status.fault_short ? 'var(--accent-rose)' : 'var(--text-muted)';
             statusInjectedShort.style.fontWeight = status.fault_short ? '600' : 'normal';
+            const icon = statusInjectedShort.querySelector('i');
+            if (icon) {
+                if (status.fault_short) {
+                    icon.className = 'fa-solid fa-triangle-exclamation';
+                    icon.style.fontSize = '11px';
+                    icon.style.marginRight = '4px';
+                } else {
+                    icon.className = 'fa-solid fa-circle';
+                    icon.style.fontSize = '8px';
+                    icon.style.marginRight = '6px';
+                }
+            }
         }
         if (statusInjectedThermal) {
             statusInjectedThermal.style.color = status.fault_thermal ? 'var(--accent-rose)' : 'var(--text-muted)';
             statusInjectedThermal.style.fontWeight = status.fault_thermal ? '600' : 'normal';
+            const icon = statusInjectedThermal.querySelector('i');
+            if (icon) {
+                if (status.fault_thermal) {
+                    icon.className = 'fa-solid fa-fire';
+                    icon.style.fontSize = '11px';
+                    icon.style.marginRight = '4px';
+                } else {
+                    icon.className = 'fa-solid fa-circle';
+                    icon.style.fontSize = '8px';
+                    icon.style.marginRight = '6px';
+                }
+            }
         }
         if (statusInjectedDropout) {
             statusInjectedDropout.style.color = status.fault_dropout ? 'var(--accent-rose)' : 'var(--text-muted)';
             statusInjectedDropout.style.fontWeight = status.fault_dropout ? '600' : 'normal';
+            const icon = statusInjectedDropout.querySelector('i');
+            if (icon) {
+                if (status.fault_dropout) {
+                    icon.className = 'fa-solid fa-ban';
+                    icon.style.fontSize = '11px';
+                    icon.style.marginRight = '4px';
+                } else {
+                    icon.className = 'fa-solid fa-circle';
+                    icon.style.fontSize = '8px';
+                    icon.style.marginRight = '6px';
+                }
+            }
         }
     }
 

@@ -93,6 +93,11 @@ class EstimatorPipeline:
         if self.esn_soh is not None:
             self.esn_soh_state = [0.0] * self.esn_soh.n_reservoir
 
+        # Add prev_fault properties for transition checks
+        self.prev_fault_short = False
+        self.prev_fault_dropout = False
+        self.prev_fault_thermal = False
+
     def load_model(self, esn_soc, esn_soh, input_means, input_stds):
         """Load or update ESN model weights"""
         self.esn_soc = esn_soc
@@ -123,7 +128,10 @@ class EstimatorPipeline:
             'esn_soc_state': self.esn_soc_state,
             'esn_soh_state': self.esn_soh_state,
             'primed': bool(self.primed),
-            'elapsed_time': float(self.elapsed_time)
+            'elapsed_time': float(self.elapsed_time),
+            'prev_fault_short': bool(getattr(self, 'prev_fault_short', False)),
+            'prev_fault_dropout': bool(getattr(self, 'prev_fault_dropout', False)),
+            'prev_fault_thermal': bool(getattr(self, 'prev_fault_thermal', False))
         }
 
     def set_state(self, state_dict):
@@ -157,6 +165,10 @@ class EstimatorPipeline:
         self.esn_soc_state = state_dict.get('esn_soc_state')
         self.esn_soh_state = state_dict.get('esn_soh_state')
         self.primed = state_dict.get('primed', False)
+        
+        self.prev_fault_short = state_dict.get('prev_fault_short', False)
+        self.prev_fault_dropout = state_dict.get('prev_fault_dropout', False)
+        self.prev_fault_thermal = state_dict.get('prev_fault_thermal', False)
 
     def prime_esn(self, V_initial, T_initial=25.0, priming_steps=50, selected_indices=None, dataset_dt=0.001, sim_dt=1.0):
         """Run ESN priming steps to populate reservoir memory from initial state"""
@@ -216,7 +228,8 @@ class EstimatorPipeline:
         soe = integral_soc / max(integral_total, 1e-4)
         return float(np.clip(soe, 0.0, 1.0))
 
-    def step(self, V_meas, I_meas_discharge, T_meas, dt, quantize_mode='float32', selected_indices=None, dataset_dt=0.001):
+    def step(self, V_meas, I_meas_discharge, T_meas, dt, quantize_mode='float32', selected_indices=None, dataset_dt=0.001,
+             fault_short=False, fault_thermal=False, fault_dropout=False):
         """
         Execute one prediction-estimation step for all estimators.
         :param V_meas: Noisy voltage measurement (V)
@@ -226,6 +239,16 @@ class EstimatorPipeline:
         :param quantize_mode: Precision for ESN ('float32', 'int16', 'int8')
         :returns: dict of updated values and latencies
         """
+        # If fault_short transitions from True to False, reset cc_soc to ekf_soc to recover
+        if hasattr(self, 'prev_fault_short') and self.prev_fault_short and not fault_short:
+            self.cc_soc = self.ekf_soc
+        if hasattr(self, 'prev_fault_dropout') and self.prev_fault_dropout and not fault_dropout:
+            self.cc_soc = self.ekf_soc
+            
+        self.prev_fault_short = fault_short
+        self.prev_fault_dropout = fault_dropout
+        self.prev_fault_thermal = fault_thermal
+
         # EKF/Coulomb Counting expects positive current for charge, negative for discharge
         I_meas_ekf = -I_meas_discharge
         
@@ -250,9 +273,9 @@ class EstimatorPipeline:
         if soc_diff > Config.DIAG_SHORT_SOC_DIFF_THRESHOLD and abs(I_meas_discharge) <= Config.DIAG_SHORT_CURRENT_THRESHOLD:
             faults_detected.append('internal_short')
             
-        # 2. Update physical/traditional estimators only if sensors are healthy
+        # 2. Update physical/traditional estimators only if sensors are healthy and not in thermal runaway
         ekf_time = 0.0
-        if 'sensor_dropout' not in faults_detected:
+        if 'sensor_dropout' not in faults_detected and 'thermal_runaway' not in faults_detected:
             self.elapsed_time += dt
             
             # Update Coulomb Counting
@@ -274,7 +297,7 @@ class EstimatorPipeline:
             ekf_time = (time.perf_counter() - t_ekf_start) * 1000.0 # ms
 
         # Save previous readings
-        if 'sensor_dropout' not in faults_detected:
+        if 'sensor_dropout' not in faults_detected and 'thermal_runaway' not in faults_detected:
             self.prev_voltage = V_meas
             self.prev_current = I_meas_discharge
         
@@ -287,7 +310,7 @@ class EstimatorPipeline:
         model_loaded = (self.esn_soc is not None and self.esn_soh is not None and 
                         self.input_means is not None and self.input_stds is not None)
         
-        if 'sensor_dropout' in faults_detected:
+        if 'sensor_dropout' in faults_detected or 'thermal_runaway' in faults_detected:
             esn_soc_pred = self.ekf_soc
             esn_soh_pred = self.trad_soh
         elif model_loaded:
