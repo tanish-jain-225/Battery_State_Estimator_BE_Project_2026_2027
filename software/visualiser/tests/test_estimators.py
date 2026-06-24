@@ -419,5 +419,88 @@ class TestConfigConsistency(unittest.TestCase):
                            "Fallback limit should be larger than response limit")
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 10. Adaptive Auto-Calibration & Dynamic Chemistry
+# ─────────────────────────────────────────────────────────────────────────────
+class TestAdaptiveAutoCalibrationAndDynamicRegistration(unittest.TestCase):
+
+    def test_rls_parameter_identification(self):
+        """RLS parameter identification must track and approximate nominal parameters."""
+        from traditional_estimator import RecursiveLeastSquares
+        # Initialize RLS with dt=1.0
+        rls = RecursiveLeastSquares(dt=1.0, lmbda=0.99)
+        
+        # Drive it with a square-wave current profile and steady state voltage responses
+        r0_nom = 0.05
+        r1_nom = 0.03
+        c1_nom = 1200.0
+        tau = r1_nom * c1_nom
+        a1 = -np.exp(-1.0 / tau)
+        
+        v1_prev = 0.0
+        prev_y = 0.0
+        
+        # Drive RLS updates for 120 steps to allow matrix covariance to converge
+        for step in range(120):
+            # Square wave current (alternate charge/discharge)
+            I = 2.0 if (step % 20 < 10) else -2.0
+            
+            # 1RC polarization voltage state update
+            v1 = -a1 * v1_prev + r1_nom * (1.0 + a1) * I
+            v1_prev = v1
+            
+            # Vt - Voc = I*R0 + V1
+            y = I * r0_nom + v1
+            
+            # Step RLS (we assume OCV is 12.0V constant for regression)
+            V_meas = 12.0 + y
+            r0_est, r1_est, c1_est, converged = rls.step(V_meas, I, ocv=12.0)
+            
+        # RLS must converge on healthy parameters and flags converged
+        self.assertTrue(converged)
+        self.assertTrue(0.01 < r0_est < 0.2)
+        self.assertTrue(0.01 < r1_est < 0.2)
+        self.assertTrue(10.0 < c1_est < 10000.0)
+
+    def test_adaptive_ekf(self):
+        """EKF measurement noise covariance must adapt dynamically under high residuals."""
+        ekf = ExtendedKalmanFilter("li_ion", mismatch=1.0, adaptive_r=True)
+        initial_r = ekf.R_meas
+        P = np.eye(3) * 0.01
+        
+        # Step EKF with an anomalous measured voltage to trigger high residual innovation
+        _, _, _, _ = ekf.step(
+            soc=0.8, v1=0.0, v2=0.0, P=P,
+            I_meas=-1.0, V_meas=5.0, dt=1.0, T_meas=25.0
+        )
+        
+        # measurement noise covariance must increase to account for high modeling/sensor discrepancy
+        self.assertNotEqual(ekf.R_meas, initial_r)
+        self.assertGreater(ekf.R_meas, initial_r)
+
+    def test_dynamic_chemistry_registration(self):
+        """Dynamically registered chemistry profiles must be loaded and looked up correctly."""
+        from battery_chemistry import get_chemistry, register_chemistry
+        name = "custom_super_cell"
+        register_chemistry(
+            name=name,
+            nominal_capacity=5.0,
+            R0_nom=0.01,
+            R1_nom=0.005,
+            C1_nom=1000,
+            R2_nom=0.008,
+            C2_nom=3000,
+            thermal_capacitance=100.0,
+            cooling_coefficient=0.4,
+            ocv_table=[(0.0, 3.0), (0.5, 3.7), (1.0, 4.2)],
+            n_cells=1
+        )
+        
+        chem = get_chemistry(name)
+        self.assertEqual(chem.name, name)
+        self.assertEqual(chem.nominal_capacity, 5.0)
+        self.assertEqual(chem.lookup_ocv(0.5), 3.7)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

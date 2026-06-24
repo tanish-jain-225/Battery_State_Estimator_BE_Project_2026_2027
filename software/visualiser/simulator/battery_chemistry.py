@@ -135,3 +135,35 @@ CHEMISTRIES = {
 def get_chemistry(name):
     clean_name = str(name).lower().replace(" ", "_").replace("-", "_")
     return CHEMISTRIES.get(clean_name, LiIon_Chemistry)
+
+def register_chemistry(name, nominal_capacity, R0_nom, R1_nom, C1_nom, R2_nom, C2_nom, thermal_capacitance, cooling_coefficient, ocv_table, n_cells):
+    """
+    Registers a new battery chemistry profile dynamically at runtime.
+    """
+    clean_name = str(name).lower().replace(" ", "_").replace("-", "_")
+    
+    # Validate and structure ocv_table as list of (soc, ocv) tuples
+    formatted_ocv_table = []
+    for pair in ocv_table:
+        if isinstance(pair, (list, tuple)) and len(pair) == 2:
+            formatted_ocv_table.append((float(pair[0]), float(pair[1])))
+    
+    # Sort OCV table by SOC to ensure monotonic lookup behavior
+    formatted_ocv_table.sort(key=lambda x: x[0])
+    
+    chem = BatteryChemistry(
+        name=name,
+        nominal_capacity=float(nominal_capacity),
+        R0_nom=float(R0_nom),
+        R1_nom=float(R1_nom),
+        C1_nom=float(C1_nom),
+        R2_nom=float(R2_nom),
+        C2_nom=float(C2_nom),
+        thermal_capacitance=float(thermal_capacitance),
+        cooling_coefficient=float(cooling_coefficient),
+        ocv_table=formatted_ocv_table,
+        n_cells=int(n_cells)
+    )
+    
+    CHEMISTRIES[clean_name] = chem
+    return chem

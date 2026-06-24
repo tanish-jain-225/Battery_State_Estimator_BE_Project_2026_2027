@@ -75,10 +75,10 @@ int16_t tanh_lut[33];
 int16_t esn_W_in_q15[ESN_N_RESERVOIR][1 + ESN_N_INPUTS];
 int16_t esn_W_res_val_q15[ESN_W_RES_NNZ];
 
-// Initialise lookup table for high-speed integer activation
+// Initialise lookup table for high-speed integer activation (covers 0.0 to 8.0 in steps of 0.25)
 void init_tanh_lut(void) {
     for (int i = 0; i <= 32; i++) {
-        float x = (float)i / 32.0f;
+        float x = (float)i * 0.25f;
         float y = tanhf(x);
         tanh_lut[i] = float_to_q15(y);
     }
@@ -160,43 +160,44 @@ void esn_predict_fixed(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
         u_scaled_q12[i] = float_to_q12(val);
     }
 
-    // 2. Update reservoir states in Q15 format using CSR
-    int16_t arg_q15[ESN_N_RESERVOIR];
+    // 2. Update reservoir states using CSR (sum calculated in Q12 format to allow arg range up to +/- 8.0)
+    int16_t arg_q12[ESN_N_RESERVOIR];
     for (int i = 0; i < ESN_N_RESERVOIR; i++) {
-        // Bias term: W_in_q15[i][0] is in Q15. Bias input is 1.0 (Q12 scale 4096)
-        // (Q15 * Q12) >> 12 = Q15
-        int32_t sum = ((int32_t)esn_W_in_q15[i][0] * 4096) >> 12;
+        // Bias term: W_in_q15[i][0] is in Q15. Bias input is 1.0.
+        // (Q15 * 1.0) in Q12 is (W_in_q15[i][0] * 4096) >> 15 = W_in_q15[i][0] >> 3
+        int32_t sum = ((int32_t)esn_W_in_q15[i][0]) >> 3;
 
         // Input terms: W_in_q15[i][1+j] is in Q15, u_scaled_q12 is in Q12
-        // (Q15 * Q12) >> 12 = Q15
+        // (Q15 * Q12) >> 15 = Q12
         for (int j = 0; j < ESN_N_INPUTS; j++) {
-            sum += ((int32_t)esn_W_in_q15[i][1 + j] * u_scaled_q12[j]) >> 12;
+            sum += ((int32_t)esn_W_in_q15[i][1 + j] * u_scaled_q12[j]) >> 15;
         }
 
         // Reservoir terms: W_res is in Q15, esn_x_q is in Q15
-        // (Q15 * Q15) >> 15 = Q15
+        // (Q15 * Q15) >> 18 = Q12
         uint16_t start = esn_W_res_row_ptr[i];
         uint16_t end = esn_W_res_row_ptr[i + 1];
         for (uint16_t k = start; k < end; k++) {
             uint16_t col_idx = esn_W_res_col[k];
-            sum += ((int32_t)esn_W_res_val_q15[k] * esn_x_q[col_idx]) >> 15;
+            sum += ((int32_t)esn_W_res_val_q15[k] * esn_x_q[col_idx]) >> 18;
         }
         
-        // Clip to avoid overflow before tanh
+        // Clip to avoid overflow of 16-bit signed integer (Q12 limit +/- 8.0)
         if (sum > 32767) sum = 32767;
         if (sum < -32768) sum = -32768;
-        arg_q15[i] = (int16_t)sum;
+        arg_q12[i] = (int16_t)sum;
     }
 
-    // 3. Apply leak rate and tanh activation in Q15:
-    // x_q(t) = (1 - alpha) * x_q(t-1) + alpha * tanh(arg_q15)
+    // 3. Apply leak rate and tanh activation:
+    // x_q(t) = (1 - alpha) * x_q(t-1) + alpha * tanh(arg_q12)
     // ESN_LEAK_RATE is 0.3f, which in Q15 is 9830.
     // 1 - ESN_LEAK_RATE is 0.7f, which in Q15 is 22938.
     int16_t leak_rate_q15 = 9830;
     int16_t one_minus_leak_rate_q15 = 22938;
 
     for (int i = 0; i < ESN_N_RESERVOIR; i++) {
-        int16_t tanh_val = q15_tanh(arg_q15[i]);
+        // arg_q12[i] is in Q12, which represents up to 8.0, and q15_tanh expects Q12 input!
+        int16_t tanh_val = q15_tanh(arg_q12[i]);
         int32_t state_update = ((int32_t)one_minus_leak_rate_q15 * esn_x_q[i]) >> 15;
         state_update += ((int32_t)leak_rate_q15 * tanh_val) >> 15;
         

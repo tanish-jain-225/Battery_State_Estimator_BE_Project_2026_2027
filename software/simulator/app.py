@@ -13,7 +13,7 @@ sys.path.append(base_dir)
 sys.path.append(os.path.dirname(base_dir)) # software
 
 from battery_simulator import BatterySimulator, DriveCycles
-from battery_chemistry import get_chemistry
+from battery_chemistry import get_chemistry, register_chemistry
 from config import Config
 
 # Suppress Flask startup banner and logs
@@ -397,6 +397,50 @@ def home():
 def get_readings():
     sync_simulation_on_demand()
     return jsonify(local_telemetry_buffer)
+
+@app.route('/api/chemistry/register', methods=['POST'])
+def post_register_chemistry():
+    try:
+        data = request.json or {}
+        name = data.get('name')
+        nominal_capacity = data.get('nominal_capacity')
+        R0_nom = data.get('R0_nom')
+        R1_nom = data.get('R1_nom')
+        C1_nom = data.get('C1_nom')
+        R2_nom = data.get('R2_nom')
+        C2_nom = data.get('C2_nom')
+        thermal_capacitance = data.get('thermal_capacitance')
+        cooling_coefficient = data.get('cooling_coefficient')
+        ocv_table = data.get('ocv_table')
+        n_cells = data.get('n_cells', 1)
+        
+        if not name or not nominal_capacity or not ocv_table:
+            return jsonify({'status': 'error', 'message': 'Missing required fields (name, nominal_capacity, ocv_table)'}), 400
+            
+        chem = register_chemistry(
+            name=name,
+            nominal_capacity=nominal_capacity,
+            R0_nom=R0_nom or 0.02,
+            R1_nom=R1_nom or 0.01,
+            C1_nom=C1_nom or 1000,
+            R2_nom=R2_nom or 0.015,
+            C2_nom=C2_nom or 4000,
+            thermal_capacitance=thermal_capacitance or 80.0,
+            cooling_coefficient=cooling_coefficient or 0.25,
+            ocv_table=ocv_table,
+            n_cells=n_cells
+        )
+        return jsonify({
+            'status': 'ok',
+            'message': f"Chemistry '{chem.name}' registered successfully.",
+            'chemistry': {
+                'name': chem.name,
+                'nominal_capacity': chem.nominal_capacity,
+                'n_cells': chem.n_cells
+            }
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/api/status', methods=['GET'])
 def get_status():

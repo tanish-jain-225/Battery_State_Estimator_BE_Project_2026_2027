@@ -17,10 +17,10 @@ _spec.loader.exec_module(_config_mod)
 Config = _config_mod.Config
 
 try:
-    from traditional_estimator import ExtendedKalmanFilter, ResistanceSOH
+    from traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
     from battery_chemistry import get_chemistry
 except ImportError:
-    from simulator.traditional_estimator import ExtendedKalmanFilter, ResistanceSOH
+    from simulator.traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
     from simulator.battery_chemistry import get_chemistry
 
 try:
@@ -65,6 +65,7 @@ class EstimatorPipeline:
         self.chem_obj = get_chemistry(chemistry_name)
         self.ekf = ExtendedKalmanFilter(chemistry_name, mismatch=mismatch)
         self.soh_tracker = ResistanceSOH(chemistry_name)
+        self.rls = RecursiveLeastSquares(dt=1.0)
         
         # Reset internal states
         self.reset()
@@ -87,6 +88,8 @@ class EstimatorPipeline:
         self.esn_soc_state = None
         self.esn_soh_state = None
         self.primed = False
+        
+        self.rls = RecursiveLeastSquares(dt=1.0)
         
         if self.esn_soc is not None:
             self.esn_soc_state = [0.0] * self.esn_soc.n_reservoir
@@ -131,7 +134,14 @@ class EstimatorPipeline:
             'elapsed_time': float(self.elapsed_time),
             'prev_fault_short': bool(getattr(self, 'prev_fault_short', False)),
             'prev_fault_dropout': bool(getattr(self, 'prev_fault_dropout', False)),
-            'prev_fault_thermal': bool(getattr(self, 'prev_fault_thermal', False))
+            'prev_fault_thermal': bool(getattr(self, 'prev_fault_thermal', False)),
+            'rls_r0': float(self.rls.r0),
+            'rls_r1': float(self.rls.r1),
+            'rls_c1': float(self.rls.c1),
+            'rls_converged': bool(self.rls.converged),
+            'rls_steps': int(self.rls.steps),
+            'rls_theta': self.rls.theta.tolist(),
+            'rls_p': self.rls.P.tolist()
         }
 
     def set_state(self, state_dict):
@@ -144,6 +154,7 @@ class EstimatorPipeline:
         self.chem_obj = get_chemistry(self.chemistry_name)
         self.ekf = ExtendedKalmanFilter(self.chemistry_name, mismatch=self.mismatch)
         self.soh_tracker = ResistanceSOH(self.chemistry_name)
+        self.rls = RecursiveLeastSquares(dt=1.0)
         
         self.cc_soc = state_dict.get('cc_soc', 1.0)
         self.ekf_soc = state_dict.get('ekf_soc', 1.0)
@@ -169,6 +180,19 @@ class EstimatorPipeline:
         self.prev_fault_short = state_dict.get('prev_fault_short', False)
         self.prev_fault_dropout = state_dict.get('prev_fault_dropout', False)
         self.prev_fault_thermal = state_dict.get('prev_fault_thermal', False)
+        
+        self.rls.r0 = state_dict.get('rls_r0', 0.075)
+        self.rls.r1 = state_dict.get('rls_r1', 0.045)
+        self.rls.c1 = state_dict.get('rls_c1', 1000.0)
+        self.rls.converged = state_dict.get('rls_converged', False)
+        self.rls.steps = state_dict.get('rls_steps', 0)
+        
+        rls_theta_val = state_dict.get('rls_theta')
+        if rls_theta_val is not None:
+            self.rls.theta = np.array(rls_theta_val)
+        rls_p_val = state_dict.get('rls_p')
+        if rls_p_val is not None:
+            self.rls.P = np.array(rls_p_val)
 
     def prime_esn(self, V_initial, T_initial=25.0, priming_steps=50, selected_indices=None, dataset_dt=0.001, sim_dt=1.0):
         """Run ESN priming steps to populate reservoir memory from initial state"""
@@ -283,17 +307,39 @@ class EstimatorPipeline:
             self.cc_soc = self.cc_soc + (I_meas_ekf * dt) / (self.chem_obj.nominal_capacity * 3600.0)
             self.cc_soc = max(0.0, min(1.0, self.cc_soc))
             
+            # Run RLS Parameter Identification
+            ocv_est = self.chem_obj.lookup_ocv(self.ekf_soc)
+            rls_r0, rls_r1, rls_c1, rls_conv = self.rls.step(V_meas, I_meas_ekf, ocv_est)
+            
+            # Pass RLS parameter estimations to EKF if converged
+            use_rls_r0 = rls_r0 if rls_conv else None
+            use_rls_r1 = rls_r1 if rls_conv else None
+            use_rls_c1 = rls_c1 if rls_conv else None
+
             # Update Resistance SOH FIRST so EKF can use the latest updated SOH
-            self.trad_r0, self.trad_soh = self.soh_tracker.step(
-                self.trad_r0, self.prev_voltage, self.prev_current, V_meas, I_meas_discharge,
-                soc_est=self.ekf_soc, v1=self.ekf_v1, v2=self.ekf_v2, T_meas=T_meas, elapsed_time=self.elapsed_time
-            )
+            if rls_conv:
+                # Invert R0 growth formula to get SOH: R0 = R0_nom * (1 + 1.5 * (1 - SOH))
+                T_c = max(-20.0, min(60.0, T_meas))
+                temp_kelvin = T_c + 273.15
+                temp_ref_kelvin = 25.0 + 273.15
+                temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+                r0_comp = rls_r0 / temp_effect if temp_effect > 0 else rls_r0
+                
+                self.trad_r0 = rls_r0
+                soh_est = 1.0 - ((r0_comp / self.chem_obj.R0_nom) - 1.0) / 1.5
+                self.trad_soh = float(np.clip(soh_est, 0.2, 1.0))
+            else:
+                self.trad_r0, self.trad_soh = self.soh_tracker.step(
+                    self.trad_r0, self.prev_voltage, self.prev_current, V_meas, I_meas_discharge,
+                    soc_est=self.ekf_soc, v1=self.ekf_v1, v2=self.ekf_v2, T_meas=T_meas, elapsed_time=self.elapsed_time
+                )
             
             # Update EKF dynamically adjusting parameters with T_meas and SOH
             t_ekf_start = time.perf_counter()
             self.ekf_soc, self.ekf_v1, self.ekf_v2, self.ekf_p = self.ekf.step(
                 self.ekf_soc, self.ekf_v1, self.ekf_v2, self.ekf_p,
-                I_meas_ekf, V_meas, dt, T_meas=T_meas, soh_est=self.trad_soh
+                I_meas_ekf, V_meas, dt, T_meas=T_meas, soh_est=self.trad_soh,
+                rls_r0=use_rls_r0, rls_r1=use_rls_r1, rls_c1=use_rls_c1
             )
             ekf_time = (time.perf_counter() - t_ekf_start) * 1000.0 # ms
 
@@ -469,5 +515,9 @@ class EstimatorPipeline:
             'esn_soe': esn_soe,
             'ekf_rul_cycles': ekf_rul_cycles,
             'esn_rul_cycles': esn_rul_cycles,
-            'energy_remaining_wh': energy_remaining_wh
+            'energy_remaining_wh': energy_remaining_wh,
+            'rls_r0': float(self.rls.r0),
+            'rls_r1': float(self.rls.r1),
+            'rls_c1': float(self.rls.c1),
+            'rls_converged': bool(self.rls.converged)
         }

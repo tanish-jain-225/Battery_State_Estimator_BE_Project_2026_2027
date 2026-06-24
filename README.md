@@ -1,458 +1,222 @@
-````markdown
-# BE Capstone Project
+# Advanced Edge & Cyber-Physical Battery State Estimator
 
-## Project Title
+A state-of-the-art cyber-physical platform combining high-fidelity electro-thermal battery simulations, traditional state observers (Extended Kalman Filter & Coulomb Counting), and modern data-driven machine learning (**Reservoir Computing / Echo State Networks**) to estimate battery states in real time.
 
-**Write the full title of your project here**
-
----
-
-## Team Details
-
-| Sr. No. | Name of Student | Roll No. | Branch | Email ID |
-|---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
+This project is fully modular and comprises independent edge hardware firmware and software simulation/monitoring modules.
 
 ---
 
-## Guide Details
-
-**Project Guide:**  
-**Department:** Automation and Robotics  
-**Institute:** VESIT, Mumbai  
-
----
-
-## Problem Statement
-
-Write a clear problem statement here.
-
-Example:
-
-> The aim of this project is to design and develop a system that solves the problem of __________ by using __________ technology.
-
----
-
-## Abstract
-
-Write a short summary of the project in 150–250 words.
-
-The abstract should include:
-
-- Background of the problem
-- Proposed solution
-- Technology used
-- Expected outcome
-- Application area
-
----
-
-## Objectives
-
-1. To study the existing problem and available solutions.
-2. To design a suitable hardware/software/system architecture.
-3. To implement the proposed solution.
-4. To test and validate the system.
-5. To document and publish the project work.
-
----
-
-## Scope of the Project
-
-Mention what the project will cover.
-
-Example:
-
-- Design and development of prototype
-- Hardware implementation
-- Software/mobile/web interface
-- Data collection and testing
-- Performance analysis
-
----
-
-## Existing System
-
-Describe the currently available system or method.
-
-Mention its limitations:
-
-- High cost
-- Low accuracy
-- Manual process
-- Lack of automation
-- Poor scalability
-- Limited accessibility
-
----
-
-## Proposed System
-
-Describe your proposed solution.
-
-Include:
-
-- Main idea
-- How it works
-- Major components
-- Expected benefits
-
----
-
-## System Architecture
-
-Add block diagram or system architecture image here.
-
-```markdown
-![System Architecture](images/system_architecture.png)
-````
-
-Briefly explain the architecture.
-
----
-
-## Hardware Requirements
-
-| Sr. No. | Component | Specification | Quantity | Purpose |
-| ------- | --------- | ------------- | -------- | ------- |
-| 1       |           |               |          |         |
-| 2       |           |               |          |         |
-| 3       |           |               |          |         |
-| 4       |           |               |          |         |
-
----
-
-## Software Requirements
-
-| Sr. No. | Software / Tool | Version | Purpose |
-| ------- | --------------- | ------- | ------- |
-| 1       |                 |         |         |
-| 2       |                 |         |         |
-| 3       |                 |         |         |
-
----
-
-## Technologies Used
-
-Mention technologies used in the project.
-
-Example:
-
-* Embedded C / Python / JavaScript
-* Arduino / STM32 / ESP32 / Raspberry Pi
-* ROS / MATLAB / Simulink
-* Machine Learning / Computer Vision
-* IoT / Cloud / Mobile App
-* PCB Design / CAD Design
-
----
-
-## Methodology
-
-Explain the step-by-step approach.
-
-1. Literature survey
-2. Problem identification
-3. Requirement analysis
-4. System design
-5. Hardware/software development
-6. Integration
-7. Testing and validation
-8. Documentation and publication
-
----
-
-## Project Timeline
-
-| Week / Month | Task Planned          | Status                            |
-| ------------ | --------------------- | --------------------------------- |
-| Week 1       | Problem finalization  | Pending / In Progress / Completed |
-| Week 2       | Literature survey     |                                   |
-| Week 3       | Requirement analysis  |                                   |
-| Week 4       | System design         |                                   |
-| Week 5       | Prototype development |                                   |
-| Week 6       | Testing               |                                   |
-| Week 7       | Documentation         |                                   |
-| Week 8       | Paper writing         |                                   |
-
----
-
-## Weekly Progress Updates
-
-Students must update this section every week.
-
-| Week   | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | GitHub Commit Link |
-| ------ | ---- | -------------- | -------------------------- | ------------------- | ------------------ |
-| Week 1 |      |                |                            |                     |                    |
-| Week 2 |      |                |                            |                     |                    |
-| Week 3 |      |                |                            |                     |                    |
-| Week 4 |      |                |                            |                     |                    |
-| Week 5 |      |                |                            |                     |                    |
-| Week 6 |      |                |                            |                     |                    |
-| Week 7 |      |                |                            |                     |                    |
-| Week 8 |      |                |                            |                     |                    |
-
----
-
-## Design Files
-
-Upload and link all design files here.
-
-| File Type       | File Name / Link | Description |
-| --------------- | ---------------- | ----------- |
-| CAD Model       |                  |             |
-| Circuit Diagram |                  |             |
-| PCB Design      |                  |             |
-| Flowchart       |                  |             |
-| Simulation File |                  |             |
-
----
-
-## Circuit Diagram
-
-Add circuit diagram image here.
-
-```markdown
-![Circuit Diagram](images/circuit_diagram.png)
+## 🏗️ System Architecture & Modularity
+
+The system is split into three decoupled components that communicate via standard web APIs, databases, or serial links:
+
+```mermaid
+graph TD
+    subgraph Hardware ["Edge Hardware Subsystem (C99 / STM32)"]
+        FW[STM32 Edge Firmware]
+        FW_LUT[Q15 Fixed-Point LUT Tanh]
+        FW_CSR[CSR Sparse SpMV]
+        FW_LED[GPIO PA5 State LED]
+        FW_UART[UART telemetry COM]
+    end
+
+    subgraph Software_Simulator ["Physics Simulator (Flask - Port 8000)"]
+        Sim[2RC Equivalent Circuit Model]
+        Sim_Deg[Capacity Fade SOH Degradation]
+        Sim_Temp[Coupled Thermal Model]
+        Sim_Noise[Sensor Noise & Fault Injector]
+    end
+
+    subgraph Software_Visualiser ["Visualiser Dashboard (Flask - Port 5000)"]
+        Vis_UI[Glassmorphic Operator Console]
+        Vis_EKF[Extended Kalman Filter]
+        Vis_CC[Coulomb Counting Estimator]
+        Vis_ESN[Echo State Network Inference]
+    end
+
+    subgraph DB ["Database (MongoDB / RAM Fallback)"]
+        Mongo[(MongoDB)]
+    end
+
+    %% Communications
+    Sim -- Telemetry Readings --> Mongo
+    Mongo -- Cached State --> Vis_UI
+    Vis_UI -- REST API Control --> Sim
+    FW -- UART Telemetry Stream --> Sim
+    FW -- Output Alerts --> FW_LED
 ```
 
----
+### 1. Edge Hardware Diagnostics (`hardware/`)
+- A highly optimized C99 implementation designed for low-power microcontrollers (ARM Cortex-M core).
+- Implements a sparse reservoir Echo State Network (ESN) classifier executing at the edge.
+- **High-Performance Math Options**:
+  - **Floating-Point Path**: High-precision inference using hardware FPU.
+  - **Q15 Fixed-Point Path**: Pure integer implementation for low-cost microcontrollers lacking an FPU. Uses a 33-point lookup table with linear interpolation for high-speed `tanh` approximations, and CSR (Compressed Sparse Row) sparse matrix multiplication (achieving a **6.7× speedup**).
+- Drives visual alerts via GPIO (`PA5` LED) indicating battery state: **NORMAL** (LED Off), **WARNING** (LED Blinking at 20Hz), **CRITICAL** (LED Solid On).
 
-## Flowchart / Algorithm
+### 2. Standalone Physics Simulator (`software/simulator/`)
+- A Python Flask service (running on Port `8000` by default) modeling real-world cell physics.
+- **Equivalent Circuit Model**: First-order ECM with 2RC branches simulating slow/fast polarization diffusion.
+- **Degradation & Aging**: Models capacity fade and ohmic resistance growth based on temperature (Arrhenius equation) and current load. Toggling **Accelerated Aging** scales degradation by $1500\times$ for rapid testing.
+- **Fault Injector**: Supports remote fault injection (Thermal Runaway, Sensor Dropout, Micro-Short Circuit) via API to test diagnostic safety loops.
 
-Add flowchart image here.
-
-```markdown
-![Flowchart](images/flowchart.png)
-```
-
-### Algorithm
-
-1. Start
-2. Initialize the system
-3. Read input from sensors/user
-4. Process the data
-5. Generate output/control action
-6. Display/store/transmit result
-7. Stop
-
----
-
-## Implementation Details
-
-Explain the actual implementation of the project.
-
-### Hardware Implementation
-
-Write details about connections, components, power supply, sensors, actuators, PCB, enclosure, etc.
-
-### Software Implementation
-
-Write details about code structure, libraries used, algorithms, communication protocols, database, app, cloud, etc.
+### 3. Operator Comparative Dashboard (`software/visualiser/`)
+- A Flask-based glassmorphic comparison console (running on Port `5000` by default).
+- Compares traditional estimators (**Extended Kalman Filter** for SOC, temperature-compensated observers for SOH) side-by-side with data-driven **Echo State Network (Reservoir Computing)** models against the **True Physical Ground Truth** generated by the simulator.
+- **Stateless/Serverless Mode**: Fully compliant with Vercel deployment requirements. If the standalone simulator server is offline, the visualiser runs the physics engine locally on-demand based on elapsed real-world time and hydrates state variables from MongoDB or memory.
 
 ---
 
-## Code Structure
+## 📂 Repository Structure
 
 ```text
-BE-Capstone-Project/
+Battery_State_Estimator_BE_Project_2026_2027/
+├── README.md                      # [THIS FILE] Unified project documentation
+├── docs/                          # Project specifications and literature survey
+│   ├── literature_survey.md       # Equations, state observers, and ESN theory
+│   └── system_specification.md    # Pin mappings, schemas, and API documentation
 │
-├── README.md
-├── docs/
-│   ├── literature_survey.md
-│   ├── project_report.pdf
-│   └── presentation.pptx
+├── hardware/                      # STM32 C Firmware & Python training scripts
+│   ├── main.c                     # Edge ESN firmware & C simulation entry point
+│   ├── main.h                     # Mock definitions for desktop compiling
+│   ├── train.py                   # Core ESN Python class
+│   ├── train_classifier.py        # Offline classifier training pipeline
+│   ├── train_estimator.py         # Offline estimator training pipeline
+│   ├── esn_classifier_weights.h   # CSR-optimized weights for edge classification
+│   ├── esn_estimator_weights.h    # Dense weights for edge estimators
+│   ├── original_ev_battery_dataset_multiclass.csv # EV time-series dataset
+│   └── run_c_simulator.bat/.sh    # Platform scripts to compile/test main.c
 │
-├── hardware/
-│   ├── circuit_diagram.png
-│   ├── pcb_design/
-│   └── cad_model/
-│
-├── software/
-│   ├── src/
-│   ├── include/
-│   └── tests/
-│
-├── images/
-│   ├── system_architecture.png
-│   ├── prototype_photo.jpg
-│   └── results.png
-│
-└── references/
-    └── papers/
+└── software/                      # Software simulation & comparative visualizer
+    ├── simulator/                 # Standalone physics engine server (Port 8000)
+    │   ├── app.py                 # Flask server and simulation loops
+    │   ├── battery_simulator.py   # ECM cell equations & drive cycles (UDDS/US06)
+    │   └── traditional_estimator.py # EKF observer & SOH resistance tracker
+    │
+    └── visualiser/                # Comparative dashboard server (Port 5000)
+        ├── app.py                 # Dashboard server with local simulator fallback
+        ├── config.py              # Visualiser hyperparameters & database configurations
+        ├── model_rc.pkl           # Pickled pre-trained ESN SOC/SOH model package
+        ├── vercel.json            # Vercel serverless compliance configurations
+        ├── datasets/              # Dataset files for comparative retraining
+        ├── training/              # ESN training scripts & feature extraction
+        └── tests/                 # Unit tests for estimators, physics, and filters
 ```
 
 ---
 
-## How to Run the Project
+## ⚡ Setup & Execution Guide
 
-### Step 1: Clone the Repository
-
+### 1. Prerequisites
+Ensure you have Python 3.8+ installed. Install the required Python packages:
 ```bash
-git clone https://github.com/username/project-name.git
+pip install -r software/visualiser/requirements.txt
 ```
+*(Optional) Start a local MongoDB service on Port 27017. If MongoDB is not running, the system automatically falls back to secure in-memory/RAM arrays for logging telemetry.*
 
-### Step 2: Install Dependencies
+### 2. Running Locally (Segregated Mode)
+In this configuration, the simulator handles physics, and the visualizer handles observers and the frontend dashboard.
 
+1. **Start the Simulator Server**:
+   ```bash
+   python software/simulator/app.py
+   ```
+   *The simulator will start on `http://localhost:8000`.*
+
+2. **Start the Visualiser Server**:
+   ```bash
+   python software/visualiser/app.py
+   ```
+   *The dashboard will start on `http://localhost:5000`.*
+
+3. Open `http://localhost:5000` in your browser. The dashboard will automatically detect the simulator on Port 8000 and stream comparative charts in real time.
+
+### 3. Running Locally (Standalone Mode)
+If you want to run the visualiser on its own without running the simulator server:
+- Simply start the visualiser (`python software/visualiser/app.py`).
+- The dashboard will detect that Port 8000 is offline, transition the "Sim Service" badge to `Offline`, and fall back to its internal simulator thread to run calculations locally.
+
+### 4. Running the Edge C Simulator
+You can compile and run the STM32 edge diagnostic code directly on your local computer to verify compilation and reservoir outputs:
+- **Windows**:
+  Run the batch script:
+  ```bash
+  hardware/run_c_simulator.bat
+  ```
+- **Unix / macOS / Linux**:
+  Make the shell script executable and run:
+  ```bash
+  chmod +x hardware/run_c_simulator.sh
+  hardware/run_c_simulator.sh
+  ```
+To toggle between floating-point and Q15 fixed-point execution, modify line 51 of `hardware/main.c`:
+- `#define ESN_FIXED_POINT 0` for floating point.
+- `#define ESN_FIXED_POINT 1` for fixed point (integer arithmetic).
+
+---
+
+## ☁️ Independent Production Deployment
+
+Both software components are fully decoupled and can be deployed to separate hosts in production.
+
+### A. Deploying the Simulator (e.g., Render)
+1. Deploy `software/simulator` as a Web Service.
+2. Set the build command to:
+   ```bash
+   pip install -r software/simulator/requirements.txt
+   ```
+3. Set the start command to:
+   ```bash
+   gunicorn --bind 0.0.0.0:$PORT --chdir software/simulator app:app --timeout 120
+   ```
+4. Expose the environment variable:
+   - `PORT=8000` (or leave it to Render's default).
+
+### B. Deploying the Visualiser (e.g., Vercel / Render)
+1. Deploy `software/visualiser` as a Web Service.
+2. Set the build command to:
+   ```bash
+   pip install -r software/visualiser/requirements.txt
+   ```
+3. Set the start command to:
+   ```bash
+   gunicorn --bind 0.0.0.0:$PORT --chdir software/visualiser app:app --timeout 120
+   ```
+4. Expose the environment variables:
+   - `SIMULATOR_URL`: The public URL of your deployed simulator service (e.g., `https://battery-simulator.onrender.com`).
+   - `MONGODB_URI`: Connection string to your production database (e.g., MongoDB Atlas).
+
+*Note: For Vercel, the `vercel.json` file in `software/visualiser` handles serverless configuration automatically. Simply hook the repository up to Vercel and direct the root directory to `software/visualiser`.*
+
+---
+
+## 🧠 Training & Exporting ESN Models
+
+If you wish to retrain the models on new datasets:
+
+### Retraining Visualiser ESN:
 ```bash
-pip install -r requirements.txt
+python software/visualiser/training/train_rc.py
 ```
+This trains the SOC and SOH ESNs on the CSV dataset under `datasets/` and saves the serialized models to `model_rc.pkl`.
 
-or mention specific software/library installation steps.
-
-### Step 3: Upload / Run the Code
-
+### Retraining Edge ESN Classifier:
 ```bash
-python main.py
+python hardware/train_classifier.py
 ```
+This trains the 3-state temperature classifier and generates the header file `hardware/esn_classifier_weights.h` using CSR sparse compression.
 
-or
-
+### Retraining Edge ESN Estimators:
 ```bash
-arduino-cli upload -p COMx --fqbn board_name
+python hardware/train_estimator.py
 ```
-
-### Step 4: Observe the Output
-
-Mention the expected output of the project.
+This trains the dense SOC and SOH estimators and generates the header file `hardware/esn_estimator_weights.h`.
 
 ---
 
-## Testing and Results
-
-| Test No. | Test Description | Expected Result | Actual Result | Status      |
-| -------- | ---------------- | --------------- | ------------- | ----------- |
-| 1        |                  |                 |               | Pass / Fail |
-| 2        |                  |                 |               | Pass / Fail |
-| 3        |                  |                 |               | Pass / Fail |
-
----
-
-## Result Images / Videos
-
-Add images or videos of the working prototype.
-
-```markdown
-![Prototype](images/prototype_photo.jpg)
+## 🛠️ Verification & Test Suite
+To verify the observers, equivalent circuit models, and ESN quantization operations:
+```bash
+python -m unittest software/visualiser/tests/test_estimators.py
 ```
-
-Video Link:
-
-```markdown
-[Project Demo Video](https://drive.google.com/your-video-link)
-```
-
----
-
-## Applications
-
-Mention real-world applications of the project.
-
-1.
-2.
-3.
-4.
-
----
-
-## Advantages
-
-1.
-2.
-3.
-4.
-
----
-
-## Limitations
-
-1.
-2.
-3.
-4.
-
----
-
-## Future Scope
-
-Mention possible improvements.
-
-1.
-2.
-3.
-4.
-
----
-
-## Research Paper / Publication
-
-| Item                      | Details                                                   |
-| ------------------------- | --------------------------------------------------------- |
-| Paper Title               |                                                           |
-| Conference / Journal Name |                                                           |
-| Paper Status              | Not Started / Drafting / Submitted / Accepted / Published |
-| Submission Date           |                                                           |
-| Paper Link                |                                                           |
-
----
-
-## References
-
-Add references in IEEE format.
-
-Example:
-
-```text
-[1] A. Author, B. Author, "Title of the Paper," Journal/Conference Name, vol. X, no. Y, pp. xx-yy, Year.
-[2] Datasheet / Website / Book reference.
-```
-
----
-
-## Repository Update Guidelines
-
-Each student team must update the GitHub repository regularly.
-
-Minimum expected updates:
-
-* Update README every week.
-* Push code changes regularly.
-* Upload circuit diagrams, CAD files, PCB files, reports and presentations.
-* Add weekly progress in the progress table.
-* Maintain proper folder structure.
-* Do not upload unnecessary temporary files.
-* Each major update should have a meaningful commit message.
-
-Example commit messages:
-
-```text
-Added problem statement and objectives
-Updated system architecture diagram
-Added sensor interfacing code
-Updated weekly progress for Week 3
-Added testing results and prototype images
-```
-
----
-
-## Declaration
-
-We declare that this project work is carried out by our team as part of the BE Capstone Project. The work will be regularly updated on GitHub and all references used will be properly cited.
-
----
-
-## License
-
-This project is for academic use only.
-
-Optional:
-
-```text
-MIT License / Creative Commons / Institute Use Only
-```
-
-```
-```
+All 40 assertions in the test suite validate numerical accuracy and system integrity.
