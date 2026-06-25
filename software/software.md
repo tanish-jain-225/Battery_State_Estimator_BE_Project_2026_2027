@@ -3,8 +3,8 @@
 A comprehensive cyber-physical battery evaluation and monitoring system combining high-fidelity electro-thermal simulations, traditional state observers, and data-driven Machine Learning (ML).
 
 The project is structured into two modular, independent components that run in a synchronized loop:
-1. [Simulator Server](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/simulator.md): A standalone physics engine on Port 8000 that models cell behavior, noise, and faults.
-2. [Visualiser Dashboard](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/visualiser.md): A Flask-based interactive comparative dashboard on Port 5000 that runs EKF & ESN estimators.
+1. [Simulator Server](simulator/simulator.md): A standalone physics engine on Port 8000 that models cell behavior, noise, and faults.
+2. [Visualiser Dashboard](visualiser/visualiser.md): A Flask-based interactive comparative dashboard on Port 5000 that runs EKF & ESN estimators.
 
 ---
 
@@ -26,7 +26,7 @@ The standalone simulator handles physics, and the visualizer handles estimators 
 ```
 
 ### 2. Standalone / Serverless Mode
-If the simulator server is offline, the Visualizer acts serverlessly. It loads historical parameters from the database, catches up on simulator ticks locally on-demand based on elapsed time, and runs the estimation pipeline in a stateless execution loop (100% compliant with Vercel serverless functions).
+If the simulator server is offline, the Visualizer acts serverlessly. It loads historical parameters from the database, catches up on simulator ticks locally on-demand based on elapsed time, and runs the estimation pipeline in a stateless execution loop (100% compliant with serverless and stateless execution environments).
 
 ---
 
@@ -34,23 +34,22 @@ If the simulator server is offline, the Visualizer acts serverlessly. It loads h
 
 The `software` directory contains the following components:
 
-- **[software.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/software.md)**: Main architecture overview and running instructions.
-- **[simulator/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/)**: Standalone battery cell physics simulation server (Port 8000).
-  - [app.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/app.py): Flask simulator server with background thread loop.
-  - [config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/config.py): Private database, server, noise, and fault configurations.
-  - [battery_simulator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_simulator.py): 2RC ECM electro-thermal physics and drive cycle profiles.
-  - [battery_chemistry.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_chemistry.py): NMC, LFP, and Lead-Acid OCV lookup tables.
-  - [traditional_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/traditional_estimator.py): Physics-based EKF and SOH tracker.
-  - [estimator_pipeline.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/estimator_pipeline.py): Orchestrates EKF, CC, and ESN estimators with diagnostics.
-- **[visualiser/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/)**: Flask interactive comparative dashboard (Port 5000).
-  - [app.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/app.py): Flask visualizer backend with local simulation fallback.
-  - [config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/config.py): Visualizer configs, ESN hyperparameters, and noise thresholds.
-  - [vercel.json](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/vercel.json): Vercel Serverless deployment and file inclusion rules.
-  - [model_rc.pkl](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/model_rc.pkl): Pre-trained Echo State Network weights.
-  - [datasets/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/datasets/): Time-series datasets used for ESN model training.
-  - [training/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/): ESN training scripts and feature extraction functions.
-  - [simulator/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/simulator/): Replicated core physics and estimators for standalone serverless mode.
-  - [tests/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/tests/): Unit tests for physics engine, observers, and ESN predictions.
+- **[software.md](software.md)**: Main architecture overview and running instructions.
+- **[simulator/](simulator/)**: Standalone battery cell physics simulation server (Port 8000).
+  - [app.py](simulator/app.py): Flask simulator server with background thread loop.
+  - [config.py](simulator/config.py): Private database, server, noise, and fault configurations.
+  - [battery_simulator.py](simulator/battery_simulator.py): 2RC ECM electro-thermal physics and drive cycle profiles.
+  - [battery_chemistry.py](simulator/battery_chemistry.py): NMC, LFP, and Lead-Acid OCV lookup tables.
+  - [traditional_estimator.py](simulator/traditional_estimator.py): Physics-based EKF and SOH tracker.
+  - [estimator_pipeline.py](simulator/estimator_pipeline.py): Orchestrates EKF, CC, and ESN estimators with diagnostics.
+- **[visualiser/](visualiser/)**: Flask interactive comparative dashboard (Port 5000).
+  - [app.py](visualiser/app.py): Flask visualizer backend with local simulation fallback.
+  - [config.py](visualiser/config.py): Visualizer configs, ESN hyperparameters, and noise thresholds.
+  - [model_rc.pkl](visualiser/model_rc.pkl): Pre-trained Echo State Network weights.
+  - [datasets/](visualiser/datasets/): Time-series datasets used for ESN model training.
+  - [training/](visualiser/training/): ESN training scripts and feature extraction functions.
+  - [simulator/](visualiser/simulator/): Replicated core physics and estimators for standalone serverless mode.
+  - [tests/](visualiser/tests/): Unit tests for physics engine, observers, and ESN predictions.
 
 ---
 

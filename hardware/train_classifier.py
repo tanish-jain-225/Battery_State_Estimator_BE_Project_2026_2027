@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import os
 from train import EchoStateNetwork
+from config import Config
 
-# Load the original multiclass dataset
-base_dir = os.path.dirname(os.path.abspath(__file__))
-csv_path = os.path.join(base_dir, "original_ev_battery_dataset_multiclass.csv")
+# Load the multiclass dataset from configuration path
+csv_path = Config.CSV_PATH
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"Dataset not found at {csv_path}")
 
@@ -15,19 +15,19 @@ df = pd.read_csv(csv_path)
 # Extract features: Voltage, Current, Temperature
 U = df[['Voltage', 'Current', 'Temperature']].values
 
-# Programmatically generate State label based on data_set.m thresholds
+# Programmatically generate State label based on config thresholds
 T = df['Temperature'].values
 labels = np.zeros(len(T), dtype=int)
 for i in range(len(T)):
-    if T[i] < 35:
+    if T[i] < Config.TEMP_NORMAL_MAX:
         labels[i] = 0  # Normal
-    elif T[i] < 45:
+    elif T[i] < Config.TEMP_WARNING_MAX:
         labels[i] = 1  # Warning
     else:
         labels[i] = 2  # Critical
 
 # One-hot encode the target states (3 classes)
-n_classes = 3
+n_classes = Config.ESN_N_OUTPUTS
 Y = np.zeros((len(labels), n_classes))
 for i in range(len(labels)):
     Y[i, labels[i]] = 1.0
@@ -44,21 +44,21 @@ print(f"  Current: mean={input_means[1]:.4f}, std={input_stds[1]:.4f}")
 print(f"  Temperature: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
 
 # Train the ESN Classifier
-n_inputs = 3
-n_reservoir = 50
-n_outputs = 3
-washout = 50
+n_inputs = Config.ESN_N_INPUTS
+n_reservoir = Config.ESN_N_RESERVOIR
+n_outputs = Config.ESN_N_OUTPUTS
+washout = Config.ESN_WASHOUT
 
 print(f"Training ESN Classifier (n_reservoir={n_reservoir}, washout={washout})...")
 esn = EchoStateNetwork(
     n_inputs=n_inputs,
     n_reservoir=n_reservoir,
     n_outputs=n_outputs,
-    spectral_radius=0.95,
-    leak_rate=0.3,
-    input_scaling=1.0,
-    ridge_param=1e-4,
-    sparsity=0.85
+    spectral_radius=Config.ESN_SPECTRAL_RADIUS,
+    leak_rate=Config.ESN_LEAK_RATE,
+    input_scaling=Config.ESN_INPUT_SCALING,
+    ridge_param=Config.ESN_RIDGE_PARAM,
+    sparsity=Config.ESN_SPARSITY
 )
 
 esn.train(U_scaled, Y, washout=washout)
@@ -71,8 +71,8 @@ pred_labels = np.argmax(predictions, axis=1)
 acc = np.mean(pred_labels[washout:] == labels[washout:])
 print(f"Training Accuracy (post-washout): {acc*100.0:.2f}%")
 
-# Generate the esn_classifier_weights.h header file
-header_path = os.path.join(base_dir, "esn_classifier_weights.h")
+# Generate the C header file containing weights
+header_path = Config.WEIGHTS_HEADER
 print(f"Writing weights to {header_path}...")
 
 def to_csr(matrix):
@@ -133,7 +133,7 @@ with open(header_path, "w") as f:
     f.write(f"#define ESN_N_INPUTS {n_inputs}\n")
     f.write(f"#define ESN_N_RESERVOIR {n_reservoir}\n")
     f.write(f"#define ESN_N_OUTPUTS {n_outputs}\n")
-    f.write(f"#define ESN_LEAK_RATE 0.3f\n\n")
+    f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.1f}f\n\n")
     
     write_array_1d(f, "esn_input_means", input_means)
     write_array_1d(f, "esn_input_stds", input_stds)
@@ -152,4 +152,3 @@ with open(header_path, "w") as f:
     f.write("#endif // ESN_CLASSIFIER_WEIGHTS_H\n")
 
 print(f"Successfully generated {header_path}!")
-

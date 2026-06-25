@@ -5,10 +5,6 @@
 .env.test.local
 .env.production.local
 
-
-# ── Vercel Deployment Secrets & Cache ─────────────────────────
-.vercel/
-
 # ── Python Bytecode & Cache ───────────────────────────────────
 __pycache__/
 *.pyc

@@ -76,7 +76,7 @@ The simulator functions as a self-contained cyber-physical generator:
 - Uses dynamic sleep timers calculated relative to `Config.SIMULATION_STEP_DELAY` to guarantee real-time execution pacing.
 
 ### 2. On-Demand Catch-up (`sync_simulation_on_demand`)
-- Designed for serverless environments (e.g. Vercel) where background threads are disabled.
+- Designed for serverless environments where background threads are disabled.
 - Evaluates the real-world time elapsed since the last API poll.
 - Steps the physics simulation dynamically by the required number of ticks (capped to avoid lockups) to catch up, maintaining stateless consistency.
 
@@ -84,14 +84,14 @@ The simulator functions as a self-contained cyber-physical generator:
 
 ## 🔋 Electro-Thermal & Degradation Physics
 
-Implemented in [battery_simulator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_simulator.py).
+Implemented in [battery_simulator.py](battery_simulator.py).
 
 ### 1. Equivalent Circuit Model (ECM)
 The cell voltage drop utilizes a 2RC transient branch framework:
 $$V_{\text{terminal}} = V_{\text{OCV}}(SOC) + I \cdot R_0 + V_1 + V_2$$
 
 Where:
-- $V_{\text{OCV}}$ is OCV lookup from [battery_chemistry.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_chemistry.py).
+- $V_{\text{OCV}}$ is OCV lookup from [battery_chemistry.py](battery_chemistry.py).
 - $I$ is external current ($I > 0$ for charging, $I < 0$ for discharging).
 - $R_0$ is internal ohmic resistance (grows with aging).
 - $V_1, V_2$ model the slow and fast diffusion voltages:
@@ -173,7 +173,7 @@ Exposes the raw history of measured telemetry records stored in buffer.
 
 ## ⚙️ Configuration & Tuning Parameters
 
-Settings are declared in [config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/config.py):
+Settings are declared in [config.py](config.py):
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |

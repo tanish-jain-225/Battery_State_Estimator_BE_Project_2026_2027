@@ -16,7 +16,7 @@ An end-to-end Python, Machine Learning, and Flask-based Battery State Estimator 
 9. [Configuration & Tuning Parameters](#-configuration--tuning-parameters)
 10. [UI/UX Interface & Interactive Elements](#-uiux-interface--interactive-elements)
 11. [Setup & Running Instructions](#-setup--running-instructions)
-12. [Vercel Serverless Compliance](#-vercel-serverless-compliance)
+12. [Serverless Compliance](#serverless-compliance)
 
 ---
 
@@ -40,17 +40,16 @@ This dashboard provides an evaluation sandbox to compare EKF and ESN estimators 
 
 The visualizer's code and assets are organized as follows:
 
-| **[app.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/app.py)** | Main web server Flask application. Exposes endpoints for controls and telemetry, handles local catch-up simulation cycles, and manages background retraining threads. |
-| **[config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/config.py)** | Application configurations, ESN hyperparameters, noise thresholds, fault injection rules, and database connection settings. |
-| **[vercel.json](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/vercel.json)** | Vercel deployment configurations, lambda size tuning, and file inclusions for serverless deployments. |
-| **[requirements.txt](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/requirements.txt)** | Python package dependencies for serverless executions, dashboard observers, and neural network calculations. |
-| **[model_rc.pkl](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/model_rc.pkl)** | Pickled pre-trained ESN model package (contains weights for SOC & SOH estimators, alongside feature normalization factors). |
-| **[datasets/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/datasets/)** | Time-series datasets (Voltage, Current, Temp, SOC, SOH) used to train the Reservoir ML estimators. |
-| **[training/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/)** | Offline ESN model training scripts and online/offline feature engineering extraction routines. |
-| **[simulator/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/simulator/)** | Subsystem representing equivalent circuit physics modeling, EKF observers, SOH observers, and unified estimation pipelines. |
-| **[static/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
-| **[templates/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[tests/](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability, and ESN quantization mappings. |
+| **[app.py](app.py)** | Main web server Flask application. Exposes endpoints for controls and telemetry, handles local catch-up simulation cycles, and manages background retraining threads. |
+| **[config.py](config.py)** | Application configurations, ESN hyperparameters, noise thresholds, fault injection rules, and database connection settings. |
+| **[requirements.txt](requirements.txt)** | Python package dependencies for database connection, dashboard observers, and neural network calculations. |
+| **[model_rc.pkl](model_rc.pkl)** | Pickled pre-trained ESN model package (contains weights for SOC & SOH estimators, alongside feature normalization factors). |
+| **[datasets/](datasets/)** | Time-series datasets (Voltage, Current, Temp, SOC, SOH) used to train the Reservoir ML estimators. |
+| **[training/](training/)** | Offline ESN model training scripts and online/offline feature engineering extraction routines. |
+| **[simulator/](simulator/)** | Subsystem representing equivalent circuit physics modeling, EKF observers, SOH observers, and unified estimation pipelines. |
+| **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
+| **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
+| **[tests/](tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability, and ESN quantization mappings. |
 
 ---
 
@@ -90,7 +89,7 @@ The platform utilizes a hybrid architecture: a Python simulation engine, a docum
 
 ## 🔋 Deep Dive: Battery Physics Simulator
 
-Located in **[battery_simulator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/simulator/battery_simulator.py)**. It models a **3S (3 Cells in Series)** pack (or 6S for Lead-Acid) using a **first-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
+Located in **[battery_simulator.py](simulator/battery_simulator.py)**. It models a **3S (3 Cells in Series)** pack (or 6S for Lead-Acid) using a **first-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
 
 ### 1. Electrical Model Dynamics
 The terminal voltage is calculated using:
@@ -121,7 +120,7 @@ The internal ohmic resistance increases as capacity fades:
 $$R_0(t) = R_{0,\text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - SOH)\right]$$
 
 ### 4. Chemistry Models
-Configurations are stored in **[battery_chemistry.py](file:///d:/_Deployed_Projects_Vercel/major_project/software/visualiser/simulator/battery_chemistry.py)**:
+Configurations are stored in **[battery_chemistry.py](simulator/battery_chemistry.py)**:
 - **NMC (Lithium Nickel Manganese Cobalt Oxide)**: Nominal 11.1V (3S), 2.5 Ah capacity. Standard curve.
 - **LFP (Lithium Iron Phosphate)**: Nominal 9.6V (3S), 3.0 Ah capacity. Extremely flat OCV curve between 20% and 80% SOC.
 - **Lead-Acid**: Nominal 12.0V (6S), 7.0 Ah capacity. High internal resistance, heavy thermal mass.
@@ -130,7 +129,7 @@ Configurations are stored in **[battery_chemistry.py](file:///d:/_Deployed_Proje
 
 ## 🎛️ Deep Dive: Traditional Estimators (EKF & SOH)
 
-Located in **[traditional_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/simulator/traditional_estimator.py)**.
+Located in **[traditional_estimator.py](simulator/traditional_estimator.py)**.
 
 ### 1. Extended Kalman Filter (SOC, $V_1$, $V_2$ Estimation)
 The EKF treats the battery as a stochastic linear state-space system around the current state. The state vector is:
@@ -179,7 +178,7 @@ The SOH tracking module estimates resistance growth from step voltage changes an
 
 ## 🧠 Deep Dive: Echo State Networks (Reservoir ML)
 
-Located in **[train_rc.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/train_rc.py)**. ESNs utilize high-dimensional temporal representations.
+Located in **[train_rc.py](training/train_rc.py)**. ESNs utilize high-dimensional temporal representations.
 
 ### 1. Reservoir Initialization
 - **Input Weights ($\mathbf{W}_{\text{in}}$)**: Randomly generated within range $[-input\_scaling, input\_scaling]$. Dimension: $N_{\text{reservoir}} \times (1 + N_{\text{inputs}})$.
@@ -223,7 +222,7 @@ The ESN models are trained using training files in `datasets/`:
 - `SOC / SOH`: Ground truth indices.
 
 ### 2. Feature Extraction
-Features are extracted offline in **[feature_engineering.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/feature_engineering.py)** and replicated online at runtime:
+Features are extracted offline in **[feature_engineering.py](training/feature_engineering.py)** and replicated online at runtime:
 1. **Voltage**: Terminal voltage $V$.
 2. **Current**: Load current $I$.
 3. **Temperature**: Cell temperature $T$ (excluded from selected ESN inputs to prevent out-of-distribution thermal bias).
@@ -318,7 +317,7 @@ Returns the historical records of the simulation run.
 
 ## ⚙️ Configuration & Tuning Parameters
 
-All settings are configured inside **[config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/config.py)** and can be overriden via environment variables:
+All settings are configured inside **[config.py](config.py)** and can be overriden via environment variables:
 
 | Setting | Default Value | Description |
 | :--- | :--- | :--- |
@@ -354,7 +353,7 @@ The frontend is built using a custom light-mode glassmorphic design system:
 ## 🚀 Setup & Running Instructions
 
 The platform is designed to be highly flexible:
-1. **Visualizer App (`app.py`)**: Can run entirely self-contained using its bundled physics simulator if the standalone simulator is offline (ideal for serverless Vercel deployments).
+1. **Visualizer App (`app.py`)**: Can run entirely self-contained using its bundled physics simulator if the standalone simulator is offline (ideal for serverless/stateless cloud deployments).
 2. **Segregated Mode**: If the standalone simulator (under `software/simulator`) is run on Port 8000, `app.py` automatically detects it, halts local simulation catch-ups, and pulls real-time synchronized telemetry.
 
 ### Step 1: Install Dependencies
@@ -387,9 +386,9 @@ python software/visualiser/app.py
 
 ---
 
-## ☁️ Vercel Serverless Compliance
+## ☁️ Serverless Compliance
 
-Standard simulators require stateful background threads. Since serverless deployments (like Vercel Lambdas) terminate execution between HTTP requests, background threads cannot be utilized.
+Standard simulators require stateful background threads. Since serverless deployments (like Lambdas) terminate execution between HTTP requests, background threads cannot be utilized.
 
 To run 100% serverlessly:
 - **On-Demand Synchronization**: Inside `sync_simulation_locally()`, the server checks the elapsed real-world time since the last API request.

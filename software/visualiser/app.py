@@ -40,8 +40,8 @@ app = Flask(__name__)
 import atexit
 import tempfile
 
-# Serverless/Vercel support detection
-IS_SERVERLESS = os.environ.get('VERCEL') == '1' or os.environ.get('SERVERLESS') == '1'
+# Serverless support detection
+IS_SERVERLESS = os.environ.get('SERVERLESS') == '1'
 
 # Non-blocking async cache variables
 _simulator_port_online = False
@@ -117,7 +117,7 @@ _telemetry_cache = {
 def load_ml_model():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
     
-    # First: Try to load from MongoDB Registry (supports Vercel serverless read-only filesystem)
+    # First: Try to load from MongoDB Registry (supports serverless read-only filesystem)
     if check_db_connected():
         try:
             print(f"[DEBUG] MongoDB collections found: {db.list_collection_names()}")

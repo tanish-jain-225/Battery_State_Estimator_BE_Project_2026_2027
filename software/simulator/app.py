@@ -44,8 +44,8 @@ DEFAULT_STATE = {
     'prev_current': 0.0
 }
 
-# Serverless/Vercel support detection
-IS_SERVERLESS = os.environ.get('VERCEL') == '1' or os.environ.get('SERVERLESS') == '1'
+# Serverless support detection
+IS_SERVERLESS = os.environ.get('SERVERLESS') == '1'
 
 # Shared state memory
 local_state = DEFAULT_STATE.copy()
@@ -253,8 +253,8 @@ def generator_loop():
             print(f"Simulator thread exception: {e}")
             time.sleep(1.0)
 
-# Serverless/Vercel support detection
-IS_SERVERLESS = os.environ.get('VERCEL') == '1' or os.environ.get('SERVERLESS') == '1'
+# Serverless support detection
+IS_SERVERLESS = os.environ.get('SERVERLESS') == '1'
 
 def sync_simulation_on_demand():
     global current_chemistry, simulator, local_telemetry_buffer

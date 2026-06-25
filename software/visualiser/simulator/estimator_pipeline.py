@@ -46,7 +46,7 @@ except ImportError:
         else:
             V_prev = history[-1]['voltage']
             V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
-            I_history = [r['current'] for r in history[-lookback:]] + [V_current]
+            I_history = [r['current'] for r in history[-lookback:]] + [I_current]
             T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
         V_grad = V_current - V_prev
         I_ma = np.mean(I_history)
@@ -423,7 +423,7 @@ class EstimatorPipeline:
 
         # 4. Advanced Battery Estimations (SOP, SOE, RUL)
         V_min = self.chem_obj.lookup_ocv(0.0)
-        V_max = self.chem_obj.chem_obj.lookup_ocv(1.0) if hasattr(self.chem_obj, 'chem_obj') else self.chem_obj.lookup_ocv(1.0)
+        V_max = self.chem_obj.lookup_ocv(1.0)
         ocv = self.chem_obj.lookup_ocv(self.ekf_soc)
         
         # Safe current limits (Amps, positive values) based on terminal voltage limits (V_min, V_max)

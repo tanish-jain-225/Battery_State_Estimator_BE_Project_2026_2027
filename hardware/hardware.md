@@ -1,6 +1,6 @@
 # STM32 Edge Battery State Evaluator & Classifier (Hardware Component)
 
-A highly optimized cyber-physical edge computing subsystem designed to run real-time battery diagnostics directly on low-power microcontrollers (ARM Cortex-M core). This folder contains the offline Python training scripts, feature engineering pipelines, math models, and embedded C firmware executing an optimized [EchoStateNetwork](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train.py#L3).
+A highly optimized cyber-physical edge computing subsystem designed to run real-time battery diagnostics directly on low-power microcontrollers (ARM Cortex-M core). This folder contains the offline Python training scripts, feature engineering pipelines, math models, and embedded C firmware executing an optimized [EchoStateNetwork](train.py#L3).
 
 ---
 
@@ -10,20 +10,20 @@ The hardware component is structured as follows:
 
 | File / Directory | Description |
 | :--- | :--- |
-| **[main.c](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c)** | Firmware entry point for STM32 and desktop host simulation. Executes sparse reservoir computing inference in real-time, processes telemetry arrays, drives GPIO status LED (`PA5`), and outputs diagnostic streams. |
-| **[main.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.h)** | Mock header enabling desktop/host compilation when not targeting ARM microcontrollers, simulating STM32 HAL variables, types, and functions. |
-| **[train.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train.py)** | Core [EchoStateNetwork](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train.py#L3) model class implementing recurrent reservoir dynamics, Ridge Regression readout fitting, and fixed-point quantization simulations (`float32`, `int16`, `int8`). |
-| **[train_classifier.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train_classifier.py)** | Offline pipeline to train the 3-state ESN battery classifier. Scales inputs, generates CSR (Compressed Sparse Row) arrays, and writes [esn_classifier_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_classifier_weights.h). |
-| **[train_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train_estimator.py)** | Offline script to train dual ESN estimators: SOC Estimator (300 reservoir nodes) and SOH Estimator (200 reservoir nodes). Performs feature engineering and writes dense weights to [esn_estimator_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_estimator_weights.h). |
-| **[export_weights.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/export_weights.py)** | Duplicate/helper pipeline identical to [train_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train_estimator.py) that trains SOC/SOH estimators and exports weights to the C header structure. |
-| **[config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/config.py)** | Environment-driven centralized pipeline configurations (hyperparameters, database configurations, dataset locations, classification thresholds). |
-| **[esn_classifier_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_classifier_weights.h)** | Auto-generated C header representing the 3-state classifier ESN parameters (normalization coefficients, input/readout weights, CSR reservoir representation). |
-| **[esn_estimator_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_estimator_weights.h)** | Auto-generated C header representing dense ESN estimators for State of Charge (SOC) and State of Health (SOH) tracking. |
-| **[original_ev_battery_dataset_multiclass.csv](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/original_ev_battery_dataset_multiclass.csv)** | Raw time-series dataset containing simulated electric vehicle (EV) battery parameters (Voltage, Current, Temperature, SOC, SOH). |
-| **[requirements.txt](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/requirements.txt)** | Python dependencies list for ESN training scripts (`numpy`, `pandas`, `scipy`). |
-| **[run_c_simulator.bat](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/run_c_simulator.bat)** / **[run_c_simulator.sh](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/run_c_simulator.sh)** | Cross-platform build and execution scripts to compile and run the ESN C classifier simulator locally on your PC. |
-| **[.env](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/.env)** / **[.env.example](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/.env.example)** | Placeholders for overriding ESN structural dimensions and training constraints dynamically. |
-| **[.gitignore](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/.gitignore)** | Git version control ignore rules for compilation objects, virtual environments, and local credentials. |
+| **[main.c](main.c)** | Firmware entry point for STM32 and desktop host simulation. Executes sparse reservoir computing inference in real-time, processes telemetry arrays, drives GPIO status LED (`PA5`), and outputs diagnostic streams. |
+| **[main.h](main.h)** | Mock header enabling desktop/host compilation when not targeting ARM microcontrollers, simulating STM32 HAL variables, types, and functions. |
+| **[train.py](train.py)** | Core [EchoStateNetwork](train.py#L3) model class implementing recurrent reservoir dynamics, Ridge Regression readout fitting, and fixed-point quantization simulations (`float32`, `int16`, `int8`). |
+| **[train_classifier.py](train_classifier.py)** | Offline pipeline to train the 3-state ESN battery classifier. Scales inputs, generates CSR (Compressed Sparse Row) arrays, and writes [esn_classifier_weights.h](esn_classifier_weights.h). |
+| **[train_estimator.py](train_estimator.py)** | Offline script to train dual ESN estimators: SOC Estimator (300 reservoir nodes) and SOH Estimator (200 reservoir nodes). Performs feature engineering and writes dense weights to [esn_estimator_weights.h](esn_estimator_weights.h). |
+| **[export_weights.py](export_weights.py)** | Duplicate/helper pipeline identical to [train_estimator.py](train_estimator.py) that trains SOC/SOH estimators and exports weights to the C header structure. |
+| **[config.py](config.py)** | Environment-driven centralized pipeline configurations (hyperparameters, database configurations, dataset locations, classification thresholds). |
+| **[esn_classifier_weights.h](esn_classifier_weights.h)** | Auto-generated C header representing the 3-state classifier ESN parameters (normalization coefficients, input/readout weights, CSR reservoir representation). |
+| **[esn_estimator_weights.h](esn_estimator_weights.h)** | Auto-generated C header representing dense ESN estimators for State of Charge (SOC) and State of Health (SOH) tracking. |
+| **[original_ev_battery_dataset_multiclass.csv](original_ev_battery_dataset_multiclass.csv)** | Raw time-series dataset containing simulated electric vehicle (EV) battery parameters (Voltage, Current, Temperature, SOC, SOH). |
+| **[requirements.txt](requirements.txt)** | Python dependencies list for ESN training scripts (`numpy`, `pandas`, `scipy`). |
+| **[run_c_simulator.bat](run_c_simulator.bat)** / **[run_c_simulator.sh](run_c_simulator.sh)** | Cross-platform build and execution scripts to compile and run the ESN C classifier simulator locally on your PC. |
+| **[.env](.env)** / **[.env.example](.env.example)** | Placeholders for overriding ESN structural dimensions and training constraints dynamically. |
+| **[.gitignore](.gitignore)** | Git version control ignore rules for compilation objects, virtual environments, and local credentials. |
 
 
 ---
@@ -93,11 +93,11 @@ Standard dense matrix-vector multiplication (SpMV) for a $50 \times 50$ reservoi
 
 This reduces reservoir operations to only $375$ multiplications (a **6.7× execution speedup**) and saves ~10 KB of Flash storage.
 
-### 2. Low-Power Fixed-Point Math ([ESN_FIXED_POINT](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c#L51))
+### 2. Low-Power Fixed-Point Math ([ESN_FIXED_POINT](main.c#L51))
 For ultra-low-power microcontrollers lacking a Hardware Floating-Point Unit (FPU), the firmware provides a pure integer execution path. Toggling `#define ESN_FIXED_POINT 1` compiles the algorithm into integer-only arithmetic:
 - **Q12 Format Inputs**: Scaled features are represented in Q12 format ($\pm 8.0$ dynamic range, scaled by $4096$).
 - **Q15 Format States & Weights**: All states $x_t$ and matrices $\mathbf{W}_{\text{in}}$, $\mathbf{W}_{\text{res}}$ are converted to Q15 format ($[-1.0, 1.0)$, scaled by $32768$).
-- **Look-Up Table (LUT) Tanh Approximation**: Tanh calculations are avoided using a high-speed 33-point lookup table ([tanh_lut](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c#L74)) combined with linear interpolation:
+- **Look-Up Table (LUT) Tanh Approximation**: Tanh calculations are avoided using a high-speed 33-point lookup table ([tanh_lut](main.c#L74)) combined with linear interpolation:
   $$\text{frac} = |x| \pmod{1024}$$
   $$y = \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{index}] + \text{frac} \cdot \text{LUT}[\text{index} + 1]}{1024}$$
 - **Readout mapping**: Only the final evaluation boundary (the dense readout $\mathbf{W}_{\text{out}}$) is cast back to floats to maintain classification accuracy.
@@ -113,18 +113,18 @@ Run the training pipelines to generate the weights header files:
   ```bash
   python hardware/train_classifier.py
   ```
-  Generates [esn_classifier_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_classifier_weights.h) (uses 3 features $\rightarrow$ 50 reservoir nodes $\rightarrow$ CSR representation).
+  Generates [esn_classifier_weights.h](esn_classifier_weights.h) (uses 3 features $\rightarrow$ 50 reservoir nodes $\rightarrow$ CSR representation).
 
 - **Train SOC/SOH Estimators**:
   ```bash
   python hardware/train_estimator.py
   ```
-  Generates [esn_estimator_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_estimator_weights.h) (uses 4 features $\rightarrow$ 300 & 200 reservoir nodes $\rightarrow$ dense matrices).
+  Generates [esn_estimator_weights.h](esn_estimator_weights.h) (uses 4 features $\rightarrow$ 300 & 200 reservoir nodes $\rightarrow$ dense matrices).
 
 ### 2. Configure & Build Firmware
 1. Open the project in your microcontroller toolchain (e.g., STM32CubeIDE, Keil MDK).
-2. Copy [esn_classifier_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_classifier_weights.h) into your compiler's directory headers (include search paths).
-3. Open [main.c](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c) and configure your target math path at line 51:
+2. Copy [esn_classifier_weights.h](esn_classifier_weights.h) into your compiler's directory headers (include search paths).
+3. Open [main.c](main.c) and configure your target math path at line 51:
    - `#define ESN_FIXED_POINT 0` for high-precision standard float math.
    - `#define ESN_FIXED_POINT 1` for integer-optimized low-power fixed-point math.
 4. Compile the project and flash the binary onto your board.
@@ -142,7 +142,7 @@ You can compile and execute the C code directly on your local computer to verify
   chmod +x hardware/run_c_simulator.sh
   hardware/run_c_simulator.sh
   ```
-The compilation script automatically detects GCC, Clang, or MSVC and compiles [main.c](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c) against the simulated [main.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.h) definitions, then runs the test suite.
+The compilation script automatically detects GCC, Clang, or MSVC and compiles [main.c](main.c) against the simulated [main.h](main.h) definitions, then runs the test suite.
 
 ### 4. Monitor Real-Time Classification
 Connect your STM32 development board (e.g., Nucleo) to your PC and open a serial terminal (PuTTY, Tera Term, or `screen`):
