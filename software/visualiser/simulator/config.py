@@ -1,5 +1,9 @@
 import os
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*_args, **_kwargs):
+        return False
 
 # Load environmental variables from .env file in the simulator directory
 base_dir = os.path.dirname(os.path.abspath(__file__))

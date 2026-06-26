@@ -242,12 +242,13 @@ class EstimatorPipeline:
         # Integral from 0 to soc
         s_vals = np.linspace(0.0, soc, steps + 1)
         ocv_vals = [self.chem_obj.lookup_ocv(s) for s in s_vals]
-        integral_soc = np.trapz(ocv_vals, s_vals)
+        integrate = getattr(np, 'trapezoid', np.trapz)
+        integral_soc = integrate(ocv_vals, s_vals)
         
         # Integral from 0 to 1.0
         s_all = np.linspace(0.0, 1.0, steps + 1)
         ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integral_total = np.trapz(ocv_all, s_all)
+        integral_total = integrate(ocv_all, s_all)
         
         soe = integral_soc / max(integral_total, 1e-4)
         return float(np.clip(soe, 0.0, 1.0))
@@ -442,7 +443,8 @@ class EstimatorPipeline:
         # Project total and remaining energy in Wh
         s_all = np.linspace(0.0, 1.0, 21)
         ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integral_total = np.trapz(ocv_all, s_all)
+        integrate = getattr(np, 'trapezoid', np.trapz)
+        integral_total = integrate(ocv_all, s_all)
         energy_total_wh = self.chem_obj.nominal_capacity * self.trad_soh * integral_total
         energy_remaining_wh = float(max(0.0, energy_total_wh * ekf_soe))
         

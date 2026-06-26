@@ -125,7 +125,7 @@ class ExtendedKalmanFilter:
         
         # Dynamically adapt measurement noise covariance R_meas using innovation sequence (Sage-Husa)
         if self.adaptive_r:
-            H_P_HT = float(np.dot(np.dot(H, P_pred), H.T))
+            H_P_HT = np.dot(np.dot(H, P_pred), H.T).item()
             # Sage-Husa adaptation update with learning factor alpha = 0.95
             R_est = 0.95 * self.R_meas + 0.05 * (residual**2 - H_P_HT)
             self.R_meas = float(np.clip(R_est, 0.0001, 1.0))
@@ -236,12 +236,12 @@ class RecursiveLeastSquares:
         phi = np.array([[-self.prev_y], [I_meas_ekf], [self.prev_i]])
         
         # Error prediction: e(k) = y(k) - theta^T * phi(k)
-        y_pred = float(np.dot(self.theta.T, phi))
+        y_pred = np.dot(self.theta.T, phi).item()
         e = y - y_pred
         
         # Gain vector K(k) = P * phi / (lambda + phi^T * P * phi)
         P_phi = np.dot(self.P, phi)
-        denom = self.lmbda + float(np.dot(phi.T, P_phi))
+        denom = self.lmbda + np.dot(phi.T, P_phi).item()
         K = P_phi / max(denom, 1e-6)
         
         # Parameter update: theta = theta + K * e

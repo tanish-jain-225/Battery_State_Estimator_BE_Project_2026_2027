@@ -1,106 +1,69 @@
-# Advanced Cyber-Physical Battery State Estimator System
+# Software Subsystem
 
-A comprehensive cyber-physical battery evaluation and monitoring system combining high-fidelity electro-thermal simulations, traditional state observers, and data-driven Machine Learning (ML).
+The software subsystem contains two Flask applications that can run together or
+independently with in-memory fallback storage.
 
-The project is structured into two modular, independent components that run in a synchronized loop:
-1. [Simulator Server](simulator/simulator.md): A standalone physics engine on Port 8000 that models cell behavior, noise, and faults.
-2. [Visualiser Dashboard](visualiser/visualiser.md): A Flask-based interactive comparative dashboard on Port 5000 that runs EKF & ESN estimators.
+## Components
 
----
+| Component | Port | Purpose |
+| --- | ---: | --- |
+| `software/simulator` | `8000` | Physics engine, drive-cycle generator, noise, aging, and fault injection. |
+| `software/visualiser` | `5000` | Operator dashboard, EKF/CC/ESN estimators, metrics, and controls. |
 
-## 🏗️ System Architecture & Connectivity
+## Data Flow
 
-The system can run in two configurations:
+```mermaid
+flowchart LR
+    Sim["Simulator service\n2-RC ECM + faults"]
+    Store["MongoDB\nor in-memory buffer"]
+    Dash["Visualiser dashboard\nEKF + CC + ESN"]
+    User["Operator controls"]
 
-### 1. Segregated Mode (Cyber-Physical Loop)
-The standalone simulator handles physics, and the visualizer handles estimators and UI. Communication occurs via REST APIs and MongoDB.
+    Sim --> Store
+    Store --> Dash
+    User --> Dash
+    Dash --> Sim
 ```
- ┌──────────────────────────────┐              ┌──────────────────────────────┐
- │   Visualiser (Port 5000)     │  API status  │     Simulator (Port 8000)    │
- │   - EKF & ESN Estimators     ├─────────────►│   - 2RC ECM Physics Model    │
- │   - Glassmorphic Frontend    │◄─────────────┤   - Thermal & Aging dynamics │
- └──────────────┬───────────────┘  readings    └──────────────┬───────────────┘
-                │                                             │
-                └───────────────►  MongoDB  ◄─────────────────┘
-                                 readings
+
+## Run Locally
+
+Install dependencies from the repository root:
+
+```bash
+python -m pip install -r requirements.txt
 ```
 
-### 2. Standalone / Serverless Mode
-If the simulator server is offline, the Visualizer acts serverlessly. It loads historical parameters from the database, catches up on simulator ticks locally on-demand based on elapsed time, and runs the estimation pipeline in a stateless execution loop (100% compliant with serverless and stateless execution environments).
+Start the simulator:
 
----
+```bash
+python software/simulator/app.py
+```
 
-## 📂 System File Hierarchy
+Start the dashboard in another terminal:
 
-The `software` directory contains the following components:
+```bash
+python software/visualiser/app.py
+```
 
-- **[software.md](software.md)**: Main architecture overview and running instructions.
-- **[simulator/](simulator/)**: Standalone battery cell physics simulation server (Port 8000).
-  - [app.py](simulator/app.py): Flask simulator server with background thread loop.
-  - [config.py](simulator/config.py): Private database, server, noise, and fault configurations.
-  - [battery_simulator.py](simulator/battery_simulator.py): 2RC ECM electro-thermal physics and drive cycle profiles.
-  - [battery_chemistry.py](simulator/battery_chemistry.py): NMC, LFP, and Lead-Acid OCV lookup tables.
-  - [traditional_estimator.py](simulator/traditional_estimator.py): Physics-based EKF and SOH tracker.
-  - [estimator_pipeline.py](simulator/estimator_pipeline.py): Orchestrates EKF, CC, and ESN estimators with diagnostics.
-- **[visualiser/](visualiser/)**: Flask interactive comparative dashboard (Port 5000).
-  - [app.py](visualiser/app.py): Flask visualizer backend with local simulation fallback.
-  - [config.py](visualiser/config.py): Visualizer configs, ESN hyperparameters, and noise thresholds.
-  - [model_rc.pkl](visualiser/model_rc.pkl): Pre-trained Echo State Network weights.
-  - [datasets/](visualiser/datasets/): Time-series datasets used for ESN model training.
-  - [training/](visualiser/training/): ESN training scripts and feature extraction functions.
-  - [simulator/](visualiser/simulator/): Replicated core physics and estimators for standalone serverless mode.
-  - [tests/](visualiser/tests/): Unit tests for physics engine, observers, and ESN predictions.
+Open `http://localhost:5000`.
 
----
+## Test
 
-## 🧮 Mathematical Foundations
+```bash
+python -m unittest discover -s software/visualiser/tests
+```
 
-The estimators utilize a hybrid of physics-informed models and reservoir-based data mappings:
+## Configuration
 
-### 1. Equivalent Circuit Model (ECM)
-Cell dynamics are modeled using a 2RC branch circuit:
-$$V_{\text{terminal}} = V_{\text{OCV}}(SOC) + I \cdot R_0 + V_1 + V_2$$
-$$\frac{dV_i}{dt} = \frac{I - \frac{V_i}{R_i}}{C_i}$$
+- `software/simulator/.env.example` documents simulator settings.
+- `software/visualiser/.env.example` documents dashboard settings.
+- MongoDB is optional for local development; fallback buffers keep the demo
+  usable when no database is running.
 
-### 2. Extended Kalman Filter (EKF)
-State predictions are dynamically corrected using noisy terminal voltage readings:
-$$\hat{\mathbf{x}}_{k|k-1} = \mathbf{F} \hat{\mathbf{x}}_{k-1|k-1} + \mathbf{B} I_k$$
-$$\mathbf{P}_{k|k-1} = \mathbf{F} \mathbf{P}_{k-1|k-1} \mathbf{F}^T + \mathbf{Q}$$
-$$\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}^T (\mathbf{H} \mathbf{P}_{k|k-1} \mathbf{H}^T + R_{\text{meas}})^{-1}$$
-$$\hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k (V_{\text{meas}, k} - V_{\text{pred}, k})$$
+## Key Models
 
-### 3. SOH & Temperature-Compensated Resistance Tracking
-Ohmic resistance is estimated using a dual-mode observer compensated for temperature variations using the Arrhenius equation:
-$$\text{temp\_effect} = \exp\left(1500.0 \cdot \left(\frac{1}{T_{\text{meas}} + 273.15} - \frac{1}{298.15}\right)\right)$$
-- **Transient Observer**: Triggered on current step transients ($|\Delta I| > 0.2\text{ A}$):
-  $$R_{0,\text{calc}} = \frac{|\Delta V|}{|\Delta I| \cdot \text{temp\_effect}}$$
-- **Static Observer**: Triggered on steady-state loads ($|I| > 0.2\text{ A}$) after a 30-second convergence delay:
-  $$R_{0,\text{static}} = \frac{|OCV(SOC) + V_1 + V_2 - V_t|}{|I| \cdot \text{temp\_effect}}$$
-- **SOH Projection**: SOH capacity is mapped from resistance growth:
-  $$SOH = 1.0 - \frac{(R_0 / R_{0,\text{nom}}) - 1.0}{1.5}$$
-
-### 4. Echo State Network (ESN)
-Input features are mapped into a high-dimensional recurrent reservoir, updating reservoir states:
-$$\mathbf{x}(t) = (1 - \alpha)\mathbf{x}(t-1) + \alpha \tanh\left(\mathbf{W}_{\text{in}} [1; \mathbf{u}(t)] + \mathbf{W}_{\text{res}} \mathbf{x}(t-1)\right)$$
-- **ESN SOH Hybridisation**: SOH changes very slowly compared to the simulation step size. To bridge the training time-resolution mismatch, SOH prediction is hybridized:
-  $$\text{esn\_soh\_pred} = 0.02 \cdot \text{esn\_soh\_pred\_raw} + 0.98 \cdot \text{trad\_soh}$$
-  This ensures the ESN Remaining Useful Life (RUL) cycle output tracks degradation accurately.
-
----
-
-## 🚀 Running the System
-
-1. **Install Requirements**:
-   ```bash
-   pip install -r software/visualiser/requirements.txt
-   ```
-2. **Start MongoDB** locally on Port 27017 (Optional; falls back to in-memory storage if offline).
-3. **Run Simulator Server**:
-   ```bash
-   python software/simulator/app.py
-   ```
-4. **Run Visualizer comparisons**:
-   ```bash
-   python software/visualiser/app.py
-   ```
-   Navigate to `http://localhost:5000/` to open the evaluation dashboard.
+- 2-RC equivalent circuit model for terminal voltage behavior.
+- Thermal and aging dynamics for safety and SOH validation.
+- Extended Kalman Filter for physics-based SOC estimation.
+- Resistance-based SOH observer for degradation tracking.
+- Echo State Network estimator for lightweight data-driven tracking.

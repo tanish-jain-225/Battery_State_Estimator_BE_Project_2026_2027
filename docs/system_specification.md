@@ -1,144 +1,169 @@
-# Cyber-Physical Battery Estimator System Specification
+# System Specification
 
-This specification documents the interfaces, data flows, APIs, and pinout configurations that bridge the hardware and software components of the integrated Battery State Estimator system.
+This document defines the interfaces, state flow, runtime modes, and validation
+scope for the Battery State Estimator.
 
----
+## System Goal
 
-## 1. Cyber-Physical Data Flows
+Estimate battery SOC and SOH while classifying thermal safety state under
+dynamic load profiles. The implementation combines a physics simulator,
+traditional observers, reservoir-computing estimators, and an embedded edge
+classifier.
 
-The system operates in a closed loop, processing real-time electrical transients into predictive state vectors (SOC, SOH) and diagnostic safety evaluations.
+## Runtime Components
 
+| Component | Location | Responsibility |
+| --- | --- | --- |
+| Physics simulator | `software/simulator` | Generates 2-RC ECM telemetry, thermal behavior, aging, and injected faults. |
+| Visualiser dashboard | `software/visualiser` | Presents telemetry, estimator outputs, diagnostics, and controls. |
+| Estimator pipeline | `software/*/estimator_pipeline.py` | Runs EKF, Coulomb Counting, ESN, and CPS diagnostics. |
+| Hardware classifier | `hardware/main.c` | Runs sparse ESN inference for Normal/Warning/Critical classification. |
+| Training/export scripts | `hardware`, `software/visualiser/training` | Train ESN models and export Python/C artifacts. |
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+    participant Operator
+    participant Dashboard as Visualiser Dashboard
+    participant Simulator as Physics Simulator
+    participant Store as MongoDB or In-Memory Store
+    participant Edge as STM32 Edge Classifier
+
+    Operator->>Dashboard: Start simulation or set fault toggles
+    Dashboard->>Simulator: Control request
+    Simulator->>Store: Write telemetry frame
+    Store->>Dashboard: Read telemetry history
+    Dashboard->>Dashboard: Run EKF, CC, ESN, diagnostics
+    Simulator->>Edge: Telemetry input path
+    Edge->>Dashboard: UART/status output when hardware is connected
 ```
-       🔋 PHYSICAL BATTERY
-               │
-               ▼ Sensor telemetry (V, I, T)
-      ╔═══════════════════════════╗
-      ║ STM32 Edge Classifier     ║ ◄─── Off-line Ridge Regression training
-      ║  - Sparse Reservoir (CSR) ║
-      ║  - Fixed-Point (LUT Tanh) ║
-      ╚═══════════════════════════╝
-               │
-               ├─────── GPIO PA5 status LED 🟡/🟢/🔴
-               │
-               ▼ UART ST-Link Virtual COM stream
-      ╔═══════════════════════════╗
-      ║ software/simulator        ║ ◄─── REST APIs (Port 8000)
-      ║  - 2RC Electro-Thermal    ║
-      ║  - Noise & fault injector ║
-      ╚═══════════════════════════╝
-               │
-               ├─── MongoDB logs (telemetry_data)
-               │
-               ▼ Web WebSockets / AJAX
-      ╔═══════════════════════════╗
-      ║ software/visualiser       ║ ◄─── comparative dashboard (Port 5000)
-      ║  - EKF vs ESN Estimators  ║
-      ║  - Glassmorphic UI        ║
-      ╚═══════════════════════════╝
-```
 
----
+## Telemetry Schema
 
-## 2. Software Subsystem Specification
+Telemetry frames contain:
 
-### A. Battery Physics Simulator (Port `8000`)
-The simulator server is a standalone Python Flask microservice that implements a high-fidelity 2-RC equivalent circuit physical model.
+| Field | Unit | Meaning |
+| --- | --- | --- |
+| `time` | seconds | Simulation time index. |
+| `voltage` | volts | Noisy/measured terminal voltage. |
+| `current` | amperes | Measured load current, positive for discharge in dashboard records. |
+| `temperature` | Celsius | Measured cell temperature. |
+| `true_soc` | ratio | Physics-model state of charge. |
+| `true_soh` | ratio | Physics-model state of health. |
+| `true_v1`, `true_v2` | volts | Internal RC branch polarization states. |
+| `true_r0` | ohms | Internal resistance reference. |
+| `fault_short` | boolean | Micro-short injection state. |
+| `fault_thermal` | boolean | Thermal runaway injection state. |
+| `fault_dropout` | boolean | Sensor dropout injection state. |
 
-* **API Endpoints**:
-  * `POST /step`: Advances the physical model by step size `dt`.
-    - *Request Body*: `{"current": -2.5, "accelerated_aging": false, "fault_thermal": false, "fault_dropout": false, "fault_short": false}`
-    - *Response*: Telemetry frame containing `voltage`, `current`, `temperature`, `true_soc`, `true_soh`, `v1`, `v2`, `R0`.
-  * `POST /config/chemistry`: Switch active chemistry profile.
-    - *Request Body*: `{"chemistry": "li_ion"}` or `{"chemistry": "lfp"}`.
-  * `GET /state`: Retrieve current internal physical values.
-  * `POST /reset`: Reinitialise cell parameters to nominal state.
+## Simulator API
 
-* **MongoDB Database Integration**:
-  * **Database Name**: `battery_monitor`
-  * **Collection**: `telemetry_data`
-  * **Document Schema**:
-    ```json
-    {
-      "_id": "ObjectId",
-      "timestamp": "ISODate",
-      "time": "double (seconds)",
-      "voltage": "double (Volts)",
-      "current": "double (Amperes)",
-      "temperature": "double (°C)",
-      "true_soc": "double (0.0 to 1.0)",
-      "true_soh": "double (0.0 to 1.0)"
-    }
-    ```
+Representative endpoints:
 
-### B. Visualiser Dashboard (Port `5000`)
-The visualiser dashboard serves as the central operator control center. It runs EKF (Kalman Filter) and ESN (Echo State Network) observers simultaneously to estimate states from noisy sensor inputs.
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/status` | Health, simulator status, and state summary. |
+| `POST` | `/api/start` | Start telemetry generation. |
+| `POST` | `/api/pause` | Pause telemetry generation. |
+| `POST` | `/api/reset` | Reset simulator state. |
+| `POST` | `/api/config` | Update chemistry, cycle, aging, or fault settings. |
 
-* **Sidebar Diagnostics**:
-  - **Sim Service Badge**: Scans Port 8000 asynchronously. Status transitions: `Online` (green), `Offline` (orange).
-  - **MongoDB Badge**: Background connection check. Status transitions: `Connected` (green), `In-Memory` (blue, falling back to local list buffers).
-* **Fault Injection Console**:
-  - Toggles active physical faults (Thermal Runaway, Sensor Dropout, Micro-Short Circuit) on the simulator via `/step` payload flags.
+## Dashboard API
 
----
+Representative endpoints:
 
-## 3. Hardware Subsystem Specification
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/status` | Dashboard, model, database, and simulator status. |
+| `GET` | `/api/telemetry` | Recent telemetry with estimator outputs. |
+| `POST` | `/api/train` | Retrain ESN model and update model registry when available. |
+| `POST` | `/api/config` | Update estimation and visualization parameters. |
 
-The edge diagnostic subsystem compiles to standard C99 code running on a low-power STM32 Nucleo board (or compiled locally on a desktop PC).
+## Estimator Outputs
 
-### A. MCU Pin Mapping (STM32 Nucleo H7)
-* **GPIO Output (`PA5` / Nucleo Green LED)**:
-  Used for immediate visual alert indicators depending on ESN argmax state:
-  * 🟢 **Normal State (0)**: `PA5` is kept `LOW` (LED Off). Represents nominal temperatures ($T < 35^{\circ}\text{C}$).
-  * 🟡 **Warning State (1)**: `PA5` is toggled at $20\text{Hz}$ (LED Blinking). Represents temperature warning range ($35^{\circ}\text{C} \le T < 45^{\circ}\text{C}$).
-  * 🔴 **Critical State (2)**: `PA5` is kept `HIGH` (LED On). Represents thermal threat ($T \ge 45^{\circ}\text{C}$).
-* **UART2 Tx/Rx Pins (`PA2` / `PA3` / ST-Link Virtual COM)**:
-  Transmits character streams at `115200` baud rate, 8 data bits, 1 stop bit, no parity (`115200 8N1`) to the PC host dashboard.
+The visualiser enriches each telemetry frame with:
 
-### B. Fixed-Point ESN Network Matrix Shapes
-* **Input Layer ($N_u = 3$)**: Voltage, Current, Temperature.
-* **Reservoir Layer ($N_r = 50$)**: Sparse CSR recurrent matrix ($85\%$ sparsity $\rightarrow 375$ NNZ).
-* **Output Readout Layer ($N_y = 3$)**: Normalized classifier confidence score for [Normal, Warning, Critical].
-* **Lookup Table Dimensions**: 33-point lookup table mapping positive quadrant `tanh` float mappings into Q15 format.
+- `ekf_soc`
+- `esn_soc`
+- `ekf_soh`
+- `esn_soh`
+- `ekf_v1`
+- `ekf_v2`
+- `ekf_p_diag`
+- `esn_features`
+- timing metrics for EKF and ESN execution
+- fault diagnostics
+- state of power, state of energy, and RUL estimates when available
 
----
+## Edge Classifier Specification
 
-## 4. Consolidated Workspace Tree
-
-The unified directory layout below shows where all component files reside in the workspace:
+Input:
 
 ```text
-Battery_State_Estimator_BE_Project_2026_2027/
-│
-├── README.md                          # Global Capstone template
-│
-├── docs/                              # Project technical files
-│   ├── literature_survey.md           # Theoretical review & equations
-│   └── system_specification.md        # [THIS FILE] Interface specification
-│
-├── hardware/                          # STM32 C Firmware & Python trainers
-│   ├── main.c                         # Inference engine & mock host
-│   ├── main.h                         # HAL mocks & target structures
-│   ├── train.py                       # Core ESN Python class
-│   ├── train_classifier.py            # Generates esn_classifier_weights.h
-│   ├── train_estimator.py             # Generates esn_estimator_weights.h
-│   ├── esn_classifier_weights.h       # Quantized CSR classifier weights
-│   ├── esn_estimator_weights.h        # Dense regression estimator weights
-│   ├── original_ev_battery_dataset... # Synthetic EV battery CSV
-│   ├── run_c_simulator.bat            # Windows MSVC/MinGW runner
-│   └── run_c_simulator.sh             # Linux/macOS GCC compile runner
-│
-├── software/
-│   ├── simulator/                     # Port 8000 Physics Simulator
-│   │   ├── app.py                     # Flask server with async DB checker
-│   │   ├── battery_simulator.py       # 2-RC dynamic physics equations
-│   │   └── traditional_estimator.py   # EKF prediction-correction loops
-│   │
-│   └── visualiser/                    # Port 5000 comparative dashboard
-│       ├── app.py                     # Web dashboard with async paced checker
-│       └── training/
-│           ├── train_rc.py            # Train visualiser model_rc.pkl
-│           └── model_rc.pkl           # Packed weights & RMSE bounds
-│
-└── reference/
-    └── paper.md                       # Academic draft of the research
+[voltage, current, temperature]
 ```
+
+Network:
+
+```text
+3 inputs -> 50-node sparse ESN reservoir -> 3 safety classes
+```
+
+Classes:
+
+| Class | Name | Condition |
+| ---: | --- | --- |
+| `0` | Normal | `temperature < 35 C` |
+| `1` | Warning | `35 C <= temperature < 45 C` |
+| `2` | Critical | `temperature >= 45 C` |
+
+Hardware indicators:
+
+| Class | `PA5` LED |
+| --- | --- |
+| Normal | Off |
+| Warning | Blink |
+| Critical | On |
+
+## Fault Model
+
+| Fault | Behavior | Validation Goal |
+| --- | --- | --- |
+| Thermal runaway | Adds aggressive heat generation. | Detect fast temperature growth and unsafe thermal state. |
+| Sensor dropout | Forces voltage/current readings toward zero. | Preserve estimator robustness and raise diagnostics. |
+| Micro-short | Adds internal leakage and heating. | Detect hidden SOC divergence under low external current. |
+
+## Runtime Modes
+
+| Mode | Description |
+| --- | --- |
+| Full local mode | Simulator, dashboard, and optional MongoDB run on the same machine. |
+| In-memory mode | Simulator and dashboard run without MongoDB; data is held in local buffers. |
+| Serverless-aware mode | Apps avoid long-lived filesystem assumptions and can load model state from MongoDB. |
+| Embedded mode | C classifier runs on STM32 hardware or desktop simulator. |
+
+## Validation Scope
+
+The unit suite covers:
+
+- chemistry loading and OCV monotonicity,
+- 2-RC simulator discharge, charge, aging, and faults,
+- EKF output bounds and covariance health,
+- resistance-based SOH behavior,
+- feature engineering output shape and gradients,
+- ESN behavior and quantization paths,
+- estimator pipeline and CPS fault diagnostics,
+- configuration consistency.
+
+Run:
+
+```bash
+python -m unittest discover -s software/visualiser/tests
+```
+
+## Non-Goals
+
+This prototype is not a certified BMS, not a pack-balancing controller, and not
+qualified for safety-critical field deployment without independent validation,
+HIL testing, and regulatory review.
