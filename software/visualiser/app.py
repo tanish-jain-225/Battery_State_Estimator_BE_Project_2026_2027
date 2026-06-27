@@ -636,29 +636,39 @@ def _release_lock():
 atexit.register(_release_lock)
 
 _local_threads_started = False
+_checker_thread_started = False
 
 def _start_background_threads():
-    global _local_threads_started
+    global _local_threads_started, _checker_thread_started
     if IS_SERVERLESS:
         return
+        
+    # Start status checker thread unconditionally for every process/worker
+    if not _checker_thread_started:
+        _checker_thread_started = True
+        checker = threading.Thread(target=status_checker_loop, daemon=True)
+        checker.start()
+        
+    # Start local generator fallback simulator ONLY if we acquire the lock
     if not _local_threads_started:
         if _acquire_lock():
             _local_threads_started = True
-            
-            # Start status checker thread
-            checker = threading.Thread(target=status_checker_loop, daemon=True)
-            checker.start()
-            
-            # Start local generator simulation thread
             sim_thread = threading.Thread(target=local_generator_loop, daemon=True)
             sim_thread.start()
-            
-            print(f"Visualizer background threads active (PID: {os.getpid()}).")
-        else:
-            print(f"Visualizer simulator lock held by another process. Threads not started (PID: {os.getpid()}).")
+            print(f"Visualizer local simulator thread active (PID: {os.getpid()}).")
 
-# Launch threads on module load
-_start_background_threads()
+# Lazy-start threads on first HTTP request when running under WSGI servers like Gunicorn
+_lazy_initialized = False
+_lazy_lock = threading.Lock()
+
+@app.before_request
+def _lazy_init():
+    global _lazy_initialized
+    if not _lazy_initialized:
+        with _lazy_lock:
+            if not _lazy_initialized:
+                _start_background_threads()
+                _lazy_initialized = True
 
 
 # ── ESN Model Retraining Background Worker ────────────────────────────
@@ -1123,6 +1133,11 @@ def get_telemetry():
         chemistry_name = state.get('chemistry', 'li_ion')
         ekf_mismatch   = state.get('ekf_mismatch', 1.0)
         quantize_mode  = state.get('quantize_mode', 'float32')
+        
+        # Override with live port state if simulator is online
+        port_online, port_data = check_simulator_port()
+        if port_online and port_data:
+            chemistry_name = port_data.get('chemistry', chemistry_name)
 
         # ── Incremental pipeline cache ──────────────────────────────────────────
         # Key that identifies the current estimator configuration
@@ -1241,6 +1256,7 @@ except Exception as _startup_err:
     print(f"Battery State Estimator — ESN model cold-start load skipped: {_startup_err}")
 
 if __name__ == '__main__':
+    _start_background_threads()
     if not Config.FLASK_DEBUG or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         print(f"Visualizer Running on http://localhost:{Config.PORT}")
     app.run(host='0.0.0.0', port=Config.PORT, debug=Config.FLASK_DEBUG)
