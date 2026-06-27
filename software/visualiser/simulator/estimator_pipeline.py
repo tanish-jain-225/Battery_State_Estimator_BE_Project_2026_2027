@@ -153,7 +153,7 @@ class EstimatorPipeline:
         self.mismatch = state_dict.get('mismatch', self.mismatch)
         self.chem_obj = get_chemistry(self.chemistry_name)
         self.ekf = ExtendedKalmanFilter(self.chemistry_name, mismatch=self.mismatch)
-        self.soh_tracker = ResistanceSOH(chemistry_name)
+        self.soh_tracker = ResistanceSOH(self.chemistry_name)
         self.rls = RecursiveLeastSquares(dt=1.0)
         
         self.cc_soc = state_dict.get('cc_soc', 1.0)
