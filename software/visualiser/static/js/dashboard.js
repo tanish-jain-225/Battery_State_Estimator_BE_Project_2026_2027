@@ -688,8 +688,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const trueSocVal = latest.true_soc !== undefined ? latest.true_soc : latest.cc_soc;
             const trueSohVal = latest.true_soh !== undefined ? latest.true_soh : latest.trad_soh;
             
-            valTrueSocLarge.textContent = (trueSocVal * 100.0).toFixed(1) + '%';
-            valTrueSohLarge.textContent = (trueSohVal * 100.0).toFixed(1) + '%';
+            if (valTrueSocLarge) valTrueSocLarge.textContent = (trueSocVal * 100.0).toFixed(1) + '%';
+            if (valTrueSohLarge) valTrueSohLarge.textContent = (trueSohVal * 100.0).toFixed(1) + '%';
 
             // Diagnostics and faults evaluation
             const faults = latest.faults || [];
@@ -751,8 +751,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 valRulStatus.style.color = '#10b981';
             }
 
-            valTrueSocLarge.textContent = '--%';
-            valTrueSohLarge.textContent = '--%';
+            if (valTrueSocLarge) valTrueSocLarge.textContent = '--%';
+            if (valTrueSohLarge) valTrueSohLarge.textContent = '--%';
 
             setAlarmBadge(alarmSensor,  false, 'alarm-active-sensor');
             setAlarmBadge(alarmShort,   false, 'alarm-active-short');
