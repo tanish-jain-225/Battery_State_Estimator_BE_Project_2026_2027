@@ -10,16 +10,16 @@
 
 | Sr. No. | Name of Student | Roll No. | Branch | Email ID |
 |---|---|---|---|---|
-| 1 | To be updated by project team | To be updated | Automation and Robotics | To be updated |
-| 2 | To be updated by project team | To be updated | Automation and Robotics | To be updated |
-| 3 | To be updated by project team | To be updated | Automation and Robotics | To be updated |
-| 4 | To be updated by project team | To be updated | Automation and Robotics | To be updated |
+| 1 | Tanish Sanghvi | 56 | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in |
+| 2 | Akshay Nambiar | 40 | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in |
+| 3 | Sanjana Patankar | 47 | Automation and Robotics | 2023.sanjana.patankar@ves.ac.in |
+| 4 | Satvik Verma | 60 | Automation and Robotics | 2023.satvik.verma@ves.ac.in |
 
 ---
 
 ## Guide Details
 
-**Project Guide:** To be updated by department  
+**Project Guide:** Dr. Kadambari Sharma   
 **Department:** Automation and Robotics  
 **Institute:** VESIT, Mumbai  
 
@@ -207,7 +207,7 @@ desktop C simulator.
 | Week 5 | 2026-06-04 | Implemented Flask services and dashboard | Edge classifier work | Porting ESN to C | Repository history |
 | Week 6 | 2026-06-11 | Added CSR and Q12/Q15 inference paths | Fault testing | LUT accuracy | Repository history |
 | Week 7 | 2026-06-18 | Added tests, documentation, and validation flow | Deployment polish | MongoDB fallback behavior | Repository history |
-| Week 8 | 2026-06-25 | Added CI, Render guidance, artifact policy, and demo checklist | Final review | Final team metadata pending | Repository history |
+| Week 8 | 2026-06-25 | Added CI, Render guidance, artifact policy, and demo checklist | Final review | None | Repository history |
 
 ---
 
@@ -422,7 +422,7 @@ Available screenshots are stored in [images/assets](images/assets).
 ![Estimator Charts](images/assets/Screenshot%202026-06-25%20095127.png)
 ```
 
-Project demo video: To be added after final demonstration recording.
+Project demo video: Refer to the Operations Guide at [docs/OPERATIONS.md](docs/OPERATIONS.md) for instructions on capturing, generating, and embedding local project demo clips.
 
 ---
 
@@ -452,7 +452,6 @@ Project demo video: To be added after final demonstration recording.
 2. ESN performance depends on training data coverage and drive-cycle similarity.
 3. Render free-tier services may sleep and are not ideal for uninterrupted telemetry generation.
 4. Hardware-in-the-loop validation is still required before real safety-critical use.
-5. Final team metadata and formal demo video need to be updated by the project team.
 
 ---
 

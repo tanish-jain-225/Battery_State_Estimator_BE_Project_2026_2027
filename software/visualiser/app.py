@@ -764,9 +764,12 @@ def run_training_async():
         esn_soh = local_esn_soh
         input_means = input_means
         input_stds = input_stds
-        model_loaded = True
         loaded_soc_rmse = soc_rmse
         loaded_soh_rmse = soh_rmse
+        model_loaded = True
+        
+        # Invalidate telemetry cache to apply the newly trained ESN weights retroactively
+        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
 
     except Exception as err:
         training_status['status'] = 'failed'
@@ -805,8 +808,8 @@ def get_status():
         fault_dropout = state.get('fault_dropout', False)
         fault_short = state.get('fault_short', False)
         
-        # Override with live port state if online (ONLY when database is NOT connected)
-        if port_online and port_data and not check_db_connected():
+        # Override with live port state if online (always when simulator is online)
+        if port_online and port_data:
             sim_running = port_data.get('sim_running', sim_running)
             active_cycle = port_data.get('active_cycle', active_cycle)
             accelerated_aging = port_data.get('accelerated_aging', accelerated_aging)

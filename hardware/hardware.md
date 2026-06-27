@@ -79,3 +79,35 @@ hardware/run_c_simulator.sh
 
 Use `hardware/.env.example` as the documented template for local overrides.
 Commit only the example file, never a real `.env`.
+
+## Hardware Wiring & Pinout Reference
+
+When deploying to a physical STM32 Nucleo board (e.g., STM32F401RE / STM32F446RE), connect the peripherals according to the pinout schematic below:
+
+```text
+               +-------------------------------------------+
+               |              STM32 NUCLEO BOARD           |
+               |                                           |
+               |      [ PA2 ] ------------------> TX       | --> UART2 Serial Output
+               |      [ PA3 ] <------------------ RX       |     (115200 Baud, 8N1)
+               |                                           |
+               |      [ PA5 ] ----[ R_220 ]----( LED )--+  | --> Status LED Output
+               |                               |           |     (Blinks/ON for Warnings)
+               |                               GND         |
+               |                                           |
+               |      [ PC0 ] <--------- Analog Input      | --> Optional ADC Channel 
+               |                         (Cell Temp / Volt)|     for real-world sensors
+               |                                           |
+               |      [ GND ] --------------------------   | --> Common Ground Reference
+               +-------------------------------------------+
+```
+
+### Pin Description Table
+
+| Pin Name | Function | Direction | Electrical Specification | Purpose |
+| --- | --- | --- | --- | --- |
+| `PA2` | `USART2_TX` | Output | 3.3V Logic | Diagnostic telemetry transmitter |
+| `PA3` | `USART2_RX` | Input | 3.3V Logic | Control command receiver |
+| `PA5` | `GPIO_Output` | Output | 3.3V, max 20mA | Status Indicator LED (Normal/Warning/Critical) |
+| `PC0` | `ADC_IN10` | Input | Analog, 0V - 3.3V | Raw cell voltage/temperature monitoring |
+| `GND` | `Ground` | Power | 0V | Ground reference |
