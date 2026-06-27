@@ -660,30 +660,43 @@ def db_checker_loop():
 
 # Battery State Estimator — Physics Engine startup
 # Thread starts at module level so it works under gunicorn AND direct execution.
-# _start_sim_thread() checks lock file to ensure only one worker runs the thread.
+# _start_sim_thread() checks lock file to ensure only one worker runs
 _sim_thread_started = False
+_db_thread_started = False
 
 def _start_sim_thread():
-    global _sim_thread_started
+    global _sim_thread_started, _db_thread_started
     if IS_SERVERLESS:
         return
+    
+    # Start DB checker thread for this process if not already started
+    if not _db_thread_started:
+        _db_thread_started = True
+        db_checker = threading.Thread(target=db_checker_loop, daemon=True)
+        db_checker.start()
+        
+    # Start generator thread if lock is acquired and generator not already running in this process
     if not _sim_thread_started:
         if _acquire_lock():
             _sim_thread_started = True
-            
-            # Start DB checker thread
-            db_checker = threading.Thread(target=db_checker_loop, daemon=True)
-            db_checker.start()
-            
-            # Start generator thread
             t = threading.Thread(target=generator_loop, daemon=True)
             t.start()
-        else:
-            pass
 
-_start_sim_thread()
+# Lazy-start threads on first HTTP request when running under WSGI servers like Gunicorn
+_lazy_initialized = False
+_lazy_lock = threading.Lock()
+
+@app.before_request
+def _lazy_init():
+    global _lazy_initialized
+    if not _lazy_initialized:
+        with _lazy_lock:
+            if not _lazy_initialized:
+                _start_sim_thread()
+                _lazy_initialized = True
 
 if __name__ == '__main__':
+    _start_sim_thread()
     # Wait for the first asynchronous database check to complete (up to 5.0 seconds)
     start_wait = time.time()
     while not _mongodb_connected and (time.time() - start_wait) < 5.0:

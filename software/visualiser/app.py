@@ -55,23 +55,30 @@ mongodb_connected = False
 
 def check_db_connected():
     global db_client, db, mongodb_connected
-    if IS_SERVERLESS:
-        if mongodb_connected and db is not None:
-            return True
+    if mongodb_connected and db is not None:
         try:
-            db_client = MongoClient(mongodb_uri)
-            db_client.server_info()
-            db = db_client[Config.MONGODB_DB_NAME]
-            mongodb_connected = True
+            db_client.admin.command('ping')
             return True
         except Exception:
             mongodb_connected = False
-            return False
+            db_client = None
+            db = None
             
-    return _mongodb_connected and db is not None
+    try:
+        db_client = MongoClient(mongodb_uri)
+        db_client.admin.command('ping')
+        db = db_client[Config.MONGODB_DB_NAME]
+        mongodb_connected = True
+        return True
+    except Exception as e:
+        print(f"Visualiser Database connection failed: {e}")
+        mongodb_connected = False
+        db_client = None
+        db = None
+        return False
 
-if IS_SERVERLESS:
-    check_db_connected()
+# Establish connection at startup
+check_db_connected()
 
 # Default state parameters for fallback
 DEFAULT_SIM_STATE = {
