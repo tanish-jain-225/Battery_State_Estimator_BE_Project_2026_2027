@@ -434,8 +434,30 @@ document.addEventListener('DOMContentLoaded', () => {
             graphSliceLimit = status.graph_slice_limit;
         }
 
-        mismatchSelect.value = status.ekf_mismatch !== undefined ? Number(status.ekf_mismatch).toFixed(1) : "1.0";
-        quantizeSelect.value = status.quantize_mode || "float32";
+        if (mismatchSelect && status.ekf_mismatch !== undefined) {
+            mismatchSelect.value = Number(status.ekf_mismatch).toFixed(1);
+        }
+        if (quantizeSelect && status.quantize_mode) {
+            quantizeSelect.value = status.quantize_mode;
+        }
+
+        const valEkfMismatch = document.getElementById('val-ekf-mismatch');
+        if (valEkfMismatch && status.ekf_mismatch !== undefined) {
+            const mismatchVal = Number(status.ekf_mismatch);
+            const percentage = Math.round((mismatchVal - 1.0) * 100);
+            const text = percentage === 0 ? "0% (Perfect Tuning)" : (percentage > 0 ? `+${percentage}% Mismatch` : `${percentage}% Mismatch`);
+            valEkfMismatch.textContent = text;
+        }
+
+        const valQuantizePrecision = document.getElementById('val-quantize-precision');
+        if (valQuantizePrecision && status.quantize_mode) {
+            const modeMap = {
+                'float32': 'Float32 (Standard)',
+                'int16': 'INT16 Fixed-Point (Simulated)',
+                'int8': 'INT8 Fixed-Point (Simulated)'
+            };
+            valQuantizePrecision.textContent = modeMap[status.quantize_mode] || status.quantize_mode;
+        }
 
         // Update Ambient Temp status badge
         if (diagEnvTemp && status.T_ambient !== undefined) {
@@ -844,19 +866,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    mismatchSelect.addEventListener('change', async (e) => {
-        resumeLiveMode();
-        await apiRequest('/api/control', 'POST', { ekf_mismatch: parseFloat(e.target.value) });
-        refreshStatus();
-        refreshTelemetry();
-    });
+    if (mismatchSelect) {
+        mismatchSelect.addEventListener('change', async (e) => {
+            resumeLiveMode();
+            await apiRequest('/api/control', 'POST', { ekf_mismatch: parseFloat(e.target.value) });
+            refreshStatus();
+            refreshTelemetry();
+        });
+    }
 
-    quantizeSelect.addEventListener('change', async (e) => {
-        resumeLiveMode();
-        await apiRequest('/api/control', 'POST', { quantize_mode: e.target.value });
-        refreshStatus();
-        refreshTelemetry();
-    });
+    if (quantizeSelect) {
+        quantizeSelect.addEventListener('change', async (e) => {
+            resumeLiveMode();
+            await apiRequest('/api/control', 'POST', { quantize_mode: e.target.value });
+            refreshStatus();
+            refreshTelemetry();
+        });
+    }
 
     // Playback control button listeners
     if (btnStart) {

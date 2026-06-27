@@ -70,12 +70,12 @@
 
             <!-- ── Sidebar ──────────────────────────────────────── -->
             <aside class="sidebar-container">
+                <!-- Estimator Parameters (Display Only) -->
                 <section class="dashboard-card control-card">
                     <div class="card-header">
                         <h2><i class="fa-solid fa-sliders"></i> Estimator Parameters</h2>
                     </div>
-
-                    <div class="card-body">
+                    <div class="card-body font-sans" style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
                         <!-- ML Warning Banner -->
                         <div id="ml-warning-banner" class="warning-banner hidden">
                             <div class="banner-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -85,165 +85,18 @@
                                 <code>python training/train_rc.py</code>
                             </div>
                         </div>
-
-                        <!-- EKF Parameter Mismatch -->
-                        <div class="control-group">
-                            <label for="mismatch-select">EKF Parameter Mismatch</label>
-                            <div class="select-wrapper">
-                                <select id="mismatch-select">
-                                    <option value="1.0">0% (Perfect Tuning)</option>
-                                    <option value="1.2">+20% Mismatch</option>
-                                    <option value="0.8">-20% Mismatch</option>
-                                    <option value="1.5">+50% Mismatch</option>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-arrow"></i>
-                            </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+                            <span>EKF Parameter Mismatch:</span>
+                            <strong id="val-ekf-mismatch">--</strong>
                         </div>
-
-                        <!-- ESN Quantization Mode -->
-                        <div class="control-group">
-                            <label for="quantize-select">ML Quantization Precision</label>
-                            <div class="select-wrapper">
-                                <select id="quantize-select">
-                                    <option value="float32">Float32 (Standard)</option>
-                                    <option value="int16">INT16 Fixed-Point (Simulated)</option>
-                                    <option value="int8">INT8 Fixed-Point (Simulated)</option>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-arrow"></i>
-                            </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>ML Quantization Precision:</span>
+                            <strong id="val-quantize-precision">--</strong>
                         </div>
                     </div>
                 </section>
 
-                <!-- Simulator Playback Control -->
-                <section class="dashboard-card control-card margin-top-md">
-                    <div class="card-header">
-                        <h2><i class="fa-solid fa-circle-play"></i> Telemetry Playback</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="btn-group">
-                            <button id="btn-start" class="btn btn-primary" title="Start Telemetry Generation">
-                                <i class="fa-solid fa-play"></i> Start
-                            </button>
-                            <button id="btn-pause" class="btn btn-secondary" title="Pause Telemetry Generation" disabled>
-                                <i class="fa-solid fa-pause"></i> Pause
-                            </button>
-                            <button id="btn-stop" class="btn btn-dark" title="Stop Telemetry Generation" disabled>
-                                <i class="fa-solid fa-stop"></i> Stop
-                            </button>
-                            <button id="btn-reset" class="btn btn-danger" title="Reset Simulation &amp; Purge Readings">
-                                <i class="fa-solid fa-rotate-left"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Simulator Settings -->
-                <section class="dashboard-card control-card margin-top-md">
-                    <div class="card-header">
-                        <h2><i class="fa-solid fa-sliders"></i> Simulator Settings</h2>
-                    </div>
-                    <div class="card-body">
-                        <!-- Chemistry Select -->
-                        <div class="control-group">
-                            <label for="chem-select">Battery Cell Chemistry</label>
-                            <div class="select-wrapper">
-                                <select id="chem-select">
-                                    <option value="nmc">Li-ion NMC — 3S Pack (11.1 V)</option>
-                                    <option value="lfp">LiFePO₄ LFP — 3S Pack (9.6 V)</option>
-                                    <option value="lead_acid">Lead-Acid — 6S Pack (12 V)</option>
-                                    <option value="li_ion">Generic Li-ion — 3S Pack</option>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-arrow"></i>
-                            </div>
-                        </div>
-
-                        <!-- Drive Cycle Select -->
-                        <div class="control-group margin-top-sm">
-                            <label for="cycle-select">Current Excitation Drive Cycle</label>
-                            <div class="select-wrapper">
-                                <select id="cycle-select">
-                                    <option value="udds">Urban Driving Schedule (UDDS)</option>
-                                    <option value="hwfet">Highway Fuel Economy (HWFET)</option>
-                                    <option value="us06">Aggressive Spikes (US06)</option>
-                                    <option value="constant">Constant Current Discharge (-1C)</option>
-                                    <option value="charge">CC-CV Charge</option>
-                                </select>
-                                <i class="fa-solid fa-chevron-down select-arrow"></i>
-                            </div>
-                        </div>
-
-                        <!-- Accelerated Aging Toggle -->
-                        <div class="control-group switch-group margin-top-sm">
-                            <div class="switch-container">
-                                <span class="switch-label">Accelerated SOH Aging</span>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="aging-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <p class="help-text">Arrhenius degradation is scaled by x1500 for testing capacity fade.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Environment & Faults -->
-                <section class="dashboard-card control-card margin-top-md">
-                    <div class="card-header" style="border-bottom: 1px solid rgba(190, 18, 60, 0.15);">
-                        <h2 style="color: var(--accent-rose);"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-rose);"></i> Environment &amp; Faults</h2>
-                    </div>
-                    <div class="card-body">
-                        <!-- Ambient Temperature -->
-                        <div class="control-group">
-                            <label for="temp-slider">Ambient Temperature: <strong id="val-ambient-temp" class="font-mono" style="color: var(--accent-blue);">25</strong> &deg;C</label>
-                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
-                                <span style="font-size: 10px; color: var(--text-muted); font-weight: bold;">-20°C</span>
-                                <input type="range" id="temp-slider" min="-20" max="50" value="25" step="1" style="flex: 1; accent-color: var(--accent-blue); height: 6px; border-radius: 3px; outline: none; cursor: pointer;">
-                                <span style="font-size: 10px; color: var(--text-muted); font-weight: bold;">50°C</span>
-                            </div>
-                        </div>
-
-                        <div class="control-divider"></div>
-
-                        <!-- Fault: Short Circuit -->
-                        <div class="control-group switch-group">
-                            <div class="switch-container">
-                                <span class="switch-label" style="color: var(--accent-rose);"><i class="fa-solid fa-bolt-lightning" style="margin-right: 6px;"></i>Internal Micro-Short</span>
-                                <label class="toggle-switch switch-rose">
-                                    <input type="checkbox" id="fault-short-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <p class="help-text">Injects 0.8A internal self-discharge short circuit bypass.</p>
-                        </div>
-
-                        <!-- Fault: Thermal Runaway -->
-                        <div class="control-group switch-group margin-top-sm">
-                            <div class="switch-container">
-                                <span class="switch-label" style="color: var(--accent-rose);"><i class="fa-solid fa-fire" style="margin-right: 6px;"></i>Thermal Runaway Spike</span>
-                                <label class="toggle-switch switch-rose">
-                                    <input type="checkbox" id="fault-thermal-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <p class="help-text">Injects exponential exothermic runaway heat generation.</p>
-                        </div>
-
-                        <!-- Fault: Sensor Dropout -->
-                        <div class="control-group switch-group margin-top-sm">
-                            <div class="switch-container">
-                                <span class="switch-label" style="color: var(--accent-rose);"><i class="fa-solid fa-ban" style="margin-right: 6px;"></i>Sensor Dropout Fault</span>
-                                <label class="toggle-switch switch-rose">
-                                    <input type="checkbox" id="fault-dropout-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <p class="help-text">Force output voltage and current to 0 (dropout simulation).</p>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Simulator Live Status -->
+                <!-- Simulator Live Status (Display Only) -->
                 <section class="dashboard-card control-card margin-top-md">
                     <div class="card-header">
                         <h2><i class="fa-solid fa-tower-broadcast"></i> Simulator State</h2>
