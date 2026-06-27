@@ -153,7 +153,7 @@ class EstimatorPipeline:
         self.mismatch = state_dict.get('mismatch', self.mismatch)
         self.chem_obj = get_chemistry(self.chemistry_name)
         self.ekf = ExtendedKalmanFilter(self.chemistry_name, mismatch=self.mismatch)
-        self.soh_tracker = ResistanceSOH(self.chemistry_name)
+        self.soh_tracker = ResistanceSOH(chemistry_name)
         self.rls = RecursiveLeastSquares(dt=1.0)
         
         self.cc_soc = state_dict.get('cc_soc', 1.0)
@@ -242,7 +242,9 @@ class EstimatorPipeline:
         # Integral from 0 to soc
         s_vals = np.linspace(0.0, soc, steps + 1)
         ocv_vals = [self.chem_obj.lookup_ocv(s) for s in s_vals]
-        integrate = getattr(np, 'trapezoid', np.trapz)
+        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
+        if integrate is None:
+            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
         integral_soc = integrate(ocv_vals, s_vals)
         
         # Integral from 0 to 1.0
@@ -443,7 +445,9 @@ class EstimatorPipeline:
         # Project total and remaining energy in Wh
         s_all = np.linspace(0.0, 1.0, 21)
         ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integrate = getattr(np, 'trapezoid', np.trapz)
+        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
+        if integrate is None:
+            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
         integral_total = integrate(ocv_all, s_all)
         energy_total_wh = self.chem_obj.nominal_capacity * self.trad_soh * integral_total
         energy_remaining_wh = float(max(0.0, energy_total_wh * ekf_soe))
