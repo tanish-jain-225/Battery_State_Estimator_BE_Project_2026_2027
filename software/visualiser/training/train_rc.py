@@ -169,16 +169,28 @@ def main():
     model_save_path = Config.MODEL_PATH
 
     df = None
-    if os.path.exists(csv_path):
-        print(f"Loading local dataset from {csv_path}...")
-        df = pd.read_csv(csv_path)
-    elif csv_url:
-        print(f"Local dataset not found. Fetching remote dataset from URL: {csv_url}...")
+    if csv_url:
+        print(f"Fetching remote dataset from URL: {csv_url}...")
         try:
             df = pd.read_csv(csv_url)
             print(f"Remote dataset loaded ({len(df)} rows).")
         except Exception as e:
             print(f"Error loading remote CSV from CSV_URL: {e}")
+            if os.path.exists(csv_path):
+                print(f"Falling back to local dataset from {csv_path}...")
+                try:
+                    df = pd.read_csv(csv_path)
+                except Exception as local_err:
+                    print(f"Error loading local dataset: {local_err}")
+                    return
+            else:
+                return
+    elif os.path.exists(csv_path):
+        print(f"Loading local dataset from {csv_path}...")
+        try:
+            df = pd.read_csv(csv_path)
+        except Exception as e:
+            print(f"Error loading local dataset: {e}")
             return
     else:
         print(f"Error: No training dataset source available.")

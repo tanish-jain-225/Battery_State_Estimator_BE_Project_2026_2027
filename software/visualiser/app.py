@@ -781,24 +781,29 @@ def run_training_async():
         csv_path = Config.CSV_PATH
         csv_url  = Config.CSV_URL
 
-        if os.path.exists(csv_path):
-            # Local dataset available (development / self-hosted environment)
-            training_status['training_source'] = 'local_csv'
-            training_status['logs'] += "Dataset found. Loading ev battery dataframe into memory...\n"
-            df = pd.read_csv(csv_path)
-        elif csv_url:
-            # Remote dataset via Google Sheets / public CSV URL
+        if csv_url:
+            # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
             training_status['training_source'] = 'remote_url'
-            training_status['logs'] += f"Local dataset not found. Fetching remote dataset from URL...\n"
+            training_status['logs'] += f"Fetching remote dataset from URL...\n"
             try:
                 df = pd.read_csv(csv_url)
                 training_status['logs'] += f"Remote dataset loaded ({len(df)} rows).\n"
             except Exception as url_err:
-                raise RuntimeError(
-                    f"Failed to load remote CSV from CSV_URL: {url_err}. "
-                    "Ensure the Google Sheet is shared as 'Anyone with the link can view' "
-                    "and the URL ends with export?format=csv"
-                ) from url_err
+                if os.path.exists(csv_path):
+                    training_status['training_source'] = 'local_csv'
+                    training_status['logs'] += f"Remote CSV load failed: {url_err}. Falling back to local CSV...\n"
+                    df = pd.read_csv(csv_path)
+                else:
+                    raise RuntimeError(
+                        f"Failed to load remote CSV from CSV_URL: {url_err}. "
+                        "Ensure the Google Sheet is shared as 'Anyone with the link can view' "
+                        "and the URL ends with export?format=csv"
+                    ) from url_err
+        elif os.path.exists(csv_path):
+            # Local dataset available (development / self-hosted environment)
+            training_status['training_source'] = 'local_csv'
+            training_status['logs'] += "Dataset found. Loading ev battery dataframe into memory...\n"
+            df = pd.read_csv(csv_path)
         else:
             raise FileNotFoundError(
                 f"No training data source available.\n"
@@ -1010,8 +1015,8 @@ def get_status():
             'csv_url_configured': bool(Config.CSV_URL),
             'training_available': os.path.exists(Config.CSV_PATH) or bool(Config.CSV_URL),
             'training_source': (
-                'local_csv' if os.path.exists(Config.CSV_PATH)
-                else ('remote_url' if Config.CSV_URL else None)
+                'remote_url' if Config.CSV_URL
+                else ('local_csv' if os.path.exists(Config.CSV_PATH) else None)
             )
         })
     except Exception as e:
