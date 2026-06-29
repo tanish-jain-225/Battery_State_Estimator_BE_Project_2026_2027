@@ -194,9 +194,6 @@ class EchoStateNetwork:
         return np.array(predictions)
 
 def main():
-    import socket
-    socket.setdefaulttimeout(10.0)
-    
     csv_path = Config.CSV_PATH
     csv_url = getattr(Config, 'CSV_URL', '').strip()
     model_save_path = Config.MODEL_PATH
@@ -206,13 +203,10 @@ def main():
         print(f"Fetching remote dataset from URL (timeout: 10s): {csv_url}...")
         try:
             import io
-            import urllib.request
-            req = urllib.request.Request(
-                csv_url, 
-                headers={'User-Agent': 'Mozilla/5.0'}
-            )
-            with urllib.request.urlopen(req, timeout=10.0) as response:
-                csv_data = response.read().decode('utf-8')
+            import requests
+            response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+            response.raise_for_status()
+            csv_data = response.text
             if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
                 raise ValueError("URL returned an HTML webpage instead of raw CSV data. Ensure the link format ends with /export?format=csv")
             df = pd.read_csv(io.StringIO(csv_data))

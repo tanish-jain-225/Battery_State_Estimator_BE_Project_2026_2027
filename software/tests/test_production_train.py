@@ -27,21 +27,16 @@ class TestProductionTraining(unittest.TestCase):
     def setUp(self):
         # Use the actual published Google Sheets URL from the user
         self.csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbY6uZX7_v-cvyxws5Xx1no7FRMp5tzjLynxBGPYutG5aC7dmgD6k7n8J_8G70D42R6kQNDi8oMYM-/pub?gid=432011183&single=true&output=csv"
-        # Set socket timeout to 10s to prevent hangs
-        socket.setdefaulttimeout(10.0)
 
     def test_remote_dataset_fetch_and_parse(self):
         """Test downloading and parsing the remote CSV dataset from Google Sheets."""
         print(f"\n[STEP 1] Fetching remote dataset from: {self.csv_url}")
         
-        req = urllib.request.Request(
-            self.csv_url, 
-            headers={'User-Agent': 'Mozilla/5.0'}
-        )
-        
         try:
-            with urllib.request.urlopen(req, timeout=10.0) as response:
-                csv_data = response.read().decode('utf-8')
+            import requests
+            response = requests.get(self.csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+            response.raise_for_status()
+            csv_data = response.text
             
             # Check for HTML redirect page error
             self.assertFalse(
@@ -69,13 +64,10 @@ class TestProductionTraining(unittest.TestCase):
     def test_end_to_end_training_pipeline(self):
         """Test complete feature extraction, scaling, ESN training, and pickling logic."""
         print("\n[STEP 2] Fetching remote dataset for E2E training test...")
-        req = urllib.request.Request(
-            self.csv_url, 
-            headers={'User-Agent': 'Mozilla/5.0'}
-        )
-        
-        with urllib.request.urlopen(req, timeout=10.0) as response:
-            csv_data = response.read().decode('utf-8')
+        import requests
+        response = requests.get(self.csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+        response.raise_for_status()
+        csv_data = response.text
         
         df = pd.read_csv(io.StringIO(csv_data))
         
