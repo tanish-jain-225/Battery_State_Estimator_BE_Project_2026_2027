@@ -92,8 +92,11 @@ class EchoStateNetwork:
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
         
+        import time
         states = []
         for t in range(n_samples):
+            if t % 100 == 0:
+                time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
             # Advance state using precomputed input term
             input_term = W_in_U[t].reshape(-1, 1)
             x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
@@ -181,8 +184,11 @@ class EchoStateNetwork:
         one_minus_leak = 1.0 - leak
         W_out = self.W_out
         
+        import time
         predictions = []
         for t in range(n_samples):
+            if t % 100 == 0:
+                time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
             input_term = W_in_U[t].reshape(-1, 1)
             x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
             
@@ -235,6 +241,13 @@ def main():
         print(f"  • CSV_URL is not configured.")
         return
 
+    # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
+    is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+    if is_production and len(df) > 2500:
+        step = int(np.ceil(len(df) / 2500))
+        df = df.iloc[::step].reset_index(drop=True)
+        print(f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.")
+        
     # 1. Feature Engineering
     print("Performing feature engineering...")
     U_raw = extract_features_df(df)

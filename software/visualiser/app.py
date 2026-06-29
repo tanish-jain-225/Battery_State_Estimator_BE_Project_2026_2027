@@ -819,6 +819,13 @@ def run_training_async():
                 f"Set CSV_URL to your Google Sheets export URL to enable production retraining."
             )
         
+        # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
+        is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+        if is_production and len(df) > 2500:
+            step = int(np.ceil(len(df) / 2500))
+            df = df.iloc[::step].reset_index(drop=True)
+            training_status['logs'] += f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.\n"
+            
         training_status['logs'] += "Extracting features & scaling rolling MA features...\n"
         U_raw = extract_features_df(df)
         selected_indices = Config.ESN_SELECTED_FEATURE_INDICES
