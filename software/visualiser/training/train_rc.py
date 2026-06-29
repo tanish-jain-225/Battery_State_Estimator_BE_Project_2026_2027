@@ -82,15 +82,29 @@ class EchoStateNetwork:
         n_samples = U.shape[0]
         self.reset_state()
         
+        # Pre-compute input projections: U_biased shape (n_samples, 1 + n_inputs)
+        U_biased = np.hstack((np.ones((n_samples, 1)), U))
+        W_in_U = np.dot(U_biased, self.W_in.T) # shape (n_samples, n_reservoir)
+        
+        # Cache variables locally to avoid attribute lookup overhead inside loop
+        x = self.x
+        W_res = self.W_res
+        leak = self.leak_rate
+        one_minus_leak = 1.0 - leak
+        
         states = []
         for t in range(n_samples):
-            u_t = U[t].reshape(-1, 1)
-            x_t = self._update(u_t)
-            # Skip the washout phase — reservoir states are unreliable when starting from zero
-            if t >= washout:
-                state_vec = np.vstack(([1.0], u_t, x_t))
-                states.append(state_vec.flatten())
+            # Advance state using precomputed input term
+            input_term = W_in_U[t].reshape(-1, 1)
+            x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
             
+            # Skip the washout phase
+            if t >= washout:
+                state_vec = np.vstack(([1.0], U[t].reshape(-1, 1), x))
+                states.append(state_vec.flatten())
+                
+        self.x = x # Save final state back
+        
         # Design matrix X: (1 + n_inputs + n_reservoir, n_samples - washout)
         X = np.array(states).T
         
@@ -157,10 +171,26 @@ class EchoStateNetwork:
         """
         n_samples = U.shape[0]
         self.reset_state()
+        
+        U_biased = np.hstack((np.ones((n_samples, 1)), U))
+        W_in_U = np.dot(U_biased, self.W_in.T)
+        
+        x = self.x
+        W_res = self.W_res
+        leak = self.leak_rate
+        one_minus_leak = 1.0 - leak
+        W_out = self.W_out
+        
         predictions = []
         for t in range(n_samples):
-            y_pred = self.predict_step(U[t])
-            predictions.append(y_pred)
+            input_term = W_in_U[t].reshape(-1, 1)
+            x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
+            
+            state_vec = np.vstack(([1.0], U[t].reshape(-1, 1), x))
+            y_pred = np.dot(W_out, state_vec)
+            predictions.append(y_pred.flatten())
+            
+        self.x = x
         return np.array(predictions)
 
 def main():
@@ -170,9 +200,19 @@ def main():
 
     df = None
     if csv_url:
-        print(f"Fetching remote dataset from URL: {csv_url}...")
+        print(f"Fetching remote dataset from URL (timeout: 10s): {csv_url}...")
         try:
-            df = pd.read_csv(csv_url)
+            import io
+            import urllib.request
+            req = urllib.request.Request(
+                csv_url, 
+                headers={'User-Agent': 'Mozilla/5.0'}
+            )
+            with urllib.request.urlopen(req, timeout=10.0) as response:
+                csv_data = response.read().decode('utf-8')
+            if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
+                raise ValueError("URL returned an HTML webpage instead of raw CSV data. Ensure the link format ends with /export?format=csv")
+            df = pd.read_csv(io.StringIO(csv_data))
             print(f"Remote dataset loaded ({len(df)} rows).")
         except Exception as e:
             print(f"Error loading remote CSV from CSV_URL: {e}")

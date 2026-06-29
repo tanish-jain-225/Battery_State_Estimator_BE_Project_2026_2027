@@ -784,9 +784,18 @@ def run_training_async():
         if csv_url:
             # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
             training_status['training_source'] = 'remote_url'
-            training_status['logs'] += f"Fetching remote dataset from URL...\n"
+            training_status['logs'] += f"Fetching remote dataset from URL (timeout: 10s)...\n"
             try:
-                df = pd.read_csv(csv_url)
+                import io
+                req = urllib.request.Request(
+                    csv_url, 
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                with urllib.request.urlopen(req, timeout=10.0) as response:
+                    csv_data = response.read().decode('utf-8')
+                if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
+                    raise ValueError("URL returned an HTML webpage instead of raw CSV data. Ensure the link format ends with /export?format=csv")
+                df = pd.read_csv(io.StringIO(csv_data))
                 training_status['logs'] += f"Remote dataset loaded ({len(df)} rows).\n"
             except Exception as url_err:
                 if os.path.exists(csv_path):
