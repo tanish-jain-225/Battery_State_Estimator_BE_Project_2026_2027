@@ -88,10 +88,16 @@ class Config:
     # Eliminates the 30-50 second convergence lag at simulation start.
     ESN_PRIMING_STEPS = int(os.environ.get("ESN_PRIMING_STEPS", 50))
 
+    # Detect production cloud environment (Render sets RENDER=true automatically)
+    _IS_PRODUCTION = os.environ.get('RENDER') == 'true'
+
     # -------------------------------------------------------------------------
     # SOC Echo State Network hyperparameters
+    # Production cloud uses a smaller reservoir (200 nodes) so training finishes
+    # in ~3 seconds instead of 60s+ on a single-core Render container.
+    # Local development retains full accuracy with 500 nodes.
     # -------------------------------------------------------------------------
-    ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 500))
+    ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 200 if _IS_PRODUCTION else 500))
     ESN_SOC_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOC_SPECTRAL_RADIUS", 0.95))
     ESN_SOC_LEAK_RATE    = float(os.environ.get("ESN_SOC_LEAK_RATE", 0.15))
     ESN_SOC_INPUT_SCALING = float(os.environ.get("ESN_SOC_INPUT_SCALING", 0.8))
@@ -100,8 +106,9 @@ class Config:
 
     # -------------------------------------------------------------------------
     # SOH Echo State Network hyperparameters
+    # Production cloud uses a smaller reservoir (150 nodes) for the same reason.
     # -------------------------------------------------------------------------
-    ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 400))
+    ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 150 if _IS_PRODUCTION else 400))
     ESN_SOH_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOH_SPECTRAL_RADIUS", 0.85))
     ESN_SOH_LEAK_RATE    = float(os.environ.get("ESN_SOH_LEAK_RATE", 0.02))
     ESN_SOH_INPUT_SCALING = float(os.environ.get("ESN_SOH_INPUT_SCALING", 0.4))
