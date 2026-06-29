@@ -15,6 +15,9 @@ visualiser_dir = os.path.join(software_dir, 'visualiser')
 sys.path.insert(0, visualiser_dir)
 sys.path.insert(0, os.path.join(visualiser_dir, 'training'))
 
+# Prevent sys.modules caching collision with simulator config.py files during discover run
+if 'config' in sys.modules:
+    del sys.modules['config']
 from config import Config
 from train_rc import EchoStateNetwork
 from feature_engineering import extract_features_df
