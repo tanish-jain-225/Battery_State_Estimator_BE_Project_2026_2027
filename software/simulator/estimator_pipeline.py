@@ -67,6 +67,14 @@ class EstimatorPipeline:
         self.soh_tracker = ResistanceSOH(chemistry_name)
         self.rls = RecursiveLeastSquares(dt=1.0)
         
+        # Precompute and cache total OCV integral to prevent redundant numerical integrations
+        s_all = np.linspace(0.0, 1.0, 21)
+        ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
+        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
+        if integrate is None:
+            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
+        self.integral_total = integrate(ocv_all, s_all)
+        
         # Reset internal states
         self.reset()
 
@@ -247,12 +255,7 @@ class EstimatorPipeline:
             raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
         integral_soc = integrate(ocv_vals, s_vals)
         
-        # Integral from 0 to 1.0
-        s_all = np.linspace(0.0, 1.0, steps + 1)
-        ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integral_total = integrate(ocv_all, s_all)
-        
-        soe = integral_soc / max(integral_total, 1e-4)
+        soe = integral_soc / max(self.integral_total, 1e-4)
         return float(np.clip(soe, 0.0, 1.0))
 
     def step(self, V_meas, I_meas_discharge, T_meas, dt, quantize_mode='float32', selected_indices=None, dataset_dt=0.001,
@@ -283,22 +286,29 @@ class EstimatorPipeline:
         faults_detected = []
         
         # Sensor Dropout Diagnostic
-        if V_meas < Config.DIAG_DROPOUT_VOLTAGE_THRESHOLD:
+        if V_meas < Config.DIAG_DROPOUT_VOLTAGE_THRESHOLD or fault_dropout:
             faults_detected.append('sensor_dropout')
             
         # Thermal Runaway Diagnostic (Temp > 60°C or self-heating rate dT/dt > 2.0°C/s)
         dT_dt = 0.0
         if len(self.rolling_history) >= 1:
             prev_t_val = self.rolling_history[-1]['temperature']
-            dT_dt = (T_meas - prev_t_val) / dt
+            raw_rate = (T_meas - prev_t_val) / dt
+            # Apply low-pass filter to rate to prevent noise amplification under small dt
+            if not hasattr(self, 'dT_dt_filtered'):
+                self.dT_dt_filtered = 0.0
+            # Dynamic alpha based on a 5-second filter time-constant
+            alpha = min(1.0, dt / 5.0)
+            self.dT_dt_filtered = (1.0 - alpha) * self.dT_dt_filtered + alpha * raw_rate
+            dT_dt = self.dT_dt_filtered
             
-        # Thermal Runaway Diagnostic
-        if T_meas > Config.DIAG_THERMAL_TEMP_THRESHOLD or dT_dt > Config.DIAG_THERMAL_RATE_THRESHOLD:
+        # Thermal Runaway Diagnostic (triggered if temp > 60°C OR rate > 2.0°C/s at elevated temperature >= 35°C OR injected thermal fault)
+        if T_meas > Config.DIAG_THERMAL_TEMP_THRESHOLD or (dT_dt > Config.DIAG_THERMAL_RATE_THRESHOLD and T_meas >= 35.0) or fault_thermal:
             faults_detected.append('thermal_runaway')
             
         # Internal Short-Circuit Diagnostic
         soc_diff = self.cc_soc - self.ekf_soc
-        if soc_diff > Config.DIAG_SHORT_SOC_DIFF_THRESHOLD and abs(I_meas_discharge) <= Config.DIAG_SHORT_CURRENT_THRESHOLD:
+        if (soc_diff > Config.DIAG_SHORT_SOC_DIFF_THRESHOLD and abs(I_meas_discharge) <= Config.DIAG_SHORT_CURRENT_THRESHOLD) or fault_short:
             faults_detected.append('internal_short')
             
         # 2. Update physical/traditional estimators only if sensors are healthy and not in thermal runaway
@@ -442,14 +452,8 @@ class EstimatorPipeline:
         ekf_soe = self.calculate_soe(self.ekf_soc)
         esn_soe = self.calculate_soe(esn_soc_pred)
         
-        # Project total and remaining energy in Wh
-        s_all = np.linspace(0.0, 1.0, 21)
-        ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
-        if integrate is None:
-            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
-        integral_total = integrate(ocv_all, s_all)
-        energy_total_wh = self.chem_obj.nominal_capacity * self.trad_soh * integral_total
+        # Project total and remaining energy in Wh using cached OCV integral
+        energy_total_wh = self.chem_obj.nominal_capacity * self.trad_soh * self.integral_total
         energy_remaining_wh = float(max(0.0, energy_total_wh * ekf_soe))
         
         # Remaining Useful Life (RUL) in Cycles

@@ -13,12 +13,13 @@ class BatteryChemistry:
         self.cooling_coefficient = cooling_coefficient  # W/K
         self.ocv_table = ocv_table                      # List of (SOC, OCV)
         self.n_cells = n_cells
+        
+        # Precompute numpy arrays to prevent slow list comprehensions in high-frequency lookup_ocv
+        self.socs = np.array([x[0] for x in ocv_table])
+        self.ocvs = np.array([x[1] for x in ocv_table])
 
     def lookup_ocv(self, soc):
-        s = np.clip(soc, 0.0, 1.0)
-        socs = [x[0] for x in self.ocv_table]
-        ocvs = [x[1] for x in self.ocv_table]
-        return float(np.interp(s, socs, ocvs))
+        return float(np.interp(np.clip(soc, 0.0, 1.0), self.socs, self.ocvs))
 
 # NMC 3S (3 Cells in Series, 11.1V nominal)
 NMC_OCV_TABLE = [

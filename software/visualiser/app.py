@@ -37,6 +37,59 @@ except Exception:
 
 app = Flask(__name__)
 
+def get_shared_secret():
+    import hashlib
+    # Read database connection URI which is already required and configured
+    uri = os.environ.get("MONGODB_URI", Config.MONGODB_URI)
+    if not uri or "localhost" in uri or "127.0.0.1" in uri:
+        return None
+    # Hash the connection URI to create a secure 64-character secret
+    return hashlib.sha256(uri.encode('utf-8')).hexdigest()
+
+def verify_request_auth():
+    # Loopback addresses (localhost) bypass auth checks in dev/local environments
+    remote = request.remote_addr
+    if remote in ('127.0.0.1', '::1', 'localhost'):
+        return True
+        
+    secret = get_shared_secret()
+    if not secret:
+        return True # Fails-open for local developer runs
+    
+    # Check header
+    header_key = request.headers.get("X-API-Key")
+    if header_key == secret:
+        return True
+        
+    # Check query param as fallback
+    query_key = request.args.get("api_key")
+    if query_key == secret:
+        return True
+        
+    return False
+
+
+def make_simulator_request(path, method='GET', data=None, timeout=1.0):
+    url = f"{Config.SIMULATOR_URL}{path}"
+    headers = {}
+    
+    secret = get_shared_secret()
+    if secret:
+        headers["X-API-Key"] = secret
+        
+    encoded_data = None
+    if data is not None:
+        encoded_data = json.dumps(data).encode('utf-8')
+        headers["Content-Type"] = "application/json"
+        
+    req = urllib.request.Request(
+        url,
+        data=encoded_data,
+        headers=headers,
+        method=method
+    )
+    return urllib.request.urlopen(req, timeout=timeout)
+
 import atexit
 import tempfile
 
@@ -53,11 +106,18 @@ db_client = None
 db = None
 mongodb_connected = False
 
+_last_db_ping_time = 0.0
+
 def check_db_connected():
-    global db_client, db, mongodb_connected
+    global db_client, db, mongodb_connected, _last_db_ping_time
+    now = time.time()
     if mongodb_connected and db is not None:
+        # Rate-limit database pings to once every 10 seconds to eliminate HTTP blocking lag
+        if now - _last_db_ping_time < 10.0:
+            return True
         try:
             db_client.admin.command('ping')
+            _last_db_ping_time = now
             return True
         except Exception:
             mongodb_connected = False
@@ -67,6 +127,7 @@ def check_db_connected():
     try:
         db_client = MongoClient(mongodb_uri)
         db_client.admin.command('ping')
+        _last_db_ping_time = now
         db = db_client[Config.MONGODB_DB_NAME]
         mongodb_connected = True
         return True
@@ -121,6 +182,27 @@ _telemetry_cache = {
     'n_cached':  0       # number of raw_readings already processed
 }
 
+class SafeUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        # Remap numpy._core -> numpy.core (handles loading NumPy 2.x pickles on NumPy 1.x environments)
+        if module.startswith("numpy._core"):
+            module = module.replace("numpy._core", "numpy.core")
+        # Remap numpy.core -> numpy._core (handles loading older pickles on environments where numpy.core is missing)
+        elif module.startswith("numpy.core"):
+            try:
+                import numpy._core
+                module = module.replace("numpy.core", "numpy._core")
+            except ImportError:
+                pass
+        return super().find_class(module, name)
+
+def safe_pickle_loads(data):
+    import io
+    return SafeUnpickler(io.BytesIO(data)).load()
+
+def safe_pickle_load(fileobj):
+    return SafeUnpickler(fileobj).load()
+
 def load_ml_model():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
     
@@ -131,7 +213,7 @@ def load_ml_model():
             print(f"[DEBUG] Documents in model_weights: {list(db['model_weights'].find({}, {'pickle_data': False}))}")
             db_model = db['model_weights'].find_one({'_id': 'esn_package'})
             if db_model is not None:
-                package = pickle.loads(db_model['pickle_data'])
+                package = safe_pickle_loads(db_model['pickle_data'])
                 esn_soc = package['esn_soc']
                 esn_soh = package['esn_soh']
                 input_means = package['input_means']
@@ -159,7 +241,7 @@ def load_ml_model():
     if os.path.exists(model_path):
         try:
             with open(model_path, 'rb') as f:
-                package = pickle.load(f)
+                package = safe_pickle_load(f)
                 esn_soc = package['esn_soc']
                 esn_soh = package['esn_soh']
                 input_means = package['input_means']
@@ -185,8 +267,7 @@ def check_simulator_port(force=False):
     global _simulator_port_online, _simulator_port_data
     if IS_SERVERLESS or force:
         try:
-            url = f"{Config.SIMULATOR_URL}/api/status"
-            with urllib.request.urlopen(url, timeout=1.0) as response:
+            with make_simulator_request("/api/status", timeout=1.0) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
                     return True, data
@@ -393,9 +474,7 @@ def status_checker_loop():
     while True:
         # 1. Asynchronously check Simulator Port
         try:
-            url = f"{Config.SIMULATOR_URL}/api/status"
-            req = urllib.request.Request(url)
-            with urllib.request.urlopen(req, timeout=1.0) as response:
+            with make_simulator_request("/api/status", timeout=1.0) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
                     _simulator_port_online = True
@@ -583,7 +662,7 @@ def _is_pid_alive(pid):
     try:
         os.kill(pid, 0)
         return True
-    except OSError:
+    except (OSError, SystemError):
         return False
     except (AttributeError, ValueError):
         try:
@@ -979,14 +1058,8 @@ def control_simulation():
                 if 'active_cycle' in sim_data:
                     sim_data['cycle_type'] = sim_data.pop('active_cycle')
                 
-                req = urllib.request.Request(
-                    f"{Config.SIMULATOR_URL}/api/control",
-                    data=json.dumps(sim_data).encode('utf-8'),
-                    headers={'Content-Type': 'application/json'},
-                    method='POST'
-                )
                 # Increased timeout to 1.5s to prevent false timeouts on Render
-                with urllib.request.urlopen(req, timeout=1.5) as response:
+                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=1.5) as response:
                     if response.status == 200:
                         sim_resp = json.loads(response.read().decode())
                         # Update cache with the simulator's updated status values
@@ -1077,13 +1150,7 @@ def post_register_chemistry():
         port_online, _ = check_simulator_port()
         if port_online:
             try:
-                req = urllib.request.Request(
-                    f"{Config.SIMULATOR_URL}/api/chemistry/register",
-                    data=json.dumps(data).encode('utf-8'),
-                    headers={'Content-Type': 'application/json'},
-                    method='POST'
-                )
-                with urllib.request.urlopen(req, timeout=1.0) as response:
+                with make_simulator_request("/api/chemistry/register", method='POST', data=data, timeout=1.0) as response:
                     pass
             except Exception as e:
                 print(f"Warning: Failed to forward registered chemistry to simulator: {e}")
@@ -1106,28 +1173,6 @@ def get_telemetry():
     try:
         if not model_loaded:
             load_ml_model()
-
-        raw_readings = []
-        if check_db_connected():
-            # O(1) fetch — sorted by time ascending
-            cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', 1)
-            raw_readings = list(cursor)
-        else:
-            port_online, _ = check_simulator_port()
-            if port_online:
-                try:
-                    url = f"{Config.SIMULATOR_URL}/api/readings"
-                    # Increased timeout to 1.5s to handle Render network variance
-                    with urllib.request.urlopen(url, timeout=1.5) as response:
-                        if response.status == 200:
-                            raw_readings = json.loads(response.read().decode())
-                except Exception as e:
-                    print(f"Error fetching readings from simulator: {e}")
-            else:
-                raw_readings = list(local_telemetry_buffer)
-
-        if not raw_readings:
-            return jsonify({'model_loaded': model_loaded, 'data': []})
 
         state = load_sim_state()
         chemistry_name = state.get('chemistry', 'li_ion')
@@ -1162,18 +1207,65 @@ def get_telemetry():
 
         pipeline         = cache['pipeline']
         pipeline.load_model(esn_soc, esn_soh, input_means, input_stds)
-        # Invalidate cache if the database was reset / purged
         already_cached   = cache['n_cached']
-        if len(raw_readings) < already_cached:
-            cache.update({
-                'key':       None,
-                'pipeline':  None,
-                'processed': [],
-                'n_cached':  0
-            })
-            already_cached = 0
+        
+        new_readings = []
+        prev_time = None
+        if already_cached > 0 and len(cache['processed']) > 0:
+            prev_time = cache['processed'][-1]['time']
+
+        if check_db_connected():
+            try:
+                total_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
+                # Invalidate cache if the database was reset / purged
+                if total_count < already_cached:
+                    cache.update({
+                        'key':       None,
+                        'pipeline':  None,
+                        'processed': [],
+                        'n_cached':  0
+                    })
+                    already_cached = 0
+                    prev_time = None
+                    total_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
+                
+                if prev_time is not None:
+                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1)
+                    new_readings = list(cursor)
+                else:
+                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', 1)
+                    new_readings = list(cursor)
+                    
+                cache['n_cached'] = total_count
+            except Exception as db_err:
+                print(f"Error querying database in get_telemetry: {db_err}")
+                new_readings = []
+        else:
+            # Fallback when database is offline
+            port_online, _ = check_simulator_port()
+            raw_readings = []
+            if port_online:
+                try:
+                    with make_simulator_request("/api/readings", timeout=1.5) as response:
+                        if response.status == 200:
+                            raw_readings = json.loads(response.read().decode())
+                except Exception as e:
+                    print(f"Error fetching readings from simulator: {e}")
+            else:
+                raw_readings = list(local_telemetry_buffer)
             
-        new_readings     = raw_readings[already_cached:]
+            # Invalidate cache if local buffer was cleared / truncated
+            if len(raw_readings) < already_cached:
+                cache.update({
+                    'key':       None,
+                    'pipeline':  None,
+                    'processed': [],
+                    'n_cached':  0
+                })
+                already_cached = 0
+            
+            new_readings = raw_readings[already_cached:]
+            cache['n_cached'] = len(raw_readings)
 
         cpu_usage, mem_usage = get_system_metrics()
         prev_time = None
@@ -1197,6 +1289,7 @@ def get_telemetry():
                 dt=dt,
                 quantize_mode=quantize_mode,
                 dataset_dt=Config.DATASET_TIME_STEP,
+                selected_indices=Config.ESN_SELECTED_FEATURE_INDICES,
                 fault_short=record.get('fault_short', False),
                 fault_thermal=record.get('fault_thermal', False),
                 fault_dropout=record.get('fault_dropout', False)
@@ -1233,8 +1326,7 @@ def get_telemetry():
             })
             cache['processed'].append(processed_record)
 
-        # Update cache watermark
-        cache['n_cached'] = len(raw_readings)
+        # Update cache watermark is handled inside the fetch branches
 
         # Return the most-recent window only
         limit = Config.TELEMETRY_RESPONSE_LIMIT

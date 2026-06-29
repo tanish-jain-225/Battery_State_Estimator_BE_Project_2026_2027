@@ -46,13 +46,13 @@ class Config:
     # Telemetry storage limits
     # -------------------------------------------------------------------------
     # Maximum readings returned per /api/telemetry call (prevents large browser payloads)
-    TELEMETRY_RESPONSE_LIMIT = int(os.environ.get("TELEMETRY_RESPONSE_LIMIT", 150))
+    TELEMETRY_RESPONSE_LIMIT = int(os.environ.get("TELEMETRY_RESPONSE_LIMIT", 60))
 
     # Rolling points limit for dashboard graph visualization
-    GRAPH_SLICE_LIMIT = int(os.environ.get("GRAPH_SLICE_LIMIT", 120))
+    GRAPH_SLICE_LIMIT = int(os.environ.get("GRAPH_SLICE_LIMIT", 60))
 
     # Maximum in-memory fallback list size when MongoDB is offline
-    TELEMETRY_FALLBACK_LIMIT = int(os.environ.get("TELEMETRY_FALLBACK_LIMIT", 1000))
+    TELEMETRY_FALLBACK_LIMIT = int(os.environ.get("TELEMETRY_FALLBACK_LIMIT", 100))
 
     # -------------------------------------------------------------------------
     # Feature engineering parameters
@@ -67,9 +67,9 @@ class Config:
 
     # Indices into the 6-element raw feature vector [Voltage, Current, Temperature,
     # Voltage_grad, Current_ma, Temp_ma] to select for ESN input.
-    # Default: [0, 1, 3, 4] = Voltage, Current, Voltage_grad, Current_ma
-    # (Temperature features excluded to prevent out-of-distribution bias)
-    ESN_SELECTED_FEATURE_INDICES = [0, 1, 3, 4]
+    # Updated to select all 6 features (including temperature) to allow
+    # the networks to capture complete thermodynamic battery states.
+    ESN_SELECTED_FEATURE_INDICES = [0, 1, 2, 3, 4, 5]
 
     # -------------------------------------------------------------------------
     # ESN reservoir priming & training washout
@@ -86,21 +86,21 @@ class Config:
     # -------------------------------------------------------------------------
     # SOC Echo State Network hyperparameters
     # -------------------------------------------------------------------------
-    ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 300))
-    ESN_SOC_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOC_SPECTRAL_RADIUS", 0.90))
-    ESN_SOC_LEAK_RATE    = float(os.environ.get("ESN_SOC_LEAK_RATE", 0.3))
+    ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 500))
+    ESN_SOC_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOC_SPECTRAL_RADIUS", 0.95))
+    ESN_SOC_LEAK_RATE    = float(os.environ.get("ESN_SOC_LEAK_RATE", 0.15))
     ESN_SOC_INPUT_SCALING = float(os.environ.get("ESN_SOC_INPUT_SCALING", 0.8))
-    ESN_SOC_RIDGE_PARAM  = float(os.environ.get("ESN_SOC_RIDGE_PARAM", 1e-4))
+    ESN_SOC_RIDGE_PARAM  = float(os.environ.get("ESN_SOC_RIDGE_PARAM", 1e-5))
     ESN_SOC_SPARSITY     = float(os.environ.get("ESN_SOC_SPARSITY", 0.85))
 
     # -------------------------------------------------------------------------
     # SOH Echo State Network hyperparameters
     # -------------------------------------------------------------------------
-    ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 200))
-    ESN_SOH_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOH_SPECTRAL_RADIUS", 0.70))
-    ESN_SOH_LEAK_RATE    = float(os.environ.get("ESN_SOH_LEAK_RATE", 0.05))
+    ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 400))
+    ESN_SOH_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOH_SPECTRAL_RADIUS", 0.85))
+    ESN_SOH_LEAK_RATE    = float(os.environ.get("ESN_SOH_LEAK_RATE", 0.02))
     ESN_SOH_INPUT_SCALING = float(os.environ.get("ESN_SOH_INPUT_SCALING", 0.4))
-    ESN_SOH_RIDGE_PARAM  = float(os.environ.get("ESN_SOH_RIDGE_PARAM", 1e-3))
+    ESN_SOH_RIDGE_PARAM  = float(os.environ.get("ESN_SOH_RIDGE_PARAM", 1e-5))
     ESN_SOH_SPARSITY     = float(os.environ.get("ESN_SOH_SPARSITY", 0.85))
 
     # -------------------------------------------------------------------------

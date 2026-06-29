@@ -21,8 +21,14 @@ from feature_engineering import extract_features_step, extract_features_df
 from train_rc import EchoStateNetwork
 from estimator_pipeline import EstimatorPipeline
 
-# Visualiser Config (standard import — visualiser_dir is first in sys.path)
-from config import Config as VisConfig
+# Visualiser Config — loaded by absolute file path to bypass sys.modules cache.
+_vis_spec = importlib.util.spec_from_file_location(
+    '_vis_config_test',
+    os.path.join(visualiser_dir, 'config.py')
+)
+_vis_cfg_mod = importlib.util.module_from_spec(_vis_spec)
+_vis_spec.loader.exec_module(_vis_cfg_mod)
+VisConfig = _vis_cfg_mod.Config
 
 # Simulator Config — loaded by absolute file path to bypass sys.modules cache.
 # 'config' may already be cached as the visualiser's Config; using a unique

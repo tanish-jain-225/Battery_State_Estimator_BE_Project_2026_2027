@@ -22,6 +22,45 @@ log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 
+def get_shared_secret():
+    import hashlib
+    # Read database connection URI which is already required and configured
+    uri = os.environ.get("MONGODB_URI", Config.MONGODB_URI)
+    if not uri or "localhost" in uri or "127.0.0.1" in uri:
+        return None
+    # Hash the connection URI to create a secure 64-character secret
+    return hashlib.sha256(uri.encode('utf-8')).hexdigest()
+
+def verify_request_auth():
+    # Loopback addresses (localhost) bypass auth checks in dev/local environments
+    remote = request.remote_addr
+    if remote in ('127.0.0.1', '::1', 'localhost'):
+        return True
+        
+    secret = get_shared_secret()
+    if not secret:
+        return True # Fails-open for local developer runs
+    
+    # Check header
+    header_key = request.headers.get("X-API-Key")
+    if header_key == secret:
+        return True
+        
+    # Check query param as fallback
+    query_key = request.args.get("api_key")
+    if query_key == secret:
+        return True
+        
+    return False
+
+@app.before_request
+def enforce_api_key():
+    if request.path.startswith('/api/') and request.method == 'POST':
+        if not verify_request_auth():
+            return jsonify({'status': 'error', 'message': 'Unauthorized: Invalid API Key.'}), 401
+
+
+
 # Default generator config
 DEFAULT_STATE = {
     'chemistry': 'li_ion',
@@ -578,7 +617,7 @@ def _is_pid_alive(pid):
     try:
         os.kill(pid, 0)
         return True
-    except OSError:
+    except (OSError, SystemError):
         return False
     except (AttributeError, ValueError):
         try:

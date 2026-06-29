@@ -194,7 +194,8 @@ def main():
     input_stds = U_raw.std(axis=0)
     input_stds[input_stds == 0.0] = 1.0
     
-    feature_names = ['Voltage', 'Current', 'Voltage_grad', 'Current_ma']
+    all_names = ['Voltage', 'Current', 'Temperature', 'Voltage_grad', 'Current_ma', 'Temp_ma']
+    feature_names = [all_names[i] for i in selected_indices]
     for idx, name in enumerate(feature_names):
         print(f"  Feature '{name}': mean={input_means[idx]:.4f}, std={input_stds[idx]:.4f}")
         

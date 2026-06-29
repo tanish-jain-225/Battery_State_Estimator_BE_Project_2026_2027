@@ -4,6 +4,48 @@
 
 **Battery State Estimator: Cyber-Physical State Estimation and Edge Diagnostics**
 
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat&logo=python)](https://www.python.org/)
+[![Embedded C](https://img.shields.io/badge/Embedded_C-C99-orange?style=flat)](https://en.cppreference.com/w/c/99)
+[![Flask](https://img.shields.io/badge/Flask-2.0%2B-black?style=flat&logo=flask)](https://flask.palletsprojects.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0%2B-green?style=flat&logo=mongodb)](https://www.mongodb.com/)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=flat)](.github/workflows/ci.yml)
+
+A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC), State of Health (SOH), State of Energy (SOE), State of Power (SOP), and thermal safety monitoring under dynamic EV-style drive-cycle workloads. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, RLS), Echo State Networks, and low-power embedded C edge diagnostics.
+
+---
+
+## Table of Contents
+1. [Team Details](#team-details)
+2. [Guide Details](#guide-details)
+3. [Problem Statement](#problem-statement)
+4. [Abstract](#abstract)
+5. [Objectives](#objectives)
+6. [Scope of the Project](#scope-of-the-project)
+7. [Existing System](#existing-system)
+8. [Proposed System](#proposed-system)
+9. [System Architecture](#system-architecture)
+10. [Hardware Requirements](#hardware-requirements)
+11. [Software Requirements](#software-requirements)
+12. [Technologies Used](#technologies-used)
+13. [Methodology](#methodology)
+14. [Security and Data Privacy](#security-and-data-privacy)
+15. [Project Timeline](#project-timeline)
+16. [Weekly Progress Updates](#weekly-progress-updates)
+17. [Design Files](#design-files)
+18. [Circuit Diagram](#circuit-diagram)
+19. [Flowchart / Algorithm](#flowchart--algorithm)
+20. [Implementation Details](#implementation-details)
+21. [Code Structure](#code-structure)
+22. [How to Run the Project](#how-to-run-the-project)
+23. [Testing and Results](#testing-and-results)
+24. [Applications](#applications)
+25. [Advantages](#advantages)
+26. [Limitations](#limitations)
+27. [Future Scope](#future-scope)
+28. [Research Paper / Publication](#research-paper--publication)
+29. [References](#references)
+30. [Repository Update Guidelines](#repository-update-guidelines)
+
 ---
 
 ## Team Details
@@ -33,23 +75,7 @@
 
 ## Abstract
 
-Reliable SOC and SOH estimation is essential for electric vehicles, smart grids,
-and battery-powered systems. Traditional Battery Management Systems often rely
-on Coulomb Counting or Extended Kalman Filters, which can drift under aging,
-temperature changes, and unmodeled cell behavior. Deep recurrent neural
-networks can improve sequence modeling, but they are often too expensive for
-small microcontrollers. This project implements a cyber-physical battery
-estimation framework that combines a 2-RC electro-thermal physics simulator,
-traditional EKF and resistance-based SOH observers, Echo State Network
-estimators, and an optimized embedded ESN classifier. The software side includes
-two Flask services: a physics simulator and a comparative visualiser dashboard.
-The hardware side includes C99 inference code using Compressed Sparse Row
-reservoir matrices and optional Q12/Q15 fixed-point arithmetic. The system
-supports fault injection for thermal runaway, sensor dropout, and micro-short
-conditions, enabling validation of estimator robustness and edge safety
-classification. Current validation targets include sub-1.5 percent SOC RMSE,
-sub-1.0 percent SOH RMSE, 98.40 percent thermal safety classification accuracy,
-and a 6.7x sparse reservoir speedup.
+Reliable SOC and SOH estimation is essential for electric vehicles, smart grids, and battery-powered systems. Traditional Battery Management Systems often rely on Coulomb Counting or Extended Kalman Filters, which can drift under aging, temperature changes, and unmodeled cell behavior. Deep recurrent neural networks can improve sequence modeling, but they are often too expensive for small microcontrollers. This project implements a cyber-physical battery estimation framework that combines a 2-RC electro-thermal physics simulator, traditional EKF and resistance-based SOH observers, Echo State Network estimators, and an optimized embedded ESN classifier. The software side includes two Flask services: a physics simulator and a comparative visualiser dashboard. The hardware side includes C99 inference code using Compressed Sparse Row reservoir matrices and optional Q12/Q15 fixed-point arithmetic. The system supports fault injection for thermal runaway, sensor dropout, and micro-short conditions, enabling validation of estimator robustness and edge safety classification. Current validation targets include sub-1.5 percent SOC RMSE, sub-1.0 percent SOH RMSE, 98.40 percent thermal safety classification accuracy, and a 6.7x sparse reservoir speedup.
 
 ---
 
@@ -79,8 +105,7 @@ and a 6.7x sparse reservoir speedup.
 
 ## Existing System
 
-Existing BMS approaches commonly use Coulomb Counting, voltage lookup tables, or
-Kalman filters. These methods are useful but have limitations:
+Existing BMS approaches commonly use Coulomb Counting, voltage lookup tables, or Kalman filters. These methods are useful but have limitations:
 
 - **High drift:** Coulomb Counting accumulates error without periodic correction.
 - **Model mismatch:** EKF performance depends on accurate battery parameters and OCV-SOC curves.
@@ -93,8 +118,7 @@ Kalman filters. These methods are useful but have limitations:
 
 ## Proposed System
 
-The proposed system combines physics-based modeling, classical observers, and
-reservoir computing in one integrated workflow.
+The proposed system combines physics-based modeling, classical observers, and reservoir computing in one integrated workflow.
 
 - **Main idea:** Use a 2-RC electro-thermal simulator as the physical reference, run EKF/CC/ESN estimators in parallel, and deploy an optimized ESN classifier on edge hardware.
 - **How it works:** The simulator generates battery telemetry and stores it in MongoDB or an in-memory buffer. The visualiser reads telemetry, estimates SOC/SOH, computes diagnostics, and displays results. The hardware classifier consumes voltage, current, and temperature inputs and classifies the thermal safety state.
@@ -121,10 +145,7 @@ flowchart LR
     Dash -->|"control and fault toggles"| Sim
 ```
 
-The simulator produces physical telemetry. The visualiser consumes telemetry and
-runs estimators. MongoDB provides persistence when available. The embedded ESN
-classifier provides edge safety state inference and can be tested through the
-desktop C simulator.
+The simulator produces physical telemetry. The visualiser consumes telemetry and runs estimators. MongoDB provides persistence when available. The embedded ESN classifier provides edge safety state inference and can be tested through the desktop C simulator.
 
 ---
 
@@ -181,6 +202,18 @@ desktop C simulator.
 
 ---
 
+## Security and Data Privacy
+
+To support production-grade deployment guidelines, the system implements the following security mechanisms:
+
+* **Zero-Configuration Cryptographic Gating**: Rather than requiring a new, separate secret configuration key, the system automatically derives a secure 64-character SHA-256 signature token from the **pre-existing** `MONGODB_URI` environment connection string.
+* **Dynamic API Signature Verification**: Both the Simulator and Visualizer service endpoints (all routes under `/api/*`) dynamically check incoming requests. Requests must present the correct derived SHA-256 signature in the `X-API-Key` HTTP header (or the `api_key` URL query parameter) to succeed.
+* **Inter-Service Request Delegation**: The Visualizer features a centralized dispatcher (`make_simulator_request`) that hashes the shared `MONGODB_URI` database string on the fly and automatically signs all outgoing HTTP calls to the physics simulator.
+* **Fails-Open Local Development**: If the `MONGODB_URI` contains `localhost` or `127.0.0.1` (the default configurations in local developer `.env` files), the authentication checks are bypassed automatically. This allows seamless out-of-the-box offline runs for the student team.
+* **Credentials Sanitization**: Highly sensitive parameters, including MongoDB Atlas connection passwords, are loaded dynamically into runtime memory and are completely omitted from the repository's tracked code history.
+
+---
+
 ## Project Timeline
 
 | Week / Month | Task Planned | Status |
@@ -190,9 +223,9 @@ desktop C simulator.
 | Week 3 | Requirement analysis | Completed |
 | Week 4 | System design | Completed |
 | Week 5 | Prototype development | Completed |
-| Week 6 | Testing and validation | In Progress |
-| Week 7 | Documentation and deployment polish | In Progress |
-| Week 8 | Paper writing and final demonstration | In Progress |
+| Week 6 | Testing and validation | Completed |
+| Week 7 | Documentation and deployment polish | Completed |
+| Week 8 | Paper writing and final demonstration | Completed |
 
 ---
 
@@ -207,7 +240,7 @@ desktop C simulator.
 | Week 5 | 2026-06-04 | Implemented Flask services and dashboard | Edge classifier work | Porting ESN to C | Repository history |
 | Week 6 | 2026-06-11 | Added CSR and Q12/Q15 inference paths | Fault testing | LUT accuracy | Repository history |
 | Week 7 | 2026-06-18 | Added tests, documentation, and validation flow | Deployment polish | MongoDB fallback behavior | Repository history |
-| Week 8 | 2026-06-25 | Added CI, Render guidance, artifact policy, and demo checklist | Final review | None | Repository history |
+| Week 8 | 2026-06-25 | Added CI, Render guidance, API key security, and tests | Final review | None | Repository history |
 
 ---
 
@@ -215,8 +248,8 @@ desktop C simulator.
 
 | File Type | File Name / Link | Description |
 | --------- | ---------------- | ----------- |
-| System Specification | [docs/system_specification.md](docs/system_specification.md) | Interfaces, data flow, APIs, and validation scope |
-| Operations Guide | [docs/OPERATIONS.md](docs/OPERATIONS.md) | Local setup, run, and verification steps |
+| System Specification | [docs/system_specification.md](docs/system_specification.md) | Interfaces, data flow, APIs, security, and validation scope |
+| Operations Guide | [docs/OPERATIONS.md](docs/OPERATIONS.md) | Local setup, run, security settings, and verification steps |
 | Render Deployment | [docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md) | Standalone Render deployment instructions |
 | Demo Checklist | [docs/DEMO_CHECKLIST.md](docs/DEMO_CHECKLIST.md) | Review and viva demonstration checklist |
 | Circuit / Pinout Reference | [hardware/main.h](hardware/main.h) | Host HAL mocks and STM32-style pin assumptions |
@@ -239,8 +272,7 @@ The physical battery is represented using a 2-RC equivalent circuit model:
            +----[ C2 ]----+-----+
 ```
 
-The embedded diagnostic output uses GPIO `PA5` for the status LED and UART2 for
-serial diagnostic output.
+The embedded diagnostic output uses GPIO `PA5` for the status LED and UART2 for serial diagnostic output.
 
 ---
 
@@ -276,22 +308,11 @@ flowchart TD
 
 ### Hardware Implementation
 
-The hardware module is implemented in C99 for STM32-style targets. It uses a
-3-input ESN classifier with a 50-node sparse reservoir and 3 output classes:
-Normal, Warning, and Critical. The recurrent matrix is stored in CSR format to
-skip zero multiplications. Optional fixed-point mode converts inputs to Q12 and
-states/weights to Q15, using a lookup-table tanh approximation for faster
-microcontroller inference. GPIO `PA5` is used as a visual status output.
+The hardware module is implemented in C99 for STM32-style targets. It uses a 3-input ESN classifier with a 50-node sparse reservoir and 3 output classes: Normal, Warning, and Critical. The recurrent matrix is stored in CSR format to skip zero multiplications. Optional fixed-point mode converts inputs to Q12 and states/weights to Q15, using a lookup-table tanh approximation for faster microcontroller inference. GPIO `PA5` is used as a visual status output.
 
 ### Software Implementation
 
-The software module is split into two Flask services. The simulator service
-models 2-RC ECM dynamics, thermal behavior, aging, noise, and faults. The
-visualiser service reads telemetry, runs EKF/CC/ESN estimators, computes
-diagnostics, and serves the dashboard. MongoDB provides persistent telemetry and
-model storage when available; otherwise, local buffers keep the system runnable.
-The repository also includes unit tests, CI configuration, deployment guidance,
-and documented artifact handling.
+The software module is split into two Flask services. The simulator service models 2-RC ECM dynamics, thermal behavior, aging, noise, and faults. The visualiser service reads telemetry, runs EKF/CC/ESN estimators, computes diagnostics, and serves the dashboard. MongoDB provides persistent telemetry and model storage when available; otherwise, local buffers keep the system runnable. The repository also includes unit tests, CI configuration, deployment guidance, and documented artifact handling.
 
 ---
 
@@ -329,6 +350,8 @@ Battery_State_Estimator_BE_Project_2026_2027/
 |       |-- config.py
 |       |-- model_rc.pkl
 |       |-- tests/
+|       |   |-- test_estimators.py
+|       |   `-- test_api_auth.py
 |       |-- training/
 |       `-- templates/
 |-- images/
@@ -402,27 +425,14 @@ python -m unittest discover -s software/visualiser/tests
 
 | Test No. | Test Description | Expected Result | Actual Result | Status |
 | -------- | ---------------- | --------------- | ------------- | ------ |
-| 1 | Chemistry profile loading and OCV behavior | Valid profiles and monotonic OCV | 43-test suite covers chemistry checks | Pass |
-| 2 | 2-RC simulator dynamics | Charge/discharge, aging, and fault behavior | Covered by simulator physics tests | Pass |
-| 3 | EKF and SOH observers | Bounded SOC/SOH and stable covariance | Covered by estimator tests | Pass |
-| 4 | ESN feature and prediction path | Valid features and estimator outputs | Covered by ESN and pipeline tests | Pass |
+| 1 | Chemistry profile loading and OCV behavior | Valid profiles and monotonic OCV | Verified via test_estimators.py | Pass |
+| 2 | 2-RC simulator dynamics | Charge/discharge, aging, and fault behavior | Verified via test_estimators.py | Pass |
+| 3 | EKF and SOH observers | Bounded SOC/SOH and stable covariance | Verified via test_estimators.py | Pass |
+| 4 | ESN feature and prediction path | Valid features and estimator outputs | Verified via test_estimators.py | Pass |
 | 5 | Edge classifier | Normal/Warning/Critical classification | 98.40 percent reported accuracy | Pass |
+| 6 | API Security & Fails-Open Routing | Verify 401 on missing key and 200 on valid credentials or local fallback | Verified via test_api_auth.py | Pass |
 
-Current automated result: `43 tests OK`.
-
----
-
-## Result Images / Videos
-
-Available screenshots are stored in [images/assets](images/assets).
-
-```markdown
-![BMS Physical Simulator](images/assets/Screenshot%202026-06-25%20095034.png)
-![Battery State Estimator Dashboard](images/assets/Screenshot%202026-06-25%20095057.png)
-![Estimator Charts](images/assets/Screenshot%202026-06-25%20095127.png)
-```
-
-Project demo video: Refer to the Operations Guide at [docs/OPERATIONS.md](docs/OPERATIONS.md) for instructions on capturing, generating, and embedding local project demo clips.
+Current automated result: `47 tests OK`.
 
 ---
 
@@ -500,12 +510,3 @@ Minimum expected updates:
 * Add tests when changing simulator, estimator, or feature logic.
 * Document model, dataset, and generated-header changes in `docs/ARTIFACTS.md`.
 * Keep deployment settings documented in `docs/DEPLOY_RENDER.md`.
-
-Example commit messages:
-
-```text
-Added EKF covariance validation tests
-Updated Render deployment guide
-Regenerated ESN classifier weights
-Improved simulator fault injection documentation
-```

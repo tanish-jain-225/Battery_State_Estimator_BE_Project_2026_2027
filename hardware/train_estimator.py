@@ -17,8 +17,9 @@ print("Performing feature engineering...")
 df = df.copy()
 df['Voltage_grad'] = df['Voltage'].diff().fillna(0.0)
 df['Current_ma'] = df['Current'].rolling(window=5, min_periods=1).mean()
+df['Temp_ma'] = df['Temperature'].rolling(window=5, min_periods=1).mean()
 
-U = df[['Voltage', 'Current', 'Voltage_grad', 'Current_ma']].values
+U = df[['Voltage', 'Current', 'Temperature', 'Voltage_grad', 'Current_ma', 'Temp_ma']].values
 Y_soc = df[['SOC']].values
 Y_soh = df[['SOH']].values
 
@@ -31,19 +32,21 @@ U_scaled = (U - input_means) / input_stds
 print("Input features details:")
 print(f"  Voltage: mean={input_means[0]:.4f}, std={input_stds[0]:.4f}")
 print(f"  Current: mean={input_means[1]:.4f}, std={input_stds[1]:.4f}")
-print(f"  Voltage_grad: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
-print(f"  Current_ma: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
+print(f"  Temperature: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
+print(f"  Voltage_grad: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
+print(f"  Current_ma: mean={input_means[4]:.4f}, std={input_stds[4]:.4f}")
+print(f"  Temp_ma: mean={input_means[5]:.4f}, std={input_stds[5]:.4f}")
 
 # Train SOC ESN
 print("Training SOC Echo State Network...")
 esn_soc = EchoStateNetwork(
-    n_inputs=4,
-    n_reservoir=300,
+    n_inputs=6,
+    n_reservoir=500,
     n_outputs=1,
-    spectral_radius=0.90,
-    leak_rate=0.3,
-    input_scaling=0.8,
-    ridge_param=1e-4,
+    spectral_radius=0.95,
+    leak_rate=0.15,
+    input_scaling=1.0,
+    ridge_param=1e-5,
     sparsity=0.85
 )
 esn_soc.train(U_scaled, Y_soc, washout=50)
@@ -54,13 +57,13 @@ print(f"SOC RMSE: {soc_rmse:.6f}")
 # Train SOH ESN
 print("Training SOH Echo State Network...")
 esn_soh = EchoStateNetwork(
-    n_inputs=4,
-    n_reservoir=200,
+    n_inputs=6,
+    n_reservoir=400,
     n_outputs=1,
-    spectral_radius=0.70,
-    leak_rate=0.05,
+    spectral_radius=0.85,
+    leak_rate=0.02,
     input_scaling=0.4,
-    ridge_param=1e-3,
+    ridge_param=1e-5,
     sparsity=0.85
 )
 esn_soh.train(U_scaled, Y_soh, washout=50)
@@ -103,9 +106,9 @@ with open(header_path, "w") as f:
     f.write("#define ESN_ESTIMATOR_WEIGHTS_H\n\n")
     f.write("// Auto-generated weights file for STM32 ESN estimators\n\n")
     
-    f.write(f"#define ESN_N_INPUTS 4\n")
-    f.write(f"#define ESN_SOC_N_RESERVOIR 300\n")
-    f.write(f"#define ESN_SOH_N_RESERVOIR 200\n\n")
+    f.write(f"#define ESN_N_INPUTS 6\n")
+    f.write(f"#define ESN_SOC_N_RESERVOIR 500\n")
+    f.write(f"#define ESN_SOH_N_RESERVOIR 400\n\n")
     
     write_array_1d(f, "esn_input_means", input_means)
     write_array_1d(f, "esn_input_stds", input_stds)

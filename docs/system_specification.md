@@ -80,6 +80,22 @@ Representative endpoints:
 | `POST` | `/api/train` | Retrain ESN model and update model registry when available. |
 | `POST` | `/api/config` | Update estimation and visualization parameters. |
 
+## Security & Authentication
+
+If the `MONGODB_URI` environment variable is configured with a non-localhost connection string (such as an Atlas database path), the application server nodes enforce authentication on all mutating **`POST`** routes (such as `/api/control` and `/api/chemistry/register`). Read-only dashboard queries (`GET` requests) bypass key checks to allow standard client browser renderings.
+
+### Token Derivation
+To avoid introducing new environment variables, the system derives a secure 64-character token via:
+`SHA-256( MONGODB_URI )`
+
+### Authorization Headers
+* **Header Name**: `X-API-Key` (stores the derived SHA-256 hex string)
+* **Query Parameter Fallback**: `?api_key=<token>`
+* **Failure Code**: `401 Unauthorized`
+
+### Inter-Service Request Delegation
+The Visualizer service dynamically computes the SHA-256 hash of the shared `MONGODB_URI` and signs all outgoing requests directed at the Simulator's REST endpoints by forwarding the token in the `X-API-Key` request header.
+
 ## Estimator Outputs
 
 The visualiser enriches each telemetry frame with:
