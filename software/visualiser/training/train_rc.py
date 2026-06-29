@@ -194,6 +194,9 @@ class EchoStateNetwork:
         return np.array(predictions)
 
 def main():
+    import socket
+    socket.setdefaulttimeout(10.0)
+    
     csv_path = Config.CSV_PATH
     csv_url = getattr(Config, 'CSV_URL', '').strip()
     model_save_path = Config.MODEL_PATH

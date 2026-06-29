@@ -775,6 +775,9 @@ def run_training_async():
     training_status['logs'] = 'Checking training dataset paths...\n'
     
     try:
+        import socket
+        socket.setdefaulttimeout(10.0)
+        
         from train_rc import EchoStateNetwork
         from feature_engineering import extract_features_df
         
