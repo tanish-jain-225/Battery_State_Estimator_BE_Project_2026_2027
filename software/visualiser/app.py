@@ -1298,14 +1298,21 @@ def get_telemetry():
                     })
                     already_cached = 0
                     prev_time = None
-                    total_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
                 
                 if prev_time is not None:
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1)
                     new_readings = list(cursor)
                 else:
-                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', 1)
-                    new_readings = list(cursor)
+                    # Cap initial fetch to the most recent 500 records to prevent CPU/memory starvation on first load
+                    limit_val = 500
+                    if total_count > limit_val:
+                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
+                        new_readings = list(cursor)
+                        new_readings.reverse() # Restore chronological order
+                        already_cached = total_count - limit_val
+                    else:
+                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', 1)
+                        new_readings = list(cursor)
                     
                 cache['n_cached'] = total_count
             except Exception as db_err:
