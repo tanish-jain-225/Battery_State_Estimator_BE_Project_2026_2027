@@ -147,3 +147,34 @@ class EchoStateNetwork:
             y_pred = self.predict_step(U[t])
             predictions.append(y_pred)
         return np.array(predictions)
+
+
+if __name__ == '__main__':
+    import subprocess, sys, os
+
+    print("=" * 52)
+    print("  Battery State Estimator — Hardware ESN Trainer")
+    print("=" * 52)
+    here = os.path.dirname(os.path.abspath(__file__))
+
+    scripts = [
+        ("ESN Estimator  (SOC + SOH → esn_estimator_weights.h)", "train_estimator.py"),
+        ("ESN Classifier (fault detection → esn_classifier_weights.h)", "train_classifier.py"),
+    ]
+
+    for label, script in scripts:
+        print(f"\n[STEP] Training {label}...")
+        result = subprocess.run(
+            [sys.executable, os.path.join(here, script)],
+            capture_output=False
+        )
+        if result.returncode != 0:
+            print(f"[ERROR] {script} exited with code {result.returncode}.")
+            sys.exit(result.returncode)
+
+    print("\n" + "=" * 52)
+    print("  All hardware ESN weights generated successfully!")
+    print("  → esn_estimator_weights.h")
+    print("  → esn_classifier_weights.h")
+    print("  Run: .\\run_c_simulator.bat  to test in C")
+    print("=" * 52)
