@@ -406,12 +406,17 @@ def sync_simulation_on_demand():
         }
 
         if _ensure_db():
-            db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+            # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
+            exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
+            if not exists:
+                db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
         else:
-            local_telemetry_buffer.append(record)
-            limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
-            if len(local_telemetry_buffer) > limit:
-                local_telemetry_buffer.pop(0)
+            # Make sure we don't duplicate locally either
+            if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
+                local_telemetry_buffer.append(record)
+                limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
+                if len(local_telemetry_buffer) > limit:
+                    local_telemetry_buffer.pop(0)
 
     # Save final simulator state back to state dict
     update_sim_progress({

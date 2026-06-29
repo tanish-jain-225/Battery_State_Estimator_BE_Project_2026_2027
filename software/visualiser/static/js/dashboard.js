@@ -548,6 +548,26 @@ document.addEventListener('DOMContentLoaded', () => {
             valModelSohRmse.textContent = (status.soh_rmse !== null && status.soh_rmse !== undefined) ? status.soh_rmse.toFixed(6) : '--';
         }
 
+        // Update training data source badge
+        const valTrainingSource = document.getElementById('val-training-source');
+        const btnRetrainEl = document.getElementById('btn-retrain');
+        if (valTrainingSource) {
+            if (status.training_source === 'local_csv') {
+                valTrainingSource.textContent = '📁 Local CSV';
+                valTrainingSource.style.color = 'var(--accent-emerald)';
+                if (btnRetrainEl) btnRetrainEl.disabled = false;
+            } else if (status.training_source === 'remote_url') {
+                valTrainingSource.textContent = '🌐 Google Sheets';
+                valTrainingSource.style.color = 'var(--accent-blue)';
+                if (btnRetrainEl) btnRetrainEl.disabled = false;
+            } else {
+                valTrainingSource.textContent = '⚠ Not Configured';
+                valTrainingSource.style.color = 'var(--accent-rose)';
+                // Disable retrain if no source is available
+                if (btnRetrainEl && !isTraining) btnRetrainEl.disabled = true;
+            }
+        }
+
         // Update Sidebar elements with live status values
         const valSimPort = document.getElementById('val-sim-port');
         const valSimRunning = document.getElementById('val-sim-running');
@@ -1037,6 +1057,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await apiRequest('/api/train', 'POST');
                 if (res && (res.status === 'started' || res.status === 'running')) {
                     pollTrainingStatus();
+                } else if (res && res.status === 'unsupported') {
+                    // Server has no training data source configured
+                    if (consoleEl) {
+                        consoleEl.textContent = '[ERROR] ' + (res.message || 'Training not available: no data source configured.');
+                    }
+                    btnRetrain.disabled = false;
+                    btnRetrain.innerHTML = '<i class="fa-solid fa-arrows-spin"></i> Retrain ESN Weights';
                 } else {
                     btnRetrain.disabled = false;
                     btnRetrain.innerHTML = '<i class="fa-solid fa-arrows-spin"></i> Retrain ESN Weights';

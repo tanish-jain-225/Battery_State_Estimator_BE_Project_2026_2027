@@ -12,8 +12,7 @@ flashing a microcontroller.
 | `main.h` | Host-side HAL shims used by the desktop simulator. |
 | `train.py` | Echo State Network implementation used by hardware training scripts. |
 | `train_classifier.py` | Trains the 3-class thermal safety ESN and exports CSR C weights. |
-| `train_estimator.py` | Trains SOC/SOH ESN estimators and exports C weights. |
-| `export_weights.py` | Helper exporter for estimator weight headers. |
+| `train_estimator.py` | Single source of truth: trains SOC/SOH ESN estimators and exports C weights. |
 | `config.py` | Environment-driven configuration for datasets, ESN dimensions, and thresholds. |
 | `esn_classifier_weights.h` | Generated sparse classifier weights consumed by `main.c`. |
 | `esn_estimator_weights.h` | Generated estimator weights for embedded experiments. |

@@ -36,6 +36,11 @@ class Config:
     csv_env = os.environ.get("CSV_PATH", os.path.join("datasets", "training_ev_battery_dataset_multiclass.csv"))
     CSV_PATH = csv_env if os.path.isabs(csv_env) else os.path.join(BASE_DIR, csv_env)
 
+    # Remote CSV source — set to a public Google Sheets export URL or any direct CSV URL.
+    # Format for Google Sheets: https://docs.google.com/spreadsheets/d/{ID}/export?format=csv
+    # When set, production retraining will download the sheet instead of reading a local file.
+    CSV_URL = os.environ.get("CSV_URL", "").strip()
+
     # -------------------------------------------------------------------------
     # Physical battery simulator parameters
     # -------------------------------------------------------------------------

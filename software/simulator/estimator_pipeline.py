@@ -208,7 +208,7 @@ class EstimatorPipeline:
             return
         
         if selected_indices is None:
-            selected_indices = [0, 1, 3, 4]  # V, I, dV/dt, I_MA
+            selected_indices = Config.ESN_SELECTED_FEATURE_INDICES
 
         # Map initial voltage to NMC equivalent range
         nmc_chem = get_chemistry('nmc')
@@ -387,7 +387,7 @@ class EstimatorPipeline:
             
             if not self.primed:
                 # Lazy priming at first step
-                self.prime_esn(V_meas, T_meas, sim_dt=dt, dataset_dt=dataset_dt)
+                self.prime_esn(V_meas, T_meas, sim_dt=dt, dataset_dt=dataset_dt, selected_indices=selected_indices)
                 
             if selected_indices is None:
                 selected_indices = [0, 1, 3, 4]

@@ -170,7 +170,8 @@ training_status = {
     'logs': '',
     'soc_rmse': 0.0,
     'soh_rmse': 0.0,
-    'timestamp': None
+    'timestamp': None,
+    'training_source': None   # 'local_csv' | 'remote_url' | None
 }
 
 # Incremental pipeline state cache for /api/telemetry
@@ -263,16 +264,28 @@ def load_ml_model():
         loaded_soh_rmse = None
         print("Warning: Model not found locally or on DB. Running with blank weights.")
 
+_last_sim_port_check_time = 0.0
+
 def check_simulator_port(force=False):
-    global _simulator_port_online, _simulator_port_data
-    if IS_SERVERLESS or force:
+    global _simulator_port_online, _simulator_port_data, _last_sim_port_check_time
+    now = time.time()
+    if IS_SERVERLESS:
+        # Rate limit status port check in serverless mode to once every 20 seconds to prevent thread block lag
+        if not force and (now - _last_sim_port_check_time < 20.0):
+            return _simulator_port_online, _simulator_port_data
+            
+        _last_sim_port_check_time = now
         try:
-            with make_simulator_request("/api/status", timeout=1.0) as response:
+            with make_simulator_request("/api/status", timeout=0.8) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
+                    _simulator_port_online = True
+                    _simulator_port_data = data
                     return True, data
         except Exception:
             pass
+        _simulator_port_online = False
+        _simulator_port_data = None
         return False, None
         
     return _simulator_port_online, _simulator_port_data
@@ -431,11 +444,16 @@ def sync_simulation_locally():
         }
 
         if check_db_connected():
-            db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+            # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
+            exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
+            if not exists:
+                db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
         else:
-            local_telemetry_buffer.append(record)
-            if len(local_telemetry_buffer) > Config.TELEMETRY_FALLBACK_LIMIT:
-                local_telemetry_buffer.pop(0)
+            # Make sure we don't duplicate locally either
+            if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
+                local_telemetry_buffer.append(record)
+                if len(local_telemetry_buffer) > Config.TELEMETRY_FALLBACK_LIMIT:
+                    local_telemetry_buffer.pop(0)
 
     update_sim_progress({
         'time': visualiser_simulator.time,
@@ -752,7 +770,7 @@ def _lazy_init():
 
 # ── ESN Model Retraining Background Worker ────────────────────────────
 def run_training_async():
-    global training_status, esn_soc, esn_soh, input_means, input_stds, model_loaded
+    global training_status, esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
     
@@ -761,11 +779,33 @@ def run_training_async():
         from feature_engineering import extract_features_df
         
         csv_path = Config.CSV_PATH
-        if not os.path.exists(csv_path):
-            raise FileNotFoundError(f"Dataset CSV not found at {csv_path}. retrain requires ev dataset.")
+        csv_url  = Config.CSV_URL
 
-        training_status['logs'] += "Dataset found. Loading ev battery dataframe into memory...\n"
-        df = pd.read_csv(csv_path)
+        if os.path.exists(csv_path):
+            # Local dataset available (development / self-hosted environment)
+            training_status['training_source'] = 'local_csv'
+            training_status['logs'] += "Dataset found. Loading ev battery dataframe into memory...\n"
+            df = pd.read_csv(csv_path)
+        elif csv_url:
+            # Remote dataset via Google Sheets / public CSV URL
+            training_status['training_source'] = 'remote_url'
+            training_status['logs'] += f"Local dataset not found. Fetching remote dataset from URL...\n"
+            try:
+                df = pd.read_csv(csv_url)
+                training_status['logs'] += f"Remote dataset loaded ({len(df)} rows).\n"
+            except Exception as url_err:
+                raise RuntimeError(
+                    f"Failed to load remote CSV from CSV_URL: {url_err}. "
+                    "Ensure the Google Sheet is shared as 'Anyone with the link can view' "
+                    "and the URL ends with export?format=csv"
+                ) from url_err
+        else:
+            raise FileNotFoundError(
+                f"No training data source available.\n"
+                f"  • Local path '{csv_path}' does not exist.\n"
+                f"  • CSV_URL env var is not set.\n"
+                f"Set CSV_URL to your Google Sheets export URL to enable production retraining."
+            )
         
         training_status['logs'] += "Extracting features & scaling rolling MA features...\n"
         U_raw = extract_features_df(df)
@@ -855,11 +895,10 @@ def run_training_async():
         training_status['timestamp'] = datetime.utcnow().isoformat()
         training_status['logs'] += "Echo State Network retraining finished successfully.\n"
         
-        # Hydrate active ESN components
+        # Hydrate active ESN components in global scope
         esn_soc = local_esn_soc
         esn_soh = local_esn_soh
-        input_means = input_means
-        input_stds = input_stds
+        # input_means / input_stds already assigned via global above
         loaded_soc_rmse = soc_rmse
         loaded_soh_rmse = soh_rmse
         model_loaded = True
@@ -966,7 +1005,14 @@ def get_status():
             'fault_short': fault_short,
             'soc_rmse': loaded_soc_rmse,
             'soh_rmse': loaded_soh_rmse,
-            'graph_slice_limit': Config.GRAPH_SLICE_LIMIT
+            'graph_slice_limit': Config.GRAPH_SLICE_LIMIT,
+            # Training data source info
+            'csv_url_configured': bool(Config.CSV_URL),
+            'training_available': os.path.exists(Config.CSV_PATH) or bool(Config.CSV_URL),
+            'training_source': (
+                'local_csv' if os.path.exists(Config.CSV_PATH)
+                else ('remote_url' if Config.CSV_URL else None)
+            )
         })
     except Exception as e:
         print(f"Error in /api/status: {e}")
@@ -1102,6 +1148,17 @@ def control_simulation():
 @app.route('/api/train', methods=['POST'])
 def trigger_training():
     global training_status
+
+    # In serverless / read-only-filesystem environments, retraining requires
+    # a remote dataset source. Block only if neither local CSV nor CSV_URL is set.
+    if IS_SERVERLESS and not os.path.exists(Config.CSV_PATH) and not Config.CSV_URL:
+        return jsonify({
+            'status': 'unsupported',
+            'message': 'No training data source available in serverless mode. '
+                       'Set the CSV_URL environment variable to a public Google Sheets export URL '
+                       '(File → Share → Publish to web → CSV) to enable production retraining.'
+        }), 501
+
     if training_status['status'] == 'running':
         return jsonify({'status': 'running', 'message': 'Model retraining is already executing.'})
         

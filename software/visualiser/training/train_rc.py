@@ -165,14 +165,26 @@ class EchoStateNetwork:
 
 def main():
     csv_path = Config.CSV_PATH
+    csv_url = getattr(Config, 'CSV_URL', '').strip()
     model_save_path = Config.MODEL_PATH
 
-    print(f"Loading completed dataset from {csv_path}...")
-    if not os.path.exists(csv_path):
-        print("Error: Dataset not found. Please verify Config.CSV_PATH.")
+    df = None
+    if os.path.exists(csv_path):
+        print(f"Loading local dataset from {csv_path}...")
+        df = pd.read_csv(csv_path)
+    elif csv_url:
+        print(f"Local dataset not found. Fetching remote dataset from URL: {csv_url}...")
+        try:
+            df = pd.read_csv(csv_url)
+            print(f"Remote dataset loaded ({len(df)} rows).")
+        except Exception as e:
+            print(f"Error loading remote CSV from CSV_URL: {e}")
+            return
+    else:
+        print(f"Error: No training dataset source available.")
+        print(f"  • Local path '{csv_path}' does not exist.")
+        print(f"  • CSV_URL is not configured.")
         return
-        
-    df = pd.read_csv(csv_path)
 
     # 1. Feature Engineering
     print("Performing feature engineering...")
@@ -202,11 +214,6 @@ def main():
     U_scaled = (U_raw - input_means) / input_stds
 
     # 3. Instantiate and Train SOC ESN
-    # SOC tracks rapid electrochemical changes: use moderately high spectral radius (echo memory),
-    # stronger input scaling so voltage/current dominate the reservoir activations,
-    # and a larger reservoir for more representational capacity.
-    # Washout discards the cold-start reservoir phase so W_out is fit on settled states only.
-    # All hyperparameters are sourced from Config for easy tuning via env vars.
     print("Initializing and training SOC Echo State Network...")
     esn_soc = EchoStateNetwork(
         n_inputs=n_features,
@@ -228,10 +235,6 @@ def main():
     print(f"  Pred   SOC Range: min={pred_soc.min():.4f}, max={pred_soc.max():.4f}, mean={pred_soc.mean():.4f}")
 
     # 4. Instantiate and Train SOH ESN
-    # SOH changes very slowly (long-term drift): lower spectral radius for more stable dynamics,
-    # stronger input scaling for more signal, and a much lower ridge_param so the readout
-    # weights are NOT over-regularized and can fit the SOH levels accurately.
-    # All hyperparameters are sourced from Config for easy tuning via env vars.
     print("Initializing and training SOH Echo State Network...")
     esn_soh = EchoStateNetwork(
         n_inputs=n_features,
@@ -252,7 +255,7 @@ def main():
     print(f"  Target SOH Range: min={Y_soh.min():.4f}, max={Y_soh.max():.4f}, mean={Y_soh.mean():.4f}")
     print(f"  Pred   SOH Range: min={pred_soh.min():.4f}, max={pred_soh.max():.4f}, mean={pred_soh.mean():.4f}")
 
-    # 5. Save model package
+    # 5. Save model package locally
     model_package = {
         'esn_soc': esn_soc,
         'esn_soh': esn_soh,
@@ -262,11 +265,38 @@ def main():
         'soh_rmse': float(soh_rmse)
     }
     
-    print(f"Saving trained ESN models to {model_save_path}...")
-    with open(model_save_path, 'wb') as f:
-        pickle.dump(model_package, f)
+    print(f"Saving trained ESN models locally to {model_save_path}...")
+    try:
+        with open(model_save_path, 'wb') as f:
+            pickle.dump(model_package, f)
+        print("Model package saved locally successfully!")
+    except Exception as local_err:
+        print(f"Failed to save local file (read-only filesystem or path error): {local_err}")
+
+    # 6. Upload package to MongoDB model registry (if connection is configured)
+    try:
+        from pymongo import MongoClient
+        from datetime import datetime
+        print("Checking MongoDB Model Registry connection...")
+        client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
+        client.server_info()  # trigger connection check
+        db = client[Config.MONGODB_DB_NAME]
         
-    print("Model package saved successfully!")
+        print("Uploading package to MongoDB registry cluster...")
+        db['model_weights'].replace_one(
+            {'_id': 'esn_package'},
+            {
+                '_id': 'esn_package',
+                'pickle_data': pickle.dumps(model_package),
+                'soc_rmse': float(soc_rmse),
+                'soh_rmse': float(soh_rmse),
+                'updated_at': datetime.utcnow().isoformat()
+            },
+            upsert=True
+        )
+        print("Model saved to MongoDB Model Registry successfully!")
+    except Exception as mongo_err:
+        print(f"MongoDB Model Registry upload skipped or failed: {mongo_err}")
 
 if __name__ == "__main__":
     main()
