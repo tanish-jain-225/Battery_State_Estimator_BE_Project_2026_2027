@@ -1290,9 +1290,9 @@ def get_telemetry():
 
         if check_db_connected():
             try:
-                total_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
-                # Invalidate cache if the database was reset / purged
-                if total_count < already_cached:
+                # Fast indexed lookup for database purge or reset detection (takes < 0.001s)
+                latest_record = db[Config.MONGODB_READINGS_COLLECTION].find_one(sort=[('time', -1)])
+                if latest_record is None or (prev_time is not None and latest_record['time'] < prev_time):
                     cache.update({
                         'key':       None,
                         'pipeline':  None,
@@ -1308,16 +1308,12 @@ def get_telemetry():
                 else:
                     # Cap initial fetch to the most recent 500 records to prevent CPU/memory starvation on first load
                     limit_val = 500
-                    if total_count > limit_val:
-                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
-                        new_readings = list(cursor)
-                        new_readings.reverse() # Restore chronological order
-                        already_cached = total_count - limit_val
-                    else:
-                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', 1)
-                        new_readings = list(cursor)
+                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
+                    new_readings = list(cursor)
+                    new_readings.reverse() # Restore chronological order
+                    already_cached = max(0, len(new_readings))
                     
-                cache['n_cached'] = total_count
+                cache['n_cached'] = already_cached + len(new_readings)
             except Exception as db_err:
                 print(f"Error querying database in get_telemetry: {db_err}")
                 new_readings = []
