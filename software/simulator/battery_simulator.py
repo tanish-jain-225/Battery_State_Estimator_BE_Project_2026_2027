@@ -27,6 +27,7 @@ class BatterySimulator:
         self.C2_nom = self.chemistry.C2_nom                      # Farads
         self.thermal_capacitance = self.chemistry.thermal_capacitance  # J/K
         self.cooling_coefficient = self.chemistry.cooling_coefficient  # W/K
+        self.n_cells = self.chemistry.n_cells
 
     def reset(self, chemistry_name=None):
         if chemistry_name is not None:
@@ -42,8 +43,41 @@ class BatterySimulator:
         self.C2_nom = self.chemistry.C2_nom                      # Farads
         self.thermal_capacitance = self.chemistry.thermal_capacitance  # J/K
         self.cooling_coefficient = self.chemistry.cooling_coefficient  # W/K
+        self.n_cells = self.chemistry.n_cells
 
-        # States
+        # Define cell-to-cell variations for n_cells
+        np.random.seed(42)  # for reproducibility
+        self.cell_caps = []
+        self.cell_r0s = []
+        self.cell_r1s = []
+        self.cell_c1s = []
+        self.cell_r2s = []
+        self.cell_c2s = []
+        
+        for i in range(self.n_cells):
+            # Introduce cell unbalance: Cell 1 is nominal, Cell 2 is 98%, Cell 3 is 96%
+            cap_factor = 1.0 - 0.02 * i
+            res_factor = 1.0 + 0.05 * i
+            
+            self.cell_caps.append(self.nominal_capacity * cap_factor)
+            self.cell_r0s.append((self.R0_nom / self.n_cells) * res_factor)
+            self.cell_r1s.append((self.R1_nom / self.n_cells) * res_factor)
+            self.cell_c1s.append((self.C1_nom * self.n_cells) / res_factor)
+            self.cell_r2s.append((self.R2_nom / self.n_cells) * res_factor)
+            self.cell_c2s.append((self.C2_nom * self.n_cells) / res_factor)
+            
+        # States for each cell
+        self.cell_soc = [1.0] * self.n_cells
+        self.cell_soh = [1.0] * self.n_cells
+        self.cell_V1 = [0.0] * self.n_cells
+        self.cell_V2 = [0.0] * self.n_cells
+        # Introduce thermal gradients: cell 3 starts slightly hotter
+        self.cell_temperature = [25.0 + 1.0 * i for i in range(self.n_cells)]
+        self.cell_r_growth = [1.0] * self.n_cells
+        
+        self.balancing_active = [False] * self.n_cells
+
+        # Legacy states for backward compatibility and test validation
         self.soc = 1.0                   # State of Charge (0.0 to 1.0)
         self.soh = 1.0                   # State of Health (0.0 to 1.0)
         self.V1 = 0.0                    # polarization voltage 1 (V)
@@ -56,102 +90,129 @@ class BatterySimulator:
     def step(self, current, dt, accelerated_aging=False, fault_thermal=False, fault_dropout=False, fault_short=False):
         """
         Update the battery physics by one time step dt.
-        :param current: Applied current in Amperes (Positive = Charge, Negative = Discharge)
-        :param dt: Time step in seconds
-        :param accelerated_aging: If True, speeds up degradation rates
-        :param fault_thermal: If True, inject thermal runaway self-heating
-        :param fault_dropout: If True, indicates sensors are dropped out (handled in noise generation)
-        :param fault_short: If True, injects an internal leakage micro-short circuit current
         """
         self.time += dt
 
-        # Apply internal leakage current if micro-short fault is active
-        # The leakage current drains the cells internally but is hidden from the external sensor
-        I_leak = Config.FAULT_SHORT_LEAKAGE_CURRENT if fault_short else 0.0
-        current_internal = current - I_leak
+        # Sync external state overrides (for backwards compatibility with direct test-suite writes)
+        if abs(self.soc - np.mean(self.cell_soc)) > 1e-4:
+            self.cell_soc = [self.soc] * self.n_cells
+        if abs(self.soh - np.min(self.cell_soh)) > 1e-4:
+            self.cell_soh = [self.soh] * self.n_cells
+        if abs(self.temperature - np.max(self.cell_temperature)) > 1e-4:
+            self.cell_temperature = [self.temperature] * self.n_cells
 
-        # 1. Thermal and degradation effects on parameters
-        temp_kelvin = self.temperature + 273.15
-        temp_ref_kelvin = 25.0 + 273.15
-        
-        # Arrhenius temperature dependence
-        temp_effect = np.exp(1500 * (1 / temp_kelvin - 1 / temp_ref_kelvin))
+        cell_voltages = []
+        cell_ocvs = []
 
-        R0 = self.R0_nom * self.internal_resistance_growth * temp_effect
-        R1 = self.R1_nom * temp_effect
-        C1 = self.C1_nom / temp_effect
-        R2 = self.R2_nom * temp_effect
-        C2 = self.C2_nom / temp_effect
-        
-        active_capacity = self.nominal_capacity * self.soh  # Ah
-
-        # 2. State of Charge Update (Coulomb Counting)
-        # current is in Amperes, capacity is in Ampere-hours. Convert to hours: dt / 3600
-        dSOC = (current_internal * dt) / (active_capacity * 3600.0)
-        self.soc = np.clip(self.soc + dSOC, 0.0, 1.0)
-
-        # 3. Polarization Voltage Update (First-order differential equation for 2 RC branches)
-        # dV1/dt = (current - V1/R1) / C1
-        # dV2/dt = (current - V2/R2) / C2
-        dV1 = ((current_internal - self.V1 / R1) / C1) * dt
-        dV2 = ((current_internal - self.V2 / R2) / C2) * dt
-        self.V1 += dV1
-        self.V2 += dV2
-
-        # 4. Thermal Model Update (Joule Heating + Convective Cooling + Runway)
-        # Heat generated from external load and polarization losses
-        heat_generated = (current_internal * current_internal * R0) + abs(current_internal * self.V1) + abs(current_internal * self.V2)
-        
-        if fault_short:
-            # Direct short-circuit heating contribution
-            heat_generated += Config.FAULT_SHORT_HEATING_RATE
+        # Update each cell in series
+        for i in range(self.n_cells):
+            # Apply balance bleed current if active
+            I_bleed = 0.05 if self.balancing_active[i] else 0.0
             
-        cooling = self.cooling_coefficient * (self.temperature - self.T_ambient)
-        
-        dT = ((heat_generated - cooling) / self.thermal_capacitance) * dt
-        
-        if fault_thermal:
-            # Exponential thermal runaway heat spike
-            dT_runaway = Config.FAULT_THERMAL_RUNAWAY_MULT * np.exp(
-                Config.FAULT_THERMAL_RUNAWAY_EXP * (self.temperature - 25.0)
-            )
-            dT += dT_runaway * dt
+            # Apply short-circuit leakage to Cell 3 (last cell) specifically
+            I_leak = 0.0
+            if fault_short and i == self.n_cells - 1:
+                I_leak = Config.FAULT_SHORT_LEAKAGE_CURRENT
+                
+            # Current through cell i (Positive = Charge, Negative = Discharge)
+            current_internal = current - I_bleed - I_leak
+                
+            # Temperature and degradation effects
+            temp_kelvin = self.cell_temperature[i] + 273.15
+            temp_ref_kelvin = 25.0 + 273.15
+            temp_effect = np.exp(1500 * (1 / temp_kelvin - 1 / temp_ref_kelvin))
             
-        self.temperature = max(self.T_ambient, min(1000.0, self.temperature + dT))
-
-        # 5. State of Health (SOH) Degradation Model
-        # SOH capacity fade depends on current amplitude, temperature, and cumulative cycles
-        aging_multiplier = 1500.0 if accelerated_aging else 1.0
-        temp_aging_factor = np.exp(0.06 * (self.temperature - 25.0))
-        current_aging_factor = np.power(abs(current_internal), 1.3)
-        capacity_fade = -1.2e-7 * current_aging_factor * temp_aging_factor * aging_multiplier * dt
+            R0 = self.cell_r0s[i] * self.cell_r_growth[i] * temp_effect
+            R1 = self.cell_r1s[i] * temp_effect
+            C1 = self.cell_c1s[i] / temp_effect
+            R2 = self.cell_r2s[i] * temp_effect
+            C2 = self.cell_c2s[i] / temp_effect
+            
+            active_cap = self.cell_caps[i] * self.cell_soh[i]
+            
+            # SOC update
+            dSOC = (current_internal * dt) / (active_cap * 3600.0)
+            self.cell_soc[i] = float(np.clip(self.cell_soc[i] + dSOC, 0.0, 1.0))
+            
+            # Polarization voltages
+            dV1 = ((current_internal - self.cell_V1[i] / R1) / C1) * dt
+            dV2 = ((current_internal - self.cell_V2[i] / R2) / C2) * dt
+            self.cell_V1[i] += dV1
+            self.cell_V2[i] += dV2
+            
+            # OCV lookup (scaled per cell)
+            cell_ocv = self.chemistry.lookup_ocv(self.cell_soc[i]) / self.n_cells
+            cell_ocvs.append(cell_ocv)
+            
+            cell_v = cell_ocv + (current_internal * R0) + self.cell_V1[i] + self.cell_V2[i]
+            cell_voltages.append(cell_v)
+            
+            # Heat generation
+            heat_gen = (current_internal * current_internal * R0) + abs(current_internal * self.cell_V1[i]) + abs(current_internal * self.cell_V2[i])
+            if fault_short and i == self.n_cells - 1:
+                heat_gen += Config.FAULT_SHORT_HEATING_RATE
+                
+            cooling = self.cooling_coefficient * (self.cell_temperature[i] - self.T_ambient) / self.n_cells
+            dT = ((heat_gen - cooling) / (self.thermal_capacitance / self.n_cells)) * dt
+            
+            # Apply thermal runaway to Cell 3 specifically
+            if fault_thermal and i == self.n_cells - 1:
+                dT_runaway = Config.FAULT_THERMAL_RUNAWAY_MULT * np.exp(
+                    Config.FAULT_THERMAL_RUNAWAY_EXP * (self.cell_temperature[i] - 25.0)
+                )
+                dT += dT_runaway * dt
+                
+            self.cell_temperature[i] = float(max(self.T_ambient, min(1000.0, self.cell_temperature[i] + dT)))
+            
+            # SOH degradation
+            aging_mult = 1500.0 if accelerated_aging else 1.0
+            temp_aging_fac = np.exp(0.06 * (self.cell_temperature[i] - 25.0))
+            current_aging_fac = np.power(abs(current_internal), 1.3)
+            cap_fade = -1.2e-7 * current_aging_fac * temp_aging_fac * aging_mult * dt
+            
+            self.cell_soh[i] = float(max(0.2, self.cell_soh[i] + cap_fade))
+            self.cell_r_growth[i] = 1.0 + (1.0 - self.cell_soh[i]) * 1.5
+            
+        # Determine cell balancing decisions for the next step (active charging > 0.05A)
+        min_v_cell = min(cell_voltages)
+        for i in range(self.n_cells):
+            if cell_voltages[i] > (4.10 / 3.0 * self.n_cells) and (cell_voltages[i] - min_v_cell) > 0.010 and current > 0.05:
+                self.balancing_active[i] = True
+            else:
+                self.balancing_active[i] = False
+                
+        # Pack aggregation for single-cell backwards compatibility
+        self.soc = float(np.mean(self.cell_soc))
+        self.soh = float(np.min(self.cell_soh)) # capacity is bottlenecked by the weakest cell
+        self.V1 = float(np.mean(self.cell_V1))
+        self.V2 = float(np.mean(self.cell_V2))
+        self.temperature = float(np.max(self.cell_temperature)) # Report peak cell temp
+        self.internal_resistance_growth = float(np.mean(self.cell_r_growth))
         
-        self.soh = max(0.2, self.soh + capacity_fade)
-
-        # Resistance growth matches capacity fade
-        self.internal_resistance_growth = 1.0 + (1.0 - self.soh) * 1.5
-
-        # 6. Calculate Terminal Voltage
-        ocv = self.chemistry.lookup_ocv(self.soc)
-        terminal_voltage = ocv + (current_internal * R0) + self.V1 + self.V2
+        pack_voltage = float(np.sum(cell_voltages))
         
-        # Clip terminal voltage based on chemistry cell counts
-        n_cells = self.chemistry.n_cells
-        min_v = 1.5 * n_cells
-        max_v = 4.5 * n_cells
-        terminal_voltage = np.clip(terminal_voltage, min_v, max_v)
-
+        # Clip pack voltage
+        min_v = 1.5 * self.n_cells
+        max_v = 4.5 * self.n_cells
+        pack_voltage = float(np.clip(pack_voltage, min_v, max_v))
+        
         return {
             'time': self.time,
             'true_soc': self.soc,
             'true_soh': self.soh,
-            'ocv': ocv,
+            'ocv': float(np.sum(cell_ocvs)),
             'v1': self.V1,
             'v2': self.V2,
-            'voltage': terminal_voltage,
-            'current': current, # External current measured at terminal
+            'voltage': pack_voltage,
+            'current': current,
             'temperature': self.temperature,
-            'R0': R0
+            'R0': float(np.sum(self.cell_r0s) * self.internal_resistance_growth),
+            
+            # Multi-cell telemetry outputs
+            'cell_voltages': [float(v) for v in cell_voltages],
+            'cell_socs': [float(s) for s in self.cell_soc],
+            'cell_temperatures': [float(t) for t in self.cell_temperature],
+            'balancing_active': self.balancing_active.copy()
         }
 
     def add_sensor_noise(self, state, v_noise=0.005, i_noise=0.05, t_noise=0.2, fault_dropout=False):
@@ -165,10 +226,14 @@ class BatterySimulator:
                 'current': 0.0,
                 'temperature': 25.0, # Pulled to ambient temperature
                 'true_soc': state['true_soc'],
-                'true_soh': state['true_soh']
+                'true_soh': state['true_soh'],
+                'cell_voltages': [0.0] * self.n_cells,
+                'cell_socs': [0.0] * self.n_cells,
+                'cell_temperatures': [25.0] * self.n_cells,
+                'balancing_active': [False] * self.n_cells
             }
             
-        return {
+        noisy_rec = {
             'time': state['time'],
             'voltage': max(0.0, state['voltage'] + random.normalvariate(0, v_noise)),
             'current': state['current'] + random.normalvariate(0, i_noise),
@@ -176,6 +241,15 @@ class BatterySimulator:
             'true_soc': state['true_soc'],
             'true_soh': state['true_soh']
         }
+        
+        # Inject noise into cell-level arrays if present
+        if 'cell_voltages' in state:
+            noisy_rec['cell_voltages'] = [max(0.0, v + random.normalvariate(0, v_noise / np.sqrt(self.n_cells))) for v in state['cell_voltages']]
+            noisy_rec['cell_socs'] = state['cell_socs'].copy()
+            noisy_rec['cell_temperatures'] = [t + random.normalvariate(0, t_noise) for t in state['cell_temperatures']]
+            noisy_rec['balancing_active'] = state['balancing_active'].copy()
+            
+        return noisy_rec
 
 # Drive cycle current profiles (Amps) based on time t (seconds)
 class DriveCycles:

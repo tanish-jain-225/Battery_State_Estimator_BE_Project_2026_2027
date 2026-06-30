@@ -87,6 +87,46 @@ class EchoStateNetwork:
         reg_matrix = self.ridge_param * np.eye(X.shape[0])
         self.W_out = np.dot(np.dot(Y_target, X.T), np.linalg.inv(X_XT + reg_matrix))
         
+    def adapt_online(self, u, y_target, learning_rate=0.01, mode='rls'):
+        """
+        Adapt the readout weights W_out online based on target feedback.
+        :param u: normalized input features vector u_scaled
+        :param y_target: target ground truth value (scalar)
+        :param learning_rate: adaptation rate (for NLMS mode)
+        :param mode: 'rls' (Recursive Least Squares) or 'nlms' (Normalized LMS)
+        """
+        if self.W_out is None:
+            return
+        
+        u_t = np.array(u).reshape(-1, 1)
+        state_vec = np.vstack(([1.0], u_t, self.x)) # shape (1 + n_inputs + n_reservoir, 1)
+        
+        y_pred = np.dot(self.W_out, state_vec).item()
+        error = y_target - y_pred
+        
+        if mode == 'nlms':
+            # Normalized LMS update:
+            vec_norm_sq = np.sum(state_vec ** 2)
+            denom = vec_norm_sq + 1e-4
+            update = learning_rate * (error / denom) * state_vec.T
+            self.W_out += update
+        elif mode == 'rls':
+            # Recursive Least Squares online update:
+            if not hasattr(self, 'P_adapt') or self.P_adapt is None:
+                self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
+            
+            lmbda = 0.9995  # Forgetting factor
+            
+            P_s = np.dot(self.P_adapt, state_vec)
+            denom = lmbda + np.dot(state_vec.T, P_s).item()
+            K = P_s / max(denom, 1e-6)
+            
+            self.W_out += error * K.T
+            self.P_adapt = (self.P_adapt - np.dot(K, np.dot(state_vec.T, self.P_adapt))) / lmbda
+            
+            if np.any(np.isnan(self.P_adapt)) or np.any(np.isinf(self.P_adapt)):
+                self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
+
     def predict_step(self, u, quantize_mode='float32'):
         """
         Advance ESN state by one step and make prediction, optionally simulating quantization.

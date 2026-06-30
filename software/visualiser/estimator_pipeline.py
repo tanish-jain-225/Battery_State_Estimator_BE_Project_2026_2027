@@ -403,6 +403,10 @@ class EstimatorPipeline:
             pred_soc_val = self.esn_soc.predict_step(u_scaled, quantize_mode=quantize_mode)
             pred_soh_val = self.esn_soh.predict_step(u_scaled, quantize_mode=quantize_mode)
             
+            # Online adaptation: Calibrate the ESN SOC network online using the EKF SOC as a reference
+            if hasattr(self.esn_soc, 'adapt_online'):
+                self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.005, mode='rls')
+            
             # Save updated states
             self.esn_soc_state = self.esn_soc.get_state()
             self.esn_soh_state = self.esn_soh.get_state()
