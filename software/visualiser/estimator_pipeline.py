@@ -4,54 +4,34 @@ import sys
 import os
 import importlib.util
 
-# Load Config directly from this file's own directory by absolute path.
-# This bypasses sys.modules name-collision: when tests run from the project root,
-# 'config' may already be cached as the visualiser's Config (which lacks DIAG_*).
-# Using a private module name '_simulator_config' guarantees we always get the
-# simulator's Config regardless of sys.path or import order.
-_this_dir = os.path.dirname(os.path.abspath(__file__))
-_config_path = os.path.join(_this_dir, 'config.py')
-_spec = importlib.util.spec_from_file_location('_simulator_config', _config_path)
-_config_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_config_mod)
-Config = _config_mod.Config
+from config import Config
+from traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
+from battery_chemistry import get_chemistry
 
 try:
-    from traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
-    from battery_chemistry import get_chemistry
+    from training.feature_engineering import extract_features_step
 except ImportError:
-    from simulator.traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
-    from simulator.battery_chemistry import get_chemistry
-
-try:
-    _this_dir = os.path.dirname(os.path.abspath(__file__))
-    _paths_to_try = [
-        os.path.join(os.path.dirname(_this_dir), 'visualiser', 'training'),
-        os.path.join(os.path.dirname(os.path.dirname(_this_dir)), 'visualiser', 'training'),
-        os.path.join(os.path.dirname(_this_dir), 'training')
-    ]
-    for _p in _paths_to_try:
-        if os.path.exists(_p) and _p not in sys.path:
-            sys.path.insert(0, _p)
-    from feature_engineering import extract_features_step
-except ImportError:
-    # Fallback feature engineering logic
-    def extract_features_step(V_current, I_current, T_current, history, rolling_window=5):
-        lookback = rolling_window - 1
-        if len(history) == 0:
-            V_prev = V_current
-            V_history = [V_current]
-            I_history = [I_current]
-            T_history = [T_current]
-        else:
-            V_prev = history[-1]['voltage']
-            V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
-            I_history = [r['current'] for r in history[-lookback:]] + [I_current]
-            T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
-        V_grad = V_current - V_prev
-        I_ma = np.mean(I_history)
-        T_ma = np.mean(T_history)
-        return np.array([V_current, I_current, T_current, V_grad, I_ma, T_ma])
+    # Fallback to local import if training is in the PYTHONPATH root
+    try:
+        from feature_engineering import extract_features_step
+    except ImportError:
+        # Fallback feature engineering logic
+        def extract_features_step(V_current, I_current, T_current, history, rolling_window=5):
+            lookback = rolling_window - 1
+            if len(history) == 0:
+                V_prev = V_current
+                V_history = [V_current]
+                I_history = [I_current]
+                T_history = [T_current]
+            else:
+                V_prev = history[-1]['voltage']
+                V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
+                I_history = [r['current'] for r in history[-lookback:]] + [I_current]
+                T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
+            V_grad = V_current - V_prev
+            I_ma = np.mean(I_history)
+            T_ma = np.mean(T_history)
+            return np.array([V_current, I_current, T_current, V_grad, I_ma, T_ma])
 
 class EstimatorPipeline:
     def __init__(self, chemistry_name="li_ion", mismatch=1.0, esn_soc=None, esn_soh=None, input_means=None, input_stds=None):
@@ -208,7 +188,10 @@ class EstimatorPipeline:
             return
         
         if selected_indices is None:
-            selected_indices = Config.ESN_SELECTED_FEATURE_INDICES
+            if self.input_means is not None and len(self.input_means) == 6:
+                selected_indices = [0, 1, 2, 3, 4, 5]
+            else:
+                selected_indices = [0, 1, 3, 4]  # V, I, dV/dt, I_MA
 
         # Map initial voltage to NMC equivalent range
         nmc_chem = get_chemistry('nmc')
@@ -390,7 +373,10 @@ class EstimatorPipeline:
                 self.prime_esn(V_meas, T_meas, sim_dt=dt, dataset_dt=dataset_dt, selected_indices=selected_indices)
                 
             if selected_indices is None:
-                selected_indices = [0, 1, 3, 4]
+                if self.input_means is not None and len(self.input_means) == 6:
+                    selected_indices = [0, 1, 2, 3, 4, 5]
+                else:
+                    selected_indices = [0, 1, 3, 4]
                 
             t_esn_start = time.perf_counter()
             

@@ -223,9 +223,9 @@ To support production-grade deployment guidelines, the system implements the fol
 | Week 3 | Requirement analysis | Completed |
 | Week 4 | System design | Completed |
 | Week 5 | Prototype development | Completed |
-| Week 6 | Testing and validation | Completed |
-| Week 7 | Documentation and deployment polish | Completed |
-| Week 8 | Paper writing and final demonstration | Completed |
+| Week 6 | Testing and validation | In Progress |
+| Week 7 | Documentation and deployment polish | In Progress |
+| Week 8 | Paper writing and final demonstration | In Progress |
 
 ---
 
@@ -308,11 +308,34 @@ flowchart TD
 
 ### Hardware Implementation
 
-The hardware module is implemented in C99 for STM32-style targets. It uses a 3-input ESN classifier with a 50-node sparse reservoir and 3 output classes: Normal, Warning, and Critical. The recurrent matrix is stored in CSR format to skip zero multiplications. Optional fixed-point mode converts inputs to Q12 and states/weights to Q15, using a lookup-table tanh approximation for faster microcontroller inference. GPIO `PA5` is used as a visual status output.
+The hardware module is implemented in C99 for low-power STM32-style targets (e.g., ARM Cortex-M). Key elements include:
+* **ESN Classifier**: Uses a 3-input (Voltage, Current, Temperature) Echo State Network with a 50-node reservoir to classify battery safety into 3 states: `Normal`, `Warning`, and `Critical`.
+* **Sparse Matrix Optimization**: To optimize for microcontrollers, the reservoir matrix is stored in Compressed Sparse Row (CSR) format, skipping zero-value multiplications and yielding a 6.7x execution speedup.
+* **Fixed-Point Arithmetic Option**: Supports optional Q12 (for inputs) and Q15 (for reservoir states and weights) fixed-point modes, utilizing a lookup-table approximation of the `tanh` activation function to run efficiently without hardware floating-point support.
+* **Hardware Visual Output**: Integrates GPIO `PA5` mapping to drive status LEDs for immediate visual fault alarms directly on-chip.
 
 ### Software Implementation
 
-The software module is split into two Flask services. The simulator service models 2-RC ECM dynamics, thermal behavior, aging, noise, and faults. The visualiser service reads telemetry, runs EKF/CC/ESN estimators, computes diagnostics, and serves the dashboard. MongoDB provides persistent telemetry and model storage when available; otherwise, local buffers keep the system runnable. The repository also includes unit tests, CI configuration, deployment guidance, and documented artifact handling.
+The software core is structured as a decoupled cyber-physical architecture composed of:
+1. **Physics Simulator Service**: A Flask application modeling 2-RC equivalent circuit model (ECM) cell physics, non-linear open circuit voltage (OCV), thermodynamic heating, capacity fade/resistance aging, sensor noise, and safety fault injection.
+2. **Visualiser Dashboard Service**: A Flask web application that serves as the comparison dashboard. It retrieves live/historical telemetry, feeds data through the multi-estimator pipeline, and renders comparative charts.
+3. **Database Layer**: Leverages MongoDB Atlas (with automatic in-memory fallback buffers) to persistently store timeseries readings and the serialized machine learning model registry.
+
+### Advanced State Estimators
+
+To ensure state estimation robustness under dynamic load profiles, the visualiser runs a parallel pipeline:
+* **State of Charge (SOC)**: Estimated in parallel using Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF), and an Echo State Network (ESN).
+* **State of Health (SOH)**: Tracked traditional-style via resistance growth using online Recursive Least Squares (RLS) parameter identification, compared side-by-side with a trained SOH ESN.
+* **State of Energy (SOE)**: Computed dynamically by integrating the OCV-SOC curve to calculate remaining Wh energy capacity.
+* **State of Power (SOP)**: Estimates instantaneous charge/discharge current/power envelopes based on safe terminal voltage limits and internal cell resistance.
+* **Remaining Useful Life (RUL)**: Projects remaining cycle life based on electro-thermal stress and chemistry lookup profiles.
+
+### Cyber-Physical Diagnostics
+
+The visualiser features real-time diagnostics that identify three distinct categories of faults:
+* **Sensor Dropout**: Triggered when the measured terminal voltage drops below $1.0\text{ V}$ (`DIAG_DROPOUT_VOLTAGE_THRESHOLD`), indicating a sensor failure or connection loss.
+* **Thermal Runaway Warning**: Triggered if the battery temperature exceeds $60^\circ\text{C}$ (`DIAG_THERMAL_TEMP_THRESHOLD`) or if the temperature rise rate exceeds $2.0^\circ\text{C/s}$ (`DIAG_THERMAL_RATE_THRESHOLD`) at elevated temperatures.
+* **Internal Short-Circuit**: Triggered when there is a significant discrepancy between the Coulomb Counting SOC and EKF SOC ($>0.08$ difference, `DIAG_SHORT_SOC_DIFF_THRESHOLD`) under low-current idle conditions (`DIAG_SHORT_CURRENT_THRESHOLD`), signalling a micro-short.
 
 ---
 
@@ -320,9 +343,9 @@ The software module is split into two Flask services. The simulator service mode
 
 ```text
 Battery_State_Estimator_BE_Project_2026_2027/
+|-- .gitignore
 |-- README.md
 |-- requirements.txt
-|-- render.yaml
 |-- docs/
 |   |-- ARTIFACTS.md
 |   |-- DEMO_CHECKLIST.md
@@ -340,25 +363,30 @@ Battery_State_Estimator_BE_Project_2026_2027/
 |   |-- esn_estimator_weights.h
 |   `-- original_ev_battery_dataset_multiclass.csv
 |-- software/
+|   |-- tests/
+|   |   |-- test_estimators.py
+|   |   |-- test_api_auth.py
+|   |   `-- test_production_train.py
 |   |-- simulator/
 |   |   |-- app.py
 |   |   |-- battery_simulator.py
 |   |   |-- battery_chemistry.py
-|   |   `-- traditional_estimator.py
+|   |   `-- config.py
 |   `-- visualiser/
 |       |-- app.py
 |       |-- config.py
+|       |-- battery_chemistry.py
+|       |-- battery_simulator.py
+|       |-- traditional_estimator.py
+|       |-- estimator_pipeline.py
 |       |-- model_rc.pkl
-|       |-- tests/
-|       |   |-- test_estimators.py
-|       |   `-- test_api_auth.py
 |       |-- training/
 |       `-- templates/
 |-- images/
 |   `-- assets/
 |-- reference/
 |   `-- paper.md
-`-- .github/
+|-- .github/
     `-- workflows/ci.yml
 ```
 
@@ -420,7 +448,7 @@ hardware/run_c_simulator.sh
 Run the validation suite:
 
 ```bash
-python -m unittest discover -s software/visualiser/tests
+python -m unittest discover -s software/tests
 ```
 
 | Test No. | Test Description | Expected Result | Actual Result | Status |
@@ -432,7 +460,7 @@ python -m unittest discover -s software/visualiser/tests
 | 5 | Edge classifier | Normal/Warning/Critical classification | 98.40 percent reported accuracy | Pass |
 | 6 | API Security & Fails-Open Routing | Verify 401 on missing key and 200 on valid credentials or local fallback | Verified via test_api_auth.py | Pass |
 
-Current automated result: `47 tests OK`.
+Current automated result: `50 tests OK`.
 
 ---
 

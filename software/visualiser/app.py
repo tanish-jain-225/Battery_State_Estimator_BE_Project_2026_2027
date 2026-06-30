@@ -9,10 +9,13 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-# Add bundled simulator subdirectory to path for clean imports
+# Add local directories to path for clean imports
 base_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(base_dir, 'simulator'))                 # Bundled simulator
-sys.path.append(os.path.join(base_dir, 'training'))
+if base_dir not in sys.path:
+    sys.path.append(base_dir)
+training_dir = os.path.join(base_dir, 'training')
+if training_dir not in sys.path:
+    sys.path.append(training_dir)
 
 from flask import Flask, jsonify, request, render_template
 from pymongo import MongoClient

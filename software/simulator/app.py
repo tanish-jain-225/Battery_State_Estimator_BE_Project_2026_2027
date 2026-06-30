@@ -7,10 +7,10 @@ from datetime import datetime
 from pymongo import MongoClient
 from flask import Flask, jsonify, request, render_template
 
-# Add parent directory to path to allow clean imports
+# Add local directory to path to allow clean imports
 base_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(base_dir)
-sys.path.append(os.path.dirname(base_dir)) # software
+if base_dir not in sys.path:
+    sys.path.append(base_dir)
 
 from battery_simulator import BatterySimulator, DriveCycles
 from battery_chemistry import get_chemistry, register_chemistry

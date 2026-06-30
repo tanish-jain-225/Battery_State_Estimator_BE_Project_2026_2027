@@ -1,9 +1,6 @@
 import numpy as np
 
-try:
-    from battery_chemistry import get_chemistry
-except ImportError:
-    from simulator.battery_chemistry import get_chemistry
+from battery_chemistry import get_chemistry
 
 class ExtendedKalmanFilter:
     def __init__(self, chemistry_name="li_ion", mismatch=1.0, adaptive_r=True):

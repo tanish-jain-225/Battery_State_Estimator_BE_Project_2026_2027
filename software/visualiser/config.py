@@ -129,3 +129,17 @@ class Config:
     FAULT_SHORT_HEATING_RATE = float(os.environ.get("FAULT_SHORT_HEATING_RATE", 4.5))        # Watts (Joule heating term)
     FAULT_THERMAL_RUNAWAY_MULT = float(os.environ.get("FAULT_THERMAL_RUNAWAY_MULT", 4.0))    # Rate multiplier
     FAULT_THERMAL_RUNAWAY_EXP = float(os.environ.get("FAULT_THERMAL_RUNAWAY_EXP", 0.09))     # Exponential factor
+
+    # -------------------------------------------------------------------------
+    # CPS Diagnostic fault-detection thresholds
+    # -------------------------------------------------------------------------
+    # Voltage below this is treated as sensor dropout (V)
+    DIAG_DROPOUT_VOLTAGE_THRESHOLD  = float(os.environ.get("DIAG_DROPOUT_VOLTAGE_THRESHOLD", 1.0))
+    # Cell temperature above this triggers thermal runaway alarm (°C)
+    DIAG_THERMAL_TEMP_THRESHOLD     = float(os.environ.get("DIAG_THERMAL_TEMP_THRESHOLD", 60.0))
+    # Rate-of-temperature-change above this triggers thermal runaway alarm (°C/s)
+    DIAG_THERMAL_RATE_THRESHOLD     = float(os.environ.get("DIAG_THERMAL_RATE_THRESHOLD", 2.0))
+    # SOC divergence (CC minus EKF) above this, at near-zero current, signals micro-short (ratio)
+    DIAG_SHORT_SOC_DIFF_THRESHOLD   = float(os.environ.get("DIAG_SHORT_SOC_DIFF_THRESHOLD", 0.08))
+    # Maximum absolute current for the micro-short diagnostic to trigger (A)
+    DIAG_SHORT_CURRENT_THRESHOLD    = float(os.environ.get("DIAG_SHORT_CURRENT_THRESHOLD", 0.1))
