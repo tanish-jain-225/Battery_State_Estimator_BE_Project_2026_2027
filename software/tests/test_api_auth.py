@@ -53,5 +53,15 @@ class TestAPIAuth(unittest.TestCase):
         response = self.client.post('/api/control', json={}, environ_overrides={'REMOTE_ADDR': '192.168.1.100'})
         self.assertEqual(response.status_code, 200)
 
+    def test_health_endpoint_reports_service_status(self):
+        """The simulator should expose a health endpoint with readiness metadata."""
+        response = self.client.get('/api/health')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data['service'], 'battery-simulator')
+        self.assertTrue(data['ready'])
+        self.assertIn('uptime_seconds', data)
+        self.assertIn('database', data)
+
 if __name__ == '__main__':
     unittest.main()

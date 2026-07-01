@@ -445,6 +445,14 @@ hardware/run_c_simulator.sh
 
 ## Testing and Results
 
+Verified locally with:
+
+```bash
+python -m unittest discover -s software/tests
+```
+
+Current verification status: 50 tests passing.
+
 Run the validation suite:
 
 ```bash
@@ -460,7 +468,7 @@ python -m unittest discover -s software/tests
 | 5 | Edge classifier | Normal/Warning/Critical classification | 98.40 percent reported accuracy | Pass |
 | 6 | API Security & Fails-Open Routing | Verify 401 on missing key and 200 on valid credentials or local fallback | Verified via test_api_auth.py | Pass |
 
-Current automated result: `50 tests OK`.
+Current automated result: `51 tests OK`.
 
 ---
 

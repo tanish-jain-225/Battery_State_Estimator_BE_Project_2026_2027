@@ -21,6 +21,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
+app_start_time = time.time()
 
 def get_shared_secret():
     import hashlib
@@ -485,6 +486,45 @@ def post_register_chemistry():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/health', methods=['GET'])
+def get_health():
+    sync_simulation_on_demand()
+    state = load_sim_state()
+    db_ready = False
+    points_count = 0
+    try:
+        db_ready = _ensure_db()
+        if db_ready:
+            points_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
+    except Exception:
+        db_ready = False
+
+    return jsonify({
+        'service': 'battery-simulator',
+        'ready': True,
+        'uptime_seconds': round(time.time() - app_start_time, 2),
+        'database': {
+            'connected': db_ready,
+            'readings_count': points_count
+        },
+        'status': {
+            'sim_running': state.get('sim_running', False),
+            'chemistry': state.get('chemistry', 'li_ion'),
+            'active_cycle': state.get('active_cycle', 'udds'),
+            'accelerated_aging': state.get('accelerated_aging', False),
+            'T_ambient': state.get('T_ambient', 25.0),
+            'fault_thermal': state.get('fault_thermal', False),
+            'fault_dropout': state.get('fault_dropout', False),
+            'fault_short': state.get('fault_short', False),
+            'time': state.get('time', 0.0),
+            'soc': state.get('soc', 1.0),
+            'soh': state.get('soh', 1.0),
+            'voltage': state.get('prev_voltage', 12.6),
+            'current': state.get('prev_current', 0.0),
+            'temperature': state.get('temperature', 25.0)
+        }
+    })
 
 @app.route('/api/status', methods=['GET'])
 def get_status():
