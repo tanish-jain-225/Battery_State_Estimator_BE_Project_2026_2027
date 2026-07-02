@@ -448,7 +448,7 @@ hardware/run_c_simulator.sh
 Verified locally with:
 
 ```bash
-python -m unittest discover -s software/tests
+python -m unittest discover -s software/tests 
 ```
 
 Current verification status: 50 tests passing.
