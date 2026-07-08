@@ -1,18 +1,18 @@
 # Theoretical Foundations of Cyber-Physical Battery State Estimation
 
-This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic, and machine learning methods implemented in the cyber-physical battery state estimator system. 
+This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic, and machine learning methods implemented in the cyber-physical battery state estimator system.
 
 ---
 
 ## 1. Electro-Thermal Battery Physics & Modeling (2-RC ECM)
 
-To predict battery behavior in real-time, the system leverages a **2-RC Equivalent Circuit Model (ECM)**. This model balances computational simplicity with the dynamic representation of polarization losses and charge transfer dynamics.
+To predict battery behavior in real-time, the system leverages a **2-RC Equivalent Circuit Model (ECM)**, implemented in [`battery_simulator.py`](../software/simulator/battery_simulator.py). This model balances computational simplicity with the dynamic representation of polarization losses and charge transfer dynamics.
 
 ### Equivalent Circuit Representation
 The circuit consists of:
-* An open-circuit voltage source ($V_{\text{oc}}$ or $OCV$) as a function of the State of Charge (SOC).
-* An ohmic internal resistance ($R_0$) representing electrolyte and contact resistances.
-* Two parallel Resistor-Capacitor (RC) branches representing short-term charge transfer ($R_1, C_1$) and long-term diffusion dynamics ($R_2, C_2$).
+- An open-circuit voltage source ($V_{\text{oc}}$ or $OCV$) as a function of the State of Charge (SOC).
+- An ohmic internal resistance ($R_0$) representing electrolyte and contact resistances.
+- Two parallel Resistor-Capacitor (RC) branches representing short-term charge transfer ($R_1, C_1$) and long-term diffusion dynamics ($R_2, C_2$).
 
 ```
            ┌───[ R1 ]───┐      ┌───[ R2 ]───┐
@@ -30,7 +30,7 @@ The electrical state of the cell at tick $t$ is governed by the following state 
 
 1. **State of Charge (SOC)** update via Coulomb Counting:
    $$\frac{d\text{SOC}(t)}{dt} = \frac{I(t)}{C_n \cdot 3600}$$
-   * $I(t)$ is the current in Amperes (positive for charging, negative for discharging).
+   * $I(t)$ is the current in Amperes (positive for discharging, negative for charging).
    * $C_n$ is the active cell capacity in Ampere-hours (Ah).
    
 2. **Polarization Voltage Branches**:
@@ -58,7 +58,9 @@ $$R_0(t) = R_{0, \text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - \text{SOH}(t))\r
 
 ## 2. State Estimation via Extended Kalman Filtering (EKF)
 
-The Extended Kalman Filter (EKF) serves as the control-theoretic observer to filter sensor noise and track internal battery states.
+The Extended Kalman Filter (EKF), implemented within the [`estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py), serves as the control-theoretic observer to filter sensor noise and track internal battery states. 
+
+The joint SOC and SOH estimation is theoretically aligned with the multi-timescale EKF framework proposed by **Li et al. (2020)** [1]. Because State of Health changes slowly over cycles, updating capacity fade on the same micro-timescale as SOC (which tracks transient voltage fluctuations) is computationally redundant and prone to noise. Following Li et al., our estimator pipeline separates the estimation timescales: the EKF executes at the microscale (at each telemetry step, $T_s = 1\text{ s}$) to update the SOC ($S_{k,l}$ and polarization voltages $V_1, V_2$), while the Recursive Least Squares (RLS) parameter identifier and SOH resistance tracker update the capacity $C_k$ and internal resistance $R_0$ at a slower macroscopic scale.
 
 ### State Space Formulation
 The discrete-time state vector is defined as $x_k = [\text{SOC}_k, V_{1,k}, V_{2,k}]^T$. The discrete state transition function $f(x_k, u_k)$ updates the states:
@@ -76,7 +78,7 @@ $$\mathbf{B}_k = \begin{bmatrix} \frac{\Delta t}{C_n \cdot 3600} \\ R_1 \left[1 
 At each simulation tick $k$, the EKF executes prediction and correction stages:
 
 1. **Prediction Stage**:
-   $$\hat{x}_{k|k-1} = \mathbf{F}_{k-1} \hat{x}_{k-1|k-1} + \mathbf{B}_{k-1} u_{k-1}$$
+   $$\hat{x}_{k|k-1} = \mathbf{F}_{k-1} \hat{x}_{k-1|k-1} + \mathbf{B}_k u_{k-1}$$
    $$\mathbf{P}_{k|k-1} = \mathbf{F}_{k-1} \mathbf{P}_{k-1|k-1} \mathbf{F}_{k-1}^T + \mathbf{Q}$$
 
 2. **Measurement Prediction**:
@@ -96,10 +98,10 @@ At each simulation tick $k$, the EKF executes prediction and correction stages:
 
 ## 3. Data-Driven Estimation via Echo State Networks (ESN)
 
-Reservoir Computing (RC), specifically **Echo State Networks (ESN)**, is utilized for non-linear, data-driven regression (SOC/SOH tracking) and classification (thermal safety diagnostic status).
+Reservoir Computing (RC), specifically **Echo State Networks (ESN)**, is utilized for non-linear, data-driven regression (SOC/SOH tracking) and classification (thermal safety status). Data-driven battery state estimation using recurrent reservoir states is a highly efficient alternative to deep recurrent architectures (such as LSTMs or GRUs) on low-power microcontrollers. This strategy is highlighted by **Kamarudin et al. (2026)** [2], who developed a Reservoir Spiking Neural Network (RSNN) to track SOC under dynamic discharge cycles. While our project implements a continuous-time leaky-integrator ESN with a linear readout rather than a spiking neuromorphic reservoir, the underlying principles of utilizing a high-dimensional, sparse recurrent projection to capture non-linear temporal dynamics are fully synchronized.
 
 ### Echo State Network Formulation
-Unlike standard Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM) networks, ESNs project input signals into a high-dimensional, fixed, recurrent state space (the "reservoir") and only train the linear output readout weights. This drastically reduces training costs and enables real-time adaptation.
+Unlike standard Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM) networks, ESNs project input signals into a high-dimensional, fixed, recurrent state space (the "reservoir") and only train the linear output readout weights.
 
 ```
                   ┌──────────────────────────────────────────────┐
@@ -120,14 +122,14 @@ Unlike standard Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM
 The reservoir update equation at time step $t$ is:
 $$\tilde{x}_t = \tanh\left(\mathbf{W}_{\text{in}} [1; u_t] + \mathbf{W}_{\text{res}} x_{t-1}\right)$$
 $$x_t = (1 - \alpha) x_{t-1} + \alpha \tilde{x}_t$$
-* $u_t$ is the input vector (e.g., scaled voltage, current, and temperature).
+* $u_t$ is the input vector (scaled voltage, current, and temperature).
 * $\mathbf{W}_{\text{in}} \in \mathbb{R}^{N_r \times (1 + N_u)}$ is the input weight matrix.
 * $\mathbf{W}_{\text{res}} \in \mathbb{R}^{N_r \times N_r}$ is the recurrent reservoir matrix.
 * $\alpha \in (0, 1]$ is the leak rate, adjusting the temporal rate of state evolution.
-* $N_r$ is the reservoir size (e.g., $50$ nodes for hardware classifier, $300$ for SOC estimator).
+* $N_r$ is the reservoir size ($50$ nodes for hardware classifier, $300$ for software SOC estimator).
 
 ### Echo State Property (ESP) and Spectral Radius
-To ensure the network exhibits the *echo state property* (meaning the reservoir state is a fading memory of the input history, independent of initial state conditions), the spectral radius $\rho$ of the reservoir matrix $\mathbf{W}_{\text{res}}$ must be strictly bounded:
+To ensure the network exhibits the *echo state property* (meaning the reservoir state is a fading memory of the input history, independent of initial conditions), the spectral radius $\rho$ of the reservoir matrix $\mathbf{W}_{\text{res}}$ must satisfy:
 $$\rho(\mathbf{W}_{\text{res}}) = \max_i \{|\lambda_i|\} < 1$$
 Where $\lambda_i$ are the eigenvalues of $\mathbf{W}_{\text{res}}$. Typical values reside in the range $0.70$ to $0.95$ to capture slow thermal transients.
 
@@ -135,7 +137,7 @@ Where $\lambda_i$ are the eigenvalues of $\mathbf{W}_{\text{res}}$. Typical valu
 The output readout matrix $\mathbf{W}_{\text{out}}$ maps the combined input-reservoir state vectors to the target labels:
 $$y_t = \mathbf{W}_{\text{out}} [1; u_t; x_t]$$
 
-Given a collection of states gathered during the training phase (after discarding initial washout states to settle recurrent cold-start conditions), the readout weights are solved analytically using Ridge Regression (L2 regularization):
+Given a collection of states gathered during the training phase, the readout weights are solved analytically using Ridge Regression (L2 regularization):
 $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T \left(\mathbf{X} \mathbf{X}^T + \lambda \mathbf{I}\right)^{-1}$$
 * $\mathbf{X}$ is the matrix of state histories.
 * $\mathbf{Y}_{\text{target}}$ is the target telemetry values.
@@ -143,11 +145,25 @@ $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T \left(\mathb
 
 ---
 
-## 4. Embedded Edge Optimizations
+## 4. Analytical Comparison of Estimation Methodologies
 
-For resource-constrained edge hardware (e.g., STM32 H7 dual-core ARM Cortex-M), the firmware implements specific architectural optimizations:
+The table below contrasts the three observers evaluated by the comparative visualiser dashboard:
 
-### 1. Compressed Sparse Row (CSR) SpMV
+| Criteria | Coulomb Counting (CC) | Extended Kalman Filter (EKF) | Echo State Network (ESN) |
+| :--- | :--- | :--- | :--- |
+| **Mathematical Battery Model Dependency** | None (Integrates current input only). | High (Requires OCV curve lookup and 2-RC parameter matrices). | None (Learns mappings from training telemetry sets). |
+| **Edge Compute Cost (Microcontroller)** | Extremely Low (Single integration operation). | Medium (Matrix multiplications, Jacobian computation, inversion). | Low with Optimizations (CSR sparse representation, LUT tanh math). |
+| **Drift Vulnerability** | High (Accumulates current sensor offsets without bounds). | Low/Self-Correcting (Dynamic voltage error feedback loop). | None (Outputs are bounded by reservoir space mapping). |
+| **Non-linear Capture** | Poor (Cannot model polarization effects). | Fair (Linearizes around state transitions). | Excellent (High-dimensional reservoir mapping of inputs). |
+| **Aging Adaptability** | None (Requires manual capacity overrides). | Medium (Decoupled macroscale parameter adjustments). | High (Captures non-linear aging transitions in training). |
+
+---
+
+## 5. Embedded Edge Optimizations
+
+For resource-constrained edge hardware (implemented in [`main.c`](../hardware/main.c)), the firmware features specific performance enhancements:
+
+### A. Compressed Sparse Row (CSR) SpMV
 A $50 \times 50$ reservoir matrix has $2,500$ floating-point multiplication operations. By introducing $85\%$ sparsity during reservoir generation ($\mathbf{W}_{\text{res}}$ entries set to zero), non-zero elements (NNZ) reduce to only $375$ operations.
 
 To save RAM/Flash and bypass multiplication by zero, we compress $\mathbf{W}_{\text{res}}$ using CSR representation into three 1D arrays:
@@ -168,22 +184,21 @@ for (int i = 0; i < N_RESERVOIR; i++) {
 }
 ```
 
-### 2. Fixed-Point Q12/Q15 Mathematics
-To support microcontrollers lacking a floating-point unit (FPU), the inference can execute using pure integer arithmetic:
-* **Quantized Scaling**:
-  - Inputs scaled to Q12 format ($S_{\text{in}} = 4096$).
-  - Weights and states represented in Q15 format ($S_{\text{weights}} = 32768$).
-* **Fixed-point Tanh Look-Up Table (LUT)**:
-  Instead of compiling transcendental float math (`tanhf`), a 33-point lookup table maps values in the range $[0.0, 1.0]$. The value is resolved via linear interpolation:
+### B. Fixed-Point Q12/Q15 Mathematics
+To support microcontrollers lacking a floating-point unit (FPU), inference can execute using pure integer arithmetic:
+- **Quantized Scaling**: Inputs scaled to Q12 format ($S_{\text{in}} = 4096$) and weights/states represented in Q15 format ($S_{\text{weights}} = 32768$).
+- **Fixed-point Tanh Look-Up Table (LUT)**: Instead of compiling transcendental float math (`tanhf`), a 33-point lookup table maps values in the range $[0.0, 1.0]$. The value is resolved via linear interpolation:
   $$\text{frac} = |x_{\text{Q15}}| \pmod{1024}$$
   $$\text{index} = |x_{\text{Q15}}| \gg 10$$
   $$\tanh(x_{\text{Q15}}) = \text{sign}(x_{\text{Q15}}) \cdot \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{index}] + \text{frac} \cdot \text{LUT}[\text{index} + 1]}{1024}$$
 
 ---
 
-## 5. References & Literature Survey
+## 6. References & Literature
 
-1. **Plett, G. L.** (2004). *Extended Kalman filtering for battery management systems of LiPB-based HEV battery packs*. Journal of Power Sources, 134(2), 252-261.
-2. **Jaeger, H., & Haas, H.** (2004). *Harnessing nonlinearity: Predicting chaotic systems and saving energy in wireless communication*. Science, 304(5667), 78-80.
-3. **Rigutini, L., et al.** (2020). *State-of-charge estimation of lithium-ion batteries using reservoir computing*. IEEE Transactions on Industrial Electronics, 68(8), 7112-7121.
-4. **Compressed Sparse Row (CSR) algorithms**: *Templates for the Solution of Linear Systems: Building Blocks for Iterative Methods*, SIAM Publication.
+1. **Li, P., Wang, H., Xing, Z., Ye, K., & Li, Q.** (2020). *Joint estimation of SOC and SOH for lithium-ion batteries based on EKF multiple time scales*. Journal of Intelligent Manufacturing and Special Equipment, 1(1), 107-120. [PDF Document](../reference/paper_ekf_soc_soh.pdf)
+2. **Kamarudin, M. R., Mispan, M. S., Zainudin, M. N. S., & Sofian, H.** (2026). *Reservoir Spiking Neural Networks for Accurate State-of-Charge Estimation in Battery Management Systems*. Turkish Journal of Engineering, 10(2), 407-417. [PDF Document](../reference/paper_rc_soc_soh.pdf)
+3. **Plett, G. L.** (2004). *Extended Kalman filtering for battery management systems of LiPB-based HEV battery packs*. Journal of Power Sources, 134(2), 252-261.
+4. **Jaeger, H., & Haas, H.** (2004). *Harnessing nonlinearity: Predicting chaotic systems and saving energy in wireless communication*. Science, 304(5667), 78-80.
+5. **Rigutini, L., et al.** (2020). *State-of-charge estimation of lithium-ion batteries using reservoir computing*. IEEE Transactions on Industrial Electronics, 68(8), 7112-7121.
+6. **Compressed Sparse Row (CSR) algorithms**: *Templates for the Solution of Linear Systems: Building Blocks for Iterative Methods*, SIAM Publication.

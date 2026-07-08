@@ -1,30 +1,76 @@
 # Artifact Policy
 
-The repository intentionally contains a small set of data and model artifacts so
-reviewers can run the demo without first retraining everything.
+This document outlines the versioning, maintenance, and generation guidelines for the dataset and model weights stored within this repository. To ensure reviewers and evaluators can immediately run the visualization and edge diagnostic demonstrations, a pre-compiled set of model parameters is tracked.
 
-## Tracked Artifacts
+---
 
-- `hardware/original_ev_battery_dataset_multiclass.csv`
-  - Used by the hardware-side ESN classifier training/export path.
-- `software/visualiser/model_rc.pkl`
-  - Local fallback model for the dashboard ESN estimator when MongoDB model
-    registry data is unavailable.
-- `hardware/esn_classifier_weights.h`
-  - Generated C header consumed by `hardware/main.c`.
-- `hardware/esn_estimator_weights.h`
-  - Generated estimator weights for embedded experiments.
+## Artifact Generation & Deployment Flow
 
-## Generated Locally
+The diagram below details how source datasets feed into the training scripts to produce the serialized model assets and embedded C headers:
 
-Do not commit local caches, `.env` files, compiled binaries, Python bytecode,
-temporary logs, or scratch outputs. The root `.gitignore` covers these paths.
+```mermaid
+flowchart TD
+    subgraph Raw Datasets
+        Data_Class["original_ev_battery_dataset_multiclass.csv"]
+    end
 
-## Updating Artifacts
+    subgraph Offline Training Pipelines
+        Train_Class["train_classifier.py"]
+        Train_Est["train_estimator.py"]
+        Train_Soft["train_rc.py"]
+    end
 
-When updating a model or dataset, include:
+    subgraph Generated Assets & Code Artifacts
+        Header_Class["esn_classifier_weights.h<br>(CSR format, C header)"]
+        Header_Est["esn_estimator_weights.h<br>(C header)"]
+        Pickle_Model["model_rc.pkl<br>(Python pickle)"]
+    end
 
-- training command or script used,
-- source dataset version,
-- validation metrics,
-- reason the artifact needs to be stored in Git instead of regenerated.
+    subgraph Runtime Engines
+        MCU_Firmware["main.c<br>(Embedded diagnostic firmware)"]
+        Visualiser["app.py (Visualiser)<br>(Comparative dashboard)"]
+    end
+
+    Data_Class --> Train_Class
+    Train_Class --> Header_Class
+    Train_Est --> Header_Est
+    Train_Soft --> Pickle_Model
+
+    Header_Class --> MCU_Firmware
+    Pickle_Model --> Visualiser
+```
+
+---
+
+## Tracked Repository Artifacts
+
+The table below catalogs all model parameters, datasets, and generated headers tracked in Git:
+
+| File path | Format | Typical Size | Role | Source / Generator | Versioning Policy |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [`hardware/original_ev_battery_dataset_multiclass.csv`](../hardware/original_ev_battery_dataset_multiclass.csv) | CSV | ~360 KB | Training and validation data for thermal state classification. | Synthesized battery sensor logs. | Immutable. Only updated on structural schema shifts. |
+| [`software/visualiser/model_rc.pkl`](../software/visualiser/model_rc.pkl) | PKL | ~140 KB | Local fallback model for the visualiser ESN estimator (used when MongoDB is offline). | Trained via [`train_rc.py`](../software/visualiser/training/train_rc.py). | Regenerated upon tuning model hyperparameters. |
+| [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) | H (C Header) | ~13 KB | Generated sparse classifier weights consumed by [`main.c`](../hardware/main.c). | Exported via [`train_classifier.py`](../hardware/train_classifier.py). | Re-exported whenever the classifier ESN is retrained. |
+| [`hardware/esn_estimator_weights.h`](../hardware/esn_estimator_weights.h) | H (C Header) | ~5.8 MB | Generated estimator weights for embedded testing. | Exported via [`train_estimator.py`](../hardware/train_estimator.py). | Updated on observer pipeline refinements. |
+
+---
+
+## 🚫 What NOT to Commit
+
+> [!CAUTION]
+> The root `.gitignore` file enforces exclusion rules. Do not bypass it to commit:
+> - Local configuration scripts or `.env` files.
+> - Raw local database dumps, temporary runtime logs, or telemetry playback caches.
+> - Local python virtual environments (`venv`, `.venv`) and compiler outputs (`.o`, `.elf`, `.hex`, `.exe`).
+> - Temp python caches (`__pycache__`, `.pytest_cache`).
+
+---
+
+## 🔁 Updating Artifacts
+
+When submitting a pull request that updates any tracked model or dataset, the submitter must document the following in the commit message or PR description:
+
+1. **Training Command**: The exact python execution script and arguments used.
+2. **Dataset Version**: The source files and dataset timestamps used.
+3. **Metrics Log**: The validation criteria met (e.g., classification accuracy percentage, estimator RMSE bounds).
+4. **Justification**: A brief rationale explaining why the pre-trained weights need updating in Git instead of running dynamic local training.

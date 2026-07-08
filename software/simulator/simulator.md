@@ -1,6 +1,6 @@
 # Standalone Battery Physics Simulator Server
 
-A high-fidelity real-time Python battery physics engine and simulation server. This component runs a **first-order Equivalent Circuit Model (ECM) with 2RC branches**, dynamic cell thermal models, capacity-fading degradation models, and sensor noise/fault injectors. It serves as the data generation pipeline for the Battery State Estimator comparison platform.
+A high-fidelity real-time Python battery physics engine and simulation server. This component runs a **second-order Equivalent Circuit Model (ECM) with 2-RC branches**, dynamic cell thermal models, capacity-fading degradation models, and sensor noise/fault injectors. It serves as the data generation pipeline for the Battery State Estimator comparison platform.
 
 ---
 
@@ -30,8 +30,6 @@ simulator/
 ├── requirements.txt (Dependencies for Flask, pymongo, and NumPy)
 ├── battery_simulator.py (Core BatterySimulator physics model and DriveCycles)
 ├── battery_chemistry.py (BatteryChemistry profiles and OCV lookup tables)
-├── traditional_estimator.py (Physics-based EKF and SOH tracker)
-├── estimator_pipeline.py (Telemetry runner with safety overrides and state sync)
 ├── static/
 │   ├── css/
 │   │   └── style.css (Premium light-mode glassmorphism styling)

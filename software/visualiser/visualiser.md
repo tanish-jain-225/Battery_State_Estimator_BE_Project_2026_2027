@@ -46,10 +46,13 @@ The visualizer's code and assets are organized as follows:
 | **[model_rc.pkl](model_rc.pkl)** | Pickled pre-trained ESN model package (contains weights for SOC & SOH estimators, alongside feature normalization factors). |
 | **[datasets/](datasets/)** | Time-series datasets (Voltage, Current, Temp, SOC, SOH) used to train the Reservoir ML estimators. |
 | **[training/](training/)** | Offline ESN model training scripts and online/offline feature engineering extraction routines. |
-| **[simulator/](simulator/)** | Subsystem representing equivalent circuit physics modeling, EKF observers, SOH observers, and unified estimation pipelines. |
+| **[battery_simulator.py](battery_simulator.py)** | Core 2-RC electro-thermal battery physics simulation logic used for local execution fallback. |
+| **[traditional_estimator.py](traditional_estimator.py)** | Extended Kalman Filter (EKF) and Resistance SOH / RLS traditional observers. |
+| **[estimator_pipeline.py](estimator_pipeline.py)** | Multi-estimator runtime wrapper that paces simulation updates, tracks fault flags, and feeds data to ESN/EKF models. |
+| **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP, and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[tests/](tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability, and ESN quantization mappings. |
+| **[../tests/](../tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability, and ESN quantization mappings. |
 
 ---
 
@@ -74,9 +77,9 @@ The platform utilizes a hybrid architecture: a Python simulation engine, a docum
                    │   Data Store: MongoDB / RAM  │
                    └──────────────────────────────┘
                           │
-                          ├─► Battery Physics Simulator (simulator/battery_simulator.py)
-                          ├─► 2RC EKF & SOH Estimators (simulator/traditional_estimator.py)
-                          └─► Echo State Network ML (training/train_rc.py)
+                           ├─► Battery Physics Simulator (battery_simulator.py)
+                           ├─► 2RC EKF & SOH Estimators (traditional_estimator.py)
+                           └─► Echo State Network ML (training/train_rc.py)
 ```
 
 1. **Control Actions**: The user issues playback controls (start, pause, reset, drive cycle, chemistry, aging).
@@ -89,7 +92,7 @@ The platform utilizes a hybrid architecture: a Python simulation engine, a docum
 
 ## 🔋 Deep Dive: Battery Physics Simulator
 
-Located in **[battery_simulator.py](simulator/battery_simulator.py)**. It models a **3S (3 Cells in Series)** pack (or 6S for Lead-Acid) using a **first-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
+Located in **[battery_simulator.py](battery_simulator.py)**. It models a **3S (3 Cells in Series)** pack (or 6S for Lead-Acid) using a **second-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
 
 ### 1. Electrical Model Dynamics
 The terminal voltage is calculated using:
@@ -129,7 +132,7 @@ Configurations are stored in **[battery_chemistry.py](simulator/battery_chemistr
 
 ## 🎛️ Deep Dive: Traditional Estimators (EKF & SOH)
 
-Located in **[traditional_estimator.py](simulator/traditional_estimator.py)**.
+Located in **[traditional_estimator.py](traditional_estimator.py)**.
 
 ### 1. Extended Kalman Filter (SOC, $V_1$, $V_2$ Estimation)
 The EKF treats the battery as a stochastic linear state-space system around the current state. The state vector is:
@@ -367,7 +370,7 @@ Start a local MongoDB instance at `mongodb://localhost:27017/`. If MongoDB is di
 ### Step 3: Run Unit Tests (Recommended Verification)
 To verify calculations, observers, and ESN quantization operations:
 ```bash
-python -m unittest software/visualiser/tests/test_estimators.py
+python -m unittest software/tests/test_estimators.py
 ```
 
 ### Step 4: Train ESN Models (Optional)
