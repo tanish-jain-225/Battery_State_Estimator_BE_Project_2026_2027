@@ -50,12 +50,12 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 ## Team Details
 
-| Sr. No. | Name of Student | Roll No. | Branch | Email ID |
-| :---: | :--- | :---: | :--- | :--- |
-| 1 | Tanish Sanghvi | 56 | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in |
-| 2 | Akshay Nambiar | 40 | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in |
-| 3 | Sanjana Patankar | 47 | Automation and Robotics | 2023.sanjana.patankar@ves.ac.in |
-| 4 | Satvik Verma | 60 | Automation and Robotics | 2023.satvik.verma@ves.ac.in |
+| Sr. No. | Name of Student | Branch | Email ID | GitHub ID |
+|:-------:|------------------|:-------------------------:|-------------------------------------------|------------------|
+| 1 | Tanish Sanghvi | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in | tanish-jain-225 |
+| 2 | Akshay Nambiar | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in | RoyalMaddy08 |
+| 3 | Sanjana Patankar | Automation and Robotics | 2023.sanjana.patankar@ves.ac.in | Clothflow13 |
+| 4 | Satvik Verma | Automation and Robotics | 2023.satvik.verma@ves.ac.in | ABKmaster |
 
 ---
 
@@ -261,23 +261,53 @@ To support production-grade deployment guidelines, the system implements the fol
 
 ## Circuit Diagram
 
-The physical battery cell is represented electrically using a 2-RC Equivalent Circuit Model (ECM), visualised below:
+The battery is modeled using a **Second-Order RC Equivalent Circuit Model (2-RC ECM)**, which consists of an Open Circuit Voltage (OCV) source, an ohmic resistance, and two RC polarization networks representing the battery's dynamic electrochemical behavior.
 
 ```mermaid
 flowchart LR
-    OCV((OCV)) --- R0[R0]
-    OCV --- RC1[R1 || C1]
-    RC1 --- RC2[R2 || C2]
-    RC2 --- Terminal[Terminal Voltage Vt]
+    OCV(("Open Circuit Voltage (OCV)"))
+    R0["R₀ (Ohmic Resistance)"]
+    N1((●))
+    VT(("Terminal Voltage (Vt)"))
+
+    R1["R₁"]
+    C1["C₁"]
+
+    R2["R₂"]
+    C2["C₂"]
+
+    OCV --> R0 --> N1 --> VT
+
+    N1 --> R1 --> N2((●))
+    N2 --> C1 --> G1((Ground))
+
+    N2 --> R2 --> N3((●))
+    N3 --> C2 --> G2((Ground))
 ```
 
-Where:
-- **`OCV`** is the non-linear Open Circuit Voltage source ($f(\text{SOC})$).
-- **`R0`** represents the transient ohmic internal resistance.
-- **`R1 || C1`** represents fast charge-transfer dynamics.
-- **`R2 || C2`** represents slow polarization diffusion dynamics.
+### Description
 
-The embedded diagnostic output uses GPIO `PA5` for the status LED and UART2 for serial diagnostic output.
+- **OCV** represents the **Open Circuit Voltage**, a nonlinear function of the battery's State of Charge (SOC).
+- **R₀** models the **instantaneous ohmic internal resistance** of the battery.
+- **R₁–C₁** represents the **fast polarization (charge-transfer) dynamics**.
+- **R₂–C₂** represents the **slow diffusion polarization dynamics**.
+- **Vt** is the **terminal voltage** measured by the Battery Management System (BMS).
+
+The terminal voltage is mathematically represented as:
+
+\[
+V_t = OCV(SOC) - I R_0 - V_{RC1} - V_{RC2}
+\]
+
+where:
+
+- \(V_t\) = Terminal Voltage
+- \(I\) = Battery Current
+- \(R_0\) = Ohmic Resistance
+- \(V_{RC1}\) = Voltage across the first RC network
+- \(V_{RC2}\) = Voltage across the second RC network
+
+The embedded Battery Management System continuously measures **voltage**, **current**, and **temperature**, performs **SOC**, **SOH**, **SOE**, and **SOP** estimation using **Extended Kalman Filter (EKF)** and **Echo State Network (ESN)** algorithms, drives a **status LED through GPIO PA5**, and transmits diagnostic information over **UART2 (115200 baud)**.
 
 ---
 
