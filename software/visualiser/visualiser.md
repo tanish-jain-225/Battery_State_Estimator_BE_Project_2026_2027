@@ -92,7 +92,7 @@ The platform utilizes a hybrid architecture: a Python simulation engine, a docum
 
 ## 🔋 Deep Dive: Battery Physics Simulator
 
-Located in **[battery_simulator.py](battery_simulator.py)**. It models a **3S (3 Cells in Series)** pack (or 6S for Lead-Acid) using a **second-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
+Located in **[battery_simulator.py](battery_simulator.py)**. It models a **strictly single-cell battery** (using `n_cells = 1` for NMC, LFP, Lead-Acid, and Li-Ion profiles) based on a **second-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
 
 ### 1. Electrical Model Dynamics
 The terminal voltage is calculated using:
@@ -165,16 +165,24 @@ $$\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}^T \mathbf{S}_k^{-1}$$
 $$\hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k \tilde{y}_k$$
 $$\mathbf{P}_{k|k} = (\mathbf{I} - \mathbf{K}_k \mathbf{H}) \mathbf{P}_{k|k-1}$$
 
-### 2. Traditional SOH & Temperature-Compensated Resistance Tracker
+#### C. Covariance Trace & Negative Bounds Reset Guards
+To prevent floating-point blowup or divergence due to non-linearities and mismatches:
+- If $\text{trace}(\mathbf{P}_{k|k}) > 10.0$, the covariance matrix $\mathbf{P}$ is immediately reset to its initial nominal value:
+  $$\mathbf{P}_{k|k} \leftarrow \text{diag}([10^{-4}, 10^{-4}, 10^{-4}])$$
+- If any diagonal element of $\mathbf{P}_{k|k}$ falls below zero ($\mathbf{P}_{i,i} < 0$), that diagonal entry is clamped back to zero (or reset) to guarantee positive-definiteness.
+
+---
+
+### 2. Traditional SOH & Online Parameter Identification (VFF-RLS)
 The SOH tracking module estimates resistance growth from step voltage changes and steady-state conditions:
 - **Arrhenius Temperature Correction**: Estimates are compensated for temperature variations to prevent cold temperatures or self-heating spikes from biasing SOH calculations:
   $$\text{temp\_effect} = \exp\left(1500.0 \cdot \left(\frac{1}{T_{\text{meas}} + 273.15} - \frac{1}{298.15}\right)\right)$$
   Estimated resistances are divided by $\text{temp\_effect}$ before filtering.
-- **Dynamic Transient Observer**: Updates the internal resistance $R_0$ during load current steps ($|\Delta I| > 0.2$ A):
-  $$R_{0,\text{calc}} = \frac{|\Delta V|}{|\Delta I|}$$
-- **Static Observer**: Enables continuous resistance tracking under steady-state loads ($|I| > 0.2$ A and stable current) after a 30-second startup convergence delay (resolves startup transient drift):
-  $$R_{0,\text{static}} = \frac{|OCV(SOC) + V_1 + V_2 - V_t|}{|I|}$$
-- **Capacity Estimation**: The SOH is computed by inverting the ohmic resistance growth relation:
+- **Variable Forgetting Factor RLS (VFF-RLS)**: Identifies ohmic resistance $R_0$, polarization resistance $R_1$, and capacitance $C_1$ dynamically. To track fast changes during load steps, the forgetting factor $\lambda$ adapts dynamically based on prediction error $e$:
+  $$\lambda = \lambda_{\text{min}} + (1.0 - \lambda_{\text{min}}) \cdot e^{-\gamma \cdot e^2}$$
+  This avoids covariance windup and speeds up parameter convergence.
+- **Closed Loop Calibration**: The dynamically identified parameters ($R_0$, $R_1$, $C_1$) are directly fed into the EKF prediction and correction cycles in real-time.
+- **Capacity Estimation**: SOH is estimated from ohmic resistance growth:
   $$SOH_{\text{est}} = 1.0 - \frac{\frac{R_0}{R_{0,\text{nom}}} - 1.0}{1.5}$$
 
 ---
@@ -263,7 +271,7 @@ Fetches connection, simulation states, and model load flags.
 ```
 
 ### 2. `POST /api/control`
-Sends commands to direct the simulator configuration and state.
+Sends commands to direct the simulator configuration and state. Note that in the standardized visualizer, operator controls are display-only (modified via the simulator's UI directly), and EKF/estimator parameters are locked to standard values.
 - **Request Body Options**:
   - `command`: `"start"`, `"stop"`, `"pause"`, or `"reset"`
   - `chemistry`: `"nmc"`, `"lfp"`, `"lead_acid"`, or `"li_ion"`
@@ -273,8 +281,6 @@ Sends commands to direct the simulator configuration and state.
   - `fault_thermal`: `true` or `false`
   - `fault_dropout`: `true` or `false`
   - `fault_short`: `true` or `false`
-  - `ekf_mismatch`: `float`
-  - `quantize_mode`: `"float32"`, `"int16"`, or `"int8"`
 - **Response**: Returns the updated status configuration.
 
 ### 3. `GET /api/telemetry`

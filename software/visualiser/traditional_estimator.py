@@ -29,6 +29,11 @@ class ExtendedKalmanFilter:
         
         # Measurement noise covariance R (will adapt dynamically if adaptive_r is True)
         self.R_meas = 0.01
+
+    def update_noise_params(self, q_soc=1e-7, q_v1=1e-6, q_v2=1e-6, r_meas=0.01):
+        """Update noise parameters dynamically from the configuration sliders."""
+        self.Q = np.diag([q_soc, q_v1, q_v2])
+        self.R_meas = r_meas
         
     def step(self, soc, v1, v2, P, I_meas, V_meas, dt, T_meas=25.0, soh_est=1.0, rls_r0=None, rls_r1=None, rls_c1=None):
         """
@@ -138,6 +143,10 @@ class ExtendedKalmanFilter:
         I_mat = np.eye(3)
         P_updated = np.dot((I_mat - np.dot(K, H)), P_pred)
         
+        # Trace guard and positive-definite check to prevent EKF filter divergence
+        if np.trace(P_updated) > 10.0 or np.any(np.diag(P_updated) < 0) or np.any(np.isnan(P_updated)) or np.any(np.isinf(P_updated)):
+            P_updated = np.diag([0.01, 0.01, 0.01])
+            
         return soc_updated, v1_updated, v2_updated, P_updated
 
 class ResistanceSOH:
@@ -236,6 +245,13 @@ class RecursiveLeastSquares:
         y_pred = np.dot(self.theta.T, phi).item()
         e = y - y_pred
         
+        # Variable Forgetting Factor update (VFF-RLS)
+        # Adapt lambda dynamically based on prediction error to speed up tracking during transitions
+        lmbda_min = 0.95
+        gamma = 10.0  # Sensitivity factor
+        self.lmbda = float(lmbda_min + (1.0 - lmbda_min) * np.exp(-gamma * (e ** 2)))
+        self.lmbda = np.clip(self.lmbda, 0.95, 0.999)
+        
         # Gain vector K(k) = P * phi / (lambda + phi^T * P * phi)
         P_phi = np.dot(self.P, phi)
         denom = self.lmbda + np.dot(phi.T, P_phi).item()
@@ -248,7 +264,7 @@ class RecursiveLeastSquares:
         self.P = (self.P - np.dot(K, np.dot(phi.T, self.P))) / self.lmbda
         
         # Guard covariance from exploding or losing symmetry
-        if np.any(np.isnan(self.P)) or np.any(np.isinf(self.P)):
+        if np.any(np.isnan(self.P)) or np.any(np.isinf(self.P)) or np.trace(self.P) > 100.0:
             self.P = np.eye(3) * 10.0
             
         self.prev_y = y

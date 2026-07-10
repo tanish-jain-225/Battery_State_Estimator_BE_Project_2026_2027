@@ -157,7 +157,7 @@ class TestExtendedKalmanFilter(unittest.TestCase):
         """Posterior covariance diagonal must remain non-negative."""
         ekf = ExtendedKalmanFilter("li_ion")
         P = np.eye(3) * 0.01
-        _, _, _, P_up = ekf.step(1.0, 0.0, 0.0, P, I_meas=-1.0, V_meas=11.5, dt=1.0)
+        _, _, _, P_up = ekf.step(1.0, 0.0, 0.0, P, I_meas=-1.0, V_meas=3.83, dt=1.0)
         self.assertTrue(np.all(np.diag(P_up) >= 0.0))
 
     def test_temperature_parameter_scaling(self):
@@ -166,8 +166,8 @@ class TestExtendedKalmanFilter(unittest.TestCase):
         ekf_hot  = ExtendedKalmanFilter("nmc")
         P = np.eye(3) * 0.01
         # At cold temperature EKF covariance should differ from hot
-        _, _, _, P_cold = ekf_cold.step(0.8, 0.0, 0.0, P.copy(), -1.0, 11.0, 1.0, T_meas=-10.0)
-        _, _, _, P_hot  = ekf_hot.step( 0.8, 0.0, 0.0, P.copy(), -1.0, 11.0, 1.0, T_meas=50.0)
+        _, _, _, P_cold = ekf_cold.step(0.8, 0.0, 0.0, P.copy(), -1.0, 3.67, 1.0, T_meas=-10.0)
+        _, _, _, P_hot  = ekf_hot.step( 0.8, 0.0, 0.0, P.copy(), -1.0, 3.67, 1.0, T_meas=50.0)
         # Both should remain valid (just checking no crash and valid output)
         self.assertEqual(P_cold.shape, (3, 3))
         self.assertEqual(P_hot.shape, (3, 3))
@@ -183,8 +183,8 @@ class TestResistanceSOH(unittest.TestCase):
         tracker = ResistanceSOH("nmc")
         r0_next, soh_next = tracker.step(
             current_r0=tracker.R0_nom,
-            prev_v=12.6, prev_i=0.0,
-            V_meas=12.2, I_meas=-2.0
+            prev_v=4.2, prev_i=0.0,
+            V_meas=4.07, I_meas=-2.0
         )
         self.assertGreater(r0_next, tracker.R0_nom)
         self.assertLess(soh_next, 1.0)
@@ -194,15 +194,15 @@ class TestResistanceSOH(unittest.TestCase):
         tracker = ResistanceSOH("li_ion")
         r0_next, _ = tracker.step(
             current_r0=tracker.R0_nom,
-            prev_v=12.0, prev_i=-0.3,
-            V_meas=11.9, I_meas=-0.4    # dI = 0.1 < 0.5
+            prev_v=4.0, prev_i=-0.3,
+            V_meas=3.97, I_meas=-0.4    # dI = 0.1 < 0.5
         )
         self.assertAlmostEqual(r0_next, tracker.R0_nom, places=6)
 
     def test_soh_bounded(self):
         """SOH must always remain within [0.2, 1.0]."""
         tracker = ResistanceSOH("li_ion")
-        _, soh = tracker.step(tracker.R0_nom * 10, 12.0, 0.0, 5.0, -10.0)
+        _, soh = tracker.step(tracker.R0_nom * 10, 4.0, 0.0, 1.67, -10.0)
         self.assertGreaterEqual(soh, 0.2)
         self.assertLessEqual(soh, 1.0)
 
@@ -214,28 +214,28 @@ class TestFeatureEngineering(unittest.TestCase):
 
     def test_output_shape(self):
         """extract_features_step must return a 6-element numpy array."""
-        feats = extract_features_step(11.8, -2.0, 25.2, [])
+        feats = extract_features_step(3.93, -2.0, 25.2, [])
         self.assertEqual(feats.shape, (6,))
 
     def test_voltage_gradient(self):
         """Voltage gradient feature must equal V_current − V_prev."""
-        history = [{'voltage': 11.9, 'current': -1.5, 'temperature': 25.1}]
-        feats = extract_features_step(11.8, -2.0, 25.2, history)
-        self.assertAlmostEqual(feats[3], 11.8 - 11.9, places=5)
+        history = [{'voltage': 3.97, 'current': -1.5, 'temperature': 25.1}]
+        feats = extract_features_step(3.93, -2.0, 25.2, history)
+        self.assertAlmostEqual(feats[3], 3.93 - 3.97, places=5)
 
     def test_current_moving_average(self):
         """Current MA must equal mean of history + current reading."""
         history = [
-            {'voltage': 12.0, 'current': -1.0, 'temperature': 25.0},
-            {'voltage': 11.9, 'current': -1.5, 'temperature': 25.1},
+            {'voltage': 4.0, 'current': -1.0, 'temperature': 25.0},
+            {'voltage': 3.97, 'current': -1.5, 'temperature': 25.1},
         ]
-        feats = extract_features_step(11.8, -2.0, 25.2, history)
+        feats = extract_features_step(3.93, -2.0, 25.2, history)
         expected_i_ma = np.mean([-1.0, -1.5, -2.0])
         self.assertAlmostEqual(feats[4], expected_i_ma, places=5)
 
     def test_no_history(self):
         """With empty history gradient should be 0 and MA should equal current values."""
-        feats = extract_features_step(11.5, -1.0, 25.0, [])
+        feats = extract_features_step(3.83, -1.0, 25.0, [])
         self.assertAlmostEqual(feats[3], 0.0, places=5)   # V_grad = 0
         self.assertAlmostEqual(feats[4], -1.0, places=5)  # I_ma   = I_current
 
@@ -305,14 +305,14 @@ class TestEstimatorPipeline(unittest.TestCase):
     def test_step_soc_decreases_on_discharge(self):
         """CC SOC and EKF SOC must decrease under discharge current."""
         p = self._make_pipeline()
-        res = p.step(V_meas=11.6, I_meas_discharge=2.0, T_meas=25.0, dt=1.0)
+        res = p.step(V_meas=3.86, I_meas_discharge=2.0, T_meas=25.0, dt=1.0)
         self.assertLess(res['cc_soc'], 1.0)
         self.assertLess(res['ekf_soc'], 1.0)
 
     def test_output_keys(self):
         """Step output must contain all expected keys."""
         p = self._make_pipeline()
-        res = p.step(V_meas=11.6, I_meas_discharge=2.0, T_meas=25.0, dt=1.0)
+        res = p.step(V_meas=3.86, I_meas_discharge=2.0, T_meas=25.0, dt=1.0)
         for key in ('cc_soc', 'ekf_soc', 'trad_soh', 'esn_soc', 'esn_soh',
                     'ekf_p_diag', 'ekf_time', 'esn_time', 'model_loaded', 'faults'):
             self.assertIn(key, res, f"Missing key: {key}")
@@ -320,7 +320,7 @@ class TestEstimatorPipeline(unittest.TestCase):
     def test_covariance_diagonal_length(self):
         """EKF covariance diagonal must have exactly 3 elements."""
         p = self._make_pipeline()
-        res = p.step(11.6, 2.0, 25.0, 1.0)
+        res = p.step(3.86, 2.0, 25.0, 1.0)
         self.assertEqual(len(res['ekf_p_diag']), 3)
 
     def test_cross_chemistry_universality(self):
@@ -367,17 +367,17 @@ class TestCPSFaultDiagnostics(unittest.TestCase):
 
     def test_no_false_dropout_at_nominal_voltage(self):
         """Nominal voltage must NOT trigger a dropout alarm."""
-        res = self._stepped_pipeline(V=11.5, I=2.0, T=25.0)
+        res = self._stepped_pipeline(V=3.83, I=2.0, T=25.0)
         self.assertNotIn('sensor_dropout', res['faults'])
 
     def test_thermal_runaway_detected_by_temperature(self):
         """Temperature above threshold must trigger thermal_runaway fault."""
-        res = self._stepped_pipeline(V=11.5, I=1.0, T=65.0)
+        res = self._stepped_pipeline(V=3.83, I=1.0, T=65.0)
         self.assertIn('thermal_runaway', res['faults'])
 
     def test_no_false_thermal_alarm_at_nominal_temp(self):
         """Nominal temperature must not trigger thermal alarm."""
-        res = self._stepped_pipeline(V=11.5, I=1.0, T=30.0)
+        res = self._stepped_pipeline(V=3.83, I=1.0, T=30.0)
         self.assertNotIn('thermal_runaway', res['faults'])
 
     def test_diagnostic_thresholds_from_config(self):
@@ -445,8 +445,8 @@ class TestAdaptiveAutoCalibrationAndDynamicRegistration(unittest.TestCase):
             v1_prev = v1
             y = I * r0_nom + v1
             
-            V_meas = 12.0 + y
-            r0_est, r1_est, c1_est, converged = rls.step(V_meas, I, ocv=12.0)
+            V_meas = 4.0 + y
+            r0_est, r1_est, c1_est, converged = rls.step(V_meas, I, ocv=4.0)
             
         self.assertTrue(converged)
         self.assertTrue(0.01 < r0_est < 0.2)
@@ -461,7 +461,7 @@ class TestAdaptiveAutoCalibrationAndDynamicRegistration(unittest.TestCase):
         
         _, _, _, _ = ekf.step(
             soc=0.8, v1=0.0, v2=0.0, P=P,
-            I_meas=-1.0, V_meas=5.0, dt=1.0, T_meas=25.0
+            I_meas=-1.0, V_meas=1.67, dt=1.0, T_meas=25.0
         )
         
         self.assertNotEqual(ekf.R_meas, initial_r)
@@ -489,6 +489,43 @@ class TestAdaptiveAutoCalibrationAndDynamicRegistration(unittest.TestCase):
         self.assertEqual(chem.name, name)
         self.assertEqual(chem.nominal_capacity, 5.0)
         self.assertEqual(chem.lookup_ocv(0.5), 3.7)
+
+    def test_vff_rls_forgetting_factor(self):
+        """Variable Forgetting Factor RLS must adapt lmbda based on prediction errors."""
+        from traditional_estimator import RecursiveLeastSquares
+        rls = RecursiveLeastSquares(dt=1.0, lmbda=0.99)
+        
+        # Test baseline lambda is close to 0.99
+        self.assertAlmostEqual(rls.lmbda, 0.99, places=2)
+        
+        # Call step twice to establish history and trigger VFF update
+        rls.step(3.7, 0.0, 3.7)
+        rls.step(20.0, 10.0, 3.7)
+        
+        # Verify that lambda has adapted (decreased) to speed up convergence
+        self.assertLess(rls.lmbda, 0.99)
+        self.assertGreaterEqual(rls.lmbda, 0.85)
+
+    def test_ekf_covariance_safeguards(self):
+        """EKF must reset covariance P if trace exceeds threshold or diagonal entries drop below zero."""
+        ekf = ExtendedKalmanFilter("li_ion", mismatch=1.0)
+        
+        # 1. Test trace reset guard
+        P_large = np.eye(3) * 100.0  # Trace = 300.0 > 10.0
+        soc, v1, v2, P_new = ekf.step(
+            soc=0.8, v1=0.0, v2=0.0, P=P_large,
+            I_meas=0.0, V_meas=3.7, dt=1.0, T_meas=25.0
+        )
+        self.assertLess(np.trace(P_new), 1.0)
+        
+        # 2. Test negative diagonal reset guard
+        P_neg = np.eye(3) * 0.01
+        P_neg[0, 0] = -0.001
+        soc, v1, v2, P_new_neg = ekf.step(
+            soc=0.8, v1=0.0, v2=0.0, P=P_neg,
+            I_meas=0.0, V_meas=3.7, dt=1.0, T_meas=25.0
+        )
+        self.assertTrue(np.all(np.diag(P_new_neg) >= 0.0))
 
 
 if __name__ == '__main__':

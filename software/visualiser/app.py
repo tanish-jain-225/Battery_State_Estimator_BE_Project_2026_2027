@@ -155,6 +155,12 @@ DEFAULT_SIM_STATE = {
     'accelerated_aging': False,
     'ekf_mismatch': 1.0,
     'quantize_mode': 'float32',
+    'ekf_q_soc': 1e-7,
+    'ekf_q_v1': 1e-6,
+    'ekf_q_v2': 1e-6,
+    'ekf_r_meas': 0.01,
+    'fault_short_leakage': 0.8,
+    'fault_thermal_runaway_mult': 4.0,
 }
 
 # Load trained Reservoir Computing model
@@ -1017,8 +1023,14 @@ def get_status():
             'mongodb_connected': check_db_connected(),
             'battery_time': state.get('time', 0.0),
             'chemistry': chemistry,
-            'ekf_mismatch': state.get('ekf_mismatch', 1.0),
-            'quantize_mode': state.get('quantize_mode', 'float32'),
+            'ekf_mismatch': 1.0,
+            'quantize_mode': 'float32',
+            'ekf_q_soc': 1e-7,
+            'ekf_q_v1': 1e-6,
+            'ekf_q_v2': 1e-6,
+            'ekf_r_meas': 0.01,
+            'fault_short_leakage': 0.8,
+            'fault_thermal_runaway_mult': 4.0,
             'simulator_port_online': port_online,
             'simulator_url': Config.SIMULATOR_URL,
             'T_ambient': T_ambient,
@@ -1049,11 +1061,8 @@ def control_simulation():
         data = request.json or {}
         state = load_sim_state()
         
-        # Save local parameter modifications
-        if 'ekf_mismatch' in data:
-            state['ekf_mismatch'] = float(data['ekf_mismatch'])
-        if 'quantize_mode' in data:
-            state['quantize_mode'] = str(data['quantize_mode'])
+        # Save local parameter modifications (ignored under standard approach)
+        pass
             
         # Store other config inputs
         for key in ['chemistry', 'active_cycle', 'accelerated_aging', 'T_ambient', 'fault_thermal', 'fault_dropout', 'fault_short']:
@@ -1255,8 +1264,8 @@ def get_telemetry():
 
         state = load_sim_state()
         chemistry_name = state.get('chemistry', 'li_ion')
-        ekf_mismatch   = state.get('ekf_mismatch', 1.0)
-        quantize_mode  = state.get('quantize_mode', 'float32')
+        ekf_mismatch   = 1.0
+        quantize_mode  = 'float32'
         
         # Override with live port state if simulator is online
         port_online, port_data = check_simulator_port()
@@ -1286,6 +1295,13 @@ def get_telemetry():
 
         pipeline         = cache['pipeline']
         pipeline.load_model(esn_soc, esn_soh, input_means, input_stds)
+        
+        ekf_q_soc = 1e-7
+        ekf_q_v1  = 1e-6
+        ekf_q_v2  = 1e-6
+        ekf_r_meas = 0.01
+        pipeline.update_ekf_noise(ekf_q_soc, ekf_q_v1, ekf_q_v2, ekf_r_meas)
+        
         already_cached   = cache['n_cached']
         
         new_readings = []
@@ -1404,7 +1420,8 @@ def get_telemetry():
                 'rls_r0':        est_output.get('rls_r0', 0.075),
                 'rls_r1':        est_output.get('rls_r1', 0.045),
                 'rls_c1':        est_output.get('rls_c1', 1000.0),
-                'rls_converged': est_output.get('rls_converged', False)
+                'rls_converged': est_output.get('rls_converged', False),
+                'innovation':    est_output.get('innovation', 0.0)
             })
             cache['processed'].append(processed_record)
 

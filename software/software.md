@@ -79,11 +79,13 @@ Below is a breakdown of the key files and classes implementing the battery estim
 ### 2. Visualiser Module
 - **[`visualiser/traditional_estimator.py`](visualiser/traditional_estimator.py)**: Defines the mathematical observer classes.
   - `CoulombCounting`: Integrates current inputs directly.
-  - `ExtendedKalmanFilter`: Implements the 3-state EKF (predicts states, computes measurement Jacobians, updates covariance, and applies Kalman corrections).
+  - `ExtendedKalmanFilter`: Implements the 3-state EKF (predicts states, computes measurement Jacobians, updates covariance, and applies Kalman corrections). Includes **Trace Reset Guards** (resets covariance $P$ to initial values if trace exceeds $10.0$ or if diagonal entries become negative, preventing float overflow).
+  - `RecursiveLeastSquares`: Implements online parameter identification for electrochemistry ($R_0$, $R_1$, $C_1$) running on a macro-timescale. Features a **Variable Forgetting Factor (VFF-RLS)** adjusting $\lambda$ dynamically to prediction errors.
+  - `ResistanceSOH`: Computes capacity degradation and estimates state-of-health (SOH).
 - **[`visualiser/estimator_pipeline.py`](visualiser/estimator_pipeline.py)**: Features the `EstimatorPipeline` and `StateEstimator` classes.
-  - Integrates the EKF, Coulomb Counting, and the loaded machine learning ESN estimators.
+  - Integrates the EKF, Coulomb Counting, RLS, and the loaded machine learning ESN estimators.
   - Evaluates real-time diagnostic safety thresholds (`DIAG_DROPOUT_VOLTAGE_THRESHOLD`, `DIAG_THERMAL_TEMP_THRESHOLD`, and `DIAG_SHORT_SOC_DIFF_THRESHOLD`).
-- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, and manages the asynchronous ESN model retraining thread.
+- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, runs the comparative EKF and ESN estimation pipelines with standardized configuration parameters, and manages the asynchronous ESN model retraining thread.
 
 ---
 

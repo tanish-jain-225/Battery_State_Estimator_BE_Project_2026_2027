@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import argparse
 from train import EchoStateNetwork
 from config import Config
 
@@ -43,25 +44,60 @@ print(f"  Voltage: mean={input_means[0]:.4f}, std={input_stds[0]:.4f}")
 print(f"  Current: mean={input_means[1]:.4f}, std={input_stds[1]:.4f}")
 print(f"  Temperature: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
 
-# Train the ESN Classifier
+# Parse CLI arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--grid-search', action='store_true', help='Enable hyperparameter grid search')
+args = parser.parse_args()
+
 n_inputs = Config.ESN_N_INPUTS
 n_reservoir = Config.ESN_N_RESERVOIR
 n_outputs = Config.ESN_N_OUTPUTS
 washout = Config.ESN_WASHOUT
 
-print(f"Training ESN Classifier (n_reservoir={n_reservoir}, washout={washout})...")
-esn = EchoStateNetwork(
-    n_inputs=n_inputs,
-    n_reservoir=n_reservoir,
-    n_outputs=n_outputs,
-    spectral_radius=Config.ESN_SPECTRAL_RADIUS,
-    leak_rate=Config.ESN_LEAK_RATE,
-    input_scaling=Config.ESN_INPUT_SCALING,
-    ridge_param=Config.ESN_RIDGE_PARAM,
-    sparsity=Config.ESN_SPARSITY
-)
+best_acc = 0.0
+best_params = {}
+best_esn = None
 
-esn.train(U_scaled, Y, washout=washout)
+if args.grid_search:
+    print("Starting ESN Classifier hyperparameter grid search...")
+    # Swapping parameters
+    for sr in [0.6, 0.8, 1.0, 1.2]:
+        for lr in [0.2, 0.3, 0.4]:
+            for sp in [0.8, 0.85, 0.9]:
+                for rp in [1e-4, 1e-3, 1e-2]:
+                    esn_temp = EchoStateNetwork(
+                        n_inputs=n_inputs,
+                        n_reservoir=n_reservoir,
+                        n_outputs=n_outputs,
+                        spectral_radius=sr,
+                        leak_rate=lr,
+                        input_scaling=Config.ESN_INPUT_SCALING,
+                        ridge_param=rp,
+                        sparsity=sp
+                    )
+                    esn_temp.train(U_scaled, Y, washout=washout)
+                    preds = esn_temp.predict(U_scaled)
+                    pred_lbls = np.argmax(preds, axis=1)
+                    curr_acc = np.mean(pred_lbls[washout:] == labels[washout:])
+                    if curr_acc > best_acc:
+                        best_acc = curr_acc
+                        best_params = {'spectral_radius': sr, 'leak_rate': lr, 'sparsity': sp, 'ridge_param': rp}
+                        best_esn = esn_temp
+    print(f"Grid search complete. Best Accuracy: {best_acc*100.0:.2f}% with parameters: {best_params}")
+    esn = best_esn
+else:
+    print(f"Training ESN Classifier (n_reservoir={n_reservoir}, washout={washout})...")
+    esn = EchoStateNetwork(
+        n_inputs=n_inputs,
+        n_reservoir=n_reservoir,
+        n_outputs=n_outputs,
+        spectral_radius=Config.ESN_SPECTRAL_RADIUS,
+        leak_rate=Config.ESN_LEAK_RATE,
+        input_scaling=Config.ESN_INPUT_SCALING,
+        ridge_param=Config.ESN_RIDGE_PARAM,
+        sparsity=Config.ESN_SPARSITY
+    )
+    esn.train(U_scaled, Y, washout=washout)
 
 # Predict and verify accuracy
 predictions = esn.predict(U_scaled)

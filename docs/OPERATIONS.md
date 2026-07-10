@@ -106,9 +106,9 @@ python software/visualiser/app.py
   ```
 
 ### Step 3: Access the Dashboard
-1. Open `http://localhost:5000` in your web browser.
-2. Use the controls to start/pause telemetry playback, select active drive cycles (e.g., UDDS, US06), or inject faults.
-3. Compare EKF, Coulomb Counting, and ESN estimators side-by-side.
+1. Open `http://localhost:5000` in your web browser to view the visualizer dashboard.
+2. Open `http://localhost:8000` in your web browser to access the physics simulator dashboard. Use the controls on the simulator dashboard to start/pause telemetry playback, select active drive cycles (e.g., UDDS, US06), or toggle fault injections.
+3. Compare EKF, Coulomb Counting, and ESN estimators side-by-side on the visualiser dashboard.
 
 ---
 

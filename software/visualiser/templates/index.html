@@ -71,11 +71,12 @@
             <!-- ── Sidebar ──────────────────────────────────────── -->
             <aside class="sidebar-container">
                 <!-- Estimator Parameters (Display Only) -->
+                <!-- Interactive Observer Controls -->
                 <section class="dashboard-card control-card">
                     <div class="card-header">
-                        <h2><i class="fa-solid fa-sliders"></i> Estimator Parameters</h2>
+                        <h2><i class="fa-solid fa-sliders"></i> Observer Controls</h2>
                     </div>
-                    <div class="card-body font-sans" style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
+                    <div class="card-body font-sans" style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 12px;">
                         <!-- ML Warning Banner -->
                         <div id="ml-warning-banner" class="warning-banner hidden">
                             <div class="banner-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -85,13 +86,35 @@
                                 <code>python training/train_rc.py</code>
                             </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
-                            <span>EKF Parameter Mismatch:</span>
-                            <strong id="val-ekf-mismatch">--</strong>
+
+                        <!-- EKF Parameter Mismatch -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>EKF Parameter Mismatch:</span>
+                                <strong id="val-ekf-mismatch">1.0x</strong>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>ML Quantization Precision:</span>
-                            <strong id="val-quantize-precision">--</strong>
+
+                        <!-- EKF Process Noise Q -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Process Noise Q (SOC):</span>
+                                <strong id="val-ekf-q">1.0e-7</strong>
+                            </div>
+                        </div>
+
+                        <!-- EKF Measurement Noise R -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>Meas Noise R (Vt):</span>
+                                <strong id="val-ekf-r">0.0100</strong>
+                            </div>
+                        </div>
+
+                        <!-- ML Quantization Precision -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 8px;">
+                            <span>ESN Quantization:</span>
+                            <strong id="val-quantize">Float32</strong>
                         </div>
                     </div>
                 </section>
@@ -129,6 +152,25 @@
                                 <div id="status-injected-short" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Internal Micro-Short</div>
                                 <div id="status-injected-thermal" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Thermal Runaway Spike</div>
                                 <div id="status-injected-dropout" style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 6px;"></i>Sensor Dropout Fault</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Fault magnitudes -->
+                        <div style="border-top: 1px solid var(--border-light); padding-top: 8px; margin-top: 4px;">
+                            <span style="font-weight: 600; display: block; margin-bottom: 6px;">Fault Settings:</span>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                                        <span>Short Leakage Current:</span>
+                                        <strong id="val-fault-leakage">0.8 A</strong>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                                        <span>Thermal Runaway Mult:</span>
+                                        <strong id="val-fault-thermal-mult">4.0x</strong>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -244,6 +286,64 @@
                                 <div class="sub-values" style="margin-top: 6px;">
                                     <div>ESN RUL: <strong id="val-esn-rul" style="color: var(--accent-violet);">-- cyc</strong></div>
                                     <div>Status: <strong id="val-rul-status" style="color: var(--accent-emerald);">Good</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Detailed State Observer Panel (Single Cell Parameters) -->
+                    <section class="dashboard-card observer-panel margin-top-md">
+                        <div class="card-header observer-card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+                            <h2 style="font-size: 15px; font-weight: 700; margin: 0; color: var(--text-primary);"><i class="fa-solid fa-square-poll-vertical" style="color: var(--accent-blue); margin-right: 8px;"></i> Detailed State Observer Analytics (Single-Cell ECM)</h2>
+                            <span class="badge" style="background: var(--accent-blue-lt); color: var(--accent-blue); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;">Transient Observers</span>
+                        </div>
+                        <div class="observer-card-body" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                            <!-- Polarization Voltages -->
+                            <div class="obs-item-card" style="background: var(--bg-surface-alt); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px;">
+                                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700;">Polarization Branches</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Branch 1 (V1):</span>
+                                        <strong id="val-obs-v1" class="font-mono" style="color: var(--text-primary);">0.000 V</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Branch 2 (V2):</span>
+                                        <strong id="val-obs-v2" class="font-mono" style="color: var(--text-primary);">0.000 V</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- RLS Parameters -->
+                            <div class="obs-item-card" style="background: var(--bg-surface-alt); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px;">
+                                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700;">RLS Identified Parameters</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Ohmic Res (R0):</span>
+                                        <strong id="val-obs-r0" class="font-mono" style="color: var(--text-primary);">0.000 Ω</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Trans Res (R1):</span>
+                                        <strong id="val-obs-r1" class="font-mono" style="color: var(--text-primary);">0.000 Ω</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Trans Cap (C1):</span>
+                                        <strong id="val-obs-c1" class="font-mono" style="color: var(--text-primary);">0.0 F</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Error Metrics -->
+                            <div class="obs-item-card" style="background: var(--bg-surface-alt); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px;">
+                                <h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700;">Measurement Innovation</h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>Innovation Error:</span>
+                                        <strong id="val-obs-innovation" class="font-mono" style="color: var(--accent-amber);">0.000 V</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>RLS status:</span>
+                                        <span id="val-obs-rls-status" class="badge badge-rose" style="padding: 2px 6px; font-size: 10px; font-weight: 700;">OFFLINE</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

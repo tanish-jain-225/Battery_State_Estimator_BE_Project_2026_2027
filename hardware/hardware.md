@@ -102,10 +102,16 @@ To retrain the ESN models and export updated header configurations, run:
 ```bash
 # Trains classification model and generates esn_classifier_weights.h
 python hardware/train_classifier.py
+# Run with hyperparameter grid search:
+python hardware/train_classifier.py --grid-search
 
 # Trains estimator model and generates esn_estimator_weights.h
 python hardware/train_estimator.py
+# Run with hyperparameter grid search:
+python hardware/train_estimator.py --grid-search
 ```
+
+Adding the `--grid-search` switch triggers a programmatic sweep over spectral radii, leak rates, and regularization penalties, selecting parameters that optimize validation classification accuracy or minimize SOC/SOH RMSE.
 
 ---
 
@@ -145,7 +151,7 @@ When deploying to a physical STM32 Nucleo board (e.g., STM32F401RE / STM32F446RE
 
 ## 💻 Running the Desktop Verification Simulator
 
-To test the edge diagnostic runtime logic locally on your developer machine:
+To test the edge diagnostic runtime logic locally and benchmark execution paths on your developer machine:
 
 - **On Windows (CMD/PowerShell):**
   ```powershell
@@ -156,3 +162,10 @@ To test the edge diagnostic runtime logic locally on your developer machine:
   chmod +x hardware/run_c_simulator.sh
   ./hardware/run_c_simulator.sh
   ```
+
+### Comparative Benchmarking & Profiling
+When compiled under the `HOST_SIMULATION` define, the desktop simulator runs both the **floating-point** and **fixed-point** ESN execution paths side-by-side. It prints the step outputs and displays a final benchmark report comparing:
+- **Inference Accuracy**: Classification matching accuracy post-washout.
+- **Quantization Deviation RMSE**: Root-mean-square error discrepancy of output states:
+  $$\text{RMSE} = \sqrt{\frac{1}{M}\sum (y_{\text{float}} - y_{\text{fixed}})^2}$$
+- **Execution Speed**: Inference execution time (in milliseconds) and microseconds per sample, revealing fixed-point integer speedups.

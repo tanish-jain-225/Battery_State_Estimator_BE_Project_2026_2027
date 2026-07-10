@@ -33,6 +33,14 @@ except ImportError:
             T_ma = np.mean(T_history)
             return np.array([V_current, I_current, T_current, V_grad, I_ma, T_ma])
 
+def _trapezoidal_integration(y, x):
+    # Pure Python implementation of trapezoidal integration
+    # integral = sum_{i=0}^{n-1} (y[i] + y[i+1]) * (x[i+1] - x[i]) / 2.0
+    integral = 0.0
+    for i in range(len(x) - 1):
+        integral += (y[i] + y[i+1]) * (x[i+1] - x[i]) / 2.0
+    return float(integral)
+
 class EstimatorPipeline:
     def __init__(self, chemistry_name="li_ion", mismatch=1.0, esn_soc=None, esn_soh=None, input_means=None, input_stds=None):
         self.chemistry_name = chemistry_name
@@ -50,9 +58,7 @@ class EstimatorPipeline:
         # Precompute and cache total OCV integral to prevent redundant numerical integrations
         s_all = np.linspace(0.0, 1.0, 21)
         ocv_all = [self.chem_obj.lookup_ocv(s) for s in s_all]
-        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
-        if integrate is None:
-            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
+        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None) or _trapezoidal_integration
         self.integral_total = integrate(ocv_all, s_all)
         
         # Reset internal states
@@ -100,6 +106,11 @@ class EstimatorPipeline:
             self.esn_soc_state = [0.0] * self.esn_soc.n_reservoir
         if self.esn_soh is not None and self.esn_soh_state is None:
             self.esn_soh_state = [0.0] * self.esn_soh.n_reservoir
+
+    def update_ekf_noise(self, q_soc, q_v1, q_v2, r_meas):
+        """Pass noise params directly to the EKF object."""
+        if hasattr(self, 'ekf'):
+            self.ekf.update_noise_params(q_soc, q_v1, q_v2, r_meas)
 
     def get_state(self):
         """Serialize current estimator state to a JSON-serializable dictionary"""
@@ -233,9 +244,7 @@ class EstimatorPipeline:
         # Integral from 0 to soc
         s_vals = np.linspace(0.0, soc, steps + 1)
         ocv_vals = [self.chem_obj.lookup_ocv(s) for s in s_vals]
-        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None)
-        if integrate is None:
-            raise AttributeError("Neither np.trapezoid nor np.trapz found in numpy module.")
+        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None) or _trapezoidal_integration
         integral_soc = integrate(ocv_vals, s_vals)
         
         soe = integral_soc / max(self.integral_total, 1e-4)
@@ -338,6 +347,13 @@ class EstimatorPipeline:
                 rls_r0=use_rls_r0, rls_r1=use_rls_r1, rls_c1=use_rls_c1
             )
             ekf_time = (time.perf_counter() - t_ekf_start) * 1000.0 # ms
+            
+            # Calculate EKF measurement innovation error (residual)
+            ocv_pred = self.chem_obj.lookup_ocv(self.ekf_soc)
+            vt_pred = ocv_pred + I_meas_ekf * self.trad_r0 + self.ekf_v1 + self.ekf_v2
+            self.innovation = float(V_meas - vt_pred)
+        else:
+            self.innovation = 0.0
 
         # Save previous readings
         if 'sensor_dropout' not in faults_detected and 'thermal_runaway' not in faults_detected:
@@ -519,5 +535,6 @@ class EstimatorPipeline:
             'rls_r0': float(self.rls.r0),
             'rls_r1': float(self.rls.r1),
             'rls_c1': float(self.rls.c1),
-            'rls_converged': bool(self.rls.converged)
+            'rls_converged': bool(self.rls.converged),
+            'innovation': self.innovation
         }

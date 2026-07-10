@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import numpy as np
 import pickle
+import argparse
 from train import EchoStateNetwork
 
-def train_and_export_estimator(csv_path=None, header_path=None):
+def train_and_export_estimator(csv_path=None, header_path=None, grid_search=False):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     
     # 1. Resolve paths
@@ -65,35 +66,87 @@ def train_and_export_estimator(csv_path=None, header_path=None):
     SOH_WASHOUT = 50
 
     # 5. Train SOC ESN
-    print("Training SOC Echo State Network...")
-    esn_soc = EchoStateNetwork(
-        n_inputs=6,
-        n_reservoir=SOC_N_RESERVOIR,
-        n_outputs=1,
-        spectral_radius=SOC_SPECTRAL_RADIUS,
-        leak_rate=SOC_LEAK_RATE,
-        input_scaling=SOC_INPUT_SCALING,
-        ridge_param=SOC_RIDGE_PARAM,
-        sparsity=SOC_SPARSITY
-    )
-    esn_soc.train(U_scaled, Y_soc, washout=SOC_WASHOUT)
+    if grid_search:
+        print("Starting SOC ESN hyperparameter grid search...")
+        best_soc_rmse = float('inf')
+        best_soc_params = {}
+        for sr in [0.75, 0.85, 0.95]:
+            for lr in [0.05, 0.15, 0.25]:
+                for rp in [1e-6, 1e-5]:
+                    esn_temp = EchoStateNetwork(
+                        n_inputs=6,
+                        n_reservoir=SOC_N_RESERVOIR,
+                        n_outputs=1,
+                        spectral_radius=sr,
+                        leak_rate=lr,
+                        input_scaling=SOC_INPUT_SCALING,
+                        ridge_param=rp,
+                        sparsity=SOC_SPARSITY
+                    )
+                    esn_temp.train(U_scaled, Y_soc, washout=SOC_WASHOUT)
+                    preds = esn_temp.predict(U_scaled)
+                    rmse = np.sqrt(np.mean((Y_soc[SOC_WASHOUT:] - preds[SOC_WASHOUT:]) ** 2))
+                    if rmse < best_soc_rmse:
+                        best_soc_rmse = rmse
+                        best_soc_params = {'spectral_radius': sr, 'leak_rate': lr, 'ridge_param': rp}
+                        esn_soc = esn_temp
+        print(f"SOC Grid search complete. Best RMSE: {best_soc_rmse:.6f} with parameters: {best_soc_params}")
+    else:
+        print("Training SOC Echo State Network...")
+        esn_soc = EchoStateNetwork(
+            n_inputs=6,
+            n_reservoir=SOC_N_RESERVOIR,
+            n_outputs=1,
+            spectral_radius=SOC_SPECTRAL_RADIUS,
+            leak_rate=SOC_LEAK_RATE,
+            input_scaling=SOC_INPUT_SCALING,
+            ridge_param=SOC_RIDGE_PARAM,
+            sparsity=SOC_SPARSITY
+        )
+        esn_soc.train(U_scaled, Y_soc, washout=SOC_WASHOUT)
     pred_soc = esn_soc.predict(U_scaled)
     soc_rmse = np.sqrt(np.mean((Y_soc[SOC_WASHOUT:] - pred_soc[SOC_WASHOUT:]) ** 2))
     print(f"SOC RMSE: {soc_rmse:.6f}")
 
     # 6. Train SOH ESN
-    print("Training SOH Echo State Network...")
-    esn_soh = EchoStateNetwork(
-        n_inputs=6,
-        n_reservoir=SOH_N_RESERVOIR,
-        n_outputs=1,
-        spectral_radius=SOH_SPECTRAL_RADIUS,
-        leak_rate=SOH_LEAK_RATE,
-        input_scaling=SOH_INPUT_SCALING,
-        ridge_param=SOH_RIDGE_PARAM,
-        sparsity=SOH_SPARSITY
-    )
-    esn_soh.train(U_scaled, Y_soh, washout=SOH_WASHOUT)
+    if grid_search:
+        print("Starting SOH ESN hyperparameter grid search...")
+        best_soh_rmse = float('inf')
+        best_soh_params = {}
+        for sr in [0.75, 0.85, 0.95]:
+            for lr in [0.01, 0.02, 0.05]:
+                for rp in [1e-6, 1e-5]:
+                    esn_temp = EchoStateNetwork(
+                        n_inputs=6,
+                        n_reservoir=SOH_N_RESERVOIR,
+                        n_outputs=1,
+                        spectral_radius=sr,
+                        leak_rate=lr,
+                        input_scaling=SOH_INPUT_SCALING,
+                        ridge_param=rp,
+                        sparsity=SOH_SPARSITY
+                    )
+                    esn_temp.train(U_scaled, Y_soh, washout=SOH_WASHOUT)
+                    preds = esn_temp.predict(U_scaled)
+                    rmse = np.sqrt(np.mean((Y_soh[SOH_WASHOUT:] - preds[SOH_WASHOUT:]) ** 2))
+                    if rmse < best_soh_rmse:
+                        best_soh_rmse = rmse
+                        best_soh_params = {'spectral_radius': sr, 'leak_rate': lr, 'ridge_param': rp}
+                        esn_soh = esn_temp
+        print(f"SOH Grid search complete. Best RMSE: {best_soh_rmse:.6f} with parameters: {best_soh_params}")
+    else:
+        print("Training SOH Echo State Network...")
+        esn_soh = EchoStateNetwork(
+            n_inputs=6,
+            n_reservoir=SOH_N_RESERVOIR,
+            n_outputs=1,
+            spectral_radius=SOH_SPECTRAL_RADIUS,
+            leak_rate=SOH_LEAK_RATE,
+            input_scaling=SOH_INPUT_SCALING,
+            ridge_param=SOH_RIDGE_PARAM,
+            sparsity=SOH_SPARSITY
+        )
+        esn_soh.train(U_scaled, Y_soh, washout=SOH_WASHOUT)
     pred_soh = esn_soh.predict(U_scaled)
     soh_rmse = np.sqrt(np.mean((Y_soh[SOH_WASHOUT:] - pred_soh[SOH_WASHOUT:]) ** 2))
     print(f"SOH RMSE: {soh_rmse:.6f}")
@@ -154,4 +207,7 @@ def train_and_export_estimator(csv_path=None, header_path=None):
     print(f"Successfully generated {header_path}!")
 
 if __name__ == "__main__":
-    train_and_export_estimator()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--grid-search', action='store_true', help='Enable hyperparameter grid search')
+    args = parser.parse_args()
+    train_and_export_estimator(grid_search=args.grid_search)

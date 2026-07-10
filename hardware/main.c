@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <time.h>
 #include "esn_classifier_weights.h"
 /* USER CODE END Includes */
 
@@ -96,14 +97,20 @@ void init_fixed_point_weights(void) {
     }
 }
 
-// Tanh function in Q15 precision using LUT linear interpolation (no floats, safe against overflow)
-int16_t q15_tanh(int16_t x_q15) {
-    if (x_q15 == -32768) x_q15 = -32767;
-    int16_t abs_x = x_q15 < 0 ? -x_q15 : x_q15;
-    int idx = abs_x >> 10; // 0 to 31
+// Tanh activation function in Q15 precision using LUT linear interpolation.
+// Input (x_q12) is in Q12 format (representing -8.0 to +8.0), output is in Q15 format.
+// Safe against integer overflow and out-of-bounds lookups.
+int16_t q15_tanh(int16_t x_q12) {
+    if (x_q12 == -32768) x_q12 = -32767;
+    int16_t abs_x = x_q12 < 0 ? -x_q12 : x_q12;
+    if (abs_x > 32767) abs_x = 32767; // safety clamp
+    
+    int idx = abs_x >> 10; // 0 to 31 (since 32767 >> 10 is 31)
+    if (idx > 31) idx = 31; // defensive array bounds guard
+    
     int frac = abs_x & 1023;
     int32_t y = ((1024 - frac) * (int32_t)tanh_lut[idx] + frac * (int32_t)tanh_lut[idx + 1]) >> 10;
-    return x_q15 < 0 ? -((int16_t)y) : (int16_t)y;
+    return x_q12 < 0 ? -((int16_t)y) : (int16_t)y;
 }
 
 // Perform ESN prediction step in float32 (with CSR optimization)
@@ -796,6 +803,104 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      #ifdef HOST_SIMULATION
+      int correct_predictions_float = 0;
+      int correct_predictions_fixed = 0;
+      double sum_sq_diff = 0.0;
+      int diff_count = 0;
+
+      // 1. Profiling Float execution speed
+      for(int i = 0; i < ESN_N_RESERVOIR; i++) esn_x[i] = 0.0f;
+      clock_t start_float = clock();
+      for(int k = 0; k < N; k++) {
+          float V = data[k][0];
+          float I = data[k][1];
+          float T = data[k][2];
+          float u[ESN_N_INPUTS] = {V, I, T};
+          float y_pred[ESN_N_OUTPUTS] = {0.0f};
+          esn_predict_float(u, y_pred);
+      }
+      clock_t end_float = clock();
+      double time_float = (double)(end_float - start_float) / CLOCKS_PER_SEC * 1000.0;
+
+      // 2. Profiling Fixed-Point execution speed
+      for(int i = 0; i < ESN_N_RESERVOIR; i++) esn_x_q[i] = 0;
+      clock_t start_fixed = clock();
+      for(int k = 0; k < N; k++) {
+          float V = data[k][0];
+          float I = data[k][1];
+          float T = data[k][2];
+          float u[ESN_N_INPUTS] = {V, I, T};
+          float y_pred[ESN_N_OUTPUTS] = {0.0f};
+          esn_predict_fixed(u, y_pred);
+      }
+      clock_t end_fixed = clock();
+      double time_fixed = (double)(end_fixed - start_fixed) / CLOCKS_PER_SEC * 1000.0;
+
+      // 3. Detailed Side-by-Side Step Execution
+      for(int i = 0; i < ESN_N_RESERVOIR; i++) {
+          esn_x[i] = 0.0f;
+          esn_x_q[i] = 0;
+      }
+
+      printf("\r\n================= STARTING SIDE-BY-SIDE ESN SIMULATION =================\r\n");
+      for(int k = 0; k < N; k++) {
+          float V = data[k][0];
+          float I = data[k][1];
+          float T = data[k][2];
+          int true_state = (int)data[k][3];
+
+          float u[ESN_N_INPUTS] = {V, I, T};
+          float y_pred_float[ESN_N_OUTPUTS] = {0.0f};
+          float y_pred_fixed[ESN_N_OUTPUTS] = {0.0f};
+
+          esn_predict_float(u, y_pred_float);
+          esn_predict_fixed(u, y_pred_fixed);
+
+          int pred_float = 0;
+          float max_float = y_pred_float[0];
+          for(int i = 1; i < ESN_N_OUTPUTS; i++) {
+              if (y_pred_float[i] > max_float) {
+                  max_float = y_pred_float[i];
+                  pred_float = i;
+              }
+          }
+
+          int pred_fixed = 0;
+          float max_fixed = y_pred_fixed[0];
+          for(int i = 1; i < ESN_N_OUTPUTS; i++) {
+              if (y_pred_fixed[i] > max_fixed) {
+                  max_fixed = y_pred_fixed[i];
+                  pred_fixed = i;
+              }
+          }
+
+          if (pred_float == true_state) correct_predictions_float++;
+          if (pred_fixed == true_state) correct_predictions_fixed++;
+
+          for(int i = 0; i < ESN_N_OUTPUTS; i++) {
+              double diff = (double)y_pred_float[i] - (double)y_pred_fixed[i];
+              sum_sq_diff += diff * diff;
+              diff_count++;
+          }
+
+          const char* label_str[] = {"NORMAL  ", "WARNING ", "CRITICAL"};
+          printf("[%3d] True=%s | FloatPred=%s FixedPred=%s | V=%.2f I=%.2f T=%.2f\r\n", 
+                 k, label_str[true_state], label_str[pred_float], label_str[pred_fixed], V, I, T);
+      }
+
+      double rmse = sqrt(sum_sq_diff / diff_count);
+      printf("\r\n================= ESN HOST BENCHMARK REPORT =================\r\n");
+      printf("Float Mode Accuracy: %.2f%%\r\n", ((float)correct_predictions_float / N) * 100.0f);
+      printf("Fixed-Point Accuracy: %.2f%%\r\n", ((float)correct_predictions_fixed / N) * 100.0f);
+      printf("Quantization Deviation RMSE (Float vs Fixed): %.6f\r\n", rmse);
+      printf("Float execution time for %d samples: %.3f ms (%.3f us/sample)\r\n", N, time_float, (time_float * 1000.0) / N);
+      printf("Fixed execution time for %d samples: %.3f ms (%.3f us/sample)\r\n", N, time_fixed, (time_fixed * 1000.0) / N);
+      printf("Performance Speedup (Fixed vs Float): %.2fx\r\n", time_float / (time_fixed > 0 ? time_fixed : 1.0));
+      printf("=============================================================\r\n\r\n");
+      break;
+
+      #else
       int correct_predictions = 0;
 
       // Reset ESN states at the start of loop
@@ -864,9 +969,6 @@ int main(void)
 
       float accuracy = ((float)correct_predictions / N) * 100.0f;
       printf("--- Loop Complete. Accuracy: %.2f%% ---\r\n\r\n", accuracy);
-      #ifdef HOST_SIMULATION
-      break; // Exit the loop in host simulation
-      #else
       HAL_Delay(5000);
       #endif
       /* USER CODE END WHILE */

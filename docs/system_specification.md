@@ -37,15 +37,8 @@ sequenceDiagram
     participant DB as MongoDB Atlas / Local Buffer
     participant Edge as STM32 Edge Classifier / C Sim
 
-    Operator->>Dashboard: Start simulation or toggle faults (Thermal/Short/Dropout)
-    Dashboard->>Dashboard: Compute SHA-256(MONGODB_URI) for X-API-Key
-    Dashboard->>Simulator: POST /api/control (payload JSON + X-API-Key)
-    alt Authorized (Valid Key or Local Dev Fails-Open)
-        Simulator->>Simulator: Update runtime state variables
-        Simulator-->>Dashboard: 200 OK (Status JSON)
-    else Unauthorized
-        Simulator-->>Dashboard: 401 Unauthorized
-    end
+    Operator->>Simulator: Control simulation or toggle faults (via Simulator Dashboard Port 8000)
+    Simulator->>Simulator: Update runtime state variables
     
     loop Physics Loop (1 Hz Thread)
         Simulator->>Simulator: Solve 2-RC ECM & Thermal Equations
@@ -191,7 +184,7 @@ Registers a new OCV curve and chemical characteristics parameter file.
 ### 2. Visualiser Service (`software/visualiser`)
 
 #### `GET /api/status`
-Retrieves backend execution indicators, connection targets, and active ESN model state.
+Retrieves backend execution indicators, connection targets, active ESN model state, dynamic noise parameters, and safety fault magnitudes.
 * **Response Payload (JSON):**
   ```json
   {
@@ -199,18 +192,26 @@ Retrieves backend execution indicators, connection targets, and active ESN model
     "simulator_url": "http://localhost:8000",
     "mongodb_status": "connected",
     "model_loaded": true,
-    "model_source": "mongodb_registry"
+    "model_source": "mongodb_registry",
+    "ekf_mismatch": 1.0,
+    "quantize_mode": "float32",
+    "ekf_q_soc": 1e-7,
+    "ekf_q_v1": 1e-6,
+    "ekf_q_v2": 1e-6,
+    "ekf_r_meas": 0.01,
+    "fault_short_leakage": 0.8,
+    "fault_thermal_runaway_mult": 4.0
   }
   ```
 
 #### `GET /api/telemetry`
-Retrieves time-series data augmented with the estimators pipeline outputs (EKF, Coulomb Counting, and ESN).
+Retrieves time-series data augmented with the estimators pipeline outputs (EKF, Coulomb Counting, ESN), identified parameters, and innovation.
 * **Response Payload (JSON):**
   ```json
   [
     {
       "time": 320.0,
-      "voltage": 12.14,
+      "voltage": 3.86,
       "current": 1.25,
       "temperature": 27.4,
       "true_soc": 0.892,
@@ -221,7 +222,12 @@ Retrieves time-series data augmented with the estimators pipeline outputs (EKF, 
       "ekf_soh": 0.998,
       "esn_soh": 0.999,
       "diagnostic_status": "NORMAL",
-      "ekf_p_diag": [0.001, 0.0, 0.0]
+      "ekf_p_diag": [0.001, 0.0, 0.0],
+      "rls_r0": 0.0249,
+      "rls_r1": 0.0148,
+      "rls_c1": 1205.0,
+      "rls_converged": true,
+      "innovation": 0.00045
     }
   ]
   ```

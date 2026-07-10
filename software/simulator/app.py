@@ -633,6 +633,16 @@ def post_control():
 
         if fault_short is not None:
             state['fault_short'] = bool(fault_short)
+
+        if 'fault_short_leakage' in data:
+            val = float(data['fault_short_leakage'])
+            state['fault_short_leakage'] = val
+            Config.FAULT_SHORT_LEAKAGE_CURRENT = val
+
+        if 'fault_thermal_runaway_mult' in data:
+            val = float(data['fault_thermal_runaway_mult'])
+            state['fault_thermal_runaway_mult'] = val
+            Config.FAULT_THERMAL_RUNAWAY_MULT = val
             
         save_sim_state(state)
         return jsonify({

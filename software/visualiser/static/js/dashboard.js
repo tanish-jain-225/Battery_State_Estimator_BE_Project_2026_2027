@@ -2,8 +2,26 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI Elements
-    const mismatchSelect = document.getElementById('mismatch-select');
-    const quantizeSelect = document.getElementById('quantize-select');
+    // UI Elements - Interactive Observer Controls
+    const sliderMismatch = document.getElementById('slider-ekf-mismatch');
+    const sliderQ = document.getElementById('slider-ekf-q');
+    const sliderR = document.getElementById('slider-ekf-r');
+    const selectQuantize = document.getElementById('select-quantize');
+
+    // Dynamic Fault Settings
+    const sliderFaultLeakage = document.getElementById('slider-fault-leakage');
+    const sliderFaultThermalMult = document.getElementById('slider-fault-thermal-mult');
+    const valFaultLeakage = document.getElementById('val-fault-leakage');
+    const valFaultThermalMult = document.getElementById('val-fault-thermal-mult');
+
+    // Detailed State Observer Elements
+    const valObsV1 = document.getElementById('val-obs-v1');
+    const valObsV2 = document.getElementById('val-obs-v2');
+    const valObsR0 = document.getElementById('val-obs-r0');
+    const valObsR1 = document.getElementById('val-obs-r1');
+    const valObsC1 = document.getElementById('val-obs-c1');
+    const valObsInnovation = document.getElementById('val-obs-innovation');
+    const valObsRlsStatus = document.getElementById('val-obs-rls-status');
 
     // Simulator Control Center Elements
     const btnStart = document.getElementById('btn-start');
@@ -73,8 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let telemetryHistory = [];
     let isLocked = false;
     let lockedIndex = -1;
-    let isScrubbing = false;
-    let scrubbedIndex = -1;
 
     // Configuration Settings
     let graphSliceLimit = 120;
@@ -94,13 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
             readoutModeBadge.style.background = 'var(--accent-blue-lt)';
             readoutModeBadge.style.borderColor = 'rgba(29, 78, 216, 0.4)';
             if (btnResumeLive) btnResumeLive.style.display = 'inline-block';
-        } else if (isScrubbing && scrubbedIndex !== -1 && telemetryHistory[scrubbedIndex]) {
-            const t = Math.round(telemetryHistory[scrubbedIndex].time);
-            readoutModeLabel.textContent = `Historical: Scrubbing (t = ${t}s)`;
-            readoutModeBadge.style.display = 'flex';
-            readoutModeBadge.style.background = 'rgba(241, 245, 249, 0.9)';
-            readoutModeBadge.style.borderColor = 'var(--border-light)';
-            if (btnResumeLive) btnResumeLive.style.display = 'inline-block';
         } else {
             readoutModeBadge.style.display = 'none';
         }
@@ -111,8 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const actualIndex = telemetryHistory.length - graphDataLength + index;
 
         if (actualIndex < 0 || actualIndex >= telemetryHistory.length) return;
-        isScrubbing = true;
-        scrubbedIndex = actualIndex;
         
         const otherChart = (chart === chartSOC) ? chartSOH : chartSOC;
         if (otherChart && otherChart.data && otherChart.data.datasets && otherChart.data.datasets.length > 0 && otherChart.data.datasets[0].data) {
@@ -126,27 +133,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 otherChart.update();
             }
         }
-
-        updateNumericalReadouts(telemetryHistory[actualIndex]);
-        updateBadge();
     }
 
     function handleChartHoverEnd(chart) {
-        isScrubbing = false;
-        scrubbedIndex = -1;
-
         const otherChart = (chart === chartSOC) ? chartSOH : chartSOC;
         if (otherChart && otherChart.data && otherChart.data.datasets && otherChart.data.datasets.length > 0) {
             otherChart.setActiveElements([]);
             otherChart.update();
         }
-
-        if (isLocked && lockedIndex !== -1) {
-            updateNumericalReadouts(telemetryHistory[lockedIndex]);
-        } else if (telemetryHistory.length > 0) {
-            updateNumericalReadouts(telemetryHistory[telemetryHistory.length - 1]);
-        }
-        updateBadge();
     }
 
     function handleChartClick(index) {
@@ -167,8 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function resumeLiveMode() {
         isLocked = false;
         lockedIndex = -1;
-        isScrubbing = false;
-        scrubbedIndex = -1;
         
         if (chartSOC && chartSOC.data && chartSOC.data.datasets && chartSOC.data.datasets.length > 0) {
             chartSOC.setActiveElements([]);
@@ -229,8 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         onClick: (event, activeElements, chart) => {
-            if (activeElements && activeElements.length > 0) {
-                const index = activeElements[0].index;
+            const intersectElements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+            if (intersectElements && intersectElements.length > 0) {
+                const index = intersectElements[0].index;
                 handleChartClick(index);
             } else {
                 handleChartClickOutside();
@@ -434,29 +427,32 @@ document.addEventListener('DOMContentLoaded', () => {
             graphSliceLimit = status.graph_slice_limit;
         }
 
-        if (mismatchSelect && status.ekf_mismatch !== undefined) {
-            mismatchSelect.value = Number(status.ekf_mismatch).toFixed(1);
+        const valMismatchLabel = document.getElementById('val-ekf-mismatch');
+        if (valMismatchLabel && status.ekf_mismatch !== undefined) {
+            valMismatchLabel.textContent = Number(status.ekf_mismatch).toFixed(1) + 'x';
         }
-        if (quantizeSelect && status.quantize_mode) {
-            quantizeSelect.value = status.quantize_mode;
-        }
-
-        const valEkfMismatch = document.getElementById('val-ekf-mismatch');
-        if (valEkfMismatch && status.ekf_mismatch !== undefined) {
-            const mismatchVal = Number(status.ekf_mismatch);
-            const percentage = Math.round((mismatchVal - 1.0) * 100);
-            const text = percentage === 0 ? "0% (Perfect Tuning)" : (percentage > 0 ? `+${percentage}% Mismatch` : `${percentage}% Mismatch`);
-            valEkfMismatch.textContent = text;
+        const valQuantize = document.getElementById('val-quantize');
+        if (valQuantize && status.quantize_mode) {
+            const mode = status.quantize_mode;
+            valQuantize.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
         }
 
-        const valQuantizePrecision = document.getElementById('val-quantize-precision');
-        if (valQuantizePrecision && status.quantize_mode) {
-            const modeMap = {
-                'float32': 'Float32 (Standard)',
-                'int16': 'INT16 Fixed-Point (Simulated)',
-                'int8': 'INT8 Fixed-Point (Simulated)'
-            };
-            valQuantizePrecision.textContent = modeMap[status.quantize_mode] || status.quantize_mode;
+        const valQLabel = document.getElementById('val-ekf-q');
+        if (valQLabel && status.ekf_q_soc !== undefined) {
+            valQLabel.textContent = status.ekf_q_soc.toExponential(1);
+        }
+
+        const valRLabel = document.getElementById('val-ekf-r');
+        if (valRLabel && status.ekf_r_meas !== undefined) {
+            valRLabel.textContent = status.ekf_r_meas.toFixed(4);
+        }
+
+        if (valFaultLeakage && status.fault_short_leakage !== undefined) {
+            valFaultLeakage.textContent = Number(status.fault_short_leakage).toFixed(1) + ' A';
+        }
+
+        if (valFaultThermalMult && status.fault_thermal_runaway_mult !== undefined) {
+            valFaultThermalMult.textContent = Number(status.fault_thermal_runaway_mult).toFixed(1) + 'x';
         }
 
         // Update Ambient Temp status badge
@@ -697,6 +693,33 @@ document.addEventListener('DOMContentLoaded', () => {
             if (valEsnSoe) valEsnSoe.textContent = latest.esn_soe !== undefined ? (latest.esn_soe * 100.0).toFixed(1) + '%' : '--%';
             if (valEnergyRem) valEnergyRem.textContent = latest.energy_remaining_wh !== undefined ? latest.energy_remaining_wh.toFixed(1) + ' Wh' : '-- Wh';
             
+            // Detailed State Observer updates
+            if (valObsV1 && latest.ekf_v1 !== undefined) valObsV1.textContent = latest.ekf_v1.toFixed(4) + ' V';
+            if (valObsV2 && latest.ekf_v2 !== undefined) valObsV2.textContent = latest.ekf_v2.toFixed(4) + ' V';
+            if (valObsR0 && latest.rls_r0 !== undefined) valObsR0.textContent = latest.rls_r0.toFixed(4) + ' Ω';
+            if (valObsR1 && latest.rls_r1 !== undefined) valObsR1.textContent = latest.rls_r1.toFixed(4) + ' Ω';
+            if (valObsC1 && latest.rls_c1 !== undefined) valObsC1.textContent = Math.round(latest.rls_c1) + ' F';
+            if (valObsInnovation && latest.innovation !== undefined) {
+                valObsInnovation.textContent = latest.innovation.toFixed(4) + ' V';
+                const absErr = Math.abs(latest.innovation);
+                if (absErr > 0.05) {
+                    valObsInnovation.style.color = 'var(--accent-rose)';
+                } else if (absErr > 0.01) {
+                    valObsInnovation.style.color = 'var(--accent-amber)';
+                } else {
+                    valObsInnovation.style.color = 'var(--accent-emerald)';
+                }
+            }
+            if (valObsRlsStatus && latest.rls_converged !== undefined) {
+                if (latest.rls_converged) {
+                    valObsRlsStatus.className = 'badge badge-green';
+                    valObsRlsStatus.textContent = 'CONVERGED';
+                } else {
+                    valObsRlsStatus.className = 'badge badge-amber';
+                    valObsRlsStatus.textContent = 'IDENTIFYING';
+                }
+            }
+            
             if (valSopDischarge) valSopDischarge.textContent = latest.sop_discharge_pwr !== undefined ? Math.round(latest.sop_discharge_pwr) : '--';
             if (valSopCharge) valSopCharge.textContent = latest.sop_charge_pwr !== undefined ? Math.round(latest.sop_charge_pwr) + ' W' : '-- W';
             if (valSopCurrents) {
@@ -820,8 +843,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.length === 0) {
             isLocked = false;
             lockedIndex = -1;
-            isScrubbing = false;
-            scrubbedIndex = -1;
             updateBadge();
         } else if (isLocked && lockedIndex >= data.length) {
             isLocked = false;
@@ -829,8 +850,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBadge();
         }
         
-        // Update numerical readouts only if we are in Live Mode (not locked, not scrubbing)
-        if (!isLocked && !isScrubbing) {
+        // Update numerical readouts only if we are in Live Mode (not locked)
+        if (!isLocked) {
             if (data.length > 0) {
                 updateNumericalReadouts(data[data.length - 1]);
             } else {
@@ -886,23 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (mismatchSelect) {
-        mismatchSelect.addEventListener('change', async (e) => {
-            resumeLiveMode();
-            await apiRequest('/api/control', 'POST', { ekf_mismatch: parseFloat(e.target.value) });
-            refreshStatus();
-            refreshTelemetry();
-        });
-    }
-
-    if (quantizeSelect) {
-        quantizeSelect.addEventListener('change', async (e) => {
-            resumeLiveMode();
-            await apiRequest('/api/control', 'POST', { quantize_mode: e.target.value });
-            refreshStatus();
-            refreshTelemetry();
-        });
-    }
+    // Interactive observer controls and fault settings listeners removed (fixed to standard approach)
 
     // Playback control button listeners
     if (btnStart) {
