@@ -1,13 +1,13 @@
 # Operations Guide
 
-This guide describes local setup, environment configuration, training pipelines, running web services, and edge microcontroller simulation or compilation procedures for the Battery State Estimator.
+This guide describes local setup, environment configuration, training pipelines, running web services and edge microcontroller simulation or compilation procedures for the Battery State Estimator.
 
 ---
 
 ## 💻 1. System Setup & Configuration
 
 ### Prerequisites
-- **Python 3.8+**: Used for simulator, training scripts, and visualiser.
+- **Python 3.8+**: Used for simulator, training scripts and visualiser.
 - **C99 Compiler**: (e.g., `gcc`, `clang`, or MSVC `cl.exe`) for running the desktop C diagnostic simulator.
 - **Database (Optional)**: A local MongoDB instance or a MongoDB Atlas cloud database. If unavailable, the system defaults to in-memory buffers automatically.
 
@@ -59,14 +59,14 @@ Runs the training pipeline to build the ESN models for SOC and SOH estimation, o
 ```bash
 python software/visualiser/training/train_rc.py
 ```
-* **Expected Output:** Console logs detailing training progress, R2 and RMSE scores (validation SOC RMSE < 1.2%), and serialization of `model_rc.pkl` to the visualiser directory.
+* **Expected Output:** Console logs detailing training progress, R2 and RMSE scores (validation SOC RMSE < 1.2%) and serialization of `model_rc.pkl` to the visualiser directory.
 
 ### B. Train the Hardware ESN Classifier
 Trains the 3-class thermal safety classification network using the database records and generates the optimized C headers.
 ```bash
 python hardware/train_classifier.py
 ```
-* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details, and code generation of [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h).
+* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details and code generation of [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h).
 
 ### C. Train the Hardware ESN Estimator (Optional)
 Generates sparse estimator weights for running advanced regressions on-chip.
@@ -108,7 +108,7 @@ python software/visualiser/app.py
 ### Step 3: Access the Dashboard
 1. Open `http://localhost:5000` in your web browser to view the visualizer dashboard.
 2. Open `http://localhost:8000` in your web browser to access the physics simulator dashboard. Use the controls on the simulator dashboard to start/pause telemetry playback, select active drive cycles (e.g., UDDS, US06), or toggle fault injections.
-3. Compare EKF, Coulomb Counting, and ESN estimators side-by-side on the visualiser dashboard.
+3. Compare EKF, Coulomb Counting and ESN estimators side-by-side on the visualiser dashboard.
 
 ---
 
@@ -141,7 +141,7 @@ The desktop C simulator runs a verification dataset through the CSR-compressed E
   ```
 
 ### Microcontroller Deployment (STM32)
-1. Import [`hardware/main.c`](../hardware/main.c), [`hardware/main.h`](../hardware/main.h), and [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) into STM32CubeIDE.
+1. Import [`hardware/main.c`](../hardware/main.c), [`hardware/main.h`](../hardware/main.h) and [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) into STM32CubeIDE.
 2. In the pin configuration tool, configure **`PA5`** as a standard digital output pin (maps to the on-board user LED on Nucleo boards).
 3. Configure **`USART2`** (pins `PA2`/`PA3`) for UART communication at **115200 baud, 8 data bits, 1 stop bit**.
 4. Compile and flash the code.

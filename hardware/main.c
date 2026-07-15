@@ -203,7 +203,7 @@ void esn_predict_fixed(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
     int16_t one_minus_leak_rate_q15 = 22938;
 
     for (int i = 0; i < ESN_N_RESERVOIR; i++) {
-        // arg_q12[i] is in Q12, which represents up to 8.0, and q15_tanh expects Q12 input!
+        // arg_q12[i] is in Q12, which represents up to 8.0 and q15_tanh expects Q12 input!
         int16_t tanh_val = q15_tanh(arg_q12[i]);
         int32_t state_update = ((int32_t)one_minus_leak_rate_q15 * esn_x_q[i]) >> 15;
         state_update += ((int32_t)leak_rate_q15 * tanh_val) >> 15;

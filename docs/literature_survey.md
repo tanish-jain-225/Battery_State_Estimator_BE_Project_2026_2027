@@ -1,6 +1,6 @@
 # Theoretical Foundations of Cyber-Physical Battery State Estimation
 
-This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic, and machine learning methods implemented in the cyber-physical battery state estimator system.
+This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic and machine learning methods implemented in the cyber-physical battery state estimator system.
 
 ---
 
@@ -122,7 +122,7 @@ Unlike standard Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM
 The reservoir update equation at time step $t$ is:
 $$\tilde{x}_t = \tanh\left(\mathbf{W}_{\text{in}} [1; u_t] + \mathbf{W}_{\text{res}} x_{t-1}\right)$$
 $$x_t = (1 - \alpha) x_{t-1} + \alpha \tilde{x}_t$$
-* $u_t$ is the input vector (scaled voltage, current, and temperature).
+* $u_t$ is the input vector (scaled voltage, current and temperature).
 * $\mathbf{W}_{\text{in}} \in \mathbb{R}^{N_r \times (1 + N_u)}$ is the input weight matrix.
 * $\mathbf{W}_{\text{res}} \in \mathbb{R}^{N_r \times N_r}$ is the recurrent reservoir matrix.
 * $\alpha \in (0, 1]$ is the leak rate, adjusting the temporal rate of state evolution.

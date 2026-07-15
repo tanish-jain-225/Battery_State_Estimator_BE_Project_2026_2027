@@ -1,12 +1,12 @@
 # System Specification
 
-This document defines the interfaces, state flow, runtime modes, API payloads, and validation scope for the Battery State Estimator.
+This document defines the interfaces, state flow, runtime modes, API payloads and validation scope for the Battery State Estimator.
 
 ---
 
 ## System Goal
 
-The system aims to estimate battery State of Charge (SOC) and State of Health (SOH) while classifying the thermal safety state under dynamic load profiles. The design integrates a physics-based simulator, traditional control-theoretic estimators, data-driven reservoir-computing estimators, and an optimized embedded edge classifier.
+The system aims to estimate battery State of Charge (SOC) and State of Health (SOH) while classifying the thermal safety state under dynamic load profiles. The design integrates a physics-based simulator, traditional control-theoretic estimators, data-driven reservoir-computing estimators and an optimized embedded edge classifier.
 
 ---
 
@@ -16,9 +16,9 @@ The table below outlines the key software and hardware components of the system:
 
 | Component | Location | Responsibility |
 | :--- | :--- | :--- |
-| **Physics Simulator** | [`software/simulator/app.py`](../software/simulator/app.py) | Generates 2-RC ECM telemetry, thermal behavior, aging, and injected faults. |
-| **Visualiser Dashboard** | [`software/visualiser/app.py`](../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics, and controls. |
-| **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN, and CPS diagnostics. |
+| **Physics Simulator** | [`software/simulator/app.py`](../software/simulator/app.py) | Generates 2-RC ECM telemetry, thermal behavior, aging and injected faults. |
+| **Visualiser Dashboard** | [`software/visualiser/app.py`](../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics and controls. |
+| **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN and CPS diagnostics. |
 | **Hardware Classifier** | [`hardware/main.c`](../hardware/main.c) | Runs sparse ESN inference for Normal/Warning/Critical classification. |
 | **Training & Export Pipelines** | [`hardware/train_classifier.py`](../hardware/train_classifier.py)<br>[`hardware/train_estimator.py`](../hardware/train_estimator.py) | Train ESN models and export Python/C weight headers. |
 
@@ -52,7 +52,7 @@ sequenceDiagram
     loop Telemetry Visualisation
         Dashboard->>DB: Fetch latest telemetry frames
         DB-->>Dashboard: Telemetry readings
-        Dashboard->>Dashboard: Run EKF (SOC), CC (SOC), RLS (SOH), and ESN estimators
+        Dashboard->>Dashboard: Run EKF (SOC), CC (SOC), RLS (SOH) and ESN estimators
         Dashboard->>Dashboard: Run cyber-physical diagnostic fault checks
         Dashboard->>Operator: Render updated charts & status widgets
     end
@@ -93,7 +93,7 @@ The database document schema for each telemetry frame is detailed below:
 ### 1. Simulator Service (`software/simulator`)
 
 #### `GET /api/status`
-Retrieves the simulator state, running configurations, active fault indicators, and latest metrics.
+Retrieves the simulator state, running configurations, active fault indicators and latest metrics.
 * **Response Payload (JSON):**
   ```json
   {
@@ -184,7 +184,7 @@ Registers a new OCV curve and chemical characteristics parameter file.
 ### 2. Visualiser Service (`software/visualiser`)
 
 #### `GET /api/status`
-Retrieves backend execution indicators, connection targets, active ESN model state, dynamic noise parameters, and safety fault magnitudes.
+Retrieves backend execution indicators, connection targets, active ESN model state, dynamic noise parameters and safety fault magnitudes.
 * **Response Payload (JSON):**
   ```json
   {
@@ -205,7 +205,7 @@ Retrieves backend execution indicators, connection targets, active ESN model sta
   ```
 
 #### `GET /api/telemetry`
-Retrieves time-series data augmented with the estimators pipeline outputs (EKF, Coulomb Counting, ESN), identified parameters, and innovation.
+Retrieves time-series data augmented with the estimators pipeline outputs (EKF, Coulomb Counting, ESN), identified parameters and innovation.
 * **Response Payload (JSON):**
   ```json
   [
@@ -262,7 +262,7 @@ $$\text{Key} = \text{SHA-256}(\text{MONGODB\_URI})$$
 ## Estimator Pipeline Architecture
 
 The visualiser enriches telemetry data with dynamic state observations computed in the background:
-- **State of Charge (SOC)**: Runs Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF), and a trained Echo State Network (ESN) concurrently.
+- **State of Charge (SOC)**: Runs Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF) and a trained Echo State Network (ESN) concurrently.
 - **State of Health (SOH)**: Decoupled to track slowly varying capacity and internal resistance trends via Recursive Least Squares (RLS) parameter estimates and ESN model evaluations.
 - **Diagnostics Outputs**: Monitors anomalies to classify faults:
   - `DIAG_DROPOUT_VOLTAGE_THRESHOLD` (< 1.0 V) -> **Sensor Dropout**.

@@ -1,6 +1,6 @@
 # Artifact Policy
 
-This document outlines the versioning, maintenance, and generation guidelines for the dataset and model weights stored within this repository. To ensure reviewers and evaluators can immediately run the visualization and edge diagnostic demonstrations, a pre-compiled set of model parameters is tracked.
+This document outlines the versioning, maintenance and generation guidelines for the dataset and model weights stored within this repository. To ensure reviewers and evaluators can immediately run the visualization and edge diagnostic demonstrations, a pre-compiled set of model parameters is tracked.
 
 ---
 
@@ -44,7 +44,7 @@ flowchart TD
 
 ## Tracked Repository Artifacts
 
-The table below catalogs all model parameters, datasets, and generated headers tracked in Git:
+The table below catalogs all model parameters, datasets and generated headers tracked in Git:
 
 | File path | Format | Typical Size | Role | Source / Generator | Versioning Policy |
 | :--- | :--- | :--- | :--- | :--- | :--- |

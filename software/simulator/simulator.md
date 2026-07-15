@@ -1,6 +1,6 @@
 # Standalone Battery Physics Simulator Server
 
-A high-fidelity real-time Python battery physics engine and simulation server. This component runs a **second-order Equivalent Circuit Model (ECM) with 2-RC branches**, dynamic cell thermal models, capacity-fading degradation models, and sensor noise/fault injectors. It serves as the data generation pipeline for the Battery State Estimator comparison platform.
+A high-fidelity real-time Python battery physics engine and simulation server. This component runs a **second-order Equivalent Circuit Model (ECM) with 2-RC branches**, dynamic cell thermal models, capacity-fading degradation models and sensor noise/fault injectors. It serves as the data generation pipeline for the Battery State Estimator comparison platform.
 
 ---
 
@@ -23,11 +23,11 @@ The simulator is located in the `software/simulator` folder:
 simulator/
 ├── .env (Local environment configurations - MongoDB, debug flags, server ports)
 ├── .env.example (Template for setting up environment variables)
-├── .gitignore (Excludes pycache, env, and local build files)
+├── .gitignore (Excludes pycache, env and local build files)
 ├── simulator.md (Comprehensive documentation of the battery physics simulation server)
 ├── app.py (Flask API web server and background simulation pacing thread)
-├── config.py (Private database, server, timing, noise, and fault configurations)
-├── requirements.txt (Dependencies for Flask, pymongo, and NumPy)
+├── config.py (Private database, server, timing, noise and fault configurations)
+├── requirements.txt (Dependencies for Flask, pymongo and NumPy)
 ├── battery_simulator.py (Core BatterySimulator physics model and DriveCycles)
 ├── battery_chemistry.py (BatteryChemistry profiles and OCV lookup tables)
 ├── static/
@@ -70,7 +70,7 @@ The simulator functions as a self-contained cyber-physical generator:
 
 ### 1. Standalone Generator Loop (`generator_loop`)
 - Runs a dedicated background thread on Port 8000.
-- When `sim_running` is active, it steps the physics model, applies sensor noise, logs the data records to MongoDB, and updates the shared state in-memory/DB.
+- When `sim_running` is active, it steps the physics model, applies sensor noise, logs the data records to MongoDB and updates the shared state in-memory/DB.
 - Uses dynamic sleep timers calculated relative to `Config.SIMULATION_STEP_DELAY` to guarantee real-time execution pacing.
 
 ### 2. On-Demand Catch-up (`sync_simulation_on_demand`)
@@ -127,7 +127,7 @@ $$R_0(t) = R_{0,\text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - SOH)\right]$$
 ## 📡 API Documentation
 
 ### 1. `GET /api/status`
-Fetches connection status, settings, and live state values.
+Fetches connection status, settings and live state values.
 - **Response**:
 ```json
 {
@@ -165,7 +165,7 @@ Updates running states and injects faults.
 
 ### 3. `GET /api/readings`
 Exposes the raw history of measured telemetry records stored in buffer.
-- **Response**: List of raw readings containing `time`, `voltage`, `current`, `temperature`, and true physical ground truths (`true_soc`, `true_soh`, `true_v1`, `true_v2`, etc.).
+- **Response**: List of raw readings containing `time`, `voltage`, `current`, `temperature` and true physical ground truths (`true_soc`, `true_soh`, `true_v1`, `true_v2`, etc.).
 
 ---
 

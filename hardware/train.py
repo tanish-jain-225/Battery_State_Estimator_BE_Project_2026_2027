@@ -148,7 +148,7 @@ class EchoStateNetwork:
                 val_q = np.clip(val_q, -(2**(bits_limit - 1)), 2**(bits_limit - 1) - 1)
                 return val_q / scale
 
-            # Quantize input, weights, and states
+            # Quantize input, weights and states
             u_t_q = simulate_quantization(u_t, bits)
             W_in_q = simulate_quantization(self.W_in, bits)
             W_res_q = simulate_quantization(self.W_res, bits)

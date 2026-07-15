@@ -1,6 +1,6 @@
 # Software Subsystem
 
-This document provides a technical overview of the software architecture, directories layout, service routing, and core classes that implement the battery physics simulation and estimation comparative visualiser.
+This document provides a technical overview of the software architecture, directories layout, service routing and core classes that implement the battery physics simulation and estimation comparative visualiser.
 
 ---
 
@@ -37,7 +37,7 @@ software/
 
 ## 🔄 Software Data Flow
 
-The flowchart below traces the flow of telemetry data from the simulator, through the database, into the comparative dashboard observers, and back to the simulator via operator controls:
+The flowchart below traces the flow of telemetry data from the simulator, through the database, into the comparative dashboard observers and back to the simulator via operator controls:
 
 ```mermaid
 flowchart LR
@@ -52,7 +52,7 @@ flowchart LR
 
     subgraph Dashboard Service (Port 5000)
         VisApp["app.py (Visualiser)<br>(Dashboard Server)"]
-        EstPipe["estimator_pipeline.py<br>(EKF, CC, and ESN Observers)"]
+        EstPipe["estimator_pipeline.py<br>(EKF, CC and ESN Observers)"]
     end
 
     Sim --> SimApp
@@ -79,13 +79,13 @@ Below is a breakdown of the key files and classes implementing the battery estim
 ### 2. Visualiser Module
 - **[`visualiser/traditional_estimator.py`](visualiser/traditional_estimator.py)**: Defines the mathematical observer classes.
   - `CoulombCounting`: Integrates current inputs directly.
-  - `ExtendedKalmanFilter`: Implements the 3-state EKF (predicts states, computes measurement Jacobians, updates covariance, and applies Kalman corrections). Includes **Trace Reset Guards** (resets covariance $P$ to initial values if trace exceeds $10.0$ or if diagonal entries become negative, preventing float overflow).
+  - `ExtendedKalmanFilter`: Implements the 3-state EKF (predicts states, computes measurement Jacobians, updates covariance and applies Kalman corrections). Includes **Trace Reset Guards** (resets covariance $P$ to initial values if trace exceeds $10.0$ or if diagonal entries become negative, preventing float overflow).
   - `RecursiveLeastSquares`: Implements online parameter identification for electrochemistry ($R_0$, $R_1$, $C_1$) running on a macro-timescale. Features a **Variable Forgetting Factor (VFF-RLS)** adjusting $\lambda$ dynamically to prediction errors.
   - `ResistanceSOH`: Computes capacity degradation and estimates state-of-health (SOH).
 - **[`visualiser/estimator_pipeline.py`](visualiser/estimator_pipeline.py)**: Features the `EstimatorPipeline` and `StateEstimator` classes.
-  - Integrates the EKF, Coulomb Counting, RLS, and the loaded machine learning ESN estimators.
-  - Evaluates real-time diagnostic safety thresholds (`DIAG_DROPOUT_VOLTAGE_THRESHOLD`, `DIAG_THERMAL_TEMP_THRESHOLD`, and `DIAG_SHORT_SOC_DIFF_THRESHOLD`).
-- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, runs the comparative EKF and ESN estimation pipelines with standardized configuration parameters, and manages the asynchronous ESN model retraining thread.
+  - Integrates the EKF, Coulomb Counting, RLS and the loaded machine learning ESN estimators.
+  - Evaluates real-time diagnostic safety thresholds (`DIAG_DROPOUT_VOLTAGE_THRESHOLD`, `DIAG_THERMAL_TEMP_THRESHOLD` and `DIAG_SHORT_SOC_DIFF_THRESHOLD`).
+- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, runs the comparative EKF and ESN estimation pipelines with standardized configuration parameters and manages the asynchronous ESN model retraining thread.
 
 ---
 
@@ -114,6 +114,6 @@ Verify code correctness and math convergence by running the unit test suite:
 python -m unittest discover -s software/tests
 ```
 The test modules verify:
-- **`test_estimators.py`**: Model dynamics, observer convergence thresholds, and Arrhenius parameter shifts.
+- **`test_estimators.py`**: Model dynamics, observer convergence thresholds and Arrhenius parameter shifts.
 - **`test_api_auth.py`**: Cryptographic SHA-256 header validation and fails-open local bypassing.
 - **`test_production_train.py`**: Integrity of the offline model pipeline and generated headers output shape.

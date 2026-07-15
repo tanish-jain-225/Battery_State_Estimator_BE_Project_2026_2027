@@ -6,7 +6,7 @@ Use this interactive checklist to prepare for a review, viva, project exhibition
 
 ## 🗺️ Demonstration Workflow
 
-The flowchart below outlines the recommended sequence for setting up, running, and concluding the live demonstration:
+The flowchart below outlines the recommended sequence for setting up, running and concluding the live demonstration:
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
   - Visualiser UI: `http://localhost:5000`
   - Simulator status: `http://localhost:8000/api/status`
 - [ ] **Telemetry Playback**: Trigger playback from the dashboard and watch live data updating.
-- [ ] **Observe Estimators**: Compare ground truth SOC against EKF (physics-based), Coulomb Counting, and ESN (machine learning).
+- [ ] **Observe Estimators**: Compare ground truth SOC against EKF (physics-based), Coulomb Counting and ESN (machine learning).
 - [ ] **Inject Faults**:
   - **Thermal Runaway**: Toggle on and watch the temperature graph spike, triggering the "Thermal Warning" status.
   - **Sensor Dropout**: Toggle on and watch voltage/current drop to zero; check that estimators filter the transient.
@@ -78,4 +78,4 @@ Prepare for evaluator questions with the key design answers below:
 | **What is the benefit of ESNs over LSTMs for edge nodes?** | Echo State Networks (ESNs) belong to the **Reservoir Computing** paradigm. The recurrent weight matrix $\mathbf{W}_{\text{res}}$ is randomly initialized and kept fixed; only the linear readout layer $\mathbf{W}_{\text{out}}$ is trained via simple Ridge Regression. This avoids backpropagation-through-time (BPTT), making training extremely fast and execution lightweight enough to run on small microcontrollers without floating-point units. |
 | **How does CSR compression yield a 6.7× speedup?** | A dense $50 \times 50$ reservoir matrix requires $2,500$ multiplications. By introducing $85\%$ sparsity during training, we keep only $375$ non-zero elements. Storing these in **Compressed Sparse Row (CSR)** format (`val`, `col`, `row_ptr` arrays) allows the microcontroller to bypass multiplication by zero entirely, saving computation cycles and memory. |
 | **How does Q12/Q15 fixed-point arithmetic avoid float logic?** | Inputs are scaled by $2^{12}$ (Q12) and weights/states are scaled by $2^{15}$ (Q15). All math runs via standard 32-bit integer arithmetic. The transcendental activation function ($\tanh$) is evaluated via a 33-point lookup table (LUT) and linear interpolation: $$\tanh(x) \approx \text{LUT}[i] + \text{frac} \cdot (\text{LUT}[i+1] - \text{LUT}[i])$$ avoiding execution-heavy float divisions and library calls. |
-| **What are the limitations of this system?** | It runs on a simulated equivalent cell/pack abstraction. Full production deployment requires **Hardware-in-the-Loop (HIL)** testing with physical cells, battery management ICs, active balancing hardware, and formal ISO 26262 functional safety validation. |
+| **What are the limitations of this system?** | It runs on a simulated equivalent cell/pack abstraction. Full production deployment requires **Hardware-in-the-Loop (HIL)** testing with physical cells, battery management ICs, active balancing hardware and formal ISO 26262 functional safety validation. |

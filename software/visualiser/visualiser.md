@@ -1,6 +1,6 @@
 # Battery Estimator Evaluation Dashboard (True Physics vs. EKF+CC vs. ML-ESN)
 
-An end-to-end Python, Machine Learning, and Flask-based Battery State Estimator comparison and evaluation platform. This project simulates complex lithium-ion battery cell chemistry dynamics, logs real-time telemetry, and compares **Traditional Battery State Estimators (Extended Kalman Filter + Coulomb Counting)** side-by-side against **Modern Data-Driven Machine Learning (Reservoir Computing - Echo State Network)** models relative to the **True physical ground truth** of the cell simulator in real-time.
+An end-to-end Python, Machine Learning and Flask-based Battery State Estimator comparison and evaluation platform. This project simulates complex lithium-ion battery cell chemistry dynamics, logs real-time telemetry and compares **Traditional Battery State Estimators (Extended Kalman Filter + Coulomb Counting)** side-by-side against **Modern Data-Driven Machine Learning (Reservoir Computing - Echo State Network)** models relative to the **True physical ground truth** of the cell simulator in real-time.
 
 ---
 
@@ -22,12 +22,12 @@ An end-to-end Python, Machine Learning, and Flask-based Battery State Estimator 
 
 ## 💡 Motivation & Background
 
-Accurate state estimation of Lithium-ion batteries is critical for safe operation, range estimation, and life cycle maximization in Electric Vehicles (EVs) and Grid Storage. The core states are:
+Accurate state estimation of Lithium-ion batteries is critical for safe operation, range estimation and life cycle maximization in Electric Vehicles (EVs) and Grid Storage. The core states are:
 - **State of Charge (SOC)**: The remaining capacity relative to the nominal maximum capacity (similar to a fuel gauge).
 - **State of Health (SOH)**: The current maximum capacity relative to its brand-new capacity (indicating degradation).
 
 ### The Challenge:
-Batteries are highly non-linear, time-varying electrochemical systems. Their characteristics shift dynamically under different temperatures, discharge cycles, and degradation states.
+Batteries are highly non-linear, time-varying electrochemical systems. Their characteristics shift dynamically under different temperatures, discharge cycles and degradation states.
 - **Traditional Methods**: Standard Coulomb Counting (CC) drifts due to sensor noise. Extended Kalman Filters (EKF) resolve drift but require precise parameters (Equivalent Circuit Models) which are difficult to extract and vary over cell lifetimes.
 - **Data-Driven ML**: Machine Learning can map these curves from data. However, traditional recurrent models (LSTMs, GRUs) are computationally too heavy for low-power edge microcontrollers in real-time.
 - **The Solution (Reservoir Computing)**: Echo State Networks (ESNs) project input patterns into a high-dimensional recurrent space (the reservoir) through fixed random weights. Only the linear output layer (readout) is trained. This yields high recurrent representation capacity with extremely low computational cost, making it ideal for edge battery state estimator microcontrollers.
@@ -40,25 +40,25 @@ This dashboard provides an evaluation sandbox to compare EKF and ESN estimators 
 
 The visualizer's code and assets are organized as follows:
 
-| **[app.py](app.py)** | Main web server Flask application. Exposes endpoints for controls and telemetry, handles local catch-up simulation cycles, and manages background retraining threads. |
-| **[config.py](config.py)** | Application configurations, ESN hyperparameters, noise thresholds, fault injection rules, and database connection settings. |
-| **[requirements.txt](requirements.txt)** | Python package dependencies for database connection, dashboard observers, and neural network calculations. |
+| **[app.py](app.py)** | Main web server Flask application. Exposes endpoints for controls and telemetry, handles local catch-up simulation cycles and manages background retraining threads. |
+| **[config.py](config.py)** | Application configurations, ESN hyperparameters, noise thresholds, fault injection rules and database connection settings. |
+| **[requirements.txt](requirements.txt)** | Python package dependencies for database connection, dashboard observers and neural network calculations. |
 | **[model_rc.pkl](model_rc.pkl)** | Pickled pre-trained ESN model package (contains weights for SOC & SOH estimators, alongside feature normalization factors). |
 | **[datasets/](datasets/)** | Time-series datasets (Voltage, Current, Temp, SOC, SOH) used to train the Reservoir ML estimators. |
 | **[training/](training/)** | Offline ESN model training scripts and online/offline feature engineering extraction routines. |
 | **[battery_simulator.py](battery_simulator.py)** | Core 2-RC electro-thermal battery physics simulation logic used for local execution fallback. |
 | **[traditional_estimator.py](traditional_estimator.py)** | Extended Kalman Filter (EKF) and Resistance SOH / RLS traditional observers. |
-| **[estimator_pipeline.py](estimator_pipeline.py)** | Multi-estimator runtime wrapper that paces simulation updates, tracks fault flags, and feeds data to ESN/EKF models. |
-| **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP, and Lead-Acid profiles. |
+| **[estimator_pipeline.py](estimator_pipeline.py)** | Multi-estimator runtime wrapper that paces simulation updates, tracks fault flags and feeds data to ESN/EKF models. |
+| **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[../tests/](../tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability, and ESN quantization mappings. |
+| **[../tests/](../tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability and ESN quantization mappings. |
 
 ---
 
 ## 🏗️ Battery State Estimator Architecture & Data Flow
 
-The platform utilizes a hybrid architecture: a Python simulation engine, a document database (or memory array), and a real-time glassmorphic visualization interface.
+The platform utilizes a hybrid architecture: a Python simulation engine, a document database (or memory array) and a real-time glassmorphic visualization interface.
 
 ```
                    ┌──────────────────────────────┐
@@ -85,14 +85,14 @@ The platform utilizes a hybrid architecture: a Python simulation engine, a docum
 1. **Control Actions**: The user issues playback controls (start, pause, reset, drive cycle, chemistry, aging).
 2. **On-Demand Synchronization**: The server acts stateless. When a request is received, the backend check loops determine if a simulator is running on port 8000. If online, the visualiser pulls state telemetry directly from the simulator. If offline, the visualiser catch-up loop (`sync_simulation_locally()`) runs the bundled physics model and estimators, saving results back to local state or MongoDB.
 3. **ML Inference**: During each simulation step, raw measurements are run through online feature engineering and fed into the ESN model.
-4. **Telemetry Logging**: Every tick logs true values, EKF values, ESN values, latency, and system memory consumption.
+4. **Telemetry Logging**: Every tick logs true values, EKF values, ESN values, latency and system memory consumption.
 5. **Interactive Visualization**: The browser polls telemetry and renders it on custom Chart.js curves and a dynamic battery wavefront container.
 
 ---
 
 ## 🔋 Deep Dive: Battery Physics Simulator
 
-Located in **[battery_simulator.py](battery_simulator.py)**. It models a **strictly single-cell battery** (using `n_cells = 1` for NMC, LFP, Lead-Acid, and Li-Ion profiles) based on a **second-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
+Located in **[battery_simulator.py](battery_simulator.py)**. It models a **strictly single-cell battery** (using `n_cells = 1` for NMC, LFP, Lead-Acid and Li-Ion profiles) based on a **second-order Equivalent Circuit Model (ECM)** with two polarization RC branches.
 
 ### 1. Electrical Model Dynamics
 The terminal voltage is calculated using:
@@ -178,7 +178,7 @@ The SOH tracking module estimates resistance growth from step voltage changes an
 - **Arrhenius Temperature Correction**: Estimates are compensated for temperature variations to prevent cold temperatures or self-heating spikes from biasing SOH calculations:
   $$\text{temp\_effect} = \exp\left(1500.0 \cdot \left(\frac{1}{T_{\text{meas}} + 273.15} - \frac{1}{298.15}\right)\right)$$
   Estimated resistances are divided by $\text{temp\_effect}$ before filtering.
-- **Variable Forgetting Factor RLS (VFF-RLS)**: Identifies ohmic resistance $R_0$, polarization resistance $R_1$, and capacitance $C_1$ dynamically. To track fast changes during load steps, the forgetting factor $\lambda$ adapts dynamically based on prediction error $e$:
+- **Variable Forgetting Factor RLS (VFF-RLS)**: Identifies ohmic resistance $R_0$, polarization resistance $R_1$ and capacitance $C_1$ dynamically. To track fast changes during load steps, the forgetting factor $\lambda$ adapts dynamically based on prediction error $e$:
   $$\lambda = \lambda_{\text{min}} + (1.0 - \lambda_{\text{min}}) \cdot e^{-\gamma \cdot e^2}$$
   This avoids covariance windup and speeds up parameter convergence.
 - **Closed Loop Calibration**: The dynamically identified parameters ($R_0$, $R_1$, $C_1$) are directly fed into the EKF prediction and correction cycles in real-time.
@@ -247,7 +247,7 @@ Features are extracted offline in **[feature_engineering.py](training/feature_en
 ## 📡 API Documentation
 
 ### 1. `GET /api/status`
-Fetches connection, simulation states, and model load flags.
+Fetches connection, simulation states and model load flags.
 - **Response**:
 ```json
 {
@@ -271,7 +271,7 @@ Fetches connection, simulation states, and model load flags.
 ```
 
 ### 2. `POST /api/control`
-Sends commands to direct the simulator configuration and state. Note that in the standardized visualizer, operator controls are display-only (modified via the simulator's UI directly), and EKF/estimator parameters are locked to standard values.
+Sends commands to direct the simulator configuration and state. Note that in the standardized visualizer, operator controls are display-only (modified via the simulator's UI directly) and EKF/estimator parameters are locked to standard values.
 - **Request Body Options**:
   - `command`: `"start"`, `"stop"`, `"pause"`, or `"reset"`
   - `chemistry`: `"nmc"`, `"lfp"`, `"lead_acid"`, or `"li_ion"`
@@ -354,7 +354,7 @@ The frontend is built using a custom light-mode glassmorphic design system:
    - Triggers dynamic floating bubble particles when charging.
    - Alters OCV border coloring based on charge depletion.
 3. **Side-by-Side Dual Deviation Curves**: Visualizes estimation errors $|True - EKF|$ and $|True - ESN|$ simultaneously.
-4. **Interactive Action Toggles**: Smooth transitions, buttons with offset scales, and custom select fields.
+4. **Interactive Action Toggles**: Smooth transitions, buttons with offset scales and custom select fields.
 5. **Educational Tooltips**: Provides context about estimator algorithms on hover.
 
 ---
@@ -363,7 +363,7 @@ The frontend is built using a custom light-mode glassmorphic design system:
 
 The platform is designed to be highly flexible:
 1. **Visualizer App (`app.py`)**: Can run entirely self-contained using its bundled physics simulator if the standalone simulator is offline (ideal for serverless/stateless cloud deployments).
-2. **Segregated Mode**: If the standalone simulator (under `software/simulator`) is run on Port 8000, `app.py` automatically detects it, halts local simulation catch-ups, and pulls real-time synchronized telemetry.
+2. **Segregated Mode**: If the standalone simulator (under `software/simulator`) is run on Port 8000, `app.py` automatically detects it, halts local simulation catch-ups and pulls real-time synchronized telemetry.
 
 ### Step 1: Install Dependencies
 ```bash
@@ -374,7 +374,7 @@ pip install -r software/visualiser/requirements.txt
 Start a local MongoDB instance at `mongodb://localhost:27017/`. If MongoDB is disconnected, the visualiser will silently fall back to local memory data storage.
 
 ### Step 3: Run Unit Tests (Recommended Verification)
-To verify calculations, observers, and ESN quantization operations:
+To verify calculations, observers and ESN quantization operations:
 ```bash
 python -m unittest software/tests/test_estimators.py
 ```

@@ -62,7 +62,7 @@ class TestProductionTraining(unittest.TestCase):
             self.fail(f"Failed to fetch or parse remote CSV dataset: {e}")
 
     def test_end_to_end_training_pipeline(self):
-        """Test complete feature extraction, scaling, ESN training, and pickling logic."""
+        """Test complete feature extraction, scaling, ESN training and pickling logic."""
         print("\n[STEP 2] Fetching remote dataset for E2E training test...")
         import requests
         response = requests.get(self.csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)

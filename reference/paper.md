@@ -1,6 +1,6 @@
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 
-**Abstract** — Reliable estimation of State of Charge (SOC) and State of Health (SOH) in Lithium-Ion batteries is critical for electric vehicles (EVs) and smart grids. Traditional estimators, such as the Extended Kalman Filter (EKF), rely on high-fidelity physical models but degrade under unmodeled dynamics and cell aging. Conversely, deep recurrent neural networks present high computational costs that prevent edge deployment. This paper presents a co-designed cyber-physical system combining a 2-RC Equivalent Circuit Model (ECM) simulator, EKF state observers, and Echo State Networks (ESNs) for state tracking. Additionally, we implement an optimized, edge-capable ESN classifier on an ARM Cortex-M microcontroller for thermal safety diagnostics. By introducing Compressed Sparse Row (CSR) sparse matrix-vector multiplication (SpMV) and fixed-point Q12/Q15 integer arithmetic with lookup table (LUT) linear interpolation, we achieve a **6.7× execution speedup** and save **~10 KB of Flash memory**, while maintaining classification accuracy at **98.40%** under dynamic drive cycles.
+**Abstract** — Reliable estimation of State of Charge (SOC) and State of Health (SOH) in Lithium-Ion batteries is critical for electric vehicles (EVs) and smart grids. Traditional estimators, such as the Extended Kalman Filter (EKF), rely on high-fidelity physical models but degrade under unmodeled dynamics and cell aging. Conversely, deep recurrent neural networks present high computational costs that prevent edge deployment. This paper presents a co-designed cyber-physical system combining a 2-RC Equivalent Circuit Model (ECM) simulator, EKF state observers and Echo State Networks (ESNs) for state tracking. Additionally, we implement an optimized, edge-capable ESN classifier on an ARM Cortex-M microcontroller for thermal safety diagnostics. By introducing Compressed Sparse Row (CSR) sparse matrix-vector multiplication (SpMV) and fixed-point Q12/Q15 integer arithmetic with lookup table (LUT) linear interpolation, we achieve a **6.7× execution speedup** and save **~10 KB of Flash memory**, while maintaining classification accuracy at **98.40%** under dynamic drive cycles.
 
 ---
 
@@ -17,10 +17,10 @@ In this work, we present a co-designed cyber-physical system. We implement a dua
 
 ## II. System Architecture & Methodology
 
-The system is structured as a modular cyber-physical loop. It consists of a physical simulator modeling cell electro-thermal dynamics and fault states, an observer dashboard running EKF and ESN estimators, and an optimized embedded diagnostic firmware.
+The system is structured as a modular cyber-physical loop. It consists of a physical simulator modeling cell electro-thermal dynamics and fault states, an observer dashboard running EKF and ESN estimators and an optimized embedded diagnostic firmware.
 
 ### A. Battery Physics Simulation
-The battery cell is represented by a 2-RC Equivalent Circuit Model (ECM), modeling polarization voltage dynamics ($V_1, V_2$), ohmic losses ($I \cdot R_0$), convective cooling, and capacity fade. Parameter values depend on temperature ($T$) via Arrhenius equations:
+The battery cell is represented by a 2-RC Equivalent Circuit Model (ECM), modeling polarization voltage dynamics ($V_1, V_2$), ohmic losses ($I \cdot R_0$), convective cooling and capacity fade. Parameter values depend on temperature ($T$) via Arrhenius equations:
 $$\theta(T) = \theta(T_{\text{ref}}) \cdot \exp\left[\frac{E_a}{R_{\text{gas}}} \left(\frac{1}{T} - \frac{1}{T_{\text{ref}}}\right)\right]$$
 
 ### B. Extended Kalman Filter Observer
@@ -39,7 +39,7 @@ $$x_t = (1 - \alpha) x_{t-1} + \alpha \tilde{x}_t$$
 The output weights $\mathbf{W}_{\text{out}}$ are trained offline using Ridge Regression (L2 regularization $\lambda$):
 $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T \left(\mathbf{X} \mathbf{X}^T + \lambda \mathbf{I}\right)^{-1}$$
 
-Mirroring the findings of Kamarudin et al. [2] on the data efficiency and temporal representation capability of Reservoir Spiking Neural Networks (RSNNs), our non-spiking leaky-integrator reservoir mapping offers rich fading memory of input histories. For safety classification at the edge, the reservoir output is passed through a dense layer representing Normal, Warning, and Critical thermal safety states.
+Mirroring the findings of Kamarudin et al. [2] on the data efficiency and temporal representation capability of Reservoir Spiking Neural Networks (RSNNs), our non-spiking leaky-integrator reservoir mapping offers rich fading memory of input histories. For safety classification at the edge, the reservoir output is passed through a dense layer representing Normal, Warning and Critical thermal safety states.
 
 ---
 
@@ -57,7 +57,7 @@ This reduces reservoir computations to only $375$ multiplications, yielding a **
 
 ### B. Low-Power Fixed-Point Math (`ESN_FIXED_POINT 1`)
 We implement a pure integer execution path for microcontrollers lacking hardware floating-point units:
-1. **Quantization Scaling**: Inputs are quantized into Q12 format ($S = 4096$), and reservoir states and weights are stored in Q15 format ($S = 32768$).
+1. **Quantization Scaling**: Inputs are quantized into Q12 format ($S = 4096$) and reservoir states and weights are stored in Q15 format ($S = 32768$).
 2. **Fixed-Point Lookup Table**: The transcendental activation function ($\tanh$) is replaced with a high-speed 33-point lookup table combined with linear interpolation:
    $$\tanh(x_{\text{Q15}}) = \text{sign}(x_{\text{Q15}}) \cdot \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{index}] + \text{frac} \cdot \text{LUT}[\text{index} + 1]}{1024}$$
    Where $\text{frac} = |x_{\text{Q15}}| \pmod{1024}$ and $\text{index} = |x_{\text{Q15}}| \gg 10$.
@@ -66,7 +66,7 @@ We implement a pure integer execution path for microcontrollers lacking hardware
 
 ## IV. Experimental Results & Performance Analysis
 
-The system was validated under simulated drive cycles, including the Urban Dynamometer Driving Schedule (UDDS), Highway Fuel Economy Test (HWFET), and high-dynamic US06 profiles.
+The system was validated under simulated drive cycles, including the Urban Dynamometer Driving Schedule (UDDS), Highway Fuel Economy Test (HWFET) and high-dynamic US06 profiles.
 
 ### A. State Estimation Accuracy
 The estimator pipeline yields high-fidelity tracking metrics. Table I summarizes the Root Mean Square Error (RMSE) values for the different estimators:

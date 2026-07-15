@@ -6,7 +6,7 @@ This document describes how to deploy the Physics Simulator and the Visualiser D
 
 ## 🌐 Deployed Service Topology
 
-The diagram below illustrates the communication flow between the operator's web browser, the deployed Render services, the shared MongoDB database, and the cryptographic API security keys validation:
+The diagram below illustrates the communication flow between the operator's web browser, the deployed Render services, the shared MongoDB database and the cryptographic API security keys validation:
 
 ```mermaid
 flowchart TD

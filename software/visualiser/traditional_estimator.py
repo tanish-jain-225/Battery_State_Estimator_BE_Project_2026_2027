@@ -181,7 +181,7 @@ class ResistanceSOH:
                 r0_est = (1.0 - self.alpha) * current_r0 + self.alpha * r0_calc_comp
                 updated = True
                 
-        # 2. Static resistance observer (fallback when current is stable, active load exists, and state has converged)
+        # 2. Static resistance observer (fallback when current is stable, active load exists and state has converged)
         if not updated and abs(I_meas) > 0.2 and elapsed_time > 30.0:
             ocv = self.chemistry.lookup_ocv(soc_est)
             r0_static = abs(ocv + v1 + v2 - V_meas) / abs(I_meas)

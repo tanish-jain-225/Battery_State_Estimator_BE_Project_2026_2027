@@ -1,6 +1,6 @@
 # Hardware Subsystem
 
-This document provides a technical guide to the embedded hardware subsystem, including folder layouts, Compressed Sparse Row (CSR) matrix representation, fixed-point Q12/Q15 conversion math, wiring guides, and firmware build setups.
+This document provides a technical guide to the embedded hardware subsystem, including folder layouts, Compressed Sparse Row (CSR) matrix representation, fixed-point Q12/Q15 conversion math, wiring guides and firmware build setups.
 
 ---
 
@@ -16,7 +16,7 @@ hardware/
 ├── train.py                                     # Core ESN Python implementation
 ├── train_classifier.py                          # Trains the 3-class ESN & exports C weights
 ├── train_estimator.py                           # Trains the SOC/SOH ESN & exports weights
-├── config.py                                    # Dimensions, thresholds, and datasets settings
+├── config.py                                    # Dimensions, thresholds and datasets settings
 ├── esn_classifier_weights.h                     # Generated sparse classifier weight arrays
 ├── esn_estimator_weights.h                      # Generated sparse estimator weight arrays
 ├── original_ev_battery_dataset_multiclass.csv   # Synthesized multiclass drive-cycle data
@@ -111,7 +111,7 @@ python hardware/train_estimator.py
 python hardware/train_estimator.py --grid-search
 ```
 
-Adding the `--grid-search` switch triggers a programmatic sweep over spectral radii, leak rates, and regularization penalties, selecting parameters that optimize validation classification accuracy or minimize SOC/SOH RMSE.
+Adding the `--grid-search` switch triggers a programmatic sweep over spectral radii, leak rates and regularization penalties, selecting parameters that optimize validation classification accuracy or minimize SOC/SOH RMSE.
 
 ---
 
