@@ -239,6 +239,79 @@ class EchoStateNetwork:
         self.x = x
         return np.array(predictions)
 
+def generate_full_range_dataset():
+    """
+    Generates a high-fidelity synthetic battery dataset covering the full range
+    of SOC (0% to 100%) and SOH (80% to 100%) using the physical simulator.
+    """
+    try:
+        from battery_simulator import BatterySimulator
+    except ImportError:
+        import sys
+        import os
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from battery_simulator import BatterySimulator
+        
+    import pandas as pd
+    
+    records = []
+    soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
+    dt = 1.0
+    
+    for soh_target in soh_levels:
+        # 1. Discharging Cycle (Constant + Pulsed)
+        sim = BatterySimulator()
+        sim.reset("li_ion")
+        sim.soh = soh_target
+        sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
+        sim.temperature = 25.0
+        
+        t = 0.0
+        while sim.soc > 0.01:
+            I = 2.0
+            if int(t) % 100 < 20:
+                I = 4.5
+            elif int(t) % 200 >= 180:
+                I = -1.0
+                
+            out = sim.step(I, dt, accelerated_aging=False)
+            records.append({
+                'Time': t,
+                'Voltage': 3.0 * out['voltage'],
+                'Current': I,
+                'Temperature': out['temperature'],
+                'SOC': out['true_soc'],
+                'SOH': out['true_soh']
+            })
+            t += dt
+            
+        # 2. Charging Cycle (CCCV Charge)
+        sim = BatterySimulator()
+        sim.reset("li_ion")
+        sim.soh = soh_target
+        sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
+        sim.soc = 0.01
+        sim.temperature = 25.0
+        
+        t = 0.0
+        while sim.soc < 0.99:
+            I_charge = 2.0
+            if sim.voltage > 4.15:
+                I_charge = max(0.1, 2.0 * (4.2 - sim.voltage) / 0.05)
+                
+            out = sim.step(I_charge, dt, accelerated_aging=False)
+            records.append({
+                'Time': t,
+                'Voltage': 3.0 * out['voltage'],
+                'Current': -I_charge,
+                'Temperature': out['temperature'],
+                'SOC': out['true_soc'],
+                'SOH': out['true_soh']
+            })
+            t += dt
+            
+    return pd.DataFrame(records)
+
 def main():
     csv_path = Config.CSV_PATH
     csv_url = getattr(Config, 'CSV_URL', '').strip()
@@ -259,27 +332,23 @@ def main():
             print(f"Remote dataset loaded ({len(df)} rows).")
         except Exception as e:
             print(f"Error loading remote CSV from CSV_URL: {e}")
-            if os.path.exists(csv_path):
-                print(f"Falling back to local dataset from {csv_path}...")
-                try:
-                    df = pd.read_csv(csv_path)
-                except Exception as local_err:
-                    print(f"Error loading local dataset: {local_err}")
-                    return
-            else:
-                return
-    elif os.path.exists(csv_path):
+
+    if df is None and os.path.exists(csv_path):
         print(f"Loading local dataset from {csv_path}...")
         try:
             df = pd.read_csv(csv_path)
+            print(f"Local dataset loaded ({len(df)} rows).")
         except Exception as e:
             print(f"Error loading local dataset: {e}")
+
+    if df is None:
+        print("Generating high-fidelity full-range dataset from physical battery simulator...")
+        try:
+            df = generate_full_range_dataset()
+            print(f"Full-range dataset generated successfully: {len(df)} rows.")
+        except Exception as gen_err:
+            print(f"Failed to generate backup dataset: {gen_err}")
             return
-    else:
-        print(f"Error: No training dataset source available.")
-        print(f"  • Local path '{csv_path}' does not exist.")
-        print(f"  • CSV_URL is not configured.")
-        return
 
     # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
     is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'

@@ -69,15 +69,15 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 ## Problem Statement
 
-> The aim of this project is to design and develop a cyber-physical battery state estimator system that solves the problem of accurate, real-time State of Charge (SOC), State of Health (SOH) and thermal safety monitoring under dynamic EV-style workloads by using a hybrid approach of Extended Kalman Filtering, Echo State Networks and low-power embedded edge diagnostics.
+> The aim of this project is to design and develop a cyber-physical battery state estimator system that solves the problem of accurate, real-time State of Charge (SOC), State of Health (SOH) and thermal safety monitoring under dynamic EV-style workloads. The core contribution is a data-driven Echo State Network (ESN) designed as a direct, standalone alternative to traditional observers (EKF and Coulomb Counting), benchmarked side-by-side on a comparative dashboard.
 
 ---
 
 ### Abstract
 
-Reliable SOC and SOH estimation is essential for electric vehicles, smart grids and battery-powered systems. Traditional Battery Management Systems often rely on Coulomb Counting or Extended Kalman Filters, which can drift under aging, temperature changes and unmodeled cell behavior. This project implements a **strictly single-cell battery state estimation framework** (avoiding series unbalance pack complexity while maintaining maximum fidelity) that combines a 2-RC electro-thermal physics simulator, traditional EKF and resistance-based SOH observers, Echo State Network (ESN) estimators and an optimized embedded ESN classifier. 
+Reliable SOC and SOH estimation is essential for electric vehicles, smart grids and battery-powered systems. Traditional Battery Management Systems often rely on Coulomb Counting or Extended Kalman Filters, which can drift under aging, temperature changes and unmodeled cell behavior. This project implements a **strictly single-cell battery state estimation framework** (avoiding series unbalance pack complexity while maintaining maximum fidelity) featuring a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers. 
 
-To prevent estimator divergence and covariance windup under dynamic EV drive-cycles, the EKF includes **covariance trace guards** (resets $P$ if trace exceeds $10.0$ or diagonal entries become negative) and the SOH tracker utilizes a **Variable Forgetting Factor (VFF-RLS)** observer. The software side includes two Flask services: a physics simulator and a comparative visualiser dashboard running standardized estimator configurations and exposing a detailed transient state observer panel. The hardware side includes C99 inference code supporting side-by-side comparative profiling of float and fixed-point execution paths, enabling direct validation of edge safety classification and quantization deviation RMSE on host computers. Validation targets include sub-1.5 percent SOC RMSE, sub-1.0 percent SOH RMSE, 99.92 percent thermal safety classification accuracy and sub-1 ms sparse reservoir execution.
+To benchmark the ESN, the system runs parallel baselines: a 2-RC electro-thermal physics simulator, a traditional EKF with **covariance trace guards** (resets $P$ if trace exceeds $10.0$ or diagonal entries become negative) and an online **Variable Forgetting Factor (VFF-RLS)** SOH tracker. The software side features a comparative visualiser dashboard exposing a detailed transient state observer panel supporting both **Standalone Data-Driven** (default) and **Hybrid Observer-Assisted** ESN configuration options. The hardware side includes C99 inference code supporting side-by-side comparative profiling of float and fixed-point execution paths, enabling direct validation of edge safety classification and quantization deviation RMSE on host computers. Validation targets include sub-1.5 percent SOC RMSE, sub-1.0 percent SOH RMSE, 99.92 percent thermal safety classification accuracy and sub-1 ms sparse reservoir execution.
 
 ---
 
@@ -358,8 +358,8 @@ The software core is structured as a decoupled cyber-physical architecture compo
 
 ### Advanced State Estimators
 To ensure state estimation robustness under dynamic load profiles, the visualiser runs a parallel pipeline:
-- **State of Charge (SOC)**: Estimated in parallel using Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF) running on a micro-timescale ($T_s = 1\text{ s}$) and an Echo State Network (ESN) featuring temporal fading memory projection.
-- **State of Health (SOH)**: Tracked traditional-style via resistance growth using online Recursive Least Squares (RLS) parameter identification running on a macro-timescale (Li et al. [1]), compared side-by-side with a trained SOH ESN.
+- **State of Charge (SOC)**: Estimated in parallel using Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF) ($T_s = 1\text{ s}$) and an Echo State Network (ESN). The ESN SOC can run completely standalone (default) or adapt online using the EKF SOC as a reference.
+- **State of Health (SOH)**: Tracked traditional-style via resistance growth using online Recursive Least Squares (RLS) parameter identification on a macroscale, compared side-by-side with a trained SOH ESN. The ESN SOH can run completely standalone (default) or operate in hybrid mode (blended 98% with the traditional RLS baseline).
 - **State of Energy (SOE)**: Computed dynamically by integrating the OCV-SOC curve to calculate remaining Wh energy capacity.
 - **State of Power (SOP)**: Estimates instantaneous charge/discharge current/power envelopes based on safe terminal voltage limits and internal cell resistance.
 - **Remaining Useful Life (RUL)**: Projects remaining cycle life based on electro-thermal stress and chemistry lookup profiles.
@@ -440,7 +440,21 @@ cd Battery_State_Estimator_BE_Project_2026_2027
 python -m pip install -r requirements.txt
 ```
 
-### Step 3: Run the Code
+### Step 3: Train the ESN Estimators and Hardware Weights
+Train the software ESN models:
+```bash
+python software/visualiser/training/train_rc.py
+```
+Train the hardware classification weights:
+```bash
+python hardware/train_classifier.py
+```
+Train the hardware estimator weights (optional):
+```bash
+python hardware/train_estimator.py
+```
+
+### Step 4: Run the Code
 Start the physics simulator:
 ```bash
 python software/simulator/app.py
@@ -461,7 +475,7 @@ chmod +x hardware/run_c_simulator.sh
 hardware/run_c_simulator.sh
 ```
 
-### Step 4: Observe the Output
+### Step 5: Observe the Output
 - Visualiser dashboard: `http://localhost:5000`
 - Simulator service: `http://localhost:8000`
 - Expected dashboard output: live voltage, current, temperature, SOC, SOH, SOE, SOP, RUL, EKF/ESN comparison and fault diagnostics.

@@ -211,7 +211,7 @@ class EstimatorPipeline:
         V_min_c = self.chem_obj.lookup_ocv(0.0)
         V_max_c = self.chem_obj.lookup_ocv(1.0)
         denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
-        V_init_equiv = V_min_nmc + (V_initial - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v
+        V_init_equiv = 3.0 * (V_min_nmc + (V_initial - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
 
         # Generate priming input: constant voltage, zero current, nominal temperature
         prime_history = []
@@ -381,7 +381,7 @@ class EstimatorPipeline:
             V_max_c = self.chem_obj.lookup_ocv(1.0)
             denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
             
-            V_equiv = V_min_nmc + (V_meas - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v
+            V_equiv = 3.0 * (V_min_nmc + (V_meas - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
             I_equiv = I_meas_discharge * (nmc_chem.nominal_capacity / self.chem_obj.nominal_capacity)
             
             if not self.primed:
@@ -399,7 +399,7 @@ class EstimatorPipeline:
             # Map rolling history for ESN feature extraction
             esn_history = []
             for r in self.rolling_history:
-                r_v_equiv = V_min_nmc + (r['voltage'] - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v
+                r_v_equiv = 3.0 * (V_min_nmc + (r['voltage'] - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
                 r_i_equiv = r['current'] * (nmc_chem.nominal_capacity / self.chem_obj.nominal_capacity)
                 esn_history.append({'voltage': r_v_equiv, 'current': r_i_equiv, 'temperature': r['temperature']})
             
@@ -420,7 +420,7 @@ class EstimatorPipeline:
             pred_soh_val = self.esn_soh.predict_step(u_scaled, quantize_mode=quantize_mode)
             
             # Online adaptation: Calibrate the ESN SOC network online using the EKF SOC as a reference
-            if hasattr(self.esn_soc, 'adapt_online'):
+            if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
                 self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.005, mode='rls')
             
             # Save updated states
@@ -428,10 +428,12 @@ class EstimatorPipeline:
             self.esn_soh_state = self.esn_soh.get_state()
             
             esn_soc_pred = float(np.clip(pred_soc_val[0], 0.0, 1.0))
-            # Hybridize SOH estimation: SOH decays slowly and cannot be captured purely by short-term ESN features
-            # due to training time-step mismatch (0.001s in training vs 1s in simulator).
-            # We use the EKF traditional tracker as the robust baseline.
-            esn_soh_pred = 0.02 * float(np.clip(pred_soh_val[0], 0.0, 1.0)) + 0.98 * self.trad_soh
+            if Config.ENABLE_ESN_STANDALONE:
+                # Standalone Mode: Use pure data-driven ESN output
+                esn_soh_pred = float(np.clip(pred_soh_val[0], 0.0, 1.0))
+            else:
+                # Hybrid Mode: Blended representation with traditional observer
+                esn_soh_pred = 0.02 * float(np.clip(pred_soh_val[0], 0.0, 1.0)) + 0.98 * self.trad_soh
             
             # Update history queue
             self.rolling_history.append({'voltage': V_meas, 'current': I_meas_discharge, 'temperature': T_meas})

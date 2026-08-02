@@ -169,7 +169,7 @@ with open(header_path, "w") as f:
     f.write(f"#define ESN_N_INPUTS {n_inputs}\n")
     f.write(f"#define ESN_N_RESERVOIR {n_reservoir}\n")
     f.write(f"#define ESN_N_OUTPUTS {n_outputs}\n")
-    f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.1f}f\n\n")
+    f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.6f}f\n\n")
     
     write_array_1d(f, "esn_input_means", input_means)
     write_array_1d(f, "esn_input_stds", input_stds)

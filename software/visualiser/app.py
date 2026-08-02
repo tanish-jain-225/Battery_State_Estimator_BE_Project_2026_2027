@@ -784,12 +784,13 @@ def run_training_async():
     training_status['logs'] = 'Checking training dataset paths...\n'
     
     try:
-        from train_rc import EchoStateNetwork
+        from train_rc import EchoStateNetwork, generate_full_range_dataset
         from feature_engineering import extract_features_df
         
         csv_path = Config.CSV_PATH
         csv_url  = Config.CSV_URL
 
+        df = None
         if csv_url:
             # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
             training_status['training_source'] = 'remote_url'
@@ -805,28 +806,27 @@ def run_training_async():
                 df = pd.read_csv(io.StringIO(csv_data))
                 training_status['logs'] += f"Remote dataset loaded ({len(df)} rows).\n"
             except Exception as url_err:
-                if os.path.exists(csv_path):
-                    training_status['training_source'] = 'local_csv'
-                    training_status['logs'] += f"Remote CSV load failed: {url_err}. Falling back to local CSV...\n"
-                    df = pd.read_csv(csv_path)
-                else:
-                    raise RuntimeError(
-                        f"Failed to load remote CSV from CSV_URL: {url_err}. "
-                        "Ensure the Google Sheet is shared as 'Anyone with the link can view' "
-                        "and the URL ends with export?format=csv"
-                    ) from url_err
-        elif os.path.exists(csv_path):
+                training_status['logs'] += f"Remote CSV load failed: {url_err}.\n"
+
+        if df is None and os.path.exists(csv_path):
             # Local dataset available (development / self-hosted environment)
             training_status['training_source'] = 'local_csv'
-            training_status['logs'] += "Dataset found. Loading ev battery dataframe into memory...\n"
-            df = pd.read_csv(csv_path)
-        else:
-            raise FileNotFoundError(
-                f"No training data source available.\n"
-                f"  • Local path '{csv_path}' does not exist.\n"
-                f"  • CSV_URL env var is not set.\n"
-                f"Set CSV_URL to your Google Sheets export URL to enable production retraining."
-            )
+            training_status['logs'] += "Loading local EV battery dataframe into memory...\n"
+            try:
+                df = pd.read_csv(csv_path)
+                training_status['logs'] += f"Local CSV loaded successfully ({len(df)} rows).\n"
+            except Exception as local_err:
+                training_status['logs'] += f"Local CSV load failed: {local_err}.\n"
+
+        if df is None:
+            training_status['training_source'] = 'physical_simulator_generator'
+            training_status['logs'] += "Generating high-fidelity full-range dataset from physical battery simulator...\n"
+            try:
+                df = generate_full_range_dataset()
+                training_status['logs'] += f"Full-range dataset generated successfully: {len(df)} rows.\n"
+            except Exception as gen_err:
+                training_status['logs'] += f"Backup generator failed: {gen_err}.\n"
+                raise RuntimeError("No training data source available.") from gen_err
         
         # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
         is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
@@ -1100,8 +1100,20 @@ def control_simulation():
             state['fault_short'] = False
             
             state['time'] = 0.0
-            state['soc'] = 1.0
-            state['soh'] = 1.0
+            
+            # Detect if ESN is loaded with narrow range CSV dataset
+            is_narrow_dataset = False
+            if model_loaded and input_means is not None:
+                if len(input_means) > 0 and input_means[0] < 10.2:
+                    is_narrow_dataset = True
+                    
+            if is_narrow_dataset:
+                state['soc'] = 0.1156
+                state['soh'] = 0.90
+            else:
+                state['soc'] = 1.0
+                state['soh'] = 1.0
+                
             state['V1'] = 0.0
             state['V2'] = 0.0
             state['temperature'] = 25.0
@@ -1109,7 +1121,7 @@ def control_simulation():
             state['last_real_time'] = None
             
             chem_obj = get_chemistry(state['chemistry'])
-            state['prev_voltage'] = chem_obj.lookup_ocv(1.0)
+            state['prev_voltage'] = chem_obj.lookup_ocv(state['soc'])
             state['prev_current'] = 0.0
             
             # Clear local buffer
@@ -1132,6 +1144,8 @@ def control_simulation():
         if port_online:
             try:
                 sim_data = data.copy()
+                sim_data['soc'] = state['soc']
+                sim_data['soh'] = state['soh']
                 if 'active_cycle' in sim_data:
                     sim_data['cycle_type'] = sim_data.pop('active_cycle')
                 

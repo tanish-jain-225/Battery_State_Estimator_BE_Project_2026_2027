@@ -72,9 +72,12 @@ class Config:
 
     # Indices into the 6-element raw feature vector [Voltage, Current, Temperature,
     # Voltage_grad, Current_ma, Temp_ma] to select for ESN input.
-    # Updated to select all 6 features (including temperature) to allow
-    # the networks to capture complete thermodynamic battery states.
-    ESN_SELECTED_FEATURE_INDICES = [0, 1, 2, 3, 4, 5]
+    # Excludes temperature features (index 2 and 5) to prevent out-of-distribution thermal bias.
+    ESN_SELECTED_FEATURE_INDICES = [0, 1, 3, 4]
+
+    # Standalone ESN mode: when True, ESN predictions run without baseline adaptation/hybridization,
+    # aligning strictly with the academic presentation PDF's description of ESN as a standalone replacement.
+    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "True").lower() in ("true", "1", "t", "yes")
 
     # -------------------------------------------------------------------------
     # ESN reservoir priming & training washout

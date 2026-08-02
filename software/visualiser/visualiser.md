@@ -216,10 +216,17 @@ Given training sequences of inputs $\mathbf{U}$ and target metrics $\mathbf{Y}$ 
 To resolve startup estimation error on cold-start (where the reservoir states are empty but the battery is already partially charged):
 - Upon reset/start, the backend feeds the initial OCV voltage and zero current to the model for `Config.ESN_PRIMING_STEPS` ($50$ steps). This pre-populates the recurrent reservoir states with initial battery voltage properties before live predictions begin.
 
-### 5. Hybrid SOH and RUL Estimator
-To correct the time-resolution mismatch between ESN training (1ms step sizes) and online execution (1s step sizes), the ESN SOH prediction dynamically blends the ESN reservoir output with the physics-informed EKF traditional SOH estimate:
-$$\text{esn\_soh\_pred} = 0.02 \cdot \text{esn\_soh\_pred\_raw} + 0.98 \cdot \text{trad\_soh}$$
-This guarantees a highly accurate, noise-filtered ESN Remaining Useful Life (RUL) cycle output that correctly tracks battery degradation.
+### 5. ESN Operational Modes (Standalone vs. Hybrid)
+The ESN estimator can be operated in two modes controlled by `Config.ENABLE_ESN_STANDALONE`:
+
+* **Standalone Data-Driven Mode (Default):**
+  The ESN estimators for SOC and SOH run completely decoupled from EKF and RLS observers. This matches the presentation PDF's description of ESN as a standalone replacement.
+  
+* **Hybrid Observer-Assisted Mode:**
+  Used for testing comparative online adaptation. The ESN SOC readouts adapt dynamically using EKF SOC as a reference:
+  $$\mathbf{W}_{\text{out}, k} = \mathbf{W}_{\text{out}, k-1} + e_k \mathbf{K}_k^T$$
+  The ESN SOH is calculated using a 98% blend of the traditional RLS estimator to bridge the time-step resolution mismatch:
+  $$\text{esn\_soh\_pred} = 0.02 \cdot \text{esn\_soh\_pred\_raw} + 0.98 \cdot \text{trad\_soh}$$
 
 ---
 

@@ -5,6 +5,83 @@ import pickle
 import argparse
 from train import EchoStateNetwork
 
+def generate_full_range_dataset():
+    """
+    Generates a high-fidelity synthetic battery dataset covering the full range
+    of SOC (0% to 100%) and SOH (80% to 100%) using the physical simulator.
+    """
+    import sys
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    visualiser_path = os.path.join(base_dir, 'software', 'visualiser')
+    if visualiser_path not in sys.path:
+        sys.path.append(visualiser_path)
+    try:
+        from battery_simulator import BatterySimulator
+    except ImportError:
+        sys.path.append(os.path.join(base_dir, 'software', 'simulator'))
+        from battery_simulator import BatterySimulator
+        
+    import pandas as pd
+    
+    records = []
+    soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
+    dt = 1.0
+    
+    for soh_target in soh_levels:
+        # 1. Discharging Cycle (Constant + Pulsed)
+        sim = BatterySimulator()
+        sim.reset("li_ion")
+        sim.soh = soh_target
+        sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
+        sim.temperature = 25.0
+        
+        t = 0.0
+        while sim.soc > 0.01:
+            I = 2.0
+            if int(t) % 100 < 20:
+                I = 4.5
+            elif int(t) % 200 >= 180:
+                I = -1.0
+                
+            out = sim.step(I, dt, accelerated_aging=False)
+            records.append({
+                'Time': t,
+                'Voltage': 3.0 * out['voltage'],
+                'Current': I,
+                'Temperature': out['temperature'],
+                'SOC': out['true_soc'],
+                'SOH': out['true_soh']
+            })
+            t += dt
+            
+        # 2. Charging Cycle (CCCV Charge)
+        sim = BatterySimulator()
+        sim.reset("li_ion")
+        sim.soh = soh_target
+        sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
+        sim.soc = 0.01
+        sim.temperature = 25.0
+        
+        t = 0.0
+        while sim.soc < 0.99:
+            I_charge = 2.0
+            if sim.voltage > 4.15:
+                I_charge = max(0.1, 2.0 * (4.2 - sim.voltage) / 0.05)
+                
+            out = sim.step(I_charge, dt, accelerated_aging=False)
+            records.append({
+                'Time': t,
+                'Voltage': 3.0 * out['voltage'],
+                'Current': -I_charge,
+                'Temperature': out['temperature'],
+                'SOC': out['true_soc'],
+                'SOH': out['true_soh']
+            })
+            t += dt
+            
+    return pd.DataFrame(records)
+
 def train_and_export_estimator(csv_path=None, header_path=None, grid_search=False):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     
@@ -20,8 +97,23 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         header_path = os.path.join(base_dir, "esn_estimator_weights.h")
 
     # 2. Load dataset
-    print(f"Loading dataset from {csv_path}...")
-    df = pd.read_csv(csv_path)
+    df = None
+    if csv_path is not None and os.path.exists(csv_path):
+        print(f"Loading local dataset from {csv_path}...")
+        try:
+            df = pd.read_csv(csv_path)
+            print(f"Local CSV loaded successfully ({len(df)} rows).")
+        except Exception as e:
+            print(f"Error loading CSV file: {e}")
+            
+    if df is None:
+        print("Generating high-fidelity full-range dataset from physical battery simulator...")
+        try:
+            df = generate_full_range_dataset()
+            print(f"Full-range dataset generated successfully: {len(df)} rows.")
+        except Exception as gen_err:
+            print(f"Failed to generate backup dataset: {gen_err}")
+            raise gen_err
 
     # 3. Feature engineering
     print("Performing feature engineering...")
@@ -30,7 +122,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     df['Current_ma'] = df['Current'].rolling(window=5, min_periods=1).mean()
     df['Temp_ma'] = df['Temperature'].rolling(window=5, min_periods=1).mean()
 
-    U = df[['Voltage', 'Current', 'Temperature', 'Voltage_grad', 'Current_ma', 'Temp_ma']].values
+    U = df[['Voltage', 'Current', 'Voltage_grad', 'Current_ma']].values
     Y_soc = df[['SOC']].values
     Y_soh = df[['SOH']].values
 
@@ -43,10 +135,8 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     print("Input features details:")
     print(f"  Voltage: mean={input_means[0]:.4f}, std={input_stds[0]:.4f}")
     print(f"  Current: mean={input_means[1]:.4f}, std={input_stds[1]:.4f}")
-    print(f"  Temperature: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
-    print(f"  Voltage_grad: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
-    print(f"  Current_ma: mean={input_means[4]:.4f}, std={input_stds[4]:.4f}")
-    print(f"  Temp_ma: mean={input_means[5]:.4f}, std={input_stds[5]:.4f}")
+    print(f"  Voltage_grad: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
+    print(f"  Current_ma: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
 
     # ── ESN Estimator Hyperparameters (Aligned with Software Config) ────────────
     SOC_N_RESERVOIR = 500
@@ -74,7 +164,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             for lr in [0.05, 0.15, 0.25]:
                 for rp in [1e-6, 1e-5]:
                     esn_temp = EchoStateNetwork(
-                        n_inputs=6,
+                        n_inputs=4,
                         n_reservoir=SOC_N_RESERVOIR,
                         n_outputs=1,
                         spectral_radius=sr,
@@ -94,7 +184,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     else:
         print("Training SOC Echo State Network...")
         esn_soc = EchoStateNetwork(
-            n_inputs=6,
+            n_inputs=4,
             n_reservoir=SOC_N_RESERVOIR,
             n_outputs=1,
             spectral_radius=SOC_SPECTRAL_RADIUS,
@@ -117,7 +207,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             for lr in [0.01, 0.02, 0.05]:
                 for rp in [1e-6, 1e-5]:
                     esn_temp = EchoStateNetwork(
-                        n_inputs=6,
+                        n_inputs=4,
                         n_reservoir=SOH_N_RESERVOIR,
                         n_outputs=1,
                         spectral_radius=sr,
@@ -137,7 +227,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     else:
         print("Training SOH Echo State Network...")
         esn_soh = EchoStateNetwork(
-            n_inputs=6,
+            n_inputs=4,
             n_reservoir=SOH_N_RESERVOIR,
             n_outputs=1,
             spectral_radius=SOH_SPECTRAL_RADIUS,
@@ -185,7 +275,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         f.write("#define ESN_ESTIMATOR_WEIGHTS_H\n\n")
         f.write("// Auto-generated weights file for STM32 ESN estimators\n\n")
         
-        f.write(f"#define ESN_N_INPUTS 6\n")
+        f.write(f"#define ESN_N_INPUTS 4\n")
         f.write(f"#define ESN_SOC_N_RESERVOIR {SOC_N_RESERVOIR}\n")
         f.write(f"#define ESN_SOH_N_RESERVOIR {SOH_N_RESERVOIR}\n\n")
         

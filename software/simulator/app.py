@@ -592,8 +592,8 @@ def post_control():
             state['fault_short'] = False
             
             state['time'] = 0.0
-            state['soc'] = 1.0
-            state['soh'] = 1.0
+            state['soc'] = float(data.get('soc', 1.0))
+            state['soh'] = float(data.get('soh', 1.0))
             state['V1'] = 0.0
             state['V2'] = 0.0
             state['temperature'] = 25.0
@@ -601,7 +601,7 @@ def post_control():
             state['last_real_time'] = None
             
             chem_obj = get_chemistry(state['chemistry'])
-            state['prev_voltage'] = chem_obj.lookup_ocv(1.0)
+            state['prev_voltage'] = chem_obj.lookup_ocv(state['soc'])
             state['prev_current'] = 0.0
             
             local_telemetry_buffer.clear()

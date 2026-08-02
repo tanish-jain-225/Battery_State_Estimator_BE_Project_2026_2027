@@ -75,6 +75,8 @@ int16_t float_to_q12(float v) {
 int16_t tanh_lut[33];
 int16_t esn_W_in_q15[ESN_N_RESERVOIR][1 + ESN_N_INPUTS];
 int16_t esn_W_res_val_q15[ESN_W_RES_NNZ];
+int16_t leak_rate_q15;
+int16_t one_minus_leak_rate_q15;
 
 // Initialise lookup table for high-speed integer activation (covers 0.0 to 8.0 in steps of 0.25)
 void init_tanh_lut(void) {
@@ -87,6 +89,8 @@ void init_tanh_lut(void) {
 
 // Initialise weights into Q15 format at startup to avoid runtime float ops
 void init_fixed_point_weights(void) {
+    leak_rate_q15 = float_to_q15(ESN_LEAK_RATE);
+    one_minus_leak_rate_q15 = float_to_q15(1.0f - ESN_LEAK_RATE);
     for (int i = 0; i < ESN_N_RESERVOIR; i++) {
         for (int j = 0; j < 1 + ESN_N_INPUTS; j++) {
             esn_W_in_q15[i][j] = float_to_q15(esn_W_in[i][j]);
@@ -197,10 +201,6 @@ void esn_predict_fixed(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
 
     // 3. Apply leak rate and tanh activation:
     // x_q(t) = (1 - alpha) * x_q(t-1) + alpha * tanh(arg_q12)
-    // ESN_LEAK_RATE is 0.3f, which in Q15 is 9830.
-    // 1 - ESN_LEAK_RATE is 0.7f, which in Q15 is 22938.
-    int16_t leak_rate_q15 = 9830;
-    int16_t one_minus_leak_rate_q15 = 22938;
 
     for (int i = 0; i < ESN_N_RESERVOIR; i++) {
         // arg_q12[i] is in Q12, which represents up to 8.0 and q15_tanh expects Q12 input!
