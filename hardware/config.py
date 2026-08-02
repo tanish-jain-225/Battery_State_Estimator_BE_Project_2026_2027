@@ -1,14 +1,15 @@
 """
 hardware/config.py
 ──────────────────
-Hardware-side configuration for the ESN State Classifier.
+Hardware-side configuration for the ESN State Classifier AND ESN State Estimator.
 
 All values are read from environment variables (via .env) with sensible defaults,
 making it easy to retrain the C-header target without changing source files.
 
 Usage:
     from config import Config
-    Config.ESN_N_RESERVOIR   # → 50
+    Config.ESN_N_RESERVOIR       # → 50  (classifier)
+    Config.ESN_SOC_RESERVOIR     # → 500 (estimator)
 """
 
 import os
@@ -26,15 +27,25 @@ BASE_DIR = Path(__file__).parent.resolve()
 
 class Config:
     """
-    Central configuration for the hardware ESN classifier pipeline.
+    Central configuration for the hardware ESN pipeline.
 
-    The hardware ESN is a **3-input → 50-node reservoir → 3-class** classifier
-    that maps (Voltage, Current, Temperature) → (Normal, Warning, Critical).
+    The hardware runs TWO distinct ESN pipelines:
 
-    This is intentionally decoupled from the software/visualiser ESN, which is
-    a 4-input regression model (SOC/SOH estimation). Both sides share the same
-    reservoir computing algorithm (leaky-integrator Echo State Network + Ridge
-    Regression readout) but operate as fully independent pipelines.
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ 1. ESN Classifier (main.c + esn_classifier_weights.h)                  │
+    │    3-input  → 50-node reservoir → 3-class output                       │
+    │    Inputs : [Voltage, Current, Temperature]                             │
+    │    Outputs: [Normal, Warning, Critical] (thermal safety classification) │
+    │    Runs on STM32 in real-time, both Float32 and Q15 fixed-point modes.  │
+    ├─────────────────────────────────────────────────────────────────────────┤
+    │ 2. ESN Estimator  (esn_estimator_weights.h — offline validation only)  │
+    │    4-input  → 500-node reservoir → SOC output                           │
+    │    4-input  → 400-node reservoir → SOH output                           │
+    │    Inputs : [Voltage, Current, Voltage_grad, Current_ma]                │
+    │    Outputs: SOC (float 0–1), SOH (float 0–1)                            │
+    │    Generated for cross-validation against the software estimator.       │
+    │    Parameters MUST mirror software/visualiser/config.py ESN_SOC_*/SOH_* │
+    └─────────────────────────────────────────────────────────────────────────┘
     """
 
     # ── Dataset ────────────────────────────────────────────────────────────────
@@ -43,7 +54,11 @@ class Config:
         BASE_DIR / os.getenv("CSV_FILE", "training_ev_battery_dataset_multiclass.csv")
     )
 
-    # ── ESN Architecture ───────────────────────────────────────────────────────
+    # ══════════════════════════════════════════════════════════════════════════
+    # PIPELINE 1 — ESN CLASSIFIER (50-node, embedded on STM32)
+    # ══════════════════════════════════════════════════════════════════════════
+
+    # ── ESN Classifier Architecture ────────────────────────────────────────────
     # Number of raw sensor inputs: [Voltage, Current, Temperature]
     ESN_N_INPUTS: int = int(os.getenv("ESN_N_INPUTS", "3"))
 
@@ -54,7 +69,7 @@ class Config:
     # Number of output classes: Normal (0), Warning (1), Critical (2)
     ESN_N_OUTPUTS: int = int(os.getenv("ESN_N_OUTPUTS", "3"))
 
-    # ── ESN Hyperparameters ────────────────────────────────────────────────────
+    # ── ESN Classifier Hyperparameters ─────────────────────────────────────────
     # Spectral radius ρ controls memory horizon: ρ < 1 ensures echo-state property.
     # 0.95 gives long memory useful for slow thermal transients.
     ESN_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SPECTRAL_RADIUS", "0.95"))
@@ -83,8 +98,45 @@ class Config:
     TEMP_WARNING_MAX: float = float(os.getenv("TEMP_WARNING_MAX", "45.0")) # 35–45°C → Warning (1)
     # ≥ 45°C → Critical (2)
 
-    # ── Output ─────────────────────────────────────────────────────────────────
+    # ── Classifier Output ──────────────────────────────────────────────────────
     # Path where train_classifier.py writes the generated C header
     WEIGHTS_HEADER: str = str(
         BASE_DIR / os.getenv("WEIGHTS_HEADER", "esn_classifier_weights.h")
+    )
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # PIPELINE 2 — ESN ESTIMATOR (500/400-node, offline cross-validation)
+    # These values MUST stay in sync with software/visualiser/config.py
+    # ESN_SOC_* and ESN_SOH_* entries. Any change here must be mirrored there.
+    # ══════════════════════════════════════════════════════════════════════════
+
+    # ── ESN Estimator Inputs ───────────────────────────────────────────────────
+    # 4-feature input vector: [Voltage, Current, Voltage_grad, Current_ma]
+    # Temperature is intentionally excluded to prevent out-of-distribution thermal bias.
+    ESN_ESTIMATOR_N_INPUTS: int = int(os.getenv("ESN_ESTIMATOR_N_INPUTS", "4"))
+
+    # ── SOC Echo State Network Hyperparameters ─────────────────────────────────
+    # Must mirror software/visualiser/config.py → ESN_SOC_* values exactly.
+    ESN_SOC_RESERVOIR:       int   = int(os.getenv("ESN_SOC_RESERVOIR",       "500"))
+    ESN_SOC_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOC_SPECTRAL_RADIUS", "0.95"))
+    ESN_SOC_LEAK_RATE:       float = float(os.getenv("ESN_SOC_LEAK_RATE",       "0.15"))
+    ESN_SOC_INPUT_SCALING:   float = float(os.getenv("ESN_SOC_INPUT_SCALING",   "0.8"))
+    ESN_SOC_RIDGE_PARAM:     float = float(os.getenv("ESN_SOC_RIDGE_PARAM",     "1e-5"))
+    ESN_SOC_SPARSITY:        float = float(os.getenv("ESN_SOC_SPARSITY",        "0.85"))
+    ESN_SOC_WASHOUT:         int   = int(os.getenv("ESN_SOC_WASHOUT",           "50"))
+
+    # ── SOH Echo State Network Hyperparameters ─────────────────────────────────
+    # Must mirror software/visualiser/config.py → ESN_SOH_* values exactly.
+    ESN_SOH_RESERVOIR:       int   = int(os.getenv("ESN_SOH_RESERVOIR",       "400"))
+    ESN_SOH_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOH_SPECTRAL_RADIUS", "0.85"))
+    ESN_SOH_LEAK_RATE:       float = float(os.getenv("ESN_SOH_LEAK_RATE",       "0.02"))
+    ESN_SOH_INPUT_SCALING:   float = float(os.getenv("ESN_SOH_INPUT_SCALING",   "0.4"))
+    ESN_SOH_RIDGE_PARAM:     float = float(os.getenv("ESN_SOH_RIDGE_PARAM",     "1e-5"))
+    ESN_SOH_SPARSITY:        float = float(os.getenv("ESN_SOH_SPARSITY",        "0.85"))
+    ESN_SOH_WASHOUT:         int   = int(os.getenv("ESN_SOH_WASHOUT",           "50"))
+
+    # ── Estimator Output ───────────────────────────────────────────────────────
+    # Path where train_estimator.py writes the generated C header
+    ESTIMATOR_WEIGHTS_HEADER: str = str(
+        BASE_DIR / os.getenv("ESTIMATOR_WEIGHTS_HEADER", "esn_estimator_weights.h")
     )

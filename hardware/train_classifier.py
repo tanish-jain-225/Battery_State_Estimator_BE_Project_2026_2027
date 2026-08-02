@@ -10,28 +10,75 @@ csv_path = Config.CSV_PATH
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"Dataset not found at {csv_path}")
 
+def clean_df_columns(df_in):
+    if df_in is not None:
+        if len(df_in.columns) == 1 and ',' in str(df_in.columns[0]):
+            col_name = df_in.columns[0]
+            new_cols = [c.strip() for c in col_name.split(',')]
+            split_data = df_in[col_name].astype(str).str.split(',', expand=True)
+            if split_data.shape[1] == len(new_cols):
+                split_data.columns = new_cols
+                df_in = split_data.apply(pd.to_numeric, errors='coerce')
+                
+        df_in.columns = [str(col).strip() for col in df_in.columns]
+        rename_dict = {}
+        for col in df_in.columns:
+            col_lower = col.lower()
+            if col_lower == 'voltage':
+                rename_dict[col] = 'Voltage'
+            elif col_lower == 'current':
+                rename_dict[col] = 'Current'
+            elif col_lower == 'temperature':
+                rename_dict[col] = 'Temperature'
+            elif col_lower == 'soc':
+                rename_dict[col] = 'SOC'
+            elif col_lower == 'soh':
+                rename_dict[col] = 'SOH'
+            elif col_lower == 'time':
+                rename_dict[col] = 'Time'
+        df_in.rename(columns=rename_dict, inplace=True)
+    return df_in
+
 print(f"Loading dataset from {csv_path}...")
 df = pd.read_csv(csv_path)
+df = clean_df_columns(df)
+
+def get_labels(df_in):
+    T_in = df_in['Temperature'].values
+    labels_in = np.zeros(len(T_in), dtype=int)
+    for idx in range(len(T_in)):
+        if T_in[idx] < Config.TEMP_NORMAL_MAX:
+            labels_in[idx] = 0  # Normal
+        elif T_in[idx] < Config.TEMP_WARNING_MAX:
+            labels_in[idx] = 1  # Warning
+        else:
+            labels_in[idx] = 2  # Critical
+    return labels_in
+
+labels = get_labels(df)
+if len(np.unique(labels)) < 3:
+    print(f"WARNING: The dataset {csv_path} has only {len(np.unique(labels))} classes represented. The ESN classifier requires all 3 classes (Normal, Warning, Critical) to train correctly.")
+    fallback_path = os.path.join(os.path.dirname(csv_path), "original_ev_battery_dataset_multiclass.csv")
+    if os.path.exists(fallback_path):
+        print(f"Attempting to use fallback multiclass dataset containing all three classes: {fallback_path}...")
+        df = pd.read_csv(fallback_path)
+        df = clean_df_columns(df)
+        labels = get_labels(df)
+    else:
+        print(f"ERROR: Fallback file {fallback_path} not found.")
 
 # Extract features: Voltage, Current, Temperature
 U = df[['Voltage', 'Current', 'Temperature']].values
-
-# Programmatically generate State label based on config thresholds
-T = df['Temperature'].values
-labels = np.zeros(len(T), dtype=int)
-for i in range(len(T)):
-    if T[i] < Config.TEMP_NORMAL_MAX:
-        labels[i] = 0  # Normal
-    elif T[i] < Config.TEMP_WARNING_MAX:
-        labels[i] = 1  # Warning
-    else:
-        labels[i] = 2  # Critical
 
 # One-hot encode the target states (3 classes)
 n_classes = Config.ESN_N_OUTPUTS
 Y = np.zeros((len(labels), n_classes))
 for i in range(len(labels)):
     Y[i, labels[i]] = 1.0
+
+print("Class distribution in dataset:")
+for c in range(n_classes):
+    print(f"  Class {c}: {np.sum(labels == c)} samples")
 
 # Normalize inputs
 input_means = U.mean(axis=0)
@@ -169,7 +216,9 @@ with open(header_path, "w") as f:
     f.write(f"#define ESN_N_INPUTS {n_inputs}\n")
     f.write(f"#define ESN_N_RESERVOIR {n_reservoir}\n")
     f.write(f"#define ESN_N_OUTPUTS {n_outputs}\n")
-    f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.6f}f\n\n")
+    f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.6f}f\n")
+    f.write(f"#define ESN_SPECTRAL_RADIUS {Config.ESN_SPECTRAL_RADIUS:.6f}f\n")
+    f.write(f"#define ESN_WASHOUT_STEPS {washout}\n\n")
     
     write_array_1d(f, "esn_input_means", input_means)
     write_array_1d(f, "esn_input_stds", input_stds)

@@ -12,6 +12,10 @@
 
 A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC), State of Health (SOH), State of Energy (SOE), State of Power (SOP) and thermal safety monitoring under dynamic EV-style drive-cycle workloads. The system implements a **dual-timescale joint estimation framework** inspired by **Li et al. (2020)** [1], separating high-frequency state updates from slowly-varying capacity updates. It also leverages a data-driven **reservoir computing pipeline** for non-linear regression and classification, theoretically aligned with the **Reservoir Spiking Neural Network (RSNN)** paradigms investigated by **Kamarudin et al. (2026)** [2]. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, RLS), Echo State Networks (ESNs) and low-power embedded C edge diagnostics.
 
+### 🌐 Live Deployments
+* **Physics Simulator Link**: [https://battery-physics-simulator.onrender.com/](https://battery-physics-simulator.onrender.com/)
+* **Visualiser Dashboard Link**: [https://battery-visualizer.onrender.com/](https://battery-visualizer.onrender.com/)
+
 ---
 
 ## Table of Contents
@@ -350,11 +354,65 @@ The hardware module is implemented in C99 for low-power STM32-style targets (e.g
 - **Fixed-Point Arithmetic Option**: Supports optional Q12 (for inputs) and Q15 (for reservoir states and weights) fixed-point modes, utilizing a lookup-table approximation of the `tanh` activation function to run efficiently without hardware floating-point support.
 - **Hardware Visual Output**: Integrates GPIO `PA5` mapping to drive status LEDs for immediate visual fault alarms directly on-chip.
 
+#### CSR Sparse Matrix-Vector Multiplication (SpMV)
+The reservoir recurrent weight matrix $W_{\text{res}}$ of dimension $N_{\text{res}} \times N_{\text{res}}$ is highly sparse. To optimize memory footprint and CPU cycles, it is stored using Compressed Sparse Row format, which represents the matrix using three arrays:
+1. `val`: An array of length $NNZ$ (number of non-zero elements) storing the non-zero float/integer weights.
+2. `col`: An array of length $NNZ$ storing the column indices.
+3. `row_ptr`: An array of length $N_{\text{res}} + 1$ storing the index pointers where each row starts in `val` and `col`.
+
+During inference, the matrix-vector multiplication is computed as:
+$$arg[i] = W_{\text{in}}[i][0] + \sum_{j=1}^{N_{\text{in}}} W_{\text{in}}[i][j] \cdot u[j] + \sum_{k=row\_ptr[i]}^{row\_ptr[i+1]-1} val[k] \cdot x[col[k]]$$
+
+#### Q12/Q15 Fixed-Point Math & Tanh LUT
+For MCUs lacking a hardware FPU (Floating Point Unit), the system supports Q12/Q15 fixed-point arithmetic:
+- **Inputs**: Quantized to Q12 format: $u_{q12} = \lfloor u_{\text{scaled}} \cdot 2^{12} \rfloor$.
+- **Weights & States**: Stored in Q15 format: $W_{q15} = \lfloor W \cdot 2^{15} \rfloor$, $x_{q15} = \lfloor x \cdot 2^{15} \rfloor$.
+- **State Multiplications**: $W_{res, q15} \times x_{q15}$ results in a Q30 value, which is scaled down to Q12 via shift: $value_{q12} = (\text{Accumulator}) \gg 18$.
+- **Tanh LUT Linear Interpolation**: Cover the range $[0.0, 8.0]$ in steps of $0.25$ (size 33 lookup table). For an input $x_{q12}$:
+  $$\text{idx} = |x_{q12}| \gg 10, \quad \text{frac} = |x_{q12}| \ \& \ 1023$$
+  $$y_{q15} = \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{idx}] + \text{frac} \cdot \text{LUT}[\text{idx} + 1]}{1024}$$
+  Negative inputs apply symmetry: $y_{q15} = -y_{q15}$.
+
+---
+
 ### Software Implementation
 The software core is structured as a decoupled cyber-physical architecture composed of:
 1. **Physics Simulator Service**: A Flask application modeling 2-RC equivalent circuit model (ECM) cell physics, non-linear open circuit voltage (OCV), thermodynamic heating, capacity fade/resistance aging, sensor noise and safety fault injection.
 2. **Visualiser Dashboard Service**: A Flask web application that serves as the comparison dashboard. It retrieves live/historical telemetry, feeds data through the multi-estimator pipeline and renders comparative charts.
 3. **Database Layer**: Leverages MongoDB Atlas (with automatic in-memory fallback buffers) to persistently store timeseries readings and the serialized machine learning model registry.
+
+#### Database Telemetry Schema
+Each telemetry frame represents one state tick and is stored in MongoDB:
+
+| Field | Type | Unit | Meaning |
+| :--- | :--- | :--- | :--- |
+| `time` | Double | seconds | Simulation time index since start. |
+| `voltage` | Double | Volts | Measured terminal voltage (with sensor noise). |
+| `current` | Double | Amperes | Measured load current (positive for discharge, negative for charge). |
+| `temperature` | Double | Celsius | Measured cell temperature. |
+| `true_soc` | Double | Ratio [0, 1] | Physics-model state of charge. |
+| `true_soh` | Double | Ratio [0, 1] | Physics-model state of health (capacity fade). |
+| `true_v1` | Double | Volts | Transient polarization voltage drop (branch 1). |
+| `true_v2` | Double | Volts | Transient polarization voltage drop (branch 2). |
+| `true_r0` | Double | Ohms | Physics-model ohmic internal resistance (increases with aging). |
+| `fault_short` | Boolean | - | Flag indicating active internal micro-short injection. |
+| `fault_thermal` | Boolean | - | Flag indicating active thermal runaway simulation. |
+| `fault_dropout` | Boolean | - | Flag indicating active voltage sensor dropout fault. |
+
+#### Central API Endpoints
+The services expose the following REST endpoints:
+
+**Physics Simulator Endpoint API** (`software/simulator`)
+* `GET /api/status`: Retrieves current simulator configurations, fault states, and latest measurements.
+* `POST /api/control`: Configures simulator parameters (e.g., active drive cycle, ambient temperature, fault injection toggles, command `start`/`pause`/`reset`). Requires signed headers when remote.
+* `POST /api/chemistry/register`: Registers a custom chemistry profile, including capacity, polarization parameter lookup variables, and OCV-SOC curve.
+
+**Visualiser Dashboard Endpoint API** (`software/visualiser`)
+* `GET /api/status`: Retrieves visualiser status, gunicorn metadata, model loading status, and active filter covariance parameters.
+* `GET /api/telemetry`: Retrieves historical or real-time timeseries records populated with observer pipeline estimations.
+* `POST /api/train`: Spawns a background worker thread to retrain the ESN models from database records or Google Sheets.
+
+---
 
 ### Advanced State Estimators
 To ensure state estimation robustness under dynamic load profiles, the visualiser runs a parallel pipeline:
@@ -365,6 +423,13 @@ To ensure state estimation robustness under dynamic load profiles, the visualise
 - **Remaining Useful Life (RUL)**: Projects remaining cycle life based on electro-thermal stress and chemistry lookup profiles.
 
 The ESN models mirror the structural advantages of Reservoir Spiking Neural Networks (RSNNs) discussed by Kamarudin et al. [2], showcasing high data efficiency and capturing complex discharge dynamics while avoiding the heavy training overhead of classical LSTMs.
+
+#### Reservoir Priming & Online Convergence
+To eliminate cold-start transient dynamics of the reservoir, the system utilizes a 200-step priming phase (`ESN_PRIMING_STEPS`):
+- Before running live telemetry inference, the reservoir states are driven using the initial cell measurements ($V_0$, $I_0$, $T_0$) to allow the recurrent states to settle on the operating manifold.
+- During the first 100 steps of live execution (`ESN_CONVERGENCE_STEPS`), the dashboard marks the ESN predictions as `Converging` to alert operators to potential warm-up variance.
+
+---
 
 ### Cyber-Physical Diagnostics
 The visualiser features real-time diagnostics that identify three distinct categories of faults:
@@ -378,49 +443,56 @@ The visualiser features real-time diagnostics that identify three distinct categ
 
 ```text
 Battery_State_Estimator_BE_Project_2026_2027/
-|-- .gitignore
-|-- README.md
-|-- requirements.txt
+|-- [run_all_validation.bat](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/run_all_validation.bat)
+|-- [README.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/README.md)
+|-- [requirements.txt](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/requirements.txt)
 |-- docs/
-|   |-- ARTIFACTS.md
-|   |-- DEMO_CHECKLIST.md
-|   |-- DEPLOY_RENDER.md
-|   |-- OPERATIONS.md
-|   |-- LITERATURE_SURVEY.md
-|   `-- SYSTEM_SPECIFICATION.md
+|   |-- [ARTIFACTS.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/ARTIFACTS.md)
+|   |-- [DEMO_CHECKLIST.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/DEMO_CHECKLIST.md)
+|   |-- [DEPLOY_RENDER.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/DEPLOY_RENDER.md)
+|   |-- [OPERATIONS.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/OPERATIONS.md)
+|   |-- [LITERATURE_SURVEY.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/LITERATURE_SURVEY.md)
+|   `-- [SYSTEM_SPECIFICATION.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/SYSTEM_SPECIFICATION.md)
 |-- hardware/
-|   |-- main.c
-|   |-- main.h
-|   |-- train.py
-|   |-- train_classifier.py
-|   |-- train_estimator.py
-|   |-- esn_classifier_weights.h
-|   |-- esn_estimator_weights.h
-|   `-- original_ev_battery_dataset_multiclass.csv
+|   |-- [main.c](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.c)
+|   |-- [main.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/main.h)
+|   |-- [train.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train.py)
+|   |-- [train_classifier.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train_classifier.py)
+|   |-- [train_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/train_estimator.py)
+|   |-- [esn_classifier_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_classifier_weights.h)
+|   |-- [esn_estimator_weights.h](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/esn_estimator_weights.h)
+|   |-- [run_c_simulator.bat](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/run_c_simulator.bat)
+|   |-- [run_c_simulator.sh](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/run_c_simulator.sh)
+|   `-- [original_ev_battery_dataset_multiclass.csv](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/hardware/original_ev_battery_dataset_multiclass.csv)
 |-- software/
 |   |-- tests/
-|   |   |-- test_estimators.py
-|   |   |-- test_api_auth.py
-|   |   `-- test_production_train.py
+|   |   |-- [test_estimators.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/tests/test_estimators.py)
+|   |   |-- [test_api_auth.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/tests/test_api_auth.py)
+|   |   `-- [test_production_train.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/tests/test_production_train.py)
 |   |-- simulator/
-|   |   |-- app.py
-|   |   |-- battery_simulator.py
-|   |   |-- battery_chemistry.py
-|   |   `-- config.py
+|   |   |-- [app.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/app.py)
+|   |   |-- [battery_simulator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_simulator.py)
+|   |   |-- [battery_chemistry.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/battery_chemistry.py)
+|   |   |-- [config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/simulator/config.py)
+|   |   |-- templates/
+|   |   `-- static/
 |   `-- visualiser/
-|       |-- app.py
-|       |-- config.py
-|       |-- battery_chemistry.py
-|       |-- battery_simulator.py
-|       |-- traditional_estimator.py
-|       |-- estimator_pipeline.py
-|       |-- model_rc.pkl
+|       |-- [app.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/app.py)
+|       |-- [config.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/config.py)
+|       |-- [battery_chemistry.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/battery_chemistry.py)
+|       |-- [battery_simulator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/battery_simulator.py)
+|       |-- [traditional_estimator.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/traditional_estimator.py)
+|       |-- [estimator_pipeline.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/estimator_pipeline.py)
+|       |-- [model_rc.pkl](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/model_rc.pkl)
 |       |-- training/
-|       `-- templates/
+|       |   |-- [train_rc.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/train_rc.py)
+|       |   `-- [feature_engineering.py](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/software/visualiser/training/feature_engineering.py)
+|       |-- templates/
+|       `-- static/
 |-- images/
 |   `-- assets/
 |-- reference/
-|   `-- paper.md
+|   `-- [paper.md](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/reference/paper.md)
 |-- .github/
 |     `-- workflows/ci.yml
 ```
@@ -428,6 +500,12 @@ Battery_State_Estimator_BE_Project_2026_2027/
 ---
 
 ## How to Run the Project
+
+### Automated End-to-End Validation (Recommended)
+You can run the entire training, testing, and simulator verification pipeline in one step:
+```bash
+run_all_validation.bat
+```
 
 ### Step 1: Clone the Repository
 ```bash

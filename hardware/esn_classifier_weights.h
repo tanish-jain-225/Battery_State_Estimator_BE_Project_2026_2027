@@ -9,6 +9,8 @@
 #define ESN_N_RESERVOIR 50
 #define ESN_N_OUTPUTS 3
 #define ESN_LEAK_RATE 0.300000f
+#define ESN_SPECTRAL_RADIUS 0.950000f
+#define ESN_WASHOUT_STEPS 50
 
 const float esn_input_means[3] = {
     9.595784247f, 4.720640244f, 43.714799993f

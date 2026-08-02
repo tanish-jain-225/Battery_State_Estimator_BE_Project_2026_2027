@@ -828,10 +828,39 @@ def run_training_async():
                 training_status['logs'] += f"Backup generator failed: {gen_err}.\n"
                 raise RuntimeError("No training data source available.") from gen_err
         
-        # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
+        if df is not None:
+            # Recover if CSV was pasted into a single column
+            if len(df.columns) == 1 and ',' in str(df.columns[0]):
+                col_name = df.columns[0]
+                new_cols = [c.strip() for c in col_name.split(',')]
+                split_data = df[col_name].astype(str).str.split(',', expand=True)
+                if split_data.shape[1] == len(new_cols):
+                    split_data.columns = new_cols
+                    df = split_data.apply(pd.to_numeric, errors='coerce')
+                    
+            df.columns = [str(col).strip() for col in df.columns]
+            rename_dict = {}
+            for col in df.columns:
+                col_lower = col.lower()
+                if col_lower == 'voltage':
+                    rename_dict[col] = 'Voltage'
+                elif col_lower == 'current':
+                    rename_dict[col] = 'Current'
+                elif col_lower == 'temperature':
+                    rename_dict[col] = 'Temperature'
+                elif col_lower == 'soc':
+                    rename_dict[col] = 'SOC'
+                elif col_lower == 'soh':
+                    rename_dict[col] = 'SOH'
+                elif col_lower == 'time':
+                    rename_dict[col] = 'Time'
+            df.rename(columns=rename_dict, inplace=True)
+
+        # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
         is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
-        if is_production and len(df) > 2500:
-            step = int(np.ceil(len(df) / 2500))
+        limit = Config.PRODUCTION_DECIMATION_LIMIT
+        if is_production and len(df) > limit:
+            step = int(np.ceil(len(df) / limit))
             df = df.iloc[::step].reset_index(drop=True)
             training_status['logs'] += f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.\n"
             
@@ -1040,12 +1069,14 @@ def get_status():
             'soc_rmse': loaded_soc_rmse,
             'soh_rmse': loaded_soh_rmse,
             'graph_slice_limit': Config.GRAPH_SLICE_LIMIT,
-            # Training data source info
             'csv_url_configured': bool(Config.CSV_URL),
             'training_available': os.path.exists(Config.CSV_PATH) or bool(Config.CSV_URL),
             'training_source': (
                 'remote_url' if Config.CSV_URL
                 else ('local_csv' if os.path.exists(Config.CSV_PATH) else None)
+            ),
+            'esn_converged': (
+                getattr(_telemetry_cache.get('pipeline'), '_esn_step_count', 0) >= Config.ESN_CONVERGENCE_STEPS
             )
         })
     except Exception as e:

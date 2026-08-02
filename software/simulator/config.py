@@ -65,3 +65,7 @@ class Config:
     # Rolling window size for moving-average features; must match training config
     FEATURE_ROLLING_WINDOW = int(os.environ.get("FEATURE_ROLLING_WINDOW", 5))
 
+    ESN_PRIMING_STEPS    = int(os.environ.get("ESN_PRIMING_STEPS", 200))
+    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 100))
+    ESN_WASHOUT_STEPS    = int(os.environ.get("ESN_WASHOUT_STEPS", 50))
+

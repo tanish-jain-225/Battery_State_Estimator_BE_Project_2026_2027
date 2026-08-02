@@ -48,6 +48,31 @@ class TestProductionTraining(unittest.TestCase):
             
             # Load into pandas
             df = pd.read_csv(io.StringIO(csv_data))
+            if len(df.columns) == 1 and ',' in str(df.columns[0]):
+                col_name = df.columns[0]
+                new_cols = [c.strip() for c in col_name.split(',')]
+                split_data = df[col_name].astype(str).str.split(',', expand=True)
+                if split_data.shape[1] == len(new_cols):
+                    split_data.columns = new_cols
+                    df = split_data.apply(pd.to_numeric, errors='coerce')
+                    
+            df.columns = [str(col).strip() for col in df.columns]
+            rename_dict = {}
+            for col in df.columns:
+                col_lower = col.lower()
+                if col_lower == 'voltage':
+                    rename_dict[col] = 'Voltage'
+                elif col_lower == 'current':
+                    rename_dict[col] = 'Current'
+                elif col_lower == 'temperature':
+                    rename_dict[col] = 'Temperature'
+                elif col_lower == 'soc':
+                    rename_dict[col] = 'SOC'
+                elif col_lower == 'soh':
+                    rename_dict[col] = 'SOH'
+                elif col_lower == 'time':
+                    rename_dict[col] = 'Time'
+            df.rename(columns=rename_dict, inplace=True)
             print(f"Loaded DataFrame successfully: {len(df)} rows found.")
             
             # Validate columns
@@ -70,6 +95,31 @@ class TestProductionTraining(unittest.TestCase):
         csv_data = response.text
         
         df = pd.read_csv(io.StringIO(csv_data))
+        if len(df.columns) == 1 and ',' in str(df.columns[0]):
+            col_name = df.columns[0]
+            new_cols = [c.strip() for c in col_name.split(',')]
+            split_data = df[col_name].astype(str).str.split(',', expand=True)
+            if split_data.shape[1] == len(new_cols):
+                split_data.columns = new_cols
+                df = split_data.apply(pd.to_numeric, errors='coerce')
+                
+        df.columns = [str(col).strip() for col in df.columns]
+        rename_dict = {}
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower == 'voltage':
+                rename_dict[col] = 'Voltage'
+            elif col_lower == 'current':
+                rename_dict[col] = 'Current'
+            elif col_lower == 'temperature':
+                rename_dict[col] = 'Temperature'
+            elif col_lower == 'soc':
+                rename_dict[col] = 'SOC'
+            elif col_lower == 'soh':
+                rename_dict[col] = 'SOH'
+            elif col_lower == 'time':
+                rename_dict[col] = 'Time'
+        df.rename(columns=rename_dict, inplace=True)
         
         print("Extracting features & scaling...")
         df = df.copy()

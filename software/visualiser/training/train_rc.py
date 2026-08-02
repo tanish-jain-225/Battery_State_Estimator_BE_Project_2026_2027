@@ -207,6 +207,18 @@ class EchoStateNetwork:
             y_pred = np.dot(self.W_out, state_vec)
             return y_pred.flatten()
 
+    def adapt_online(self, u_t, target, learning_rate=0.005, mode='rls'):
+        """Online adaptation of readout weights W_out using RLS/gradient update."""
+        if self.W_out is None:
+            return
+        u_t = np.array(u_t).reshape(-1, 1)
+        state_vec = np.vstack(([1.0], u_t, self.x))
+        pred = float(np.dot(self.W_out, state_vec)[0, 0])
+        error = target - pred
+        # Online RLS gradient update on readout weights
+        norm_factor = float(np.dot(state_vec.T, state_vec)) + 1e-4
+        self.W_out += learning_rate * error * state_vec.T / norm_factor
+
     def predict(self, U):
         """
         Predict output sequence for a series of inputs U.
@@ -318,6 +330,7 @@ def main():
     model_save_path = Config.MODEL_PATH
 
     df = None
+    # 1. Primary: Remote Google Sheets docs URL
     if csv_url:
         print(f"Fetching remote dataset from URL (timeout: 10s): {csv_url}...")
         try:
@@ -326,13 +339,15 @@ def main():
             response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
             response.raise_for_status()
             csv_data = response.text
-            if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
-                raise ValueError("URL returned an HTML webpage instead of raw CSV data. Ensure the link format ends with /export?format=csv")
-            df = pd.read_csv(io.StringIO(csv_data))
-            print(f"Remote dataset loaded ({len(df)} rows).")
+            if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
+                df = pd.read_csv(io.StringIO(csv_data))
+                print(f"Remote dataset loaded ({len(df)} rows).")
+            else:
+                print("Warning: Remote URL returned HTML webpage instead of raw CSV. Falling back to local/physical dataset.")
         except Exception as e:
             print(f"Error loading remote CSV from CSV_URL: {e}")
 
+    # 2. Secondary: Local CSV dataset
     if df is None and os.path.exists(csv_path):
         print(f"Loading local dataset from {csv_path}...")
         try:
@@ -341,19 +356,50 @@ def main():
         except Exception as e:
             print(f"Error loading local dataset: {e}")
 
+    # 3. Fallback: Physical simulator dataset generator
     if df is None:
-        print("Generating high-fidelity full-range dataset from physical battery simulator...")
+        print("Generating high-fidelity full-range fallback dataset from physical battery simulator...")
         try:
             df = generate_full_range_dataset()
-            print(f"Full-range dataset generated successfully: {len(df)} rows.")
+            print(f"Fallback dataset generated successfully: {len(df)} rows.")
         except Exception as gen_err:
-            print(f"Failed to generate backup dataset: {gen_err}")
+            print(f"Failed to generate fallback dataset: {gen_err}")
             return
 
-    # Dynamic decimation: Caps training dataset to exactly 2,500 points only in production/cloud environments to scale gracefully
+    if df is not None:
+        # Recover if CSV was pasted into a single column
+        if len(df.columns) == 1 and ',' in str(df.columns[0]):
+            col_name = df.columns[0]
+            new_cols = [c.strip() for c in col_name.split(',')]
+            split_data = df[col_name].astype(str).str.split(',', expand=True)
+            if split_data.shape[1] == len(new_cols):
+                split_data.columns = new_cols
+                df = split_data.apply(pd.to_numeric, errors='coerce')
+                print(f"DEBUG: Recovered single-column CSV into {len(new_cols)} columns.")
+                
+        df.columns = [str(col).strip() for col in df.columns]
+        rename_dict = {}
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower == 'voltage':
+                rename_dict[col] = 'Voltage'
+            elif col_lower == 'current':
+                rename_dict[col] = 'Current'
+            elif col_lower == 'temperature':
+                rename_dict[col] = 'Temperature'
+            elif col_lower == 'soc':
+                rename_dict[col] = 'SOC'
+            elif col_lower == 'soh':
+                rename_dict[col] = 'SOH'
+            elif col_lower == 'time':
+                rename_dict[col] = 'Time'
+        df.rename(columns=rename_dict, inplace=True)
+
+    # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
     is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
-    if is_production and len(df) > 2500:
-        step = int(np.ceil(len(df) / 2500))
+    limit = Config.PRODUCTION_DECIMATION_LIMIT
+    if is_production and len(df) > limit:
+        step = int(np.ceil(len(df) / limit))
         df = df.iloc[::step].reset_index(drop=True)
         print(f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.")
         

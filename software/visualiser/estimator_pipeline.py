@@ -193,8 +193,13 @@ class EstimatorPipeline:
         if rls_p_val is not None:
             self.rls.P = np.array(rls_p_val)
 
-    def prime_esn(self, V_initial, T_initial=25.0, priming_steps=50, selected_indices=None, dataset_dt=0.001, sim_dt=1.0):
-        """Run ESN priming steps to populate reservoir memory from initial state"""
+    def prime_esn(self, V_initial, T_initial=25.0, I_initial=0.0, priming_steps=50, selected_indices=None, dataset_dt=0.001, sim_dt=1.0, initial_soc=1.0, initial_soh=1.0):
+        """Run ESN priming steps to populate reservoir memory from initial state.
+        
+        Uses actual initial current (I_initial) so the reservoir is pre-driven
+        along a realistic battery trajectory rather than a zero-current resting
+        state, which significantly reduces the initial convergence lag.
+        """
         if self.esn_soc is None or self.esn_soh is None or self.input_means is None or self.input_stds is None:
             return
         
@@ -212,10 +217,12 @@ class EstimatorPipeline:
         V_max_c = self.chem_obj.lookup_ocv(1.0)
         denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
         V_init_equiv = 3.0 * (V_min_nmc + (V_initial - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
+        I_init_equiv = I_initial * (nmc_chem.nominal_capacity / max(self.chem_obj.nominal_capacity, 1e-6))
 
-        # Generate priming input: constant voltage, zero current, nominal temperature
+        # Generate priming input: use actual initial V/I/T to drive reservoir along
+        # a realistic initial trajectory (not zero-current resting state)
         prime_history = []
-        u_raw = extract_features_step(V_init_equiv, 0.0, T_initial, prime_history)
+        u_raw = extract_features_step(V_init_equiv, I_init_equiv, T_initial, prime_history)
         
         # Normalize voltage gradient for sim_dt
         u_raw[3] = u_raw[3] * (dataset_dt / sim_dt)
@@ -228,10 +235,16 @@ class EstimatorPipeline:
         for _ in range(priming_steps):
             self.esn_soc._update(u_scaled.reshape(-1, 1))
             self.esn_soh._update(u_scaled.reshape(-1, 1))
+            if hasattr(self.esn_soc, 'adapt_online'):
+                self.esn_soc.adapt_online(u_scaled, initial_soc, learning_rate=0.1)
+            if hasattr(self.esn_soh, 'adapt_online'):
+                self.esn_soh.adapt_online(u_scaled, initial_soh, learning_rate=0.1)
             
         self.esn_soc_state = self.esn_soc.get_state()
         self.esn_soh_state = self.esn_soh.get_state()
         self.primed = True
+        self._esn_step_count = 0  # Reset live step counter for convergence tracking
+
 
     def calculate_soe(self, soc):
         """
@@ -250,18 +263,30 @@ class EstimatorPipeline:
         soe = integral_soc / max(self.integral_total, 1e-4)
         return float(np.clip(soe, 0.0, 1.0))
 
-    def step(self, V_meas, I_meas_discharge, T_meas, dt, quantize_mode='float32', selected_indices=None, dataset_dt=0.001,
-             fault_short=False, fault_thermal=False, fault_dropout=False):
+    def step(self, V_meas=None, I_meas_discharge=None, T_meas=None, dt=1.0, quantize_mode='float32', dataset_dt=0.001, selected_indices=None, fault_short=False, fault_thermal=False, fault_dropout=False, record=None):
         """
-        Execute one prediction-estimation step for all estimators.
-        :param V_meas: Noisy voltage measurement (V)
-        :param I_meas_discharge: Noisy current measurement (A, positive = discharge, negative = charge)
-        :param T_meas: Noisy temperature measurement (°C)
-        :param dt: Step interval (s)
-        :param quantize_mode: Precision for ESN ('float32', 'int16', 'int8')
-        :returns: dict of updated values and latencies
+        Processes a single incoming telemetry record and updates all state observers.
+        Returns a rich dictionary containing all estimated metrics.
         """
-        # If fault_short transitions from True to False, reset cc_soc to ekf_soc to recover
+        if isinstance(V_meas, dict):
+            record = V_meas
+            V_meas = None
+
+        if record is not None:
+            V_meas = record.get('voltage', 3.7) if V_meas is None else V_meas
+            I_meas_discharge = record.get('current', 0.0) if I_meas_discharge is None else I_meas_discharge
+            T_meas = record.get('temperature', 25.0) if T_meas is None else T_meas
+            fault_short = record.get('fault_short', False) or fault_short
+            fault_thermal = record.get('fault_thermal', False) or fault_thermal
+            fault_dropout = record.get('fault_dropout', False) or fault_dropout
+        else:
+            V_meas = 3.7 if V_meas is None else V_meas
+            I_meas_discharge = 0.0 if I_meas_discharge is None else I_meas_discharge
+            T_meas = 25.0 if T_meas is None else T_meas
+
+        self.quantize_mode = quantize_mode
+
+        # If fault transitions from True to False, reset cc_soc to ekf_soc to recover
         if hasattr(self, 'prev_fault_short') and self.prev_fault_short and not fault_short:
             self.cc_soc = self.ekf_soc
         if hasattr(self, 'prev_fault_dropout') and self.prev_fault_dropout and not fault_dropout:
@@ -281,20 +306,17 @@ class EstimatorPipeline:
         if V_meas < Config.DIAG_DROPOUT_VOLTAGE_THRESHOLD or fault_dropout:
             faults_detected.append('sensor_dropout')
             
-        # Thermal Runaway Diagnostic (Temp > 60°C or self-heating rate dT/dt > 2.0°C/s)
+        # Thermal Runaway Diagnostic
         dT_dt = 0.0
         if len(self.rolling_history) >= 1:
             prev_t_val = self.rolling_history[-1]['temperature']
             raw_rate = (T_meas - prev_t_val) / dt
-            # Apply low-pass filter to rate to prevent noise amplification under small dt
             if not hasattr(self, 'dT_dt_filtered'):
                 self.dT_dt_filtered = 0.0
-            # Dynamic alpha based on a 5-second filter time-constant
             alpha = min(1.0, dt / 5.0)
             self.dT_dt_filtered = (1.0 - alpha) * self.dT_dt_filtered + alpha * raw_rate
             dT_dt = self.dT_dt_filtered
             
-        # Thermal Runaway Diagnostic (triggered if temp > 60°C OR rate > 2.0°C/s at elevated temperature >= 35°C OR injected thermal fault)
         if T_meas > Config.DIAG_THERMAL_TEMP_THRESHOLD or (dT_dt > Config.DIAG_THERMAL_RATE_THRESHOLD and T_meas >= 35.0) or fault_thermal:
             faults_detected.append('thermal_runaway')
             
@@ -312,18 +334,16 @@ class EstimatorPipeline:
             self.cc_soc = self.cc_soc + (I_meas_ekf * dt) / (self.chem_obj.nominal_capacity * 3600.0)
             self.cc_soc = max(0.0, min(1.0, self.cc_soc))
             
-            # Run RLS Parameter Identification
+            # Update RLS Online Parameter Estimator
             ocv_est = self.chem_obj.lookup_ocv(self.ekf_soc)
             rls_r0, rls_r1, rls_c1, rls_conv = self.rls.step(V_meas, I_meas_ekf, ocv_est)
             
-            # Pass RLS parameter estimations to EKF if converged
             use_rls_r0 = rls_r0 if rls_conv else None
             use_rls_r1 = rls_r1 if rls_conv else None
             use_rls_c1 = rls_c1 if rls_conv else None
 
-            # Update Resistance SOH FIRST so EKF can use the latest updated SOH
+            # Update Resistance SOH FIRST
             if rls_conv:
-                # Invert R0 growth formula to get SOH: R0 = R0_nom * (1 + 1.5 * (1 - SOH))
                 T_c = max(-20.0, min(60.0, T_meas))
                 temp_kelvin = T_c + 273.15
                 temp_ref_kelvin = 25.0 + 273.15
@@ -354,6 +374,7 @@ class EstimatorPipeline:
             self.innovation = float(V_meas - vt_pred)
         else:
             self.innovation = 0.0
+            rls_r0, rls_r1, rls_c1, rls_conv = self.rls.r0, self.rls.r1, self.rls.c1, self.rls.converged
 
         # Save previous readings
         if 'sensor_dropout' not in faults_detected and 'thermal_runaway' not in faults_detected:
@@ -385,8 +406,17 @@ class EstimatorPipeline:
             I_equiv = I_meas_discharge * (nmc_chem.nominal_capacity / self.chem_obj.nominal_capacity)
             
             if not self.primed:
-                # Lazy priming at first step
-                self.prime_esn(V_meas, T_meas, sim_dt=dt, dataset_dt=dataset_dt, selected_indices=selected_indices)
+                self.prime_esn(
+                    V_meas, T_meas,
+                    I_initial=I_meas_discharge,
+                    priming_steps=Config.ESN_PRIMING_STEPS,
+                    sim_dt=dt, dataset_dt=dataset_dt,
+                    selected_indices=selected_indices,
+                    initial_soc=self.ekf_soc,
+                    initial_soh=self.trad_soh
+                )
+            else:
+                self._esn_step_count = getattr(self, '_esn_step_count', 0) + 1
                 
             if selected_indices is None:
                 if self.input_means is not None and len(self.input_means) == 6:
@@ -416,29 +446,31 @@ class EstimatorPipeline:
             self.esn_soh.reset_state(self.esn_soh_state)
             
             # Run prediction step
+            quantize_mode = getattr(self, 'quantize_mode', 'float32')
             pred_soc_val = self.esn_soc.predict_step(u_scaled, quantize_mode=quantize_mode)
             pred_soh_val = self.esn_soh.predict_step(u_scaled, quantize_mode=quantize_mode)
             
-            # Online adaptation: Calibrate the ESN SOC network online using the EKF SOC as a reference
+            # Online adaptation: Calibrate the ESN SOC & SOH networks online using EKF/Observer as a reference
             if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
-                self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.005, mode='rls')
+                self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.15, mode='rls')
+            if hasattr(self.esn_soh, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
+                self.esn_soh.adapt_online(u_scaled, self.trad_soh, learning_rate=0.15, mode='rls')
             
             # Save updated states
             self.esn_soc_state = self.esn_soc.get_state()
             self.esn_soh_state = self.esn_soh.get_state()
             
-            esn_soc_pred = float(np.clip(pred_soc_val[0], 0.0, 1.0))
+            esn_soc_raw = float(np.clip(pred_soc_val[0], 0.0, 1.0))
+            esn_soh_raw = float(np.clip(pred_soh_val[0], 0.0, 1.0))
+
             if Config.ENABLE_ESN_STANDALONE:
                 # Standalone Mode: Use pure data-driven ESN output
-                esn_soh_pred = float(np.clip(pred_soh_val[0], 0.0, 1.0))
+                esn_soc_pred = esn_soc_raw
+                esn_soh_pred = esn_soh_raw
             else:
-                # Hybrid Mode: Blended representation with traditional observer
-                esn_soh_pred = 0.02 * float(np.clip(pred_soh_val[0], 0.0, 1.0)) + 0.98 * self.trad_soh
-            
-            # Update history queue
-            self.rolling_history.append({'voltage': V_meas, 'current': I_meas_discharge, 'temperature': T_meas})
-            if len(self.rolling_history) > Config.FEATURE_ROLLING_WINDOW - 1:
-                self.rolling_history.pop(0)
+                # Hybrid Mode: Blended representation with online RLS adaptation
+                esn_soc_pred = 0.5 * esn_soc_raw + 0.5 * self.ekf_soc
+                esn_soh_pred = 0.05 * esn_soh_raw + 0.95 * self.trad_soh
                 
             esn_time = (time.perf_counter() - t_esn_start) * 1000.0 # ms
 
@@ -538,5 +570,6 @@ class EstimatorPipeline:
             'rls_r1': float(self.rls.r1),
             'rls_c1': float(self.rls.c1),
             'rls_converged': bool(self.rls.converged),
-            'innovation': self.innovation
+            'innovation': self.innovation,
+            'esn_converged': getattr(self, '_esn_step_count', 0) >= Config.ESN_CONVERGENCE_STEPS
         }

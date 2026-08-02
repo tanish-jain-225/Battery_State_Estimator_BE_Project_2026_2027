@@ -492,10 +492,16 @@ document.addEventListener('DOMContentLoaded', () => {
             dbBadge.querySelector('.label').textContent = 'MongoDB: In-Memory';
         }
 
-        // Update ESN model badge
+        // Update ESN model badge (Converging → Active once reservoir has settled)
         if (status.model_loaded) {
-            modelBadge.querySelector('.dot').className = 'dot pulse-green';
-            modelBadge.querySelector('.label').textContent = 'ESN Model: Active';
+            const esn_converged = status.esn_converged !== false; // default true if field absent
+            if (esn_converged) {
+                modelBadge.querySelector('.dot').className = 'dot pulse-green';
+                modelBadge.querySelector('.label').textContent = 'ESN Model: Active';
+            } else {
+                modelBadge.querySelector('.dot').className = 'dot pulse-amber';
+                modelBadge.querySelector('.label').textContent = 'ESN Model: Converging…';
+            }
             mlWarningBanner.classList.add('hidden');
         } else {
             modelBadge.querySelector('.dot').className = 'dot pulse-red';

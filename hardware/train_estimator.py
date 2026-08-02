@@ -93,8 +93,9 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"Dataset not found at {csv_path}. Please place the CSV in the hardware directory.")
 
+    from config import Config as HWConfig
     if header_path is None:
-        header_path = os.path.join(base_dir, "esn_estimator_weights.h")
+        header_path = HWConfig.ESTIMATOR_WEIGHTS_HEADER
 
     # 2. Load dataset
     df = None
@@ -107,13 +108,41 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             print(f"Error loading CSV file: {e}")
             
     if df is None:
-        print("Generating high-fidelity full-range dataset from physical battery simulator...")
+        print("Generating high-fidelity full-range fallback dataset from physical battery simulator...")
         try:
             df = generate_full_range_dataset()
-            print(f"Full-range dataset generated successfully: {len(df)} rows.")
+            print(f"Fallback dataset generated successfully: {len(df)} rows.")
         except Exception as gen_err:
-            print(f"Failed to generate backup dataset: {gen_err}")
+            print(f"Failed to generate fallback dataset: {gen_err}")
             raise gen_err
+
+    if df is not None:
+        # Recover if CSV was pasted into a single column
+        if len(df.columns) == 1 and ',' in str(df.columns[0]):
+            col_name = df.columns[0]
+            new_cols = [c.strip() for c in col_name.split(',')]
+            split_data = df[col_name].astype(str).str.split(',', expand=True)
+            if split_data.shape[1] == len(new_cols):
+                split_data.columns = new_cols
+                df = split_data.apply(pd.to_numeric, errors='coerce')
+                
+        df.columns = [str(col).strip() for col in df.columns]
+        rename_dict = {}
+        for col in df.columns:
+            col_lower = col.lower()
+            if col_lower == 'voltage':
+                rename_dict[col] = 'Voltage'
+            elif col_lower == 'current':
+                rename_dict[col] = 'Current'
+            elif col_lower == 'temperature':
+                rename_dict[col] = 'Temperature'
+            elif col_lower == 'soc':
+                rename_dict[col] = 'SOC'
+            elif col_lower == 'soh':
+                rename_dict[col] = 'SOH'
+            elif col_lower == 'time':
+                rename_dict[col] = 'Time'
+        df.rename(columns=rename_dict, inplace=True)
 
     # 3. Feature engineering
     print("Performing feature engineering...")
@@ -138,22 +167,25 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     print(f"  Voltage_grad: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
     print(f"  Current_ma: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
 
-    # ── ESN Estimator Hyperparameters (Aligned with Software Config) ────────────
-    SOC_N_RESERVOIR = 500
-    SOC_SPECTRAL_RADIUS = 0.95
-    SOC_LEAK_RATE = 0.15
-    SOC_INPUT_SCALING = 0.8
-    SOC_RIDGE_PARAM = 1e-5
-    SOC_SPARSITY = 0.85
-    SOC_WASHOUT = 50
+    # ── ESN Estimator Hyperparameters — read from hardware/config.py ─────────────
+    # These values MUST mirror software/visualiser/config.py → ESN_SOC_*/ESN_SOH_*.
+    # Do NOT hardcode them here — change config.py to affect both hardware and software.
+    from config import Config as HWConfig
+    SOC_N_RESERVOIR     = HWConfig.ESN_SOC_RESERVOIR
+    SOC_SPECTRAL_RADIUS = HWConfig.ESN_SOC_SPECTRAL_RADIUS
+    SOC_LEAK_RATE       = HWConfig.ESN_SOC_LEAK_RATE
+    SOC_INPUT_SCALING   = HWConfig.ESN_SOC_INPUT_SCALING
+    SOC_RIDGE_PARAM     = HWConfig.ESN_SOC_RIDGE_PARAM
+    SOC_SPARSITY        = HWConfig.ESN_SOC_SPARSITY
+    SOC_WASHOUT         = HWConfig.ESN_SOC_WASHOUT
 
-    SOH_N_RESERVOIR = 400
-    SOH_SPECTRAL_RADIUS = 0.85
-    SOH_LEAK_RATE = 0.02
-    SOH_INPUT_SCALING = 0.4
-    SOH_RIDGE_PARAM = 1e-5
-    SOH_SPARSITY = 0.85
-    SOH_WASHOUT = 50
+    SOH_N_RESERVOIR     = HWConfig.ESN_SOH_RESERVOIR
+    SOH_SPECTRAL_RADIUS = HWConfig.ESN_SOH_SPECTRAL_RADIUS
+    SOH_LEAK_RATE       = HWConfig.ESN_SOH_LEAK_RATE
+    SOH_INPUT_SCALING   = HWConfig.ESN_SOH_INPUT_SCALING
+    SOH_RIDGE_PARAM     = HWConfig.ESN_SOH_RIDGE_PARAM
+    SOH_SPARSITY        = HWConfig.ESN_SOH_SPARSITY
+    SOH_WASHOUT         = HWConfig.ESN_SOH_WASHOUT
 
     # 5. Train SOC ESN
     if grid_search:
@@ -244,6 +276,19 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     # 7. Generate header file
     print(f"Writing weights to {header_path}...")
 
+    def to_csr(matrix):
+        val = []
+        col = []
+        row_ptr = [0]
+        for r in range(matrix.shape[0]):
+            for c in range(matrix.shape[1]):
+                v = matrix[r, c]
+                if v != 0.0:
+                    val.append(v)
+                    col.append(c)
+            row_ptr.append(len(val))
+        return np.array(val), np.array(col), np.array(row_ptr)
+
     def write_array_1d(f, name, arr):
         f.write(f"const float {name}[{len(arr)}] = {{\n    ")
         for i, val in enumerate(arr):
@@ -251,6 +296,16 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             if i < len(arr) - 1:
                 f.write(", ")
             if (i + 1) % 6 == 0:
+                f.write("\n    ")
+        f.write("\n};\n\n")
+
+    def write_array_1d_int(f, name, arr):
+        f.write(f"const uint16_t {name}[{len(arr)}] = {{\n    ")
+        for i, val in enumerate(arr):
+            f.write(f"{val}")
+            if i < len(arr) - 1:
+                f.write(", ")
+            if (i + 1) % 12 == 0:
                 f.write("\n    ")
         f.write("\n};\n\n")
 
@@ -274,24 +329,54 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         f.write("#ifndef ESN_ESTIMATOR_WEIGHTS_H\n")
         f.write("#define ESN_ESTIMATOR_WEIGHTS_H\n\n")
         f.write("// Auto-generated weights file for STM32 ESN estimators\n\n")
+        f.write("#include <stdint.h>\n\n")
         
-        f.write(f"#define ESN_N_INPUTS 4\n")
+        f.write(f"#define ESN_ESTIMATOR_N_INPUTS 4\n")
         f.write(f"#define ESN_SOC_N_RESERVOIR {SOC_N_RESERVOIR}\n")
-        f.write(f"#define ESN_SOH_N_RESERVOIR {SOH_N_RESERVOIR}\n\n")
+        f.write(f"#define ESN_SOH_N_RESERVOIR {SOH_N_RESERVOIR}\n")
+        f.write(f"#define ESN_SOC_LEAK_RATE {SOC_LEAK_RATE:.6f}f\n")
+        f.write(f"#define ESN_SOH_LEAK_RATE {SOH_LEAK_RATE:.6f}f\n")
+        f.write(f"#define ESN_SOC_WASHOUT_STEPS {SOC_WASHOUT}\n")
+        f.write(f"#define ESN_SOH_WASHOUT_STEPS {SOH_WASHOUT}\n\n")
         
-        write_array_1d(f, "esn_input_means", input_means)
-        write_array_1d(f, "esn_input_stds", input_stds)
+        write_array_1d(f, "esn_estimator_input_means", input_means)
+        write_array_1d(f, "esn_estimator_input_stds", input_stds)
         
         f.write("// SOC Weights\n")
         write_array_2d(f, "esn_soc_W_in", esn_soc.W_in)
-        write_array_2d(f, "esn_soc_W_res", esn_soc.W_res)
         write_array_2d(f, "esn_soc_W_out", esn_soc.W_out)
+        soc_val, soc_col, soc_row_ptr = to_csr(esn_soc.W_res)
+        f.write(f"#define ESN_SOC_W_RES_NNZ {len(soc_val)}\n\n")
+        write_array_1d(f, "esn_soc_W_res_val", soc_val)
+        write_array_1d_int(f, "esn_soc_W_res_col", soc_col)
+        write_array_1d_int(f, "esn_soc_W_res_row_ptr", soc_row_ptr)
         
         f.write("// SOH Weights\n")
         write_array_2d(f, "esn_soh_W_in", esn_soh.W_in)
-        write_array_2d(f, "esn_soh_W_res", esn_soh.W_res)
         write_array_2d(f, "esn_soh_W_out", esn_soh.W_out)
+        soh_val, soh_col, soh_row_ptr = to_csr(esn_soh.W_res)
+        f.write(f"#define ESN_SOH_W_RES_NNZ {len(soh_val)}\n\n")
+        write_array_1d(f, "esn_soh_W_res_val", soh_val)
+        write_array_1d_int(f, "esn_soh_W_res_col", soh_col)
+        write_array_1d_int(f, "esn_soh_W_res_row_ptr", soh_row_ptr)
         
+        # Write 500-sample test data subset: Voltage, Current, Temperature, SOC, SOH
+        n_test_samples = min(500, len(df))
+        f.write(f"#define ESTIMATOR_TEST_N {n_test_samples}\n")
+        f.write(f"const float estimator_test_data[{n_test_samples}][5] = {{\n")
+        for i in range(n_test_samples):
+            v_val = df['Voltage'].iloc[i]
+            i_val = df['Current'].iloc[i]
+            t_val = df['Temperature'].iloc[i]
+            soc_val = df['SOC'].iloc[i]
+            soh_val = df['SOH'].iloc[i]
+            f.write(f"    {{{v_val:.4f}f, {i_val:.4f}f, {t_val:.4f}f, {soc_val:.4f}f, {soh_val:.4f}f}}")
+            if i < n_test_samples - 1:
+                f.write(",\n")
+            else:
+                f.write("\n")
+        f.write("};\n\n")
+
         f.write("#endif // ESN_ESTIMATOR_WEIGHTS_H\n")
 
     print(f"Successfully generated {header_path}!")
