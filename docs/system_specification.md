@@ -293,5 +293,5 @@ Robustness and estimation accuracy limits are verified using automated unit suit
 
 Run the test runner locally using:
 ```bash
-python -m unittest discover -s software/tests
+python -m unittest discover -s software/tests -t .
 ```

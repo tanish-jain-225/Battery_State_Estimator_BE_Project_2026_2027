@@ -26,7 +26,7 @@ if %errorlevel% neq 0 (
 )
 echo.
 echo [STEP 4/5] Running Software Unit Tests...
-python -m unittest discover -s software/tests
+python -m unittest discover -s software/tests -t .
 if %errorlevel% neq 0 (
     echo [ERROR] Unit tests failed.
     exit /b %errorlevel%

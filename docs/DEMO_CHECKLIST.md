@@ -48,7 +48,7 @@ flowchart TD
 - [ ] **Train ESN Estimator Model**: Execute `python software/visualiser/training/train_rc.py` and confirm `model_rc.pkl` is exported.
 - [ ] **Train Hardware Classifier**: Execute `python hardware/train_classifier.py` and confirm [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) is created.
 - [ ] **Train Hardware Estimator**: Execute `python hardware/train_estimator.py` and check [`hardware/esn_estimator_weights.h`](../hardware/esn_estimator_weights.h).
-- [ ] **Execute Test Suite**: Run `python -m unittest discover -s software/tests` (verify that all unit tests pass).
+- [ ] **Execute Test Suite**: Run `python -m unittest discover -s software/tests -t .` (verify that all unit tests pass).
 - [ ] **Build C Simulator**: Execute `hardware/run_c_simulator.bat` (Windows) or `hardware/run_c_simulator.sh` (Unix) and confirm compile success.
 
 ### 2. Live Interactive Demo

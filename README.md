@@ -565,7 +565,7 @@ hardware/run_c_simulator.sh
 
 Verified locally with:
 ```bash
-python -m unittest discover -s software/tests
+python -m unittest discover -s software/tests -t .
 ```
 
 | Test No. | Test Description | Expected Result | Actual Result | Status |

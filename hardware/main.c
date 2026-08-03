@@ -179,6 +179,8 @@ void esn_predict_float(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
         for (int j = 0; j < ESN_N_RESERVOIR; j++) {
             sum += esn_W_out[i][1 + ESN_N_INPUTS + j] * esn_x[j];
         }
+        if (sum < 0.0f) sum = 0.0f;
+        if (sum > 1.0f) sum = 1.0f;
         y_pred[i] = sum;
     }
 }
@@ -245,6 +247,8 @@ void esn_predict_fixed(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
             float state_f = (float)esn_x_q[j] / 32768.0f;
             sum += esn_W_out[i][1 + ESN_N_INPUTS + j] * state_f;
         }
+        if (sum < 0.0f) sum = 0.0f;
+        if (sum > 1.0f) sum = 1.0f;
         y_pred[i] = sum;
     }
 }
@@ -287,6 +291,8 @@ float esn_predict_soc(const float u[ESN_ESTIMATOR_N_INPUTS]) {
     for (int j = 0; j < ESN_SOC_N_RESERVOIR; j++) {
         soc_pred += esn_soc_W_out[0][1 + ESN_ESTIMATOR_N_INPUTS + j] * esn_soc_x[j];
     }
+    if (soc_pred < 0.0f) soc_pred = 0.0f;
+    if (soc_pred > 1.0f) soc_pred = 1.0f;
     return soc_pred;
 }
 
@@ -324,6 +330,8 @@ float esn_predict_soh(const float u[ESN_ESTIMATOR_N_INPUTS]) {
     for (int j = 0; j < ESN_SOH_N_RESERVOIR; j++) {
         soh_pred += esn_soh_W_out[0][1 + ESN_ESTIMATOR_N_INPUTS + j] * esn_soh_x[j];
     }
+    if (soh_pred < 0.0f) soh_pred = 0.0f;
+    if (soh_pred > 1.0f) soh_pred = 1.0f;
     return soh_pred;
 }
 

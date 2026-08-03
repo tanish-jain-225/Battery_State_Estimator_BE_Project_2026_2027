@@ -127,6 +127,9 @@ class EchoStateNetwork:
             if np.any(np.isnan(self.P_adapt)) or np.any(np.isinf(self.P_adapt)):
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
 
+    def _clip_output(self, y_pred):
+        return np.clip(y_pred, 0.0, 1.0)
+
     def predict_step(self, u, quantize_mode='float32'):
         """
         Advance ESN state by one step and make prediction, optionally simulating quantization.
@@ -168,12 +171,12 @@ class EchoStateNetwork:
             state_vec_q = simulate_quantization(state_vec, bits)
             
             y_pred = np.dot(W_out_q, state_vec_q)
-            return y_pred.flatten()
+            return self._clip_output(y_pred).flatten()
         else:
             x_t = self._update(u_t)
             state_vec = np.vstack(([1.0], u_t, x_t))
             y_pred = np.dot(self.W_out, state_vec)
-            return y_pred.flatten()
+            return self._clip_output(y_pred).flatten()
 
     def predict(self, U):
         """

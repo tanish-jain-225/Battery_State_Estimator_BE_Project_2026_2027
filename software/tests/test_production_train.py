@@ -3,9 +3,6 @@ import sys
 import unittest
 import pandas as pd
 import numpy as np
-import io
-import urllib.request
-import socket
 import pickle
 
 # Add visualiser directory to path for imports
@@ -20,106 +17,59 @@ if 'config' in sys.modules:
     del sys.modules['config']
 from config import Config
 from train_rc import EchoStateNetwork
-from feature_engineering import extract_features_df
+
+LOCAL_DATASET_PATH = os.path.join(
+    visualiser_dir,
+    'datasets',
+    'training_ev_battery_dataset_multiclass.csv',
+)
+
+
+def load_training_dataframe():
+    """Load the checked-in training dataset and normalize column names."""
+    if not os.path.exists(LOCAL_DATASET_PATH):
+        raise FileNotFoundError(f"Local training dataset is missing: {LOCAL_DATASET_PATH}")
+
+    df = pd.read_csv(LOCAL_DATASET_PATH)
+    df.columns = [str(col).strip() for col in df.columns]
+
+    rename_dict = {}
+    for col in df.columns:
+        col_lower = col.lower()
+        if col_lower == 'voltage':
+            rename_dict[col] = 'Voltage'
+        elif col_lower == 'current':
+            rename_dict[col] = 'Current'
+        elif col_lower == 'temperature':
+            rename_dict[col] = 'Temperature'
+        elif col_lower == 'soc':
+            rename_dict[col] = 'SOC'
+        elif col_lower == 'soh':
+            rename_dict[col] = 'SOH'
+        elif col_lower == 'time':
+            rename_dict[col] = 'Time'
+
+    df.rename(columns=rename_dict, inplace=True)
+    return df
 
 class TestProductionTraining(unittest.TestCase):
 
-    def setUp(self):
-        # Use the actual published Google Sheets URL from the user
-        self.csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbY6uZX7_v-cvyxws5Xx1no7FRMp5tzjLynxBGPYutG5aC7dmgD6k7n8J_8G70D42R6kQNDi8oMYM-/pub?gid=432011183&single=true&output=csv"
+    def test_local_dataset_fetch_and_parse(self):
+        """Test loading and parsing the checked-in training dataset."""
+        print(f"\n[STEP 1] Loading local dataset from: {LOCAL_DATASET_PATH}")
+        df = load_training_dataframe()
+        print(f"Loaded DataFrame successfully: {len(df)} rows found.")
 
-    def test_remote_dataset_fetch_and_parse(self):
-        """Test downloading and parsing the remote CSV dataset from Google Sheets."""
-        print(f"\n[STEP 1] Fetching remote dataset from: {self.csv_url}")
-        
-        try:
-            import requests
-            response = requests.get(self.csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
-            response.raise_for_status()
-            csv_data = response.text
-            
-            # Check for HTML redirect page error
-            self.assertFalse(
-                "<html" in csv_data.lower() or "<!doctype" in csv_data.lower(),
-                "Error: Downloaded content is an HTML page, not raw CSV."
-            )
-            
-            print(f"Downloaded {len(csv_data)} bytes of CSV data.")
-            
-            # Load into pandas
-            df = pd.read_csv(io.StringIO(csv_data))
-            if len(df.columns) == 1 and ',' in str(df.columns[0]):
-                col_name = df.columns[0]
-                new_cols = [c.strip() for c in col_name.split(',')]
-                split_data = df[col_name].astype(str).str.split(',', expand=True)
-                if split_data.shape[1] == len(new_cols):
-                    split_data.columns = new_cols
-                    df = split_data.apply(pd.to_numeric, errors='coerce')
-                    
-            df.columns = [str(col).strip() for col in df.columns]
-            rename_dict = {}
-            for col in df.columns:
-                col_lower = col.lower()
-                if col_lower == 'voltage':
-                    rename_dict[col] = 'Voltage'
-                elif col_lower == 'current':
-                    rename_dict[col] = 'Current'
-                elif col_lower == 'temperature':
-                    rename_dict[col] = 'Temperature'
-                elif col_lower == 'soc':
-                    rename_dict[col] = 'SOC'
-                elif col_lower == 'soh':
-                    rename_dict[col] = 'SOH'
-                elif col_lower == 'time':
-                    rename_dict[col] = 'Time'
-            df.rename(columns=rename_dict, inplace=True)
-            print(f"Loaded DataFrame successfully: {len(df)} rows found.")
-            
-            # Validate columns
-            expected_cols = ['Time', 'Voltage', 'Current', 'Temperature', 'SOC', 'SOH']
-            for col in expected_cols:
-                self.assertIn(col, df.columns, f"Required column '{col}' is missing from the dataset.")
-            
-            # Validate row count
-            self.assertGreater(len(df), 100, "Dataset contains too few records.")
-            
-        except Exception as e:
-            self.fail(f"Failed to fetch or parse remote CSV dataset: {e}")
+        expected_cols = ['Time', 'Voltage', 'Current', 'Temperature', 'SOC', 'SOH']
+        for col in expected_cols:
+            self.assertIn(col, df.columns, f"Required column '{col}' is missing from the dataset.")
+
+        self.assertGreater(len(df), 100, "Dataset contains too few records.")
 
     def test_end_to_end_training_pipeline(self):
         """Test complete feature extraction, scaling, ESN training and pickling logic."""
-        print("\n[STEP 2] Fetching remote dataset for E2E training test...")
-        import requests
-        response = requests.get(self.csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
-        response.raise_for_status()
-        csv_data = response.text
-        
-        df = pd.read_csv(io.StringIO(csv_data))
-        if len(df.columns) == 1 and ',' in str(df.columns[0]):
-            col_name = df.columns[0]
-            new_cols = [c.strip() for c in col_name.split(',')]
-            split_data = df[col_name].astype(str).str.split(',', expand=True)
-            if split_data.shape[1] == len(new_cols):
-                split_data.columns = new_cols
-                df = split_data.apply(pd.to_numeric, errors='coerce')
-                
-        df.columns = [str(col).strip() for col in df.columns]
-        rename_dict = {}
-        for col in df.columns:
-            col_lower = col.lower()
-            if col_lower == 'voltage':
-                rename_dict[col] = 'Voltage'
-            elif col_lower == 'current':
-                rename_dict[col] = 'Current'
-            elif col_lower == 'temperature':
-                rename_dict[col] = 'Temperature'
-            elif col_lower == 'soc':
-                rename_dict[col] = 'SOC'
-            elif col_lower == 'soh':
-                rename_dict[col] = 'SOH'
-            elif col_lower == 'time':
-                rename_dict[col] = 'Time'
-        df.rename(columns=rename_dict, inplace=True)
+        print("\n[STEP 2] Loading local dataset for E2E training test...")
+        df = load_training_dataframe()
         
         print("Extracting features & scaling...")
         df = df.copy()

@@ -111,7 +111,7 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 Verify code correctness and math convergence by running the unit test suite:
 ```bash
-python -m unittest discover -s software/tests
+python -m unittest discover -s software/tests -t .
 ```
 The test modules verify:
 - **`test_estimators.py`**: Model dynamics, observer convergence thresholds and Arrhenius parameter shifts.

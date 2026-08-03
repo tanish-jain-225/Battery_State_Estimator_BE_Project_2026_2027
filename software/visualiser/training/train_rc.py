@@ -200,12 +200,12 @@ class EchoStateNetwork:
             state_vec_q = simulate_quantization(state_vec, bits)
             
             y_pred = np.dot(W_out_q, state_vec_q)
-            return y_pred.flatten()
+            return np.clip(y_pred, 0.0, 1.0).flatten()
         else:
             x_t = self._update(u_t)
             state_vec = np.vstack(([1.0], u_t, x_t))
             y_pred = np.dot(self.W_out, state_vec)
-            return y_pred.flatten()
+            return np.clip(y_pred, 0.0, 1.0).flatten()
 
     def adapt_online(self, u_t, target, learning_rate=0.005, mode='rls'):
         """Online adaptation of readout weights W_out using RLS/gradient update."""
@@ -246,7 +246,7 @@ class EchoStateNetwork:
             
             state_vec = np.vstack(([1.0], U[t].reshape(-1, 1), x))
             y_pred = np.dot(W_out, state_vec)
-            predictions.append(y_pred.flatten())
+            predictions.append(np.clip(y_pred, 0.0, 1.0).flatten())
             
         self.x = x
         return np.array(predictions)
@@ -449,6 +449,7 @@ def main():
     soc_rmse = np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:] - pred_soc[Config.ESN_WASHOUT_STEPS:]) ** 2))
     print(f"Training SOC RMSE (post-washout): {soc_rmse:.6f}")
     print(f"  Target SOC Range: min={Y_soc.min():.4f}, max={Y_soc.max():.4f}, mean={Y_soc.mean():.4f}")
+    pred_soc = np.clip(pred_soc, 0.0, 1.0)
     print(f"  Pred   SOC Range: min={pred_soc.min():.4f}, max={pred_soc.max():.4f}, mean={pred_soc.mean():.4f}")
 
     # 4. Instantiate and Train SOH ESN
@@ -470,6 +471,7 @@ def main():
     soh_rmse = np.sqrt(np.mean((Y_soh[Config.ESN_WASHOUT_STEPS:] - pred_soh[Config.ESN_WASHOUT_STEPS:]) ** 2))
     print(f"Training SOH RMSE (post-washout): {soh_rmse:.6f}")
     print(f"  Target SOH Range: min={Y_soh.min():.4f}, max={Y_soh.max():.4f}, mean={Y_soh.mean():.4f}")
+    pred_soh = np.clip(pred_soh, 0.0, 1.0)
     print(f"  Pred   SOH Range: min={pred_soh.min():.4f}, max={pred_soh.max():.4f}, mean={pred_soh.mean():.4f}")
 
     # 5. Save model package locally

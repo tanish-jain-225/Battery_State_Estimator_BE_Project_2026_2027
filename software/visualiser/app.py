@@ -215,8 +215,15 @@ def safe_pickle_loads(data):
 def safe_pickle_load(fileobj):
     return SafeUnpickler(fileobj).load()
 
+def _model_score(soc_rmse, soh_rmse):
+    soc_val = float(soc_rmse) if soc_rmse is not None else float('inf')
+    soh_val = float(soh_rmse) if soh_rmse is not None else float('inf')
+    return soc_val + soh_val
+
 def load_ml_model():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
+
+    candidates = []
     
     # First: Try to load from MongoDB Registry (supports serverless read-only filesystem)
     if check_db_connected():
@@ -226,45 +233,44 @@ def load_ml_model():
             db_model = db['model_weights'].find_one({'_id': 'esn_package'})
             if db_model is not None:
                 package = safe_pickle_loads(db_model['pickle_data'])
-                esn_soc = package['esn_soc']
-                esn_soh = package['esn_soh']
-                input_means = package['input_means']
-                input_stds = package['input_stds']
-                model_loaded = True
-                loaded_soc_rmse = db_model.get('soc_rmse')
-                loaded_soh_rmse = db_model.get('soh_rmse')
-                print("Echo State Networks loaded successfully from MongoDB model registry.")
-                return
+                candidates.append({
+                    'source': 'MongoDB model registry',
+                    'package': package,
+                    'soc_rmse': db_model.get('soc_rmse', package.get('soc_rmse')),
+                    'soh_rmse': db_model.get('soh_rmse', package.get('soh_rmse')),
+                })
             else:
-                # MongoDB connected but empty -> run with blank weights
-                esn_soc = None
-                esn_soh = None
-                input_means = None
-                input_stds = None
-                model_loaded = False
-                loaded_soc_rmse = None
-                loaded_soh_rmse = None
-                print("MongoDB model registry is empty. Running with blank weights.")
-                return
+                print("MongoDB model registry is empty. Falling back to local model if available.")
         except Exception as e:
             print(f"Error loading model from MongoDB registry: {e}")
 
-    # Fallback: Load from local pickle file only if MongoDB connection failed
+    # Fallback: Load from local pickle file as well, then choose the best available package.
     if os.path.exists(model_path):
         try:
             with open(model_path, 'rb') as f:
                 package = safe_pickle_load(f)
-                esn_soc = package['esn_soc']
-                esn_soh = package['esn_soh']
-                input_means = package['input_means']
-                input_stds = package['input_stds']
-                model_loaded = True
-                loaded_soc_rmse = package.get('soc_rmse')
-                loaded_soh_rmse = package.get('soh_rmse')
-                print("Echo State Networks loaded successfully from local file.")
+                candidates.append({
+                    'source': 'local file',
+                    'package': package,
+                    'soc_rmse': package.get('soc_rmse'),
+                    'soh_rmse': package.get('soh_rmse'),
+                })
         except Exception as e:
             print(f"Error loading local model file: {e}")
-            model_loaded = False
+
+    if candidates:
+        best_candidate = min(candidates, key=lambda item: _model_score(item['soc_rmse'], item['soh_rmse']))
+        package = best_candidate['package']
+        esn_soc = package['esn_soc']
+        esn_soh = package['esn_soh']
+        input_means = package['input_means']
+        input_stds = package['input_stds']
+        model_loaded = True
+        loaded_soc_rmse = best_candidate['soc_rmse']
+        loaded_soh_rmse = best_candidate['soh_rmse']
+        print(f"Echo State Networks loaded successfully from {best_candidate['source']} (score={_model_score(loaded_soc_rmse, loaded_soh_rmse):.6f}).")
+        return
+
     else:
         esn_soc = None
         esn_soh = None
@@ -784,6 +790,7 @@ def run_training_async():
     global training_status, esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
+    current_model_score = _model_score(loaded_soc_rmse, loaded_soh_rmse)
     
     try:
         from train_rc import EchoStateNetwork, generate_full_range_dataset
@@ -922,6 +929,18 @@ def run_training_async():
             'soc_rmse': soc_rmse,
             'soh_rmse': soh_rmse
         }
+
+        new_model_score = _model_score(soc_rmse, soh_rmse)
+        if current_model_score < float('inf') and new_model_score > current_model_score:
+            training_status['status'] = 'completed'
+            training_status['soc_rmse'] = loaded_soc_rmse
+            training_status['soh_rmse'] = loaded_soh_rmse
+            training_status['timestamp'] = datetime.utcnow().isoformat()
+            training_status['logs'] += (
+                f"Candidate ESN score {new_model_score:.6f} was worse than the active model score "
+                f"{current_model_score:.6f}; keeping the current model.\n"
+            )
+            return
 
         # 1. Try to save locally (development environment)
         try:
@@ -1492,6 +1511,13 @@ try:
     load_ml_model()
 except Exception as _startup_err:
     print(f"Battery State Estimator — ESN model cold-start load skipped: {_startup_err}")
+
+if not model_loaded and (os.path.exists(Config.CSV_PATH) or Config.CSV_URL):
+    print("Battery State Estimator — no trained ESN loaded at startup; retraining from available data.")
+    try:
+        run_training_async()
+    except Exception as _startup_retrain_err:
+        print(f"Battery State Estimator — startup retraining failed: {_startup_retrain_err}")
 
 if __name__ == '__main__':
     _start_background_threads()
