@@ -104,7 +104,7 @@ def _ensure_db():
         if mongodb_connected and db is not None:
             return True
         try:
-            db_client = MongoClient(Config.MONGODB_URI)
+            db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
             db_client.server_info()
             db = db_client[Config.MONGODB_DB_NAME]
             mongodb_connected = True
@@ -730,7 +730,7 @@ def db_checker_loop():
     while True:
         if not _mongodb_connected or db_client is None:
             try:
-                db_client = MongoClient(Config.MONGODB_URI)
+                db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
                 db_client.server_info()
                 db = db_client[Config.MONGODB_DB_NAME]
                 _mongodb_connected = True

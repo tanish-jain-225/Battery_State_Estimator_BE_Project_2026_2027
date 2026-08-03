@@ -128,7 +128,7 @@ def check_db_connected():
             db = None
             
     try:
-        db_client = MongoClient(mongodb_uri)
+        db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
         db_client.admin.command('ping')
         _last_db_ping_time = now
         db = db_client[Config.MONGODB_DB_NAME]
@@ -194,6 +194,8 @@ _telemetry_cache = {
 
 class SafeUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
+        if name == "EchoStateNetwork":
+            return EchoStateNetwork
         # Remap numpy._core -> numpy.core (handles loading NumPy 2.x pickles on NumPy 1.x environments)
         if module.startswith("numpy._core"):
             module = module.replace("numpy._core", "numpy.core")
@@ -485,7 +487,7 @@ def status_checker_loop():
     
     # Try initial mongo connection
     try:
-        db_client = MongoClient(mongodb_uri)
+        db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
         db_client.server_info()
         db = db_client[Config.MONGODB_DB_NAME]
         _mongodb_connected = True
@@ -516,7 +518,7 @@ def status_checker_loop():
         # 2. Asynchronously check MongoDB Connection
         if not _mongodb_connected or db_client is None:
             try:
-                db_client = MongoClient(mongodb_uri)
+                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
                 db_client.server_info()
                 db = db_client[Config.MONGODB_DB_NAME]
                 _mongodb_connected = True
@@ -1426,9 +1428,9 @@ def get_telemetry():
             prev_time = t_curr
 
             est_output = pipeline.step(
-                V_meas=record['voltage'],
-                I_meas_discharge=record['current'],
-                T_meas=record['temperature'],
+                V_meas=float(record.get('voltage', 3.7)),
+                I_meas_discharge=float(record.get('current', 0.0)),
+                T_meas=float(record.get('temperature', 25.0)),
                 dt=dt,
                 quantize_mode=quantize_mode,
                 dataset_dt=Config.DATASET_TIME_STEP,

@@ -4,6 +4,7 @@
 #ifndef __arm__
 // Host simulation mocks (when compiled on a desktop PC)
 #define HOST_SIMULATION
+#define STATIC_VERIFICATION_MODE 1
 
 #include <stdint.h>
 #include <stdio.h>

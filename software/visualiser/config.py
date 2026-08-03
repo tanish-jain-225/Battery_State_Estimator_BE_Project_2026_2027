@@ -75,9 +75,9 @@ class Config:
     # Excludes temperature features (index 2 and 5) to prevent out-of-distribution thermal bias.
     ESN_SELECTED_FEATURE_INDICES = [0, 1, 3, 4]
 
-    # Standalone ESN mode: when False, ESN predictions run with baseline adaptation/hybridization,
-    # ensuring high real-time accuracy and zero reservoir saturation drift.
-    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "False").lower() in ("true", "1", "t", "yes")
+    # Standalone ESN mode: when True, ESN predictions run in pure data-driven mode (the production estimator).
+    # When False, runs with baseline adaptation/hybridization.
+    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "True").lower() in ("true", "1", "t", "yes")
 
     # -------------------------------------------------------------------------
     # ESN reservoir priming & training washout
@@ -89,14 +89,14 @@ class Config:
 
     # Steps to drive the reservoir at startup/reset before going live.
     # Eliminates the 30-50 second convergence lag at simulation start.
-    # Increased from 50→200: more priming steps allows the high-spectral-radius
-    # reservoir (0.95) to fully settle before any live prediction is made.
-    ESN_PRIMING_STEPS = int(os.environ.get("ESN_PRIMING_STEPS", 200))
+    # Increased from 200→500: more priming steps compensates for the higher
+    # leak rates, letting the reservoir reach a deeper steady state.
+    ESN_PRIMING_STEPS = int(os.environ.get("ESN_PRIMING_STEPS", 500))
 
     # Number of live inference steps after startup to treat as warm-up.
     # During this window the ESN is still converging to its operating manifold,
     # so the UI can mark the ESN estimate as 'Converging' rather than 'Active'.
-    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 100))
+    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 30))
 
     # Detect production cloud environment (Render sets RENDER=true automatically)
     _IS_PRODUCTION = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
@@ -114,10 +114,10 @@ class Config:
     # Any change here MUST be reflected there to keep hardware-software aligned.
     # -------------------------------------------------------------------------
     ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 200 if _IS_PRODUCTION else 500))
-    ESN_SOC_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOC_SPECTRAL_RADIUS", 0.95))
-    ESN_SOC_LEAK_RATE    = float(os.environ.get("ESN_SOC_LEAK_RATE", 0.15))
-    ESN_SOC_INPUT_SCALING = float(os.environ.get("ESN_SOC_INPUT_SCALING", 0.8))
-    ESN_SOC_RIDGE_PARAM  = float(os.environ.get("ESN_SOC_RIDGE_PARAM", 1e-5))
+    ESN_SOC_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOC_SPECTRAL_RADIUS", 0.30))
+    ESN_SOC_LEAK_RATE    = float(os.environ.get("ESN_SOC_LEAK_RATE", 0.25))
+    ESN_SOC_INPUT_SCALING = float(os.environ.get("ESN_SOC_INPUT_SCALING", 0.2))
+    ESN_SOC_RIDGE_PARAM  = float(os.environ.get("ESN_SOC_RIDGE_PARAM", 1e-4))
     ESN_SOC_SPARSITY     = float(os.environ.get("ESN_SOC_SPARSITY", 0.85))
 
     # -------------------------------------------------------------------------
@@ -128,14 +128,14 @@ class Config:
     # Any change here MUST be reflected there to keep hardware-software aligned.
     # -------------------------------------------------------------------------
     ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 150 if _IS_PRODUCTION else 400))
-    ESN_SOH_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOH_SPECTRAL_RADIUS", 0.85))
-    ESN_SOH_LEAK_RATE    = float(os.environ.get("ESN_SOH_LEAK_RATE", 0.02))
-    ESN_SOH_INPUT_SCALING = float(os.environ.get("ESN_SOH_INPUT_SCALING", 0.4))
-    ESN_SOH_RIDGE_PARAM  = float(os.environ.get("ESN_SOH_RIDGE_PARAM", 1e-5))
+    ESN_SOH_SPECTRAL_RADIUS = float(os.environ.get("ESN_SOH_SPECTRAL_RADIUS", 0.95))
+    ESN_SOH_LEAK_RATE    = float(os.environ.get("ESN_SOH_LEAK_RATE", 0.10))
+    ESN_SOH_INPUT_SCALING = float(os.environ.get("ESN_SOH_INPUT_SCALING", 0.8))
+    ESN_SOH_RIDGE_PARAM  = float(os.environ.get("ESN_SOH_RIDGE_PARAM", 1e-4))
     ESN_SOH_SPARSITY     = float(os.environ.get("ESN_SOH_SPARSITY", 0.85))
 
-    ESN_PRIMING_STEPS    = int(os.environ.get("ESN_PRIMING_STEPS", 200))
-    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 100))
+    ESN_PRIMING_STEPS    = int(os.environ.get("ESN_PRIMING_STEPS", 500))
+    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 30))
     ESN_WASHOUT_STEPS    = int(os.environ.get("ESN_WASHOUT_STEPS", 50))
 
     # -------------------------------------------------------------------------

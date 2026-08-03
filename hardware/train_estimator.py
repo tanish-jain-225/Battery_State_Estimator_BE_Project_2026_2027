@@ -363,6 +363,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         # Write 500-sample test data subset: Voltage, Current, Temperature, SOC, SOH
         n_test_samples = min(500, len(df))
         f.write(f"#define ESTIMATOR_TEST_N {n_test_samples}\n")
+        f.write(f"#if STATIC_VERIFICATION_MODE\n")
         f.write(f"const float estimator_test_data[{n_test_samples}][5] = {{\n")
         for i in range(n_test_samples):
             v_val = df['Voltage'].iloc[i]
@@ -375,7 +376,8 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
                 f.write(",\n")
             else:
                 f.write("\n")
-        f.write("};\n\n")
+        f.write("};\n")
+        f.write(f"#endif // STATIC_VERIFICATION_MODE\n\n")
 
         f.write("#endif // ESN_ESTIMATOR_WEIGHTS_H\n")
 

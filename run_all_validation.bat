@@ -1,4 +1,5 @@
 @echo off
+set VALIDATION_PIPELINE=1
 echo ===================================================
 echo   End-to-End Battery Estimator Validation Pipeline
 echo ===================================================

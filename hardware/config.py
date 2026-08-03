@@ -118,20 +118,20 @@ class Config:
     # ── SOC Echo State Network Hyperparameters ─────────────────────────────────
     # Must mirror software/visualiser/config.py → ESN_SOC_* values exactly.
     ESN_SOC_RESERVOIR:       int   = int(os.getenv("ESN_SOC_RESERVOIR",       "500"))
-    ESN_SOC_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOC_SPECTRAL_RADIUS", "0.95"))
-    ESN_SOC_LEAK_RATE:       float = float(os.getenv("ESN_SOC_LEAK_RATE",       "0.15"))
-    ESN_SOC_INPUT_SCALING:   float = float(os.getenv("ESN_SOC_INPUT_SCALING",   "0.8"))
-    ESN_SOC_RIDGE_PARAM:     float = float(os.getenv("ESN_SOC_RIDGE_PARAM",     "1e-5"))
+    ESN_SOC_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOC_SPECTRAL_RADIUS", "0.30"))
+    ESN_SOC_LEAK_RATE:       float = float(os.getenv("ESN_SOC_LEAK_RATE",       "0.25"))
+    ESN_SOC_INPUT_SCALING:   float = float(os.getenv("ESN_SOC_INPUT_SCALING",   "0.2"))
+    ESN_SOC_RIDGE_PARAM:     float = float(os.getenv("ESN_SOC_RIDGE_PARAM",     "1e-4"))
     ESN_SOC_SPARSITY:        float = float(os.getenv("ESN_SOC_SPARSITY",        "0.85"))
     ESN_SOC_WASHOUT:         int   = int(os.getenv("ESN_SOC_WASHOUT",           "50"))
 
     # ── SOH Echo State Network Hyperparameters ─────────────────────────────────
     # Must mirror software/visualiser/config.py → ESN_SOH_* values exactly.
     ESN_SOH_RESERVOIR:       int   = int(os.getenv("ESN_SOH_RESERVOIR",       "400"))
-    ESN_SOH_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOH_SPECTRAL_RADIUS", "0.85"))
-    ESN_SOH_LEAK_RATE:       float = float(os.getenv("ESN_SOH_LEAK_RATE",       "0.02"))
-    ESN_SOH_INPUT_SCALING:   float = float(os.getenv("ESN_SOH_INPUT_SCALING",   "0.4"))
-    ESN_SOH_RIDGE_PARAM:     float = float(os.getenv("ESN_SOH_RIDGE_PARAM",     "1e-5"))
+    ESN_SOH_SPECTRAL_RADIUS: float = float(os.getenv("ESN_SOH_SPECTRAL_RADIUS", "0.95"))
+    ESN_SOH_LEAK_RATE:       float = float(os.getenv("ESN_SOH_LEAK_RATE",       "0.10"))
+    ESN_SOH_INPUT_SCALING:   float = float(os.getenv("ESN_SOH_INPUT_SCALING",   "0.8"))
+    ESN_SOH_RIDGE_PARAM:     float = float(os.getenv("ESN_SOH_RIDGE_PARAM",     "1e-4"))
     ESN_SOH_SPARSITY:        float = float(os.getenv("ESN_SOH_SPARSITY",        "0.85"))
     ESN_SOH_WASHOUT:         int   = int(os.getenv("ESN_SOH_WASHOUT",           "50"))
 

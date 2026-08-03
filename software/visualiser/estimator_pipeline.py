@@ -102,10 +102,17 @@ class EstimatorPipeline:
         self.input_means = input_means
         self.input_stds = input_stds
         
-        if self.esn_soc is not None and self.esn_soc_state is None:
-            self.esn_soc_state = [0.0] * self.esn_soc.n_reservoir
-        if self.esn_soh is not None and self.esn_soh_state is None:
-            self.esn_soh_state = [0.0] * self.esn_soh.n_reservoir
+        if self.esn_soc is not None:
+            if self.esn_soc_state is None or len(self.esn_soc_state) != self.esn_soc.n_reservoir:
+                self.esn_soc_state = [0.0] * self.esn_soc.n_reservoir
+        else:
+            self.esn_soc_state = None
+            
+        if self.esn_soh is not None:
+            if self.esn_soh_state is None or len(self.esn_soh_state) != self.esn_soh.n_reservoir:
+                self.esn_soh_state = [0.0] * self.esn_soh.n_reservoir
+        else:
+            self.esn_soh_state = None
 
     def update_ekf_noise(self, q_soc, q_v1, q_v2, r_meas):
         """Pass noise params directly to the EKF object."""
@@ -235,9 +242,9 @@ class EstimatorPipeline:
         for _ in range(priming_steps):
             self.esn_soc._update(u_scaled.reshape(-1, 1))
             self.esn_soh._update(u_scaled.reshape(-1, 1))
-            if hasattr(self.esn_soc, 'adapt_online'):
+            if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
                 self.esn_soc.adapt_online(u_scaled, initial_soc, learning_rate=0.1)
-            if hasattr(self.esn_soh, 'adapt_online'):
+            if hasattr(self.esn_soh, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
                 self.esn_soh.adapt_online(u_scaled, initial_soh, learning_rate=0.1)
             
         self.esn_soc_state = self.esn_soc.get_state()
@@ -418,7 +425,7 @@ class EstimatorPipeline:
             else:
                 self._esn_step_count = getattr(self, '_esn_step_count', 0) + 1
                 
-            if selected_indices is None:
+            if selected_indices is None or (self.input_means is not None and len(selected_indices) != len(self.input_means)):
                 if self.input_means is not None and len(self.input_means) == 6:
                     selected_indices = [0, 1, 2, 3, 4, 5]
                 else:

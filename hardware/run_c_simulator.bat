@@ -60,4 +60,4 @@ echo [ERROR] No compatible C compiler (gcc, clang, or cl) was found in your PATH
 echo Please install GCC (MinGW), Clang, or MSVC and try again.
 
 :end
-pause
+if not defined VALIDATION_PIPELINE pause
