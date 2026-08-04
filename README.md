@@ -372,7 +372,9 @@ The reservoir recurrent weight matrix $W_{\text{res}}$ of dimension $N_{\text{re
 3. `row_ptr`: An array of length $N_{\text{res}} + 1$ storing the index pointers where each row starts in `val` and `col`.
 
 During inference, the matrix-vector multiplication is computed as:
-$$\text{arg}[i] = W_{\text{in}}[i][0] + \sum_{j=1}^{N_{\text{in}}} W_{\text{in}}[i][j] \cdot u[j] + \sum_{k=\text{row\_ptr}[i]}^{\text{row\_ptr}[i+1]-1} \text{val}[k] \cdot x[\text{col}[k]]$$
+$$
+\text{arg}[i] = W_{\text{in}}[i][0] + \sum_{j=1}^{N_{\text{in}}} W_{\text{in}}[i][j] \cdot u[j] + \sum_{k=\text{row}\_\text{ptr}[i]}^{\text{row}\_\text{ptr}[i+1]-1} \text{val}[k] \cdot x[\text{col}[k]]
+$$
 
 #### Q12/Q15 Fixed-Point Math & Tanh LUT
 For MCUs lacking a hardware FPU (Floating Point Unit), the system supports Q12/Q15 fixed-point arithmetic:
@@ -380,8 +382,12 @@ For MCUs lacking a hardware FPU (Floating Point Unit), the system supports Q12/Q
 - **Weights & States**: Stored in Q15 format: $W_{q15} = \lfloor W \cdot 2^{15} \rfloor$, $x_{q15} = \lfloor x \cdot 2^{15} \rfloor$.
 - **State Multiplications**: $W_{\text{res}, q15} \times x_{q15}$ results in a Q30 value, which is scaled down to Q12 via shift: $\text{value}_{q12} = (\text{Accumulator}) \gg 18$.
 - **Tanh LUT Linear Interpolation**: Cover the range $[0.0, 8.0]$ in steps of $0.25$ (size 33 lookup table). For an input $x_{q12}$:
-  $$\text{idx} = |x_{q12}| \gg 10, \quad \text{frac} = |x_{q12}| \text{ AND } 1023$$
-  $$y_{q15} = \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{idx}] + \text{frac} \cdot \text{LUT}[\text{idx} + 1]}{1024}$$
+  $$
+  \text{idx} = |x_{q12}| \gg 10, \quad \text{frac} = |x_{q12}| \text{ AND } 1023
+  $$
+  $$
+  y_{q15} = \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{idx}] + \text{frac} \cdot \text{LUT}[\text{idx} + 1]}{1024}
+  $$
   Negative inputs apply symmetry: $y_{q15} = -y_{q15}$.
 
 ---
