@@ -238,6 +238,12 @@ class RecursiveLeastSquares:
             self.prev_i = I_meas_ekf
             return self.r0, self.r1, self.c1, self.converged
 
+        # Guard against covariance windup by skipping parameter updates during low current (idle battery)
+        if abs(I_meas_ekf) < 0.1:
+            self.prev_y = y
+            self.prev_i = I_meas_ekf
+            return self.r0, self.r1, self.c1, self.converged
+
         # Regressor vector phi(k) = [-y(k-1), I(k), I(k-1)]^T
         phi = np.array([[-self.prev_y], [I_meas_ekf], [self.prev_i]])
         

@@ -77,7 +77,7 @@ class Config:
 
     # Standalone ESN mode: when True, ESN predictions run in pure data-driven mode (the production estimator).
     # When False, runs with baseline adaptation/hybridization.
-    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "True").lower() in ("true", "1", "t", "yes")
+    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "False").lower() in ("true", "1", "t", "yes")
 
     # -------------------------------------------------------------------------
     # ESN reservoir priming & training washout

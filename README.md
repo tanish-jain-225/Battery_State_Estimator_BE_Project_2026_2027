@@ -312,17 +312,17 @@ flowchart LR
 
 The terminal voltage is mathematically represented as:
 
-\[
+$$
 V_t = OCV(SOC) - I R_0 - V_{RC1} - V_{RC2}
-\]
+$$
 
 where:
 
-- \(V_t\) = Terminal Voltage
-- \(I\) = Battery Current
-- \(R_0\) = Ohmic Resistance
-- \(V_{RC1}\) = Voltage across the first RC network
-- \(V_{RC2}\) = Voltage across the second RC network
+- $V_t$ = Terminal Voltage
+- $I$ = Battery Current
+- $R_0$ = Ohmic Resistance
+- $V_{RC1}$ = Voltage across the first RC network
+- $V_{RC2}$ = Voltage across the second RC network
 
 The embedded Battery Management System continuously measures **voltage**, **current** and **temperature**, performs **SOC**, **SOH**, **SOE** and **SOP** estimation using **Extended Kalman Filter (EKF)** and **Echo State Network (ESN)** algorithms, drives a **status LED through GPIO PA5** and transmits diagnostic information over **UART2 (115200 baud)**.
 
@@ -372,15 +372,15 @@ The reservoir recurrent weight matrix $W_{\text{res}}$ of dimension $N_{\text{re
 3. `row_ptr`: An array of length $N_{\text{res}} + 1$ storing the index pointers where each row starts in `val` and `col`.
 
 During inference, the matrix-vector multiplication is computed as:
-$$arg[i] = W_{\text{in}}[i][0] + \sum_{j=1}^{N_{\text{in}}} W_{\text{in}}[i][j] \cdot u[j] + \sum_{k=row\_ptr[i]}^{row\_ptr[i+1]-1} val[k] \cdot x[col[k]]$$
+$$\text{arg}[i] = W_{\text{in}}[i][0] + \sum_{j=1}^{N_{\text{in}}} W_{\text{in}}[i][j] \cdot u[j] + \sum_{k=\text{row\_ptr}[i]}^{\text{row\_ptr}[i+1]-1} \text{val}[k] \cdot x[\text{col}[k]]$$
 
 #### Q12/Q15 Fixed-Point Math & Tanh LUT
 For MCUs lacking a hardware FPU (Floating Point Unit), the system supports Q12/Q15 fixed-point arithmetic:
 - **Inputs**: Quantized to Q12 format: $u_{q12} = \lfloor u_{\text{scaled}} \cdot 2^{12} \rfloor$.
 - **Weights & States**: Stored in Q15 format: $W_{q15} = \lfloor W \cdot 2^{15} \rfloor$, $x_{q15} = \lfloor x \cdot 2^{15} \rfloor$.
-- **State Multiplications**: $W_{res, q15} \times x_{q15}$ results in a Q30 value, which is scaled down to Q12 via shift: $value_{q12} = (\text{Accumulator}) \gg 18$.
+- **State Multiplications**: $W_{\text{res}, q15} \times x_{q15}$ results in a Q30 value, which is scaled down to Q12 via shift: $\text{value}_{q12} = (\text{Accumulator}) \gg 18$.
 - **Tanh LUT Linear Interpolation**: Cover the range $[0.0, 8.0]$ in steps of $0.25$ (size 33 lookup table). For an input $x_{q12}$:
-  $$\text{idx} = |x_{q12}| \gg 10, \quad \text{frac} = |x_{q12}| \ \& \ 1023$$
+  $$\text{idx} = |x_{q12}| \gg 10, \quad \text{frac} = |x_{q12}| \text{ AND } 1023$$
   $$y_{q15} = \frac{(1024 - \text{frac}) \cdot \text{LUT}[\text{idx}] + \text{frac} \cdot \text{LUT}[\text{idx} + 1]}{1024}$$
   Negative inputs apply symmetry: $y_{q15} = -y_{q15}$.
 
