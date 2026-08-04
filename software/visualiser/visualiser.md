@@ -1,6 +1,6 @@
 # Battery Estimator Evaluation Dashboard (True Physics vs. EKF+CC vs. ML-ESN)
 
-An end-to-end Python, Machine Learning and Flask-based Battery State Estimator comparison and evaluation platform. This project simulates complex lithium-ion battery cell chemistry dynamics, logs real-time telemetry and compares **Traditional Battery State Estimators (Extended Kalman Filter + Coulomb Counting)** side-by-side against **Modern Data-Driven Machine Learning (Reservoir Computing - Echo State Network)** models relative to the **True physical ground truth** of the cell simulator in real-time.
+An end-to-end Python, Machine Learning and Flask-based Battery State Estimator comparison and evaluation platform. This project simulates complex lithium-ion battery cell chemistry dynamics, logs real-time telemetry and compares **Traditional Battery State Estimators (Extended Kalman Filter + Coulomb Counting)** side-by-side (implemented strictly as accuracy baselines for comparison and not as part of the final deployed pipeline) against **Modern Data-Driven Machine Learning (Reservoir Computing - Echo State Network)** models relative to the **True physical ground truth** of the cell simulator in real-time.
 
 ---
 
@@ -28,11 +28,11 @@ Accurate state estimation of Lithium-ion batteries is critical for safe operatio
 
 ### The Challenge:
 Batteries are highly non-linear, time-varying electrochemical systems. Their characteristics shift dynamically under different temperatures, discharge cycles and degradation states.
-- **Traditional Methods**: Standard Coulomb Counting (CC) drifts due to sensor noise. Extended Kalman Filters (EKF) resolve drift but require precise parameters (Equivalent Circuit Models) which are difficult to extract and vary over cell lifetimes.
+- **Traditional Methods**: Standard Coulomb Counting (CC) drifts due to sensor noise. Extended Kalman Filters (EKF) resolve drift but require precise parameters (Equivalent Circuit Models) which are difficult to extract and vary over cell lifetimes. In this project, they serve strictly as baseline benchmarks for comparison and are not part of the final deployed pipeline.
 - **Data-Driven ML**: Machine Learning can map these curves from data. However, traditional recurrent models (LSTMs, GRUs) are computationally too heavy for low-power edge microcontrollers in real-time.
 - **The Solution (Reservoir Computing)**: Echo State Networks (ESNs) project input patterns into a high-dimensional recurrent space (the reservoir) through fixed random weights. Only the linear output layer (readout) is trained. This yields high recurrent representation capacity with extremely low computational cost, making it ideal for edge battery state estimator microcontrollers.
 
-This dashboard provides an evaluation sandbox to compare EKF and ESN estimators side-by-side against the absolute true physical state of the battery pack under diverse dynamic load cycles.
+This dashboard provides an evaluation sandbox to compare the ESN (the proposed production estimator replacement) side-by-side against EKF and Coulomb Counting baselines (retained for benchmarking only), all relative to the absolute true physical state of the battery cell under diverse dynamic load cycles.
 
 ---
 

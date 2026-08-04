@@ -1,3 +1,5 @@
+[← Back to README](../../README.md) · [← Back to Software](../software.md)
+
 # Standalone Battery Physics Simulator Server
 
 A high-fidelity real-time Python battery physics engine and simulation server. This component runs a **second-order Equivalent Circuit Model (ECM) with 2-RC branches**, dynamic cell thermal models, capacity-fading degradation models and sensor noise/fault injectors. It serves as the data generation pipeline for the Battery State Estimator comparison platform.
@@ -197,13 +199,21 @@ pip install -r requirements.txt
 ```
 
 ### Step 2: Start MongoDB (Optional)
-Ensure a MongoDB service is active on Port 27017. If unavailable, the simulator will log data in-memory fallback arrays.
+
+> [!NOTE]
+> If MongoDB is unavailable, the simulator will log data in in-memory fallback arrays automatically. No configuration changes needed.
+
+Ensure a MongoDB service is active on Port 27017.
 
 ### Step 3: Run the Server
 Launch the Flask simulator server:
 ```bash
 python app.py
 ```
+
+> [!WARNING]
+> When deploying with Gunicorn, use only **one worker** (`--workers 1`). The physics simulator runs a background telemetry loop on an active thread — multiple workers will duplicate this thread and corrupt the database state.
+
 - The backend pacing loop will initialize and log `Simulator background thread active.`
 - The server will listen on port `http://localhost:8000`. You can open this URL directly in a web browser to monitor simulation states in a simplified developer console.
 - Once running, the visualizer comparison application (on Port 5000) will automatically detect this port and sync telemetry directly.

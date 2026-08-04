@@ -1,3 +1,5 @@
+[← Back to README](../README.md)
+
 # Artifact Policy
 
 This document outlines the versioning, maintenance and generation guidelines for the dataset and model weights stored within this repository. To ensure reviewers and evaluators can immediately run the visualization and edge diagnostic demonstrations, a pre-compiled set of model parameters is tracked.

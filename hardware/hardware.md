@@ -1,6 +1,21 @@
+[← Back to README](../README.md)
+
 # Hardware Subsystem
 
 This document provides a technical guide to the embedded hardware subsystem, including folder layouts, Compressed Sparse Row (CSR) matrix representation, fixed-point Q12/Q15 conversion math, wiring guides and firmware build setups.
+
+> [!IMPORTANT]
+> **Project Scope & Feasibility Validation**: The primary deliverable of this project is a data-driven ESN estimator (software-validated for SOC/SOH), not a hardware product. The hardware deployment on STM32 exists solely as a feasibility check to validate whether the ESN's reservoir-computing approach is deployable under real-time, low-power constraints (using the ESN classifier variant). Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself. Porting the SOC/SOH estimator itself to STM32 firmware is reserved for future work. For the theoretical foundations behind these optimizations, see the [research paper](../reference/paper.md).
+
+---
+
+## 📑 Table of Contents
+1. [Hardware Folder Structure](#-hardware-folder-structure)
+2. [ESN Classifier Interface Specifications](#-esn-classifier-interface-specifications)
+3. [Embedded Optimizations](#-embedded-optimizations)
+4. [Offline Model Export Pipeline](#️-offline-model-export-pipeline)
+5. [Hardware Wiring & Pinout Reference](#-hardware-wiring--pinout-reference)
+6. [Running the Desktop Verification Simulator](#-running-the-desktop-verification-simulator)
 
 ---
 

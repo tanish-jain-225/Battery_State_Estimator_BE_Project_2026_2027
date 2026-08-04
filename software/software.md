@@ -1,6 +1,17 @@
+[← Back to README](../README.md)
+
 # Software Subsystem
 
 This document provides a technical overview of the software architecture, directories layout, service routing and core classes that implement the battery physics simulation and estimation comparative visualiser.
+
+---
+
+## 📑 Table of Contents
+1. [Software Directory Structure](#-software-directory-structure)
+2. [Software Data Flow](#-software-data-flow)
+3. [Main Modules & Python Classes Reference](#️-main-modules--python-classes-reference)
+4. [Running the Software Services Locally](#-running-the-software-services-locally)
+5. [Verification and Testing](#-verification-and-testing)
 
 ---
 
@@ -41,16 +52,16 @@ The flowchart below traces the flow of telemetry data from the simulator, throug
 
 ```mermaid
 flowchart LR
-    subgraph Physics Engine (Port 8000)
+    subgraph "Physics Engine (Port 8000)"
         Sim["battery_simulator.py<br>(2-RC ECM Solver)"]
         SimApp["app.py (Simulator)<br>(Telemetry Endpoint)"]
     end
 
-    subgraph Data Layer
+    subgraph "Data Layer"
         DB[("MongoDB Database<br>or Circular Buffer")]
     end
 
-    subgraph Dashboard Service (Port 5000)
+    subgraph "Dashboard Service (Port 5000)"
         VisApp["app.py (Visualiser)<br>(Dashboard Server)"]
         EstPipe["estimator_pipeline.py<br>(EKF, CC and ESN Observers)"]
     end
@@ -66,7 +77,7 @@ flowchart LR
 
 ## 🛠️ Main Modules & Python Classes Reference
 
-Below is a breakdown of the key files and classes implementing the battery estimator:
+Below is a breakdown of the key files and classes implementing the battery estimator. Note that EKF, Coulomb Counting, and RLS are implemented strictly as accuracy benchmarks/baselines for comparison against the ESN:
 
 ### 1. Physics Simulator Module
 - **[`simulator/battery_simulator.py`](simulator/battery_simulator.py)**: Contains the `BatterySimulator` class.
@@ -90,6 +101,9 @@ Below is a breakdown of the key files and classes implementing the battery estim
 ---
 
 ## 🚀 Running the Software Services Locally
+
+> [!NOTE]
+> Both services must be running simultaneously for the full system to operate. The visualiser (Port 5000) fetches telemetry from the simulator (Port 8000).
 
 1. Install Python packages from the repository root:
    ```bash

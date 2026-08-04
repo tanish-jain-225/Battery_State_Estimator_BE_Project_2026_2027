@@ -1,8 +1,18 @@
+[← Back to README](../README.md)
+
 # Theoretical Foundations of Cyber-Physical Battery State Estimation
 
 This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic and machine learning methods implemented in the cyber-physical battery state estimator system.
 
 ---
+
+## 📑 Table of Contents
+1. [Electro-Thermal Battery Physics & Modeling (2-RC ECM)](#1-electro-thermal-battery-physics--modeling-2-rc-ecm)
+2. [State Estimation via Extended Kalman Filtering (EKF)](#2-state-estimation-via-extended-kalman-filtering-ekf)
+3. [Data-Driven Estimation via Echo State Networks (ESN)](#3-data-driven-estimation-via-echo-state-networks-esn)
+4. [Analytical Comparison of Estimation Methodologies](#4-analytical-comparison-of-estimation-methodologies)
+5. [Embedded Edge Optimizations](#5-embedded-edge-optimizations)
+6. [References & Literature](#6-references--literature)
 
 ## 1. Electro-Thermal Battery Physics & Modeling (2-RC ECM)
 
@@ -58,9 +68,9 @@ $$R_0(t) = R_{0, \text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - \text{SOH}(t))\r
 
 ## 2. State Estimation via Extended Kalman Filtering (EKF)
 
-The Extended Kalman Filter (EKF), implemented within the [`estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py), serves as the control-theoretic observer to filter sensor noise and track internal battery states. 
+The Extended Kalman Filter (EKF) and online RLS parameter identification are implemented purely to serve as rigorous baselines for benchmarking the data-driven ESN's accuracy, rather than as part of the final deployed pipeline. The EKF is implemented within the [`estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py) as a control-theoretic observer to filter sensor noise and track internal battery states.
 
-The joint SOC and SOH estimation is theoretically aligned with the multi-timescale EKF framework proposed by **Li et al. (2020)** [1]. Because State of Health changes slowly over cycles, updating capacity fade on the same micro-timescale as SOC (which tracks transient voltage fluctuations) is computationally redundant and prone to noise. Following Li et al., our estimator pipeline separates the estimation timescales: the EKF executes at the microscale (at each telemetry step, $T_s = 1\text{ s}$) to update the SOC ($S_{k,l}$ and polarization voltages $V_1, V_2$), while the Recursive Least Squares (RLS) parameter identifier and SOH resistance tracker update the capacity $C_k$ and internal resistance $R_0$ at a slower macroscopic scale.
+The baseline joint SOC and SOH estimation is theoretically aligned with the multi-timescale EKF framework proposed by **Li et al. (2020)** [1]. Because State of Health changes slowly over cycles, updating capacity fade on the same micro-timescale as SOC (which tracks transient voltage fluctuations) is computationally redundant and prone to noise. Following Li et al., our baseline pipeline separates the estimation timescales: the EKF executes at the microscale (at each telemetry step, $T_s = 1\text{ s}$) to update the SOC ($S_{k,l}$ and polarization voltages $V_1, V_2$), while the Recursive Least Squares (RLS) parameter identifier and SOH resistance tracker update the capacity $C_k$ and internal resistance $R_0$ at a slower macroscopic scale.
 
 ### State Space Formulation
 The discrete-time state vector is defined as $x_k = [\text{SOC}_k, V_{1,k}, V_{2,k}]^T$. The discrete state transition function $f(x_k, u_k)$ updates the states:
@@ -98,7 +108,7 @@ At each simulation tick $k$, the EKF executes prediction and correction stages:
 
 ## 3. Data-Driven Estimation via Echo State Networks (ESN)
 
-Reservoir Computing (RC), specifically **Echo State Networks (ESN)**, is utilized for non-linear, data-driven regression (SOC/SOH tracking) and classification (thermal safety status). Data-driven battery state estimation using recurrent reservoir states is a highly efficient alternative to deep recurrent architectures (such as LSTMs or GRUs) on low-power microcontrollers. This strategy is highlighted by **Kamarudin et al. (2026)** [2], who developed a Reservoir Spiking Neural Network (RSNN) to track SOC under dynamic discharge cycles. While our project implements a continuous-time leaky-integrator ESN with a linear readout rather than a spiking neuromorphic reservoir, the underlying principles of utilizing a high-dimensional, sparse recurrent projection to capture non-linear temporal dynamics are fully synchronized.
+Reservoir Computing (RC), specifically **Echo State Networks (ESN)**, is proposed as the primary deliverable and a direct, standalone alternative (replacement) to traditional observers (EKF and Coulomb Counting). It is utilized for non-linear, data-driven regression (SOC/SOH tracking) and classification (thermal safety status). Data-driven battery state estimation using recurrent reservoir states is a highly efficient alternative to deep recurrent architectures (such as LSTMs or GRUs) on low-power microcontrollers. This strategy is highlighted by **Kamarudin et al. (2026)** [2], who developed a Reservoir Spiking Neural Network (RSNN) to track SOC under dynamic discharge cycles. While our project implements a continuous-time leaky-integrator ESN with a linear readout rather than a spiking neuromorphic reservoir, the underlying principles of utilizing a high-dimensional, sparse recurrent projection to capture non-linear temporal dynamics are fully synchronized.
 
 ### Echo State Network Formulation
 Unlike standard Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM) networks, ESNs project input signals into a high-dimensional, fixed, recurrent state space (the "reservoir") and only train the linear output readout weights.
@@ -147,9 +157,9 @@ $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T \left(\mathb
 
 ## 4. Analytical Comparison of Estimation Methodologies
 
-The table below contrasts the three observers evaluated by the comparative visualiser dashboard:
+The table below contrasts the three methodologies evaluated in the project. Note that Coulomb Counting and Extended Kalman Filter are implemented strictly as baseline benchmarks for comparison/evaluation, while the Echo State Network is the proposed standalone alternative:
 
-| Criteria | Coulomb Counting (CC) | Extended Kalman Filter (EKF) | Echo State Network (ESN) |
+| Criteria | Coulomb Counting (CC) [Baseline Benchmark] | Extended Kalman Filter (EKF) [Baseline Benchmark] | Echo State Network (ESN) [Proposed Alternative] |
 | :--- | :--- | :--- | :--- |
 | **Mathematical Battery Model Dependency** | None (Integrates current input only). | High (Requires OCV curve lookup and 2-RC parameter matrices). | None (Learns mappings from training telemetry sets). |
 | **Edge Compute Cost (Microcontroller)** | Extremely Low (Single integration operation). | Medium (Matrix multiplications, Jacobian computation, inversion). | Low with Optimizations (CSR sparse representation, LUT tanh math). |

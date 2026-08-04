@@ -1,12 +1,25 @@
+[← Back to README](../README.md)
+
 # System Specification
 
 This document defines the interfaces, state flow, runtime modes, API payloads and validation scope for the Battery State Estimator.
 
 ---
 
+## 📑 Table of Contents
+1. [System Goal](#system-goal)
+2. [Runtime Components](#runtime-components)
+3. [Data Flow & Architecture](#data-flow--architecture)
+4. [Telemetry Schema](#telemetry-schema)
+5. [Detailed API Endpoints Spec](#detailed-api-endpoints-spec)
+6. [Security & Authentication](#security--authentication)
+7. [Estimator Pipeline Architecture](#estimator-pipeline-architecture)
+8. [Edge Classifier Specification](#edge-classifier-specification)
+9. [Validation Scope](#validation-scope)
+
 ## System Goal
 
-The system aims to estimate battery State of Charge (SOC) and State of Health (SOH) while classifying the thermal safety state under dynamic load profiles. The design integrates a physics-based simulator, traditional control-theoretic estimators, data-driven reservoir-computing estimators and an optimized embedded edge classifier.
+The primary deliverable of this project is a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting) for SOC and SOH tracking. EKF and Coulomb Counting are implemented strictly as baseline benchmarks for comparison and not as part of the final deployed pipeline. The 2-RC physics-based simulator serves purely as a data-generation tool, and the STM32 edge classifier serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real low-power BMS constraints. Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself.
 
 ---
 
@@ -261,9 +274,9 @@ $$\text{Key} = \text{SHA-256}(\text{MONGODB\_URI})$$
 
 ## Estimator Pipeline Architecture
 
-The visualiser enriches telemetry data with dynamic state observations computed in the background:
-- **State of Charge (SOC)**: Runs Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF) and a trained Echo State Network (ESN) concurrently.
-- **State of Health (SOH)**: Decoupled to track slowly varying capacity and internal resistance trends via Recursive Least Squares (RLS) parameter estimates and ESN model evaluations.
+The visualiser enriches telemetry data with dynamic state observations computed in the background, implementing EKF and CC strictly as baseline benchmarks to quantify the ESN's standalone performance:
+- **State of Charge (SOC)**: Runs Coulomb Counting (CC) and a Sage-Husa Adaptive Extended Kalman Filter (EKF) concurrently purely as accuracy baselines, compared side-by-side with the proposed production Echo State Network (ESN) estimator.
+- **State of Health (SOH)**: Decoupled to track slowly varying capacity and internal resistance trends via online RLS resistance-growth parameters identification (baseline benchmarking) compared against the proposed data-driven ESN SOH model.
 - **Diagnostics Outputs**: Monitors anomalies to classify faults:
   - `DIAG_DROPOUT_VOLTAGE_THRESHOLD` (< 1.0 V) -> **Sensor Dropout**.
   - `DIAG_THERMAL_TEMP_THRESHOLD` (> 60 °C) or rate of rise (> 2.0 °C/s) -> **Thermal Runaway Warning**.
@@ -273,7 +286,7 @@ The visualiser enriches telemetry data with dynamic state observations computed 
 
 ## Edge Classifier Specification
 
-The embedded classifier running on the microcontroller consumes real-time telemetry inputs to flag thermal hazard classes.
+The embedded classifier running on the STM32 microcontroller serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real-time, low-power BMS constraints. It consumes real-time telemetry inputs to flag thermal hazard classes. Success is defined by algorithmic accuracy and efficiency, rather than the hardware demo itself (while the SOC/SOH estimator itself remains software-validated, with hardware porting reserved for future work).
 
 * **Network Dimensions**: 3 Inputs $\rightarrow$ 50 Reservoir Nodes (CSR format) $\rightarrow$ 3 Output Classes.
 * **Target Classes**:

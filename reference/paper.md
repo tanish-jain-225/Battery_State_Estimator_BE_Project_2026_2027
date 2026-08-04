@@ -1,3 +1,5 @@
+[← Back to README](../README.md)
+
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 
 **Abstract** — Reliable estimation of State of Charge (SOC) and State of Health (SOH) in Lithium-Ion batteries is critical for electric vehicles (EVs) and smart grids. Traditional estimators, such as the Extended Kalman Filter (EKF), rely on high-fidelity physical models but degrade under unmodeled dynamics and cell aging. Conversely, deep recurrent neural networks present high computational costs that prevent edge deployment. This paper presents a co-designed cyber-physical system combining a 2-RC Equivalent Circuit Model (ECM) simulator, EKF state observers and Echo State Networks (ESNs) for state tracking. Additionally, we implement an optimized, edge-capable ESN classifier on an ARM Cortex-M microcontroller for thermal safety diagnostics. By introducing Compressed Sparse Row (CSR) sparse matrix-vector multiplication (SpMV) and fixed-point Q12/Q15 integer arithmetic with lookup table (LUT) linear interpolation, we achieve a **6.7× execution speedup** and save **~10 KB of Flash memory**, while maintaining classification accuracy at **98.40%** under dynamic drive cycles.
@@ -93,7 +95,7 @@ The MCU execution metrics were verified on an ARM Cortex-M class microcontroller
 ---
 
 ## V. Conclusion
-This work demonstrates a co-designed cyber-physical system for battery state estimation and diagnostics. By integrating control-theoretic EKF observers and data-driven Echo State Networks, the system achieves sub-1.5% estimation errors. Furthermore, compiling ESNs with CSR matrix compression and Q12/Q15 fixed-point LUT math enables high-performance, real-time safety classification directly on low-power edge hardware. Future research will explore multi-cell pack configurations and online reservoir tuning.
+We propose a data-driven Echo State Network (ESN) estimator as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting), which are utilized strictly as baseline benchmarks for comparison. By benchmarking the ESN against EKF and Coulomb Counting, we demonstrate that the ESN achieves sub-1.5% estimation errors without precise parameter models or drift. Furthermore, compiling ESNs with CSR matrix compression and Q12/Q15 fixed-point LUT math enables high-performance, real-time safety classification directly on low-power edge hardware as a feasibility check. Future research will explore porting the full SOC/SOH estimator to firmware, online reservoir tuning, and multi-cell configurations.
 
 ---
 
