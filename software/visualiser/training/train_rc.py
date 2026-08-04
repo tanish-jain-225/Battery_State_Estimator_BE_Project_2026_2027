@@ -213,10 +213,10 @@ class EchoStateNetwork:
             return
         u_t = np.array(u_t).reshape(-1, 1)
         state_vec = np.vstack(([1.0], u_t, self.x))
-        pred = float(np.dot(self.W_out, state_vec)[0, 0])
+        pred = np.dot(self.W_out, state_vec).item()
         error = target - pred
         # Online RLS gradient update on readout weights
-        norm_factor = float(np.dot(state_vec.T, state_vec)) + 1e-4
+        norm_factor = np.dot(state_vec.T, state_vec).item() + 1e-4
         self.W_out += learning_rate * error * state_vec.T / norm_factor
 
     def predict(self, U):
