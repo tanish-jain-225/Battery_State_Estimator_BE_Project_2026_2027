@@ -1,4 +1,4 @@
-// BMS Physical Simulator - Playback Dashboard Logic
+// Battery Physics-Based Simulator - Playback Dashboard Logic
 
 document.addEventListener('DOMContentLoaded', () => {
     // Control Elements

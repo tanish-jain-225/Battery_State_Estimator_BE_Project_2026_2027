@@ -1,8 +1,8 @@
 [← Back to README](../README.md)
 
-# Theoretical Foundations of Cyber-Physical Battery State Estimation
+# Theoretical Foundations of Battery State Estimation: An ESN-Based Alternative to EKF and Coulomb Counting
 
-This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic and machine learning methods implemented in the cyber-physical battery state estimator system.
+This document provides a comprehensive theoretical review of the electro-chemical, control-theoretic and machine learning methods implemented in the Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting.
 
 ---
 

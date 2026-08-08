@@ -2,7 +2,7 @@
 
 ## Project Title
 
-**Battery State Estimator: Cyber-Physical State Estimation and Edge Diagnostics**
+**BATTERY STATE ESTIMATOR: AN ESN-BASED ALTERNATIVE TO EKF AND COULOMB COUNTING**
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![Embedded C](https://img.shields.io/badge/Embedded_C-C99-orange?style=flat)](https://en.cppreference.com/w/c/99)
@@ -86,7 +86,7 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 ## Abstract
 
-Reliable SOC and SOH estimation is essential for electric vehicles, smart grids and battery-powered systems. Traditional Battery Management Systems often rely on Coulomb Counting or Extended Kalman Filters, which can drift under aging, temperature changes and unmodeled cell behavior. This project implements a **strictly single-cell battery state estimation framework** (avoiding series unbalance pack complexity while maintaining maximum fidelity) featuring a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (which serve strictly as baseline benchmarks rather than deployment components).
+Reliable SOC and SOH estimation is essential for electric vehicles, smart grids and battery-powered systems. Traditional battery state estimation systems often rely on Coulomb Counting or Extended Kalman Filters, which can drift under aging, temperature changes and unmodeled cell behavior. This project implements a **strictly single-cell battery state estimation framework** (avoiding series unbalance pack complexity while maintaining maximum fidelity) featuring a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (which serve strictly as baseline benchmarks rather than deployment components).
 
 To evaluate and benchmark the ESN, the system runs parallel baselines: a 2-RC electro-thermal physics simulator (as a data-generation tool), a traditional EKF with **covariance trace guards** (resets $P$ if trace exceeds $10.0$ or diagonal entries become negative) and an online **Variable Forgetting Factor (VFF-RLS)** SOH tracker. The software side features a comparative visualiser dashboard exposing a detailed transient state observer panel presenting ESN vs. EKF vs. Coulomb Counting comparison metrics. The hardware side includes C99 inference code supporting side-by-side comparative profiling of float and fixed-point execution paths, serving as a **feasibility check** on STM32 hardware to test whether the ESN's reservoir-computing approach is deployable under real embedded constraints (while the SOC/SOH estimator itself remains software-validated, with hardware porting reserved for future work). Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself. Validation targets include sub-1.5 percent SOC RMSE, sub-1.0 percent SOH RMSE, 99.92 percent thermal safety classification accuracy and sub-1 ms sparse reservoir execution.
 
@@ -117,7 +117,7 @@ To evaluate and benchmark the ESN, the system runs parallel baselines: a 2-RC el
 
 ## Existing System
 
-Existing BMS approaches commonly use Coulomb Counting, voltage lookup tables, or Kalman filters. These methods are useful but have limitations:
+Existing battery state estimation approaches commonly use Coulomb Counting, voltage lookup tables, or Kalman filters. These methods are useful but have limitations:
 - **High drift**: Coulomb Counting accumulates error without periodic correction.
 - **Model mismatch**: EKF performance depends on accurate battery parameters and OCV-SOC curves.
 - **Limited aging awareness**: Basic systems may not adapt well to resistance growth and capacity fade.
@@ -308,7 +308,7 @@ flowchart LR
 - **R₀** models the **instantaneous ohmic internal resistance** of the battery.
 - **R₁–C₁** represents the **fast polarization (charge-transfer) dynamics**.
 - **R₂–C₂** represents the **slow diffusion polarization dynamics**.
-- **Vt** is the **terminal voltage** measured by the Battery Management System (BMS).
+- **Vt** is the **terminal voltage** measured by the battery state estimator.
 
 The terminal voltage is mathematically represented as:
 
@@ -324,7 +324,7 @@ where:
 - $V_{RC1}$ = Voltage across the first RC network
 - $V_{RC2}$ = Voltage across the second RC network
 
-The embedded Battery Management System continuously measures **voltage**, **current** and **temperature**, performs **SOC**, **SOH**, **SOE** and **SOP** estimation using **Extended Kalman Filter (EKF)** and **Echo State Network (ESN)** algorithms, drives a **status LED through GPIO PA5** and transmits diagnostic information over **UART2 (115200 baud)**.
+The embedded battery state estimator continuously measures **voltage**, **current** and **temperature**, performs **SOC**, **SOH**, **SOE** and **SOP** estimation using **Extended Kalman Filter (EKF)** and **Echo State Network (ESN)** algorithms, drives a **status LED through GPIO PA5** and transmits diagnostic information over **UART2 (115200 baud)**.
 
 ---
 
@@ -635,7 +635,7 @@ Detailed view of the SOC and SOH estimation comparison charts with the ESN model
 
 1. Electric vehicle battery state estimation and diagnostics.
 2. Battery energy storage system monitoring.
-3. Embedded thermal safety classification for low-power BMS nodes.
+3. Embedded thermal safety classification for low-power battery estimator nodes.
 4. Academic research on data-driven and reservoir computing battery state estimators.
 5. Operator training and fault-injection demonstrations.
 

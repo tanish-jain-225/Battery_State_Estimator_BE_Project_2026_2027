@@ -153,7 +153,7 @@ def update_sim_progress(progress_dict):
         except Exception as e:
             print(f"Battery State Estimator — Error updating simulation progress: {e}")
 
-# Spawns physical battery simulator
+# Spawns physics-based battery simulator
 simulator = BatterySimulator()
 current_chemistry = None
 
@@ -182,7 +182,7 @@ def generator_loop():
                 else:
                     simulator.change_chemistry(chemistry_name)
                 current_chemistry = chemistry_name
-                print(f"BMS Physics profile loaded: {chemistry_name.upper()}")
+                print(f"Battery Physics profile loaded: {chemistry_name.upper()}")
                 
             if sim_running:
                 # Sync physical parameters
@@ -806,8 +806,8 @@ if __name__ == '__main__':
         except Exception:
             pass
 
-    print("\nBMS Physical Simulator")
-    print(f"Hardware-in-the-Loop Telemetry Generator • http://localhost:{Config.PORT}\n")
+    print("\nBattery Physics-Based Simulator")
+    print(f"Physics-Based Telemetry Generator • http://localhost:{Config.PORT}\n")
     sim_status = "Running" if local_state.get('sim_running') else "Idle"
     print(f"Simulator: {sim_status}")
     if _mongodb_connected:

@@ -31,7 +31,7 @@ class Config:
     SIMULATION_STEP_DELAY = float(os.environ.get("SIMULATION_STEP_DELAY", 1.0))
 
     # -------------------------------------------------------------------------
-    # BMS Sensor Noise Standard Deviations
+    # Battery Sensor Noise Standard Deviations
     # -------------------------------------------------------------------------
     DEFAULT_NOISE_VOLTAGE     = float(os.environ.get("DEFAULT_NOISE_VOLTAGE", 0.005))   # Volts
     DEFAULT_NOISE_CURRENT     = float(os.environ.get("DEFAULT_NOISE_CURRENT", 0.05))    # Amperes

@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diagHealthRing && diagStatusTitle && diagStatusDesc) {
                 if (hasThermal || hasSensor) {
                     let desc = '';
-                    if (hasSensor)   desc += 'BMS sensor connection lost (voltage flatlined). ';
+                    if (hasSensor)   desc += 'Battery sensor connection lost (voltage flatlined). ';
                     if (hasThermal)  desc += 'Extreme cell temperature runaway detected! ';
                     if (hasShort)    desc += 'Internal micro-short circuit leakage detected. ';
                     setHealthRing(diagHealthRing, diagStatusTitle, diagStatusDesc,

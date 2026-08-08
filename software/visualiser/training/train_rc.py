@@ -254,7 +254,7 @@ class EchoStateNetwork:
 def generate_full_range_dataset():
     """
     Generates a high-fidelity synthetic battery dataset covering the full range
-    of SOC (0% to 100%) and SOH (80% to 100%) using the physical simulator.
+    of SOC (0% to 100%) and SOH (80% to 100%) using the physics simulator.
     """
     try:
         from battery_simulator import BatterySimulator
@@ -343,7 +343,7 @@ def main():
                 df = pd.read_csv(io.StringIO(csv_data))
                 print(f"Remote dataset loaded ({len(df)} rows).")
             else:
-                print("Warning: Remote URL returned HTML webpage instead of raw CSV. Falling back to local/physical dataset.")
+                print("Warning: Remote URL returned HTML webpage instead of raw CSV. Falling back to local/simulated dataset.")
         except Exception as e:
             print(f"Error loading remote CSV from CSV_URL: {e}")
 
@@ -356,9 +356,9 @@ def main():
         except Exception as e:
             print(f"Error loading local dataset: {e}")
 
-    # 3. Fallback: Physical simulator dataset generator
+    # 3. Fallback: Physics simulator dataset generator
     if df is None:
-        print("Generating high-fidelity full-range fallback dataset from physical battery simulator...")
+        print("Generating high-fidelity full-range fallback dataset from physics battery simulator...")
         try:
             df = generate_full_range_dataset()
             print(f"Fallback dataset generated successfully: {len(df)} rows.")

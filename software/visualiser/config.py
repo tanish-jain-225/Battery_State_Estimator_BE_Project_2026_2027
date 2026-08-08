@@ -139,7 +139,7 @@ class Config:
     ESN_WASHOUT_STEPS    = int(os.environ.get("ESN_WASHOUT_STEPS", 50))
 
     # -------------------------------------------------------------------------
-    # BMS Sensor Noise Base Standard Deviations
+    # Battery Sensor Noise Base Standard Deviations
     # -------------------------------------------------------------------------
     DEFAULT_NOISE_VOLTAGE = float(os.environ.get("DEFAULT_NOISE_VOLTAGE", 0.005))       # Volts
     DEFAULT_NOISE_CURRENT = float(os.environ.get("DEFAULT_NOISE_CURRENT", 0.05))        # Amperes

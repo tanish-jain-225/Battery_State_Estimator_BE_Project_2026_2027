@@ -2010,7 +2010,7 @@ input:checked + .slider::before {
 }
 
 /* ============================================================
-   BMS Noise & Fault Calibration Styling
+   Estimator Noise & Fault Calibration Styling
    ============================================================ */
 
 .margin-top-md { margin-top: 20px; }
@@ -2052,7 +2052,7 @@ input:checked + .slider::before {
     color: var(--text-primary);
 }
 
-.bms-slider {
+.estimator-slider {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
@@ -2063,7 +2063,7 @@ input:checked + .slider::before {
     transition: background 0.3s;
 }
 
-.bms-slider::-webkit-slider-thumb {
+.estimator-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 14px;
@@ -2075,7 +2075,7 @@ input:checked + .slider::before {
     transition: transform 0.1s;
 }
 
-.bms-slider::-webkit-slider-thumb:hover {
+.estimator-slider::-webkit-slider-thumb:hover {
     transform: scale(1.2);
 }
 

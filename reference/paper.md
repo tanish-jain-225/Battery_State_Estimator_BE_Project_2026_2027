@@ -2,14 +2,19 @@
 
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 
+**Tanish Sanghvi, Akshay Nambiar, Sanjana Patankar, Satvik Verma, and Kadambari Sharma**  
+*Department of Automation and Robotics, VESIT, Mumbai, India*  
+*Emails: {2023.tanish.sanghvi, 2023.akshay.nambiar, 2023.sanjana.patankar, 2023.satvik.verma}@ves.ac.in*
+
+
 **Abstract** — Reliable estimation of State of Charge (SOC) and State of Health (SOH) in Lithium-Ion batteries is critical for electric vehicles (EVs) and smart grids. Traditional estimators, such as the Extended Kalman Filter (EKF), rely on high-fidelity physical models but degrade under unmodeled dynamics and cell aging. Conversely, deep recurrent neural networks present high computational costs that prevent edge deployment. This paper presents a co-designed cyber-physical system combining a 2-RC Equivalent Circuit Model (ECM) simulator, EKF state observers and Echo State Networks (ESNs) for state tracking. Additionally, we implement an optimized, edge-capable ESN classifier on an ARM Cortex-M microcontroller for thermal safety diagnostics. By introducing Compressed Sparse Row (CSR) sparse matrix-vector multiplication (SpMV) and fixed-point Q12/Q15 integer arithmetic with lookup table (LUT) linear interpolation, we achieve a **6.7× execution speedup** and save **~10 KB of Flash memory**, while maintaining classification accuracy at **98.40%** under dynamic drive cycles.
 
 ---
 
 ## I. Introduction
-Battery Management Systems (BMS) must accurately estimate internal cell states that cannot be measured directly. State of Charge (SOC) represents the remaining chemical energy, whereas State of Health (SOH) represents the capacity fade and resistance growth due to electrochemical degradation.
+Battery state estimators must accurately estimate internal cell states that cannot be measured directly. State of Charge (SOC) represents the remaining chemical energy, whereas State of Health (SOH) represents the capacity fade and resistance growth due to electrochemical degradation.
 
-Historically, observers like the Extended Kalman Filter (EKF) have dominated BMS implementations. By linearizing cell voltage equations around the current operating point, EKF dynamically corrects coulomb-counting errors. However, parameter drift under thermal variation and accelerated aging degrades EKF accuracy. To overcome this, joint estimation frameworks of SOC and SOH have been developed. Notably, Li et al. [1] proposed a multi-time scale EKF observer design that decouples SOC estimation at a microscopic timescale from slowly changing capacity (SOH) estimation at a macroscopic timescale, reducing computational strain and improving robustness.
+Historically, observers like the Extended Kalman Filter (EKF) have dominated battery state estimation implementations. By linearizing cell voltage equations around the current operating point, EKF dynamically corrects coulomb-counting errors. However, parameter drift under thermal variation and accelerated aging degrades EKF accuracy. To overcome this, joint estimation frameworks of SOC and SOH have been developed. Notably, Li et al. [1] proposed a multi-time scale EKF observer design that decouples SOC estimation at a microscopic timescale from slowly changing capacity (SOH) estimation at a macroscopic timescale, reducing computational strain and improving robustness.
 
 In parallel, machine learning approaches have emerged to capture unmodeled cell dynamics. While deep recurrent models (e.g., LSTMs) offer strong sequence tracking, their high computational cost limits edge deployment. Recently, Kamarudin et al. [2] proposed a Reservoir Spiking Neural Network (RSNN) utilizing biological spike-encoding and a rectified linear unit (ReLU) readout layer to achieve data-efficient, low-power SOC estimation.
 
@@ -19,7 +24,7 @@ In this work, we present a co-designed cyber-physical system. We implement a dua
 
 ## II. System Architecture & Methodology
 
-The system is structured as a modular cyber-physical loop. It consists of a physical simulator modeling cell electro-thermal dynamics and fault states, an observer dashboard running EKF and ESN estimators and an optimized embedded diagnostic firmware.
+The system is structured as a modular cyber-physical loop. It consists of a physics-based simulator modeling cell electro-thermal dynamics and fault states, an observer dashboard running EKF and ESN estimators and an optimized embedded diagnostic firmware.
 
 ### A. Battery Physics Simulation
 The battery cell is represented by a 2-RC Equivalent Circuit Model (ECM), modeling polarization voltage dynamics ($V_1, V_2$), ohmic losses ($I \cdot R_0$), convective cooling and capacity fade. Parameter values depend on temperature ($T$) via Arrhenius equations:

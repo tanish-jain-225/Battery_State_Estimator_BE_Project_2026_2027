@@ -36,7 +36,7 @@ simulator/
 │   ├── css/
 │   │   └── style.css (Premium light-mode glassmorphism styling)
 │   ├── images/
-│   │   ├── favicon.ico (BMS icon favicon)
+│   │   ├── favicon.ico (Battery icon favicon)
 │   │   └── logo.png (Brand identity logo)
 │   └── js/
 │       └── generator.js (Developer simulation dashboard javascript controller)

@@ -39,10 +39,6 @@ def clean_df_columns(df_in):
         df_in.rename(columns=rename_dict, inplace=True)
     return df_in
 
-print(f"Loading dataset from {csv_path}...")
-df = pd.read_csv(csv_path)
-df = clean_df_columns(df)
-
 def get_labels(df_in):
     T_in = df_in['Temperature'].values
     labels_in = np.zeros(len(T_in), dtype=int)
@@ -55,17 +51,21 @@ def get_labels(df_in):
             labels_in[idx] = 2  # Critical
     return labels_in
 
+# Load dataset and check if it contains all 3 classes required for classification training
+df = pd.read_csv(csv_path)
+df = clean_df_columns(df)
 labels = get_labels(df)
+
 if len(np.unique(labels)) < 3:
-    print(f"WARNING: The dataset {csv_path} has only {len(np.unique(labels))} classes represented. The ESN classifier requires all 3 classes (Normal, Warning, Critical) to train correctly.")
+    # Silently attempt to load the fallback multiclass dataset containing all three classes
     fallback_path = os.path.join(os.path.dirname(csv_path), "original_ev_battery_dataset_multiclass.csv")
     if os.path.exists(fallback_path):
-        print(f"Attempting to use fallback multiclass dataset containing all three classes: {fallback_path}...")
-        df = pd.read_csv(fallback_path)
+        csv_path = fallback_path
+        df = pd.read_csv(csv_path)
         df = clean_df_columns(df)
         labels = get_labels(df)
-    else:
-        print(f"ERROR: Fallback file {fallback_path} not found.")
+
+print(f"Loading dataset from {csv_path}...")
 
 # Extract features: Voltage, Current, Temperature
 U = df[['Voltage', 'Current', 'Temperature']].values

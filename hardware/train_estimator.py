@@ -8,7 +8,7 @@ from train import EchoStateNetwork
 def generate_full_range_dataset():
     """
     Generates a high-fidelity synthetic battery dataset covering the full range
-    of SOC (0% to 100%) and SOH (80% to 100%) using the physical simulator.
+    of SOC (0% to 100%) and SOH (80% to 100%) using the physics simulator.
     """
     import sys
     import os

@@ -19,7 +19,7 @@ This document defines the interfaces, state flow, runtime modes, API payloads an
 
 ## System Goal
 
-The primary deliverable of this project is a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting) for SOC and SOH tracking. EKF and Coulomb Counting are implemented strictly as baseline benchmarks for comparison and not as part of the final deployed pipeline. The 2-RC physics-based simulator serves purely as a data-generation tool, and the STM32 edge classifier serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real low-power BMS constraints. Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself.
+The primary deliverable of this project is a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting) for SOC and SOH tracking. EKF and Coulomb Counting are implemented strictly as baseline benchmarks for comparison and not as part of the final deployed pipeline. The 2-RC physics-based simulator serves purely as a data-generation tool, and the STM32 edge classifier serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real low-power microcontroller constraints. Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself.
 
 ---
 
@@ -286,7 +286,7 @@ The visualiser enriches telemetry data with dynamic state observations computed 
 
 ## Edge Classifier Specification
 
-The embedded classifier running on the STM32 microcontroller serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real-time, low-power BMS constraints. It consumes real-time telemetry inputs to flag thermal hazard classes. Success is defined by algorithmic accuracy and efficiency, rather than the hardware demo itself (while the SOC/SOH estimator itself remains software-validated, with hardware porting reserved for future work).
+The embedded classifier running on the STM32 microcontroller serves as a feasibility check to validate that the ESN's reservoir-computing architecture is deployable within real-time, low-power microcontroller constraints. It consumes real-time telemetry inputs to flag thermal hazard classes. Success is defined by algorithmic accuracy and efficiency, rather than the hardware demo itself (while the SOC/SOH estimator itself remains software-validated, with hardware porting reserved for future work).
 
 * **Network Dimensions**: 3 Inputs $\rightarrow$ 50 Reservoir Nodes (CSR format) $\rightarrow$ 3 Output Classes.
 * **Target Classes**:
