@@ -1,26 +1,33 @@
-# Secrets and local configuration
+# ==============================================================================
+# Simulator Subsystem .gitignore
+# ==============================================================================
+
+# ── Secrets and Environment Configurations ────────────────────────────────────
 .env
 .env.*
 !.env.example
 
-# Python
+# ── Python Caches & Bytecode ──────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
-*.pyo
+*$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 coverage.xml
 htmlcov/
+*.cover
 
-# Virtual environments
+# ── Virtual Environments ──────────────────────────────────────────────────────
 .venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
-# Build outputs
+# ── C / C++ Compiler Outputs & Executables ────────────────────────────────────
 build/
 dist/
 *.egg-info/
@@ -30,19 +37,42 @@ dist/
 *.out
 *.elf
 *.map
+*.bin
+*.d
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.gch
+*.pch
 
-# Local runtime artifacts
+# ── Local Database & Runtime Telemetry Logs ──────────────────────────────────
 *.log
+*.db
+*.sqlite
+*.sqlite3
+mongo_data/
+data/db/
+
+# ── Temporary & Scratch Files ─────────────────────────────────────────────────
 tmp/
 temp/
 scratch/
+*.tmp
 
-# Editors and OS files
-.vscode/
+# ── IDEs, Code Editors & OS Files ──────────────────────────────────────────────
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+.vs/
+*.swp
+*~
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
+

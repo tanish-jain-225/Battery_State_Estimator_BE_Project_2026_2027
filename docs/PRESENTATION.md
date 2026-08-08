@@ -2,125 +2,136 @@
 
 # PowerPoint Presentation Plan: First Progress Review
 
-**Project Title**: BATTERY STATE ESTIMATOR: AN ESN-BASED ALTERNATIVE TO EKF AND COULOMB COUNTING
+**Project Title**: ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation  
+**Subtitle**: Software Estimator + Embedded / FPGA Hardware Validation  
+**Presentation PDF Reference**: [`Review_1_PPT.pdf`](Presentations/Review_1_PPT.pdf)
 
-This document serves as an end-to-end slide-by-slide blueprint for your first capstone project review. It strictly adheres to the requested 5-slide format, presents an evidence-based progress summary divided by phases (Completed, In Progress, End Goal), clarifies that software is the final product while hardware acts as the testing loop, and includes academic publishing and thesis targets.
+This document serves as an end-to-end slide-by-slide blueprint for your first capstone project review. It strictly adheres to the 5-slide format in [`Review_1_PPT.pdf`](Presentations/Review_1_PPT.pdf), presents an evidence-based progress summary divided by phases (Completed, In Progress, Final Goal), clarifies that software is the final product while hardware acts as the testing/verification loop, and includes academic publishing and thesis targets.
 
 ---
 
 ## ⏱️ Presentation Timing Overview
 * **Total Duration**: ~5 Minutes (4:30 to 5:00 minutes)
 * **Slide Budget**:
-  * **Slide 1 (Title & Team)**: 25 Seconds
-  * **Slide 2 (Introduction & Scope)**: 65 Seconds
-  * **Slide 3 (Phase 1: Completed Work)**: 80 Seconds
-  * **Slide 4 (Phase 2: In Progress Work)**: 80 Seconds
-  * **Slide 5 (Phase 3: End Goal & Roadmaps)**: 50 Seconds
+  * **Slide 1 (Title & Team Details)**: 30 Seconds
+  * **Slide 2 (Problem & Proposed Solution)**: 60 Seconds
+  * **Slide 3 (Phase 1 — Completed)**: 90 Seconds
+  * **Slide 4 (Phase 2 — In Progress)**: 75 Seconds
+  * **Slide 5 (Phase 3 — Final Goal & Timeline)**: 45 Seconds
 
 ---
 
 ## 🎴 Slide-by-Slide PPT Content & Layout
 
-### Slide 1: Title & Team Details
-* **Slide Title**: Project Review I: BATTERY STATE ESTIMATOR
-* **Slide Objective**: Introduce the project title, team members, department, and project guide.
+### Slide 1: Progress Review — Title & Team Details
+* **Slide Title**: Progress Review: ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
+* **Slide Subtitle**: Software Estimator + Embedded / FPGA Hardware Validation
+* **Slide Objective**: Introduce the project title, team members, guide, department, and institute.
 * **Slide Bullet Points (On-Screen Text)**:
-  * **Title**: **BATTERY STATE ESTIMATOR: AN ESN-BASED ALTERNATIVE TO EKF AND COULOMB COUNTING**
-  * **Team Members**:
-    * Tanish Sanghvi (Branch: Automation & Robotics | Email: 2023.tanish.sanghvi@ves.ac.in)
-    * Akshay Nambiar (Branch: Automation & Robotics | Email: 2023.akshay.nambiar@ves.ac.in)
-    * Sanjana Patankar (Branch: Automation & Robotics | Email: 2023.sanjana.patankar@ves.ac.in)
-    * Satvik Verma (Branch: Automation & Robotics | Email: 2023.satvik.verma@ves.ac.in)
-  * **Project Guide**: Dr. Kadambari Sharma
-  * **Department**: Department of Automation and Robotics
-  * **Institute**: VESIT, Mumbai
+  * **Title**: **ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation**
+  * **Subtitle**: Software Estimator + Embedded / FPGA Hardware Validation
+  * **Team**:
+    1. Sanjna Patankar
+    2. Akshay Nambiar
+    3. Satvik Verma
+    4. Tanish Sanghvi
+  * **Guide**: Dr. Kadambari Sharma
+  * **Department**: Automation and Robotics
+  * **Institute**: Vivekanand Education Society's Institute of Technology (VESIT), Mumbai
 * **Visual Layout & Aesthetics**:
-  * Clean, academic-themed high-contrast layout (dark slate background with gold or teal highlights).
-  * VESIT logo positioned in the top-right corner.
-  * GitHub repository link and Live Visualiser URL featured in the slide footer.
-* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Tanish, Akshay, Sanjana, and Satvik from the Automation and Robotics department. Our project is titled 'Battery State Estimator: An ESN-based Alternative to EKF and Coulomb Counting', supervised by Dr. Kadambari Sharma. Today, we will present our first progress review."
+  * Modern dark slate background with cyan and teal accent cards.
+  * Right panel highlighting Guide, Department, and Institute metadata.
+* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Sanjna Patankar, Akshay Nambiar, Satvik Verma, and Tanish Sanghvi from the Department of Automation and Robotics at VESIT. Our project is titled 'ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation', guided by Dr. Kadambari Sharma. Today we will present our first progress review."
 
 ---
 
-### Slide 2: Project Introduction & Design Scope
-* **Slide Title**: Project Motivation & Design Objectives
-* **Slide Objective**: Define the limitations of existing estimators, introduce the ESN-based solution, and clarify the project's software/hardware scope boundaries.
+### Slide 2: Problem & Proposed Solution
+* **Slide Title**: Problem & Proposed Solution
+* **Slide Subtitle**: Why existing SOC/SOH estimation falls short, and what we propose instead
+* **Slide Objective**: Define limitations of Coulomb Counting and EKF, introduce the ESN alternative, and establish software vs hardware scope.
 * **Slide Bullet Points (On-Screen Text)**:
-  * **Limitations of Existing Observers**:
-    * *Coulomb Counting (CC)*: Susceptible to continuous integration drift over time due to sensor measurement noise and offsets.
-    * *Extended Kalman Filter (EKF)*: Computationally expensive, requires complex parameter characterization, and degrades with cell aging.
-  * **Proposed ESN Solution (The End Product)**:
-    * Standalone Echo State Network (ESN) software algorithm trained for non-linear regression of SOC and SOH.
-    * Only the linear readout weights are trained, eliminating backpropagation-through-time, preserving computational resources.
-  * **Core Scope & Deliverable Separation**:
-    * **Software (End Product)**: The primary project outcome. Includes ESN SOC/SOH estimation models, physics-based 2-RC simulators, and Flask visualizer dashboard.
-    * **Hardware (Testing & Verification Loop)**: The C99 embedded firmware and Verilog modules are strictly verification environments to test reservoir computing execution feasibility under microcontroller constraints.
+  * **The Problem**:
+    * **Coulomb Counting**: Open-loop integration accumulates drift and error over time.
+    * **Extended Kalman Filter (EKF)**: Strongly model-dependent and computationally heavy for embedded use.
+  * **Proposed Solution**:
+    * **Echo State Network (ESN)**: A lightweight reservoir-computing estimator for battery SOC/SOH — trained once, cheap to run, and well suited to embedded and hardware deployment.
+    * **Software Scope**: Final estimator / product.
+    * **Hardware Scope**: Embedded implementation & verification platform.
+  * **Data Flow**:
+    `Battery Data` ➔ `Data Processing` ➔ `ESN` ➔ `SOC / SOH` ➔ `Embedded Deployment (ARTIX A7100T | RTL / HIL)`
 * **Visual Layout & Aesthetics**:
-  * Two-column split layout.
-  * **Left Side**: Bulleted points detailing the problem, solution, and clear scope division.
-  * **Right Side**: High-level block diagram showing the data flow where EKF and Coulomb Counting act strictly as baseline benchmarks for the ESN:
-    ```mermaid
-    flowchart TD
-        Data[Battery Telemetry: V, I, T] --> CC[Coulomb Counting Baseline]
-        Data --> EKF[Sage-Husa EKF Baseline]
-        Data --> ESN[Proposed ESN Estimator]
-        CC & EKF -->|Comparison metrics| Dash[Visualiser Dashboard]
-        ESN -->|Proposed Alg Output| Dash
-    ```
-* **Speaker Delivery Notes**: "Existing battery state estimation approaches rely heavily on Coulomb Counting or EKF, which degrade under battery aging. We propose a data-driven Echo State Network. Crucially, the final deliverable is the software ESN SOC/SOH estimation algorithm, while our hardware C99 port and Verilog simulations serve strictly as a testing loop to prove execution feasibility on edge MCUs."
+  * Two-column comparison: Left box detailing problem points with warning icons, Right box detailing ESN advantages in teal.
+  * Bottom flowchart showing data flow from battery telemetry through ESN to ARTIX A7100T RTL/HIL deployment.
+* **Speaker Delivery Notes**: "Traditional observers like Coulomb Counting suffer from drift over time, while Extended Kalman Filters are model-dependent and heavy for embedded chips. We propose an Echo State Network, which uses fixed reservoir weights and trains only the linear output layer. Our software algorithm represents the final product, while embedded C99 firmware and FPGA hardware serve as our verification and testing loop."
 
 ---
 
-### Slide 3: Current Status - Phase 1: Completed Work
-* **Slide Title**: Current Status: Phase 1 (Completed Work)
-* **Slide Objective**: Present the completed deliverables in both the primary software development and the hardware verification loop.
+### Slide 3: Phase 1 — Completed Work
+* **Slide Title**: Phase 1 — Completed
+* **Slide Subtitle**: Software estimator and embedded hardware, both verified
+* **Slide Objective**: Present completed software development and hardware RTL verification results.
 * **Slide Bullet Points (On-Screen Text)**:
-  * **Software Core (End Product progress)**:
-    * Developed **2-RC Electro-Thermal Battery Simulator** solving dynamic polarization state equations ($V_{RC1}, V_{RC2}$) and thermal heat generation.
-    * Implemented **Traditional Observers**: Sage-Husa Adaptive EKF (with covariance trace guards protecting $P$ from divergence), Coulomb Counting, and SOH RLS trackers.
-    * Trained **Python Echo State Network (ESN)** models using experimental EV drive-cycle databases.
-    * Created and deployed **Flask Dashboard & Telemetry DB** on Render with full comparative visualization.
-  * **Hardware Testing Loop (Verification progress)**:
-    * Ported the trained ESN model to **standalone C99 code** for embedded targets.
-    * Compressed the reservoir matrix using **Compressed Sparse Row (CSR)** format, achieving a **6.7x speedup** by skipping zero-value multiplications.
-    * Implemented **Q12/Q15 fixed-point math** with linear lookup table (LUT) approximation of $\tanh$.
-    * Designed and simulated ESN arithmetic blocks in **Verilog HDL** for hardware-level RTL proof.
+  * **Battery / Software**:
+    * ✓ 2-RC battery simulator
+    * ✓ EKF + Coulomb Counting + SOH tracking
+    * ✓ ESN training pipeline
+    * ✓ Flask dashboard deployed
+    * ✓ C99 ESN implementation
+    * ✓ CSR optimization — 6.7× speedup
+  * **Embedded / Hardware**:
+    * ✓ Q6.10 fixed-point ESN datapath
+    * ✓ Hardware tanh LUT (odd-symmetry, positive half only)
+    * ✓ Verilog ESN RTL — 100-neuron reservoir
+    * ✓ BRAM-based weight / input / state storage
+    * ✓ Double-buffered recurrent state memory
+    * ✓ $\text{Win}\cdot u + W\cdot x \text{ MAC} \rightarrow \text{bias} \rightarrow \text{clip} \rightarrow \tanh$ pipeline
+    * ✓ Vivado / XSim two-pass verification (ARTIX A7100T target)
+  * **Highlight Box**: **200 / 200 neuron updates matched bit-exactly against the Python golden model**
 * **Visual Layout & Aesthetics**:
-  * Grid layout featuring a screenshot of the deployed Flask Visualizer Dashboard alongside key validation metrics (e.g., ESN accuracy and execution latency).
-* **Speaker Delivery Notes**: "Under Phase 1, we have fully completed the software simulator, baseline EKF/CC observers, ESN model training, and the Flask dashboard, all deployed on Render. In the hardware testing loop, we ported the ESN model to C99, optimized it with CSR compression for a 6.7x speedup, implemented integer fixed-point math with a tanh LUT, and successfully simulated the RTL in Verilog."
+  * Two-card split for Battery/Software (teal) and Embedded/Hardware (dark navy).
+  * Prominent highlighted result pill at the bottom confirming 200/200 bit-exact match against Python golden model.
+* **Speaker Delivery Notes**: "In Phase 1, we completed our software foundation: a 2-RC electro-thermal battery simulator, EKF/CC baselines, ESN training pipelines, Flask dashboard, and C99 CSR implementation yielding 6.7x speedup. On hardware, we implemented a 100-neuron Q6.10 fixed-point ESN RTL in Verilog with double-buffered memory and tanh LUT. In Vivado/XSim targeting the ARTIX A7100T FPGA, 200 out of 200 neuron updates matched our Python golden model bit-exactly."
 
 ---
 
-### Slide 4: Current Status - Phase 2: In Progress Work
-* **Slide Title**: Current Status: Phase 2 (In Progress Work)
-* **Slide Objective**: Outline what tasks are currently active in software refinement and hardware testing.
+### Slide 4: Phase 2 — In Progress Work
+* **Slide Title**: Phase 2 — In Progress
+* **Slide Subtitle**: Current work on the ESN estimator and its hardware validation
+* **Slide Objective**: Outline ongoing tasks in online software adaptation and multi-timestep hardware verification.
 * **Slide Bullet Points (On-Screen Text)**:
-  * **Software Core (Active Development)**:
-    * **Online Readout Adaptation**: Integrating online Recursive Least Squares (RLS) or gradient descent into the ESN readout layer to dynamically adapt to cell aging and capacity fade in real-time.
-    * **Deep Learning Benchmarking**: Building and training LSTM and GRU neural networks strictly as software baseline comparisons to verify ESN's computational advantage.
-    * **Dynamic Workload Testing**: Running validations of ESN SOC/SOH accuracy under varying EV-style drive-cycles (DST, US06, FUDS).
-  * **Hardware Testing Loop (Active Integration)**:
-    * **STM32 Target Flashing**: Flashing the C99 ESN classifier code to a physical STM32 Nucleo microcontroller.
-    * **Execution Profiling**: Measuring real-time CPU cycle counts, latency, and RAM/Flash memory footprint on the MCU.
-    * **UART Telemetry Loop**: Setting up serial communication to stream simulator data directly to the STM32 and read back diagnostics.
+  * **ESN / Software**:
+    * Online ESN adaptation using RLS / gradient descent
+    * LSTM / GRU benchmarking
+    * Testing across different EV drive cycles (DST, US06, FUDS)
+    * C99 deployment refinement
+  * **Hardware / Embedded (5-Step Roadmap)**:
+    1. **Multi-timestep sequence input**: Extend the verified single-step design (reused $u(0)$) to full sequences $u(0)\dots u(T)$.
+    2. **FPGA sequence-level verification**: Python golden model vs. Vivado/XSim, bit-exact comparison, on ARTIX A7100T.
+    3. **ARTIX A7100T deployment**: On-board resource utilization and inference latency profiling.
+    4. **Hardware-in-the-loop interface**: UART link between the battery simulator and the FPGA board.
+    5. **End-to-end estimation**: Drive-cycle data ➔ ESN ➔ SOC / SOH on hardware.
 * **Visual Layout & Aesthetics**:
-  * Bullet points with progress icons (e.g., loading symbols) beside code block snippets or execution diagrams demonstrating STM32 serial interface connections.
-* **Speaker Delivery Notes**: "We are currently in Phase 2. On the software side, we are active on online weight adaptation using RLS for cell aging, and training LSTM/GRU models to benchmark ESN's efficiency. On the hardware testing loop, we are flashing the C99 code onto a physical STM32 Nucleo board to profile its execution footprint and setting up serial playback to verify on-chip execution."
+  * Split view with ESN software focus items on the left and a numbered 5-stage Hardware roadmap on the right.
+* **Speaker Delivery Notes**: "Phase 2 is currently active. For software, we are implementing online readout adaptation using RLS for cell aging, benchmarking against LSTM/GRU models, and running dynamic EV drive cycle tests. On hardware, we are expanding our verified single-step FPGA design to multi-timestep sequence inputs $u(0)\dots u(T)$, performing sequence-level Vivado verification on the ARTIX A7100T, and building a UART Hardware-in-the-Loop interface."
 
 ---
 
-### Slide 5: Milestones & Deadlines - Phase 3: End Goal
-* **Slide Title**: Semester Roadmap & Academic Deliverables
-* **Slide Objective**: Present a clear timeline of the remaining targets, establishing the final end product goals and academic deliverables (review paper and thesis).
+### Slide 5: Phase 3 — Final Goal & Timeline
+* **Slide Title**: Phase 3 — Final Goal & Timeline
+* **Slide Subtitle**: Final Goal & Timeline
+* **Slide Objective**: State the final project deliverable and map out semester milestones to completion.
 * **Slide Bullet Points (On-Screen Text)**:
-  * **Phase 3: End Goal Deliverables**:
-    * **Software End Product (Oct 15, 2026)**: Fully integrated and validated online-adaptive ESN battery SOC/SOH estimation algorithm, simulator, and comparison dashboard.
-    * **Hardware Verification (Oct 25, 2026)**: Completed HIL test bench using the STM32 board and serial telemetry logging.
-  * **Academic Outcomes (End Goal)**:
-    * **Literature Review Paper (Aug 31, 2026)**: Finalizing and submitting our literature survey paper to a peer-reviewed conference/journal (Targeting IEEE).
-    * **Capstone Project Thesis (Nov 20, 2026)**: Complete thesis documentation compiling model designs, simulator equations, ESN performance evaluations, and hardware validation results.
-  * **Key Presentation Reviews**:
-    * *Mid-Sem Progress Review (Review II)*: 3rd Week of October 2026.
+  * **Final Goal**: Deploy and validate a lightweight ESN-based SOC/SOH estimator on embedded hardware (ARTIX A7100T) using real / representative battery drive-cycle data.
+  * **Final Architecture**:
+    `Battery Dataset` ➔ `2-RC / Battery Model` ➔ `ESN Estimator` ➔ `SOC / SOH` ➔ `Embedded System (ARTIX A7100T | RTL / HIL Validation)`
+  * **Timeline Milestones**:
+    * **Aug 31**: Literature review / IEEE target
+    * **Oct 15**: Final ESN software
+    * **3rd wk Oct**: Review II
+    * **Oct 25**: Hardware HIL validation
+    * **Nov 20**: Final thesis
 * **Visual Layout & Aesthetics**:
-  * Horizontal timeline or Gantt chart illustrating the transition from Completed (August) to In Progress (September) and End Goal milestones (October/November), marking the Review II, Paper, and Thesis milestones.
-* **Speaker Delivery Notes**: "To conclude, our Phase 3 End Goal targets the final delivery of the online-adaptive ESN software estimator by mid-October, followed by full HIL testing. Academically, we are writing a literature review paper for IEEE submission by the end of August, and we will compile our complete capstone project thesis by November. This keeps us on track for our Review II in October."
+  * Top banner framing the final goal statement.
+  * Center architecture flow block.
+  * Bottom timeline axis with green milestone markers from August through November.
+* **Speaker Delivery Notes**: "Our final goal for Phase 3 is to deploy and validate the lightweight ESN SOC/SOH estimator on ARTIX A7100T FPGA hardware using representative drive-cycle data. Our timeline targets completing our literature review paper for IEEE by August 31st, delivering final ESN software by October 15th, hardware HIL validation by October 25th, and submitting our capstone thesis by November 20th."

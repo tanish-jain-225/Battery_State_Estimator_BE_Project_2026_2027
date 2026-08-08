@@ -134,10 +134,6 @@ class Config:
     ESN_SOH_RIDGE_PARAM  = float(os.environ.get("ESN_SOH_RIDGE_PARAM", 1e-4))
     ESN_SOH_SPARSITY     = float(os.environ.get("ESN_SOH_SPARSITY", 0.85))
 
-    ESN_PRIMING_STEPS    = int(os.environ.get("ESN_PRIMING_STEPS", 500))
-    ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 30))
-    ESN_WASHOUT_STEPS    = int(os.environ.get("ESN_WASHOUT_STEPS", 50))
-
     # -------------------------------------------------------------------------
     # Battery Sensor Noise Base Standard Deviations
     # -------------------------------------------------------------------------

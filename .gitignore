@@ -1,26 +1,33 @@
-# Secrets and local configuration
+# ==============================================================================
+# End-to-End Battery State Estimator Project .gitignore
+# ==============================================================================
+
+# ── Secrets and Environment Configurations ────────────────────────────────────
 .env
 .env.*
 !.env.example
 
-# Python
+# ── Python Caches & Bytecode ──────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
-*.pyo
+*$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 coverage.xml
 htmlcov/
+*.cover
 
-# Virtual environments
+# ── Virtual Environments ──────────────────────────────────────────────────────
 .venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
-# Build outputs
+# ── C / C++ Compiler Outputs & Executables ────────────────────────────────────
 build/
 dist/
 *.egg-info/
@@ -30,19 +37,64 @@ dist/
 *.out
 *.elf
 *.map
+*.bin
+*.d
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.gch
+*.pch
 
-# Local runtime artifacts
+# ── Xilinx Vivado & XSim FPGA Build/Simulation Artifacts ─────────────────────
+.Xil/
+xsim.dir/
+*.jou
+*.pb
+*.str
+*.wdb
+*.vcd
+*.bak
+xsim.log
+vivado.log
+
+# ── Local Database & Runtime Telemetry Logs ──────────────────────────────────
 *.log
+*.db
+*.sqlite
+*.sqlite3
+mongo_data/
+data/db/
+
+# ── Temporary & Scratch Files ─────────────────────────────────────────────────
 tmp/
 temp/
 scratch/
+*.tmp
 
-# Editors and OS files
-.vscode/
+# ── IDEs, Code Editors & OS Files ──────────────────────────────────────────────
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+.vs/
+*.swp
+*~
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Explicitly Tracked Model & Dataset Exception Rules ─────────────────────────
+!hardware/esn_classifier_weights.h
+!hardware/esn_estimator_weights.h
+!software/visualiser/model_rc.pkl
+!hardware/original_ev_battery_dataset_multiclass.csv
+!hardware/training_ev_battery_dataset_multiclass.csv
+!hardware/verilog_verifier/*.csv
+!hardware/verilog_verifier/*.coe
+!hardware/verilog_verifier/*.mem
+

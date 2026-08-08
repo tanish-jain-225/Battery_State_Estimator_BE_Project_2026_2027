@@ -1,3 +1,5 @@
+[← Back to README](../../README.md) · [← Back to Software](../software.md)
+
 # Battery Estimator Evaluation Dashboard (True Physics vs. EKF+CC vs. ML-ESN)
 
 An end-to-end Python, Machine Learning and Flask-based Battery State Estimator comparison and evaluation platform. This project simulates complex lithium-ion battery cell chemistry dynamics, logs real-time telemetry and compares **Traditional Battery State Estimators (Extended Kalman Filter + Coulomb Counting)** side-by-side (implemented strictly as accuracy baselines for comparison and not as part of the final deployed pipeline) against **Modern Data-Driven Machine Learning (Reservoir Computing - Echo State Network)** models relative to the **True physical ground truth** of the cell simulator in real-time.

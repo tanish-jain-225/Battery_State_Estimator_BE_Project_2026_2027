@@ -2,20 +2,22 @@
 
 # Hardware Subsystem
 
-This document provides a technical guide to the embedded hardware subsystem, including folder layouts, Compressed Sparse Row (CSR) matrix representation, fixed-point Q12/Q15 conversion math, wiring guides and firmware build setups.
+This document provides a technical guide to the hardware subsystem, covering both the **C99 Embedded Microcontroller Firmware** (CSR matrix representation, fixed-point math, MCU pinouts) and the **Verilog HDL FPGA Hardware Verifier** targeting the **ARTIX A7100T FPGA** ([`verilog_verifier/README.md`](verilog_verifier/README.md)).
 
 > [!IMPORTANT]
-> **Project Scope & Feasibility Validation**: The primary deliverable of this project is a data-driven ESN estimator (software-validated for SOC/SOH), not a hardware product. The hardware deployment on STM32 exists solely as a feasibility check to validate whether the ESN's reservoir-computing approach is deployable under real-time, low-power constraints (using the ESN classifier variant). Success is defined by algorithmic accuracy and efficiency, not by the hardware demo itself. Porting the SOC/SOH estimator itself to STM32 firmware is reserved for future work. For the theoretical foundations behind these optimizations, see the [research paper](../reference/paper.md).
+> **Project Scope & Feasibility Validation**: The primary deliverable of this project is a data-driven ESN estimator (software-validated for SOC/SOH), not a physical hardware product. The embedded C99 firmware and Verilog FPGA RTL modules serve strictly as a **testing and verification platform** to prove that the reservoir-computing execution pipeline is deployable under strict memory and computational constraints.
 
 ---
 
 ## 📑 Table of Contents
-1. [Hardware Folder Structure](#-hardware-folder-structure)
-2. [ESN Classifier Interface Specifications](#-esn-classifier-interface-specifications)
-3. [Embedded Optimizations](#-embedded-optimizations)
-4. [Offline Model Export Pipeline](#️-offline-model-export-pipeline)
-5. [Hardware Wiring & Pinout Reference](#-hardware-wiring--pinout-reference)
-6. [Running the Desktop Verification Simulator](#-running-the-desktop-verification-simulator)
+1. [Hardware Subsystem Overview](#hardware-subsystem-overview)
+2. [Hardware Folder Structure](#-hardware-folder-structure)
+3. [FPGA Verilog ESN Verifier (ARTIX A7100T Target)](#-fpga-verilog-esn-verifier-artix-a7100t-target)
+4. [ESN Classifier Interface Specifications](#-esn-classifier-interface-specifications)
+5. [Embedded Optimizations (C99 Firmware)](#-embedded-optimizations)
+6. [Offline Model Export Pipeline](#️-offline-model-export-pipeline)
+7. [Hardware Wiring & Pinout Reference](#-hardware-wiring--pinout-reference)
+8. [Running the Desktop Verification Simulator](#-running-the-desktop-verification-simulator)
 
 ---
 
@@ -36,8 +38,43 @@ hardware/
 ├── esn_estimator_weights.h                      # Generated sparse estimator weight arrays
 ├── original_ev_battery_dataset_multiclass.csv   # Synthesized multiclass drive-cycle data
 ├── run_c_simulator.bat                          # Windows build-and-run script
-└── run_c_simulator.sh                           # Linux/macOS build-and-run script
+├── run_c_simulator.sh                           # Linux/macOS build-and-run script
+└── verilog_verifier/                            # Verilog RTL FPGA verification module
+    ├── README.md                                # FPGA module documentation
+    ├── esn_top.v                                # Top-level Verilog ESN wrapper
+    ├── esn_neuron.v                             # Neuron datapath module
+    ├── reservoir_controller.v                   # Recurrent execution state machine
+    ├── address_generator.v                      # Memory address indexing logic
+    ├── mac_accum_q6_10.v                        # Q6.10 fixed-point MAC accumulator
+    ├── mult_q6_10.v                             # Q6.10 fixed-point multiplier
+    ├── tanh_lut.v                               # Hardware tanh lookup table module
+    ├── tb_esn_top.v                             # Testbench for Vivado / XSim simulation
+    ├── golden.py                                # Independent Python golden reference model
+    └── compare_results.py                       # Verifies Vivado CSV output against golden model
 ```
+
+---
+
+## ⚡ FPGA Verilog ESN Verifier (ARTIX A7100T Target)
+
+The hardware subsystem includes a fully verified Verilog HDL Echo State Network targeting the **ARTIX A7100T FPGA** platform:
+
+### RTL Design Specifications
+- **Reservoir Size**: 100 neurons ($N=100$)
+- **Input Dimension**: 4 features ($M=4$)
+- **Fixed-Point Data Format**: Q6.10 fixed point (6 integer bits, 10 fractional bits)
+- **Pipeline Stages**: $\text{Win}\cdot u + W\cdot x \text{ MAC} \rightarrow \text{bias addition} \rightarrow \text{saturation clipping} \rightarrow \text{tanh LUT}$
+- **Memory Architecture**: BRAM-based weight and state storage with double-buffered recurrent reservoir state memory.
+- **Activation Function**: Hardware odd-symmetry $\tanh$ lookup table (LUT, positive half only).
+
+### Verification Results
+Tested via two-pass recurrent state transitions ($x(0)\rightarrow x(1)$ and $x(1)\rightarrow x(2)$) in **Vivado / XSim**:
+- **Total Neuron Updates Evaluated**: 200
+- **MAC Stage**: 200 / 200 matched
+- **Bias Stage**: 200 / 200 matched
+- **Sum Stage**: 200 / 200 matched
+- **Tanh Input/Output Stages**: 200 / 200 matched
+- **Result**: **100% bit-exact match between Vivado XSim simulation and Python golden reference.**
 
 ---
 

@@ -2,20 +2,23 @@
 
 ## Project Title
 
-**BATTERY STATE ESTIMATOR: AN ESN-BASED ALTERNATIVE TO EKF AND COULOMB COUNTING**
+**ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation**  
+*Software Estimator + Embedded / FPGA Hardware Validation*
 
+[![Presentation PDF](https://img.shields.io/badge/Presentation-Review__1__PPT.pdf-blue?style=flat&logo=adobeacrobatreader)](docs/Presentations/Review_1_PPT.pdf)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![Embedded C](https://img.shields.io/badge/Embedded_C-C99-orange?style=flat)](https://en.cppreference.com/w/c/99)
+[![Verilog HDL](https://img.shields.io/badge/Verilog_HDL-Q6.10_FPGA-purple?style=flat)](hardware/verilog_verifier/README.md)
 [![Flask](https://img.shields.io/badge/Flask-2.0%2B-black?style=flat&logo=flask)](https://flask.palletsprojects.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0%2B-green?style=flat&logo=mongodb)](https://www.mongodb.com/)
 [![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=flat)](.github/workflows/ci.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027?style=flat)](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main)
-[![Repo Size](https://img.shields.io/github/repo-size/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027?style=flat)](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027)
 
-A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC), State of Health (SOH), State of Energy (SOE), State of Power (SOP) and thermal safety monitoring under dynamic EV-style drive-cycle workloads. The system implements a **dual-timescale joint estimation framework** inspired by **Li et al. (2020)** [1], separating high-frequency state updates from slowly-varying capacity updates. It also leverages a data-driven **reservoir computing pipeline** for non-linear regression and classification, theoretically aligned with the **Reservoir Spiking Neural Network (RSNN)** paradigms investigated by **Kamarudin et al. (2026)** [2]. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, RLS), Echo State Networks (ESNs) and low-power embedded C edge diagnostics.
+A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC) and State of Health (SOH) estimation. The software algorithm represents the final product, while embedded C99 microcontrollers and an **ARTIX A7100T FPGA** hardware RTL environment serve as the testing and verification platform. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, Coulomb Counting), Echo State Networks (ESNs), and low-power embedded hardware verification.
 
 > [!NOTE]
-> ### 🌐 Live Deployments
+> ### 🌐 Live Deployments & Presentation Reference
+> * **Presentation Slides (Review 1)**: [`docs/Presentations/Review_1_PPT.pdf`](docs/Presentations/Review_1_PPT.pdf)
 > * **Physics Simulator**: [https://battery-physics-simulator.onrender.com/](https://battery-physics-simulator.onrender.com/)
 > * **Visualiser Dashboard**: [https://battery-visualizer.onrender.com/](https://battery-visualizer.onrender.com/)
 > * Render free-tier services may sleep after 15 minutes of inactivity. First request may take 30–60 seconds to spin up.
@@ -25,23 +28,23 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 ## Table of Contents
 1. [Team Details](#team-details)
 2. [Guide Details](#guide-details)
-3. [Problem Statement](#problem-statement)
-4. [Abstract](#abstract)
-5. [Objectives](#objectives)
-6. [Scope of the Project](#scope-of-the-project)
-7. [Existing System](#existing-system)
-8. [Proposed System](#proposed-system)
-9. [System Architecture](#system-architecture)
-10. [Hardware Requirements](#hardware-requirements)
-11. [Software Requirements](#software-requirements)
-12. [Technologies Used](#technologies-used)
-13. [Methodology](#methodology)
-14. [Security and Data Privacy](#security-and-data-privacy)
-15. [Project Timeline](#project-timeline)
-16. [Weekly Progress Updates](#weekly-progress-updates)
-17. [Design Files](#design-files)
-18. [Circuit Diagram](#circuit-diagram)
-19. [Flowchart / Algorithm](#flowchart--algorithm)
+3. [Project Status & Roadmap (3 Phases)](#project-status--roadmap-3-phases)
+4. [Problem Statement](#problem-statement)
+5. [Abstract](#abstract)
+6. [Objectives](#objectives)
+7. [Scope of the Project](#scope-of-the-project)
+8. [Existing System](#existing-system)
+9. [Proposed System](#proposed-system)
+10. [System Architecture](#system-architecture)
+11. [Hardware Requirements](#hardware-requirements)
+12. [Software Requirements](#software-requirements)
+13. [Technologies Used](#technologies-used)
+14. [Methodology](#methodology)
+15. [Security and Data Privacy](#security-and-data-privacy)
+16. [Project Timeline](#project-timeline)
+17. [Weekly Progress Updates](#weekly-progress-updates)
+18. [Design Files](#design-files)
+19. [Circuit & FPGA Verifier Diagram](#circuit--fpga-verifier-diagram)
 20. [Implementation Details](#implementation-details)
 21. [Code Structure](#code-structure)
 22. [How to Run the Project](#how-to-run-the-project)
@@ -63,10 +66,10 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 | Sr. No. | Name of Student | Branch | Email ID | GitHub ID |
 |:-------:|------------------|:-------------------------:|-------------------------------------------|------------------|
-| 1 | Tanish Sanghvi | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in | tanish-jain-225 |
+| 1 | Sanjna Patankar | Automation and Robotics | 2023.sanjana.patankar@ves.ac.in | Clothflow13 |
 | 2 | Akshay Nambiar | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in | RoyalMaddy08 |
-| 3 | Sanjana Patankar | Automation and Robotics | 2023.sanjana.patankar@ves.ac.in | Clothflow13 |
-| 4 | Satvik Verma | Automation and Robotics | 2023.satvik.verma@ves.ac.in | ABKmaster |
+| 3 | Satvik Verma | Automation and Robotics | 2023.satvik.verma@ves.ac.in | ABKmaster |
+| 4 | Tanish Sanghvi | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in | tanish-jain-225 |
 
 ---
 
@@ -74,7 +77,53 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 **Project Guide:** Dr. Kadambari Sharma   
 **Department:** Automation and Robotics  
-**Institute:** VESIT, Mumbai  
+**Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Mumbai  
+
+---
+
+## Project Status & Roadmap (3 Phases)
+
+Synchronized with [`Review_1_PPT.pdf`](docs/Presentations/Review_1_PPT.pdf):
+
+### Phase 1 — Completed Work
+- **Battery / Software**:
+  - ✓ 2-RC electro-thermal battery simulator
+  - ✓ Sage-Husa EKF + Coulomb Counting + SOH tracking
+  - ✓ ESN training & export pipeline
+  - ✓ Flask visualiser dashboard deployed on Render
+  - ✓ C99 ESN implementation
+  - ✓ CSR (Compressed Sparse Row) matrix optimization — **6.7× speedup**
+- **Embedded / Hardware**:
+  - ✓ Q6.10 fixed-point ESN datapath
+  - ✓ Hardware tanh LUT (odd-symmetry, positive half only)
+  - ✓ Verilog ESN RTL — 100-neuron reservoir
+  - ✓ BRAM-based weight / input / state storage
+  - ✓ Double-buffered recurrent state memory
+  - ✓ $\text{Win}\cdot u + W\cdot x \text{ MAC} \rightarrow \text{bias} \rightarrow \text{clip} \rightarrow \tanh$ pipeline
+  - ✓ Vivado / XSim two-pass verification (targeting **ARTIX A7100T FPGA**)
+  - **Bit-Exact Result**: **200 / 200 neuron updates matched bit-exactly against the Python golden model**
+
+### Phase 2 — In Progress Work
+- **ESN / Software**:
+  - Online ESN adaptation using RLS / gradient descent for capacity fade
+  - Deep learning (LSTM / GRU) benchmarking
+  - Testing across dynamic EV drive cycles (DST, US06, FUDS)
+  - C99 deployment refinement
+- **Hardware / Embedded Roadmap**:
+  1. **Multi-timestep sequence input**: Extend verified single-step design (reused $u(0)$) to full sequences $u(0)\dots u(T)$.
+  2. **FPGA sequence-level verification**: Python golden model vs. Vivado/XSim bit-exact comparison on ARTIX A7100T.
+  3. **ARTIX A7100T deployment**: On-board resource utilization and inference latency profiling.
+  4. **Hardware-in-the-loop interface**: UART link between battery simulator and FPGA board.
+  5. **End-to-end estimation**: Drive-cycle data ➔ ESN ➔ SOC / SOH on hardware.
+
+### Phase 3 — Final Goal & Timeline
+- **Final Goal**: Deploy and validate a lightweight ESN-based SOC/SOH estimator on embedded hardware (ARTIX A7100T) using real / representative battery drive-cycle data.
+- **Key Milestones**:
+  - **Aug 31, 2026**: Literature review / IEEE paper target
+  - **Oct 15, 2026**: Final ESN software
+  - **3rd Week Oct 2026**: Review II
+  - **Oct 25, 2026**: Hardware HIL validation
+  - **Nov 20, 2026**: Final capstone thesis submission
 
 ---
 

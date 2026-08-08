@@ -69,7 +69,8 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-#define N 500
+#define EVALUATION_SAMPLES_COUNT 500
+#define N EVALUATION_SAMPLES_COUNT // Evaluation dataset sample count for host simulation benchmark loop
 #define ESN_FIXED_POINT 0 // Set to 1 to enable Q15 Fixed-Point ESN Inference
 
 // Reservoir states
