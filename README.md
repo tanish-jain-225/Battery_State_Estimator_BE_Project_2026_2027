@@ -507,20 +507,12 @@ The visualiser features real-time diagnostics that identify three distinct categ
 
 ```text
 Battery_State_Estimator_BE_Project_2026_2027/
-├── run_all_validation.bat                   # One-click training, testing and validation
+├── run_all_validation.bat                   # Windows 1-click training, testing and validation
+├── run_all_validation.sh                    # Linux/macOS 1-click training, testing and validation
 ├── README.md                                # This document
 ├── requirements.txt                         # Python dependencies
 ├── docs/
-│   ├── ARTIFACTS.md                         # Model and dataset versioning policy
-│   ├── DEMO_CHECKLIST.md                    # Review and viva demonstration checklist
-│   ├── DEPLOY_RENDER.md                     # Render cloud deployment instructions
-│   ├── OPERATIONS.md                        # Local setup and run guide
-│   ├── LITERATURE_SURVEY.md                 # Theoretical foundations and equations
-│   └── SYSTEM_SPECIFICATION.md              # Interfaces, APIs and validation scope
 ├── hardware/
-│   ├── main.c                               # C99 ESN edge classifier firmware
-│   ├── main.h                               # Host HAL mocks and STM32 pin config
-│   ├── train.py                             # Core ESN Python implementation
 │   ├── train_classifier.py                  # Trains 3-class ESN and exports C headers
 │   ├── train_estimator.py                   # Trains SOC/SOH ESN and exports weights
 │   ├── esn_classifier_weights.h             # Generated sparse classifier weight arrays

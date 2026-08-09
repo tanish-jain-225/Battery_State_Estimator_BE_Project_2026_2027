@@ -63,5 +63,23 @@ class TestAPIAuth(unittest.TestCase):
         self.assertIn('uptime_seconds', data)
         self.assertIn('database', data)
 
+    @patch.dict(os.environ, {"MONGODB_URI": "mongodb+srv://admin:secretPass123@cluster0.mongodb.net/"})
+    def test_api_rejects_wrong_secret_key(self):
+        """Requesting control endpoints with an invalid API key must be rejected with 401."""
+        response = self.client.post('/api/control', json={}, headers={"X-API-Key": "invalid_secret_key_123"}, environ_overrides={'REMOTE_ADDR': '192.168.1.100'})
+        self.assertEqual(response.status_code, 401)
+        data = response.get_json()
+        self.assertEqual(data['status'], 'error')
+        self.assertIn('Unauthorized', data['message'])
+
+    def test_simulator_get_status_returns_valid_structure(self):
+        """GET request to /api/status must return simulator configuration."""
+        response = self.client.get('/api/status')
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIn('chemistry', data)
+        self.assertIn('soc', data)
+
 if __name__ == '__main__':
     unittest.main()
+

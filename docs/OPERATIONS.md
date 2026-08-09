@@ -24,7 +24,13 @@ This guide describes local setup, environment configuration, training pipelines,
    python -m pip install -r requirements.txt
    ```
 
+### ⚡ 1-Click Automated Validation Pipeline
+You can run the entire model training, hardware weight generation, unit testing, and C simulator benchmarking pipeline in one command:
+- **Windows**: `run_all_validation.bat`
+- **Linux / macOS**: `chmod +x run_all_validation.sh && ./run_all_validation.sh`
+
 ### Local Environment Settings
+
 Configure local environment settings by creating `.env` files in the respective app directories. 
 
 #### Simulator Environment Configuration
