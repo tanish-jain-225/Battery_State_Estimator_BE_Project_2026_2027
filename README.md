@@ -5,7 +5,6 @@
 **ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation**  
 *Software Estimator + Embedded / FPGA Hardware Validation*
 
-[![Presentation PDF](https://img.shields.io/badge/Presentation-Review__1__PPT.pdf-blue?style=flat&logo=adobeacrobatreader)](docs/Presentations/Review_1_PPT.pdf)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![Embedded C](https://img.shields.io/badge/Embedded_C-C99-orange?style=flat)](https://en.cppreference.com/w/c/99)
 [![Verilog HDL](https://img.shields.io/badge/Verilog_HDL-Q6.10_FPGA-purple?style=flat)](hardware/verilog_verifier/README.md)
@@ -17,8 +16,7 @@
 A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC) and State of Health (SOH) estimation. The software algorithm represents the final product, while embedded C99 microcontrollers and an **ARTIX A7100T FPGA** hardware RTL environment serve as the testing and verification platform. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, Coulomb Counting), Echo State Networks (ESNs), and low-power embedded hardware verification.
 
 > [!NOTE]
-> ### 🌐 Live Deployments & Presentation Reference
-> * **Presentation Slides (Review 1)**: [`docs/Presentations/Review_1_PPT.pdf`](docs/Presentations/Review_1_PPT.pdf)
+> ### 🌐 Live Deployments
 > * **Physics Simulator**: [https://battery-physics-simulator.onrender.com/](https://battery-physics-simulator.onrender.com/)
 > * **Visualiser Dashboard**: [https://battery-visualizer.onrender.com/](https://battery-visualizer.onrender.com/)
 > * Render free-tier services may sleep after 15 minutes of inactivity. First request may take 30–60 seconds to spin up.
@@ -83,7 +81,7 @@ A cyber-physical battery state estimator system that delivers accurate, real-tim
 
 ## Project Status & Roadmap (3 Phases)
 
-Synchronized with [`Review_1_PPT.pdf`](docs/Presentations/Review_1_PPT.pdf):
+Overview of project progress across phases:
 
 ### Phase 1 — Completed Work
 - **Battery / Software**:
@@ -660,23 +658,23 @@ Current automated result: `51 tests OK`.
 
 The simulator provides a developer console for controlling drive cycles, chemistry profiles, fault injection and real-time telemetry monitoring.
 
-![Physics Simulator Dashboard](images/assets/Screenshot%202026-06-25%20095148.png)
+![Physics Simulator Dashboard](images/assets/screenshot_simulator_aging.png)
 
 ### Visualiser Comparison Dashboard
 
 The visualiser dashboard presents live metrics, SOC/SOH estimation accuracy panels and side-by-side EKF vs ESN comparison charts.
 
-![Visualiser Dashboard Overview](images/assets/Screenshot%202026-06-25%20095057.png)
+![Visualiser Dashboard Overview](images/assets/screenshot_visualiser_overview.png)
 
 ### SOC & SOH Estimation Charts
 
 Detailed view of the SOC and SOH estimation comparison charts with the ESN model registry and retraining terminal.
 
-![Estimation Charts Detail](images/assets/Screenshot%202026-06-25%20095127.png)
+![Estimation Charts Detail](images/assets/screenshot_estimation_charts.png)
 
 ### Simulator Controls (Compact View)
 
-![Simulator Controls](images/assets/Screenshot%202026-06-25%20095034.png)
+![Simulator Controls](images/assets/screenshot_simulator_dashboard.png)
 
 ---
 

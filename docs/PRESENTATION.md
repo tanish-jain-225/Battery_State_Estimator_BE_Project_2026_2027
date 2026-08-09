@@ -4,9 +4,8 @@
 
 **Project Title**: ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation  
 **Subtitle**: Software Estimator + Embedded / FPGA Hardware Validation  
-**Presentation PDF Reference**: [`Review_1_PPT.pdf`](Presentations/Review_1_PPT.pdf)
 
-This document serves as an end-to-end slide-by-slide blueprint for your first capstone project review. It strictly adheres to the 5-slide format in [`Review_1_PPT.pdf`](Presentations/Review_1_PPT.pdf), presents an evidence-based progress summary divided by phases (Completed, In Progress, Final Goal), clarifies that software is the final product while hardware acts as the testing/verification loop, and includes academic publishing and thesis targets.
+This document serves as an end-to-end slide-by-slide blueprint for your first capstone project review. It strictly adheres to the 5-slide presentation format, presents an evidence-based progress summary divided by phases (Completed, In Progress, Final Goal), clarifies that software is the final product while hardware acts as the testing/verification loop, and includes academic publishing and thesis targets.
 
 ---
 

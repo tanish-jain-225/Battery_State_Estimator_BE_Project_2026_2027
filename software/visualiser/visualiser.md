@@ -125,7 +125,7 @@ The internal ohmic resistance increases as capacity fades:
 $$R_0(t) = R_{0,\text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - SOH)\right]$$
 
 ### 4. Chemistry Models
-Configurations are stored in **[battery_chemistry.py](simulator/battery_chemistry.py)**:
+Configurations are stored in **[battery_chemistry.py](battery_chemistry.py)**:
 - **NMC (Lithium Nickel Manganese Cobalt Oxide)**: Nominal 11.1V (3S), 2.5 Ah capacity. Standard curve.
 - **LFP (Lithium Iron Phosphate)**: Nominal 9.6V (3S), 3.0 Ah capacity. Extremely flat OCV curve between 20% and 80% SOC.
 - **Lead-Acid**: Nominal 12.0V (6S), 7.0 Ah capacity. High internal resistance, heavy thermal mass.
