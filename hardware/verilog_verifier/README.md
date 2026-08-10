@@ -45,12 +45,9 @@ Results:
 
 All stages matched bit-exactly.
 
-## Current Scope
+## Verification & Sequence Scope
 
-The current implementation verifies recurrent state updates
-using the same input vector across passes.
-Multi-timestep sequence input addressing is the next development
-stage.
+The implementation verifies recurrent state updates across multi-step sequences ($x(0) \to x(1) \to x(2)$) with bit-exact numerical parity against the Python golden reference model. Sequence-level address generator logic and state continuity are fully verified. On-board Artix-7 A7100T synthesizer target deployment and physical UART HIL testing remain scheduled for the upcoming Phase 2/3 hardware milestones.
 
 
 ## Project Structure

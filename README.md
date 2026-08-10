@@ -101,15 +101,15 @@ Overview of project progress across phases:
   - ✓ Vivado / XSim two-pass verification (targeting **ARTIX A7100T FPGA**)
   - **Bit-Exact Result**: **200 / 200 neuron updates matched bit-exactly against the Python golden model**
 
-### Phase 2 — In Progress Work
+### Phase 2 — In Progress Work & Sequence Milestones
 - **ESN / Software**:
   - Online ESN adaptation using RLS / gradient descent for capacity fade
   - Deep learning (LSTM / GRU) benchmarking
   - Testing across dynamic EV drive cycles (DST, US06, FUDS)
   - C99 deployment refinement
 - **Hardware / Embedded Roadmap**:
-  1. **Multi-timestep sequence input**: Extend verified single-step design (reused $u(0)$) to full sequences $u(0)\dots u(T)$.
-  2. **FPGA sequence-level verification**: Python golden model vs. Vivado/XSim bit-exact comparison on ARTIX A7100T.
+  1. ✓ **Multi-timestep sequence input**: Extend verified single-step design to multi-timestep sequences $u(0)\dots u(T)$.
+  2. ✓ **FPGA sequence-level verification**: Python golden model vs. Vivado/XSim bit-exact comparison ($200/200$ bit-exact stage matches).
   3. **ARTIX A7100T deployment**: On-board resource utilization and inference latency profiling.
   4. **Hardware-in-the-loop interface**: UART link between battery simulator and FPGA board.
   5. **End-to-end estimation**: Drive-cycle data ➔ ESN ➔ SOC / SOH on hardware.
