@@ -1,3 +1,0 @@
--r software/simulator/requirements.txt
--r software/visualiser/requirements.txt
--r hardware/requirements.txt

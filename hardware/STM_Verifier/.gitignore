@@ -1,5 +1,5 @@
 # ==============================================================================
-# End-to-End Battery State Estimator Project .gitignore
+# Hardware Subsystem .gitignore
 # ==============================================================================
 
 # ── Secrets and Environment Configurations ────────────────────────────────────
@@ -88,13 +88,12 @@ Thumbs.db
 desktop.ini
 ehthumbs.db
 
-# ── Explicitly Tracked Model & Dataset Exception Rules ─────────────────────────
-!hardware/esn_classifier_weights.h
-!hardware/esn_estimator_weights.h
-!software/visualiser/model_rc.pkl
-!hardware/original_ev_battery_dataset_multiclass.csv
-!hardware/training_ev_battery_dataset_multiclass.csv
-!hardware/verilog_verifier/*.csv
-!hardware/verilog_verifier/*.coe
-!hardware/verilog_verifier/*.mem
+# ── Explicitly Tracked Hardware Model & Dataset Exception Rules ───────────────
+!esn_classifier_weights.h
+!esn_estimator_weights.h
+!original_ev_battery_dataset_multiclass.csv
+!training_ev_battery_dataset_multiclass.csv
+!verilog_verifier/*.csv
+!verilog_verifier/*.coe
+!verilog_verifier/*.mem
 
