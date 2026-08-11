@@ -118,7 +118,7 @@ def _ensure_db():
     return _mongodb_connected and db is not None
 
 def load_sim_state(force_db_read=False):
-    global local_state, _last_state_load_time
+    global _last_state_load_time
     now = time.time()
     # Cache state locally and only query remote DB Atlas once every 10 seconds unless forced
     if (force_db_read or (now - _last_state_load_time > 10.0)) and _ensure_db():
@@ -145,7 +145,6 @@ def save_sim_state(state):
             print(f"Battery State Estimator — Error saving state to MongoDB: {e}")
 
 def update_sim_progress(progress_dict):
-    global local_state
     local_state.update(progress_dict)
     if _ensure_db():
         try:
@@ -162,7 +161,7 @@ simulator = BatterySimulator()
 current_chemistry = None
 
 def generator_loop():
-    global current_chemistry, simulator
+    global current_chemistry
     print("Simulator background thread active.")
     last_loop_time = time.time()
     
@@ -298,7 +297,7 @@ def generator_loop():
             time.sleep(1.0)
 
 def sync_simulation_on_demand():
-    global current_chemistry, simulator, local_telemetry_buffer
+    global current_chemistry
     if not IS_SERVERLESS:
         return
         

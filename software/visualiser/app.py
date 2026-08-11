@@ -312,7 +312,6 @@ current_chemistry = None
 local_telemetry_buffer = []
 
 def load_sim_state():
-    global local_sim_state
     if check_db_connected():
         try:
             state = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
@@ -336,7 +335,6 @@ def save_sim_state(state):
             print(f"Error saving state to MongoDB: {e}")
 
 def update_sim_progress(progress_dict):
-    global local_sim_state
     local_sim_state.update(progress_dict)
     if check_db_connected():
         try:
@@ -349,7 +347,7 @@ def update_sim_progress(progress_dict):
             print(f"Error updating simulation progress in MongoDB: {e}")
 
 def sync_simulation_locally():
-    global current_chemistry, visualiser_simulator, local_telemetry_buffer
+    global current_chemistry
     if not IS_SERVERLESS:
         return
         
@@ -546,7 +544,7 @@ def status_checker_loop():
         time.sleep(3.0)
 
 def local_generator_loop():
-    global current_chemistry, visualiser_simulator, local_telemetry_buffer
+    global current_chemistry
     print("Visualizer local simulator background thread active.")
     last_loop_time = time.time()
     
@@ -785,7 +783,7 @@ def _lazy_init():
 
 # ── ESN Model Retraining Background Worker ────────────────────────────
 def run_training_async():
-    global training_status, esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
+    global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
     current_model_score = _model_score(loaded_soc_rmse, loaded_soh_rmse)
@@ -995,7 +993,6 @@ def index():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     try:
-        global model_loaded
         if not model_loaded:
             load_ml_model()
             
@@ -1242,8 +1239,6 @@ def control_simulation():
 
 @app.route('/api/train', methods=['POST'])
 def trigger_training():
-    global training_status
-
     # In serverless / read-only-filesystem environments, retraining requires
     # a remote dataset source. Block only if neither local CSV nor CSV_URL is set.
     if IS_SERVERLESS and not os.path.exists(Config.CSV_PATH) and not Config.CSV_URL:
@@ -1321,7 +1316,6 @@ def post_register_chemistry():
 
 @app.route('/api/telemetry', methods=['GET'])
 def get_telemetry():
-    global model_loaded
     try:
         if not model_loaded:
             load_ml_model()
