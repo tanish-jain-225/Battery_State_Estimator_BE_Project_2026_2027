@@ -382,10 +382,10 @@ pip install -r software/visualiser/requirements.txt
 ### Step 2: Set Up Database (Optional)
 Start a local MongoDB instance at `mongodb://localhost:27017/`. If MongoDB is disconnected, the visualiser will silently fall back to local memory data storage.
 
-### Step 3: Run Unit Tests (Recommended Verification)
-To verify calculations, observers and ESN quantization operations:
+### Step 3: Run ESN Training Verification (Recommended)
+To verify ESN feature engineering, observer convergence and model export:
 ```bash
-python -m unittest software/tests/test_estimators.py
+python software/visualiser/training/train_rc.py
 ```
 
 ### Step 4: Train ESN Models (Optional)

@@ -2,7 +2,7 @@
 
 # Hardware Subsystem
 
-This document provides a technical guide to the hardware subsystem, covering both the **C99 Embedded Microcontroller Firmware** (CSR matrix representation, fixed-point math, MCU pinouts) and the **Verilog HDL FPGA Hardware Verifier** targeting the **ARTIX A7100T FPGA** ([`verilog_verifier/README.md`](verilog_verifier/README.md)).
+This document provides a technical guide to the hardware subsystem, covering both the **C99 Embedded Microcontroller Firmware** (CSR matrix representation, fixed-point math, MCU pinouts) and the **Verilog HDL FPGA Hardware Verifier** targeting the **ARTIX A7100T FPGA** ([`FPGA_Verifier/README.md`](FPGA_Verifier/README.md)).
 
 > [!IMPORTANT]
 > **Project Scope & Feasibility Validation**: The primary deliverable of this project is a data-driven ESN estimator (software-validated for SOC/SOH), not a physical hardware product. The embedded C99 firmware and Verilog FPGA RTL modules serve strictly as a **testing and verification platform** to prove that the reservoir-computing execution pipeline is deployable under strict memory and computational constraints.
@@ -28,18 +28,19 @@ The layout below maps out the key modules within the hardware directory:
 ```text
 hardware/
 ├── hardware.md                                  # This hardware documentation
-├── main.c                                       # C99 classifier runtime & test simulation
-├── main.h                                       # Host-side HAL shims & microcontroller config
-├── train.py                                     # Core ESN Python implementation
-├── train_classifier.py                          # Trains the 3-class ESN & exports C weights
-├── train_estimator.py                           # Trains the SOC/SOH ESN & exports weights
-├── config.py                                    # Dimensions, thresholds and datasets settings
-├── esn_classifier_weights.h                     # Generated sparse classifier weight arrays
-├── esn_estimator_weights.h                      # Generated sparse estimator weight arrays
-├── original_ev_battery_dataset_multiclass.csv   # Synthesized multiclass drive-cycle data
-├── run_c_simulator.bat                          # Windows build-and-run script
-├── run_c_simulator.sh                           # Linux/macOS build-and-run script
-└── verilog_verifier/                            # Verilog RTL FPGA verification module
+├── STM_Verifier/                                # C99 embedded firmware and training scripts
+│   ├── main.c                                   # C99 classifier runtime & test simulation
+│   ├── main.h                                   # Host-side HAL shims & microcontroller config
+│   ├── train.py                                 # Core ESN Python implementation
+│   ├── train_classifier.py                      # Trains the 3-class ESN & exports C weights
+│   ├── train_estimator.py                       # Trains the SOC/SOH ESN & exports weights
+│   ├── config.py                                # Dimensions, thresholds and dataset settings
+│   ├── esn_classifier_weights.h                 # Generated sparse classifier weight arrays
+│   ├── esn_estimator_weights.h                  # Generated sparse estimator weight arrays
+│   ├── original_ev_battery_dataset_multiclass.csv   # Synthesized multiclass drive-cycle data
+│   ├── run_c_simulator.bat                      # Windows build-and-run script
+│   └── run_c_simulator.sh                       # Linux/macOS build-and-run script
+└── FPGA_Verifier/                               # Verilog RTL FPGA verification module
     ├── README.md                                # FPGA module documentation
     ├── esn_top.v                                # Top-level Verilog ESN wrapper
     ├── esn_neuron.v                             # Neuron datapath module
@@ -97,7 +98,7 @@ The network classifies inputs into three safety zones matching the status LED on
 
 ## ⚡ Embedded Optimizations
 
-Low-power microcontrollers (such as an ARM Cortex-M4 or M7) have strict constraints on processing speed and memory size. To deploy an Echo State Network on the edge, we implement two primary optimizations in [`main.c`](main.c).
+Low-power microcontrollers (such as an ARM Cortex-M4 or M7) have strict constraints on processing speed and memory size. To deploy an Echo State Network on the edge, we implement two primary optimizations in [`STM_Verifier/main.c`](STM_Verifier/main.c).
 
 ### A. Compressed Sparse Row (CSR) Sparse Matrix-Vector Multiplication (SpMV)
 A dense recurrent weight matrix $\mathbf{W}_{\text{res}}$ of size $50 \times 50$ requires $2,500$ multiplications. By introducing $85\%$ sparsity during reservoir generation ($\mathbf{W}_{\text{res}}$ entries set to zero), non-zero elements (NNZ) reduce to only $375$ operations.
@@ -153,14 +154,14 @@ To retrain the ESN models and export updated header configurations, run:
 
 ```bash
 # Trains classification model and generates esn_classifier_weights.h
-python hardware/train_classifier.py
+python hardware/STM_Verifier/train_classifier.py
 # Run with hyperparameter grid search:
-python hardware/train_classifier.py --grid-search
+python hardware/STM_Verifier/train_classifier.py --grid-search
 
 # Trains estimator model and generates esn_estimator_weights.h
-python hardware/train_estimator.py
+python hardware/STM_Verifier/train_estimator.py
 # Run with hyperparameter grid search:
-python hardware/train_estimator.py --grid-search
+python hardware/STM_Verifier/train_estimator.py --grid-search
 ```
 
 Adding the `--grid-search` switch triggers a programmatic sweep over spectral radii, leak rates and regularization penalties, selecting parameters that optimize validation classification accuracy or minimize SOC/SOH RMSE.
@@ -207,12 +208,12 @@ To test the edge diagnostic runtime logic locally and benchmark execution paths 
 
 - **On Windows (CMD/PowerShell):**
   ```powershell
-  hardware/run_c_simulator.bat
+  hardware/STM_Verifier/run_c_simulator.bat
   ```
 - **On Linux or macOS:**
   ```bash
-  chmod +x hardware/run_c_simulator.sh
-  ./hardware/run_c_simulator.sh
+  chmod +x hardware/STM_Verifier/run_c_simulator.sh
+  ./hardware/STM_Verifier/run_c_simulator.sh
   ```
 
 ### Comparative Benchmarking & Profiling

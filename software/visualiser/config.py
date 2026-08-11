@@ -110,7 +110,7 @@ class Config:
     # in ~3 seconds instead of 60s+ on a single-core Render container.
     # Local development retains full accuracy with 500 nodes.
     #
-    # SYNC NOTE: These values are mirrored in hardware/config.py → ESN_SOC_*.
+    # SYNC NOTE: These values are mirrored in hardware/STM_Verifier/config.py → ESN_SOC_*.
     # Any change here MUST be reflected there to keep hardware-software aligned.
     # -------------------------------------------------------------------------
     ESN_SOC_RESERVOIR    = int(os.environ.get("ESN_SOC_RESERVOIR", 200 if _IS_PRODUCTION else 500))
@@ -124,7 +124,7 @@ class Config:
     # SOH Echo State Network hyperparameters
     # Production cloud uses a smaller reservoir (150 nodes) for the same reason.
     #
-    # SYNC NOTE: These values are mirrored in hardware/config.py → ESN_SOH_*.
+    # SYNC NOTE: These values are mirrored in hardware/STM_Verifier/config.py → ESN_SOH_*.
     # Any change here MUST be reflected there to keep hardware-software aligned.
     # -------------------------------------------------------------------------
     ESN_SOH_RESERVOIR    = int(os.environ.get("ESN_SOH_RESERVOIR", 150 if _IS_PRODUCTION else 400))

@@ -48,11 +48,11 @@ flowchart TD
 - [ ] **Install Prerequisites**: Run `python -m pip install -r requirements.txt`.
 - [ ] **Clean Configuration**: Confirm `.env` files contain only local config values and are excluded from Git tracking.
 - [ ] **Train ESN Estimator Model**: Execute `python software/visualiser/training/train_rc.py` and confirm `model_rc.pkl` is exported.
-- [ ] **Train Hardware Classifier**: Execute `python hardware/train_classifier.py` and confirm [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) is created.
-- [ ] **Train Hardware Estimator**: Execute `python hardware/train_estimator.py` and check [`hardware/esn_estimator_weights.h`](../hardware/esn_estimator_weights.h).
-- [ ] **Verify FPGA Verilog RTL Golden Model**: Execute `python hardware/verilog_verifier/compare_results.py` and confirm all 200/200 neuron updates match bit-exactly between Vivado/XSim output and Python golden model.
-- [ ] **Execute Test Suite**: Run `python -m unittest discover -s software/tests -t .` (verify that all unit tests pass).
-- [ ] **Build C Simulator**: Execute `hardware/run_c_simulator.bat` (Windows) or `hardware/run_c_simulator.sh` (Unix) and confirm compile success.
+- [ ] **Train Hardware Classifier**: Execute `python hardware/STM_Verifier/train_classifier.py` and confirm [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h) is created.
+- [ ] **Train Hardware Estimator**: Execute `python hardware/STM_Verifier/train_estimator.py` and check [`hardware/STM_Verifier/esn_estimator_weights.h`](../hardware/STM_Verifier/esn_estimator_weights.h).
+- [ ] **Verify FPGA Verilog RTL Golden Model**: Execute `python hardware/FPGA_Verifier/compare_results.py` and confirm all 200/200 neuron updates match bit-exactly between Vivado/XSim output and Python golden model.
+- [ ] **Install Prerequisites**: Run `pip install -r hardware/STM_Verifier/requirements.txt`.
+- [ ] **Build C Simulator**: Execute `hardware/STM_Verifier/run_c_simulator.bat` (Windows) or `hardware/STM_Verifier/run_c_simulator.sh` (Unix) and confirm compile success.
 
 ### 2. Live Interactive Demo
 - [ ] **Boot Simulator**: Run `python software/simulator/app.py` in a separate terminal.

@@ -89,12 +89,12 @@ desktop.ini
 ehthumbs.db
 
 # ── Explicitly Tracked Model & Dataset Exception Rules ─────────────────────────
-!hardware/esn_classifier_weights.h
-!hardware/esn_estimator_weights.h
+!hardware/STM_Verifier/esn_classifier_weights.h
+!hardware/STM_Verifier/esn_estimator_weights.h
 !software/visualiser/model_rc.pkl
-!hardware/original_ev_battery_dataset_multiclass.csv
-!hardware/training_ev_battery_dataset_multiclass.csv
-!hardware/verilog_verifier/*.csv
-!hardware/verilog_verifier/*.coe
-!hardware/verilog_verifier/*.mem
+!hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv
+!hardware/STM_Verifier/training_ev_battery_dataset_multiclass.csv
+!hardware/FPGA_Verifier/*.csv
+!hardware/FPGA_Verifier/*.coe
+!hardware/FPGA_Verifier/*.mem
 

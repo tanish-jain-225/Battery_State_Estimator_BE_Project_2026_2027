@@ -105,9 +105,10 @@ Below is a breakdown of the key files and classes implementing the battery estim
 > [!NOTE]
 > Both services must be running simultaneously for the full system to operate. The visualiser (Port 5000) fetches telemetry from the simulator (Port 8000).
 
-1. Install Python packages from the repository root:
+1. Install Python packages for each service:
    ```bash
-   python -m pip install -r requirements.txt
+   pip install -r software/simulator/requirements.txt
+   pip install -r software/visualiser/requirements.txt
    ```
 2. Open terminal 1 and start the physics simulator:
    ```bash
@@ -123,11 +124,11 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 ## 🧪 Verification and Testing
 
-Verify code correctness and math convergence by running the unit test suite:
+Verify the ESN training pipeline runs correctly:
 ```bash
-python -m unittest discover -s software/tests -t .
+python software/visualiser/training/train_rc.py
 ```
-The test modules verify:
-- **`test_estimators.py`**: Model dynamics, observer convergence thresholds and Arrhenius parameter shifts.
-- **`test_api_auth.py`**: Cryptographic SHA-256 header validation and fails-open local bypassing.
-- **`test_production_train.py`**: Integrity of the offline model pipeline and generated headers output shape.
+The training script verifies:
+- Model dynamics and observer convergence.
+- ESN feature engineering and prediction pipeline.
+- Exported `model_rc.pkl` weight integrity.

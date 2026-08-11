@@ -1,5 +1,5 @@
 """
-hardware/config.py
+hardware/STM_Verifier/config.py
 ──────────────────
 Hardware-side configuration for the ESN State Classifier AND ESN State Estimator.
 

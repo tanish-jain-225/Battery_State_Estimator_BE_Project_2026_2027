@@ -93,7 +93,7 @@ ehthumbs.db
 !esn_estimator_weights.h
 !original_ev_battery_dataset_multiclass.csv
 !training_ev_battery_dataset_multiclass.csv
-!verilog_verifier/*.csv
-!verilog_verifier/*.coe
-!verilog_verifier/*.mem
+!../FPGA_Verifier/*.csv
+!../FPGA_Verifier/*.coe
+!../FPGA_Verifier/*.mem
 

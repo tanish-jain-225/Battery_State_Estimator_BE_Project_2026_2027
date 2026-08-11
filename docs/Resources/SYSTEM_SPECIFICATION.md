@@ -19,7 +19,7 @@ This document defines the interfaces, state flow, runtime modes, API payloads an
 
 ## System Goal
 
-The primary deliverable of this project is a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting) for SOC and SOH tracking. EKF and Coulomb Counting are implemented strictly as baseline benchmarks for comparison. The software estimator algorithm represents the final product, while embedded C99 microcontrollers and an **ARTIX A7100T FPGA** hardware RTL environment (`hardware/verilog_verifier`) serve as the testing and verification platform.
+The primary deliverable of this project is a data-driven **Echo State Network (ESN)** estimator designed as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting) for SOC and SOH tracking. EKF and Coulomb Counting are implemented strictly as baseline benchmarks for comparison. The software estimator algorithm represents the final product, while embedded C99 microcontrollers and an **ARTIX A7100T FPGA** hardware RTL environment (`hardware/FPGA_Verifier`) serve as the testing and verification platform.
 
 ---
 
@@ -32,9 +32,9 @@ The table below outlines the key software and hardware components of the system:
 | **Physics Simulator** | [`software/simulator/app.py`](../software/simulator/app.py) | Generates 2-RC ECM telemetry, thermal behavior, aging and injected faults. |
 | **Visualiser Dashboard** | [`software/visualiser/app.py`](../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics and controls. |
 | **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN and CPS diagnostics. |
-| **Hardware Classifier (C99)** | [`hardware/main.c`](../hardware/main.c) | Runs sparse ESN inference (CSR 6.7× speedup) for edge safety state classification. |
-| **FPGA Verilog ESN Verifier** | [`hardware/verilog_verifier/`](../hardware/verilog_verifier/README.md) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
-| **Training & Export Pipelines** | [`hardware/train_classifier.py`](../hardware/train_classifier.py)<br>[`hardware/train_estimator.py`](../hardware/train_estimator.py) | Train ESN models and export Python/C weight headers. |
+| **Hardware Classifier (C99)** | [`hardware/STM_Verifier/main.c`](../hardware/STM_Verifier/main.c) | Runs sparse ESN inference (CSR 6.7× speedup) for edge safety state classification. |
+| **FPGA Verilog ESN Verifier** | [`hardware/FPGA_Verifier/`](../hardware/FPGA_Verifier/README.md) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
+| **Training & Export Pipelines** | [`hardware/STM_Verifier/train_classifier.py`](../hardware/STM_Verifier/train_classifier.py)<br>[`hardware/STM_Verifier/train_estimator.py`](../hardware/STM_Verifier/train_estimator.py) | Train ESN models and export Python/C weight headers. |
 
 ---
 
@@ -307,5 +307,9 @@ Robustness and estimation accuracy limits are verified using automated unit suit
 
 Run the test runner locally using:
 ```bash
-python -m unittest discover -s software/tests -t .
+python software/visualiser/training/train_rc.py
+```
+
+```bash
+python hardware/STM_Verifier/train_classifier.py
 ```

@@ -167,7 +167,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     print(f"  Voltage_grad: mean={input_means[2]:.4f}, std={input_stds[2]:.4f}")
     print(f"  Current_ma: mean={input_means[3]:.4f}, std={input_stds[3]:.4f}")
 
-    # ── ESN Estimator Hyperparameters — read from hardware/config.py ─────────────
+    # ── ESN Estimator Hyperparameters — read from hardware/STM_Verifier/config.py ──────────
     # These values MUST mirror software/visualiser/config.py → ESN_SOC_*/ESN_SOH_*.
     # Do NOT hardcode them here — change config.py to affect both hardware and software.
     from config import Config as HWConfig

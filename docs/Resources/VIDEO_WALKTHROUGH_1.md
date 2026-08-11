@@ -27,8 +27,8 @@ The script below aligns what is shown on screen with the synthesized narration a
 
 1. **Prerequisites Checklist**:
    * Make sure your physics engine database or local buffer is active.
-   * Run `python software/visualiser/training/train_rc.py` and `python hardware/train_classifier.py` beforehand so all model files (`model_rc.pkl`, `esn_classifier_weights.h`) are up to date.
-   * Execute `python hardware/verilog_verifier/compare_results.py` to confirm the 200/200 bit-exact Vivado/XSim verifier report is clean.
+   * Run `python software/visualiser/training/train_rc.py` and `python hardware/STM_Verifier/train_classifier.py` beforehand so all model files (`model_rc.pkl`, `esn_classifier_weights.h`) are up to date.
+   * Execute `python hardware/FPGA_Verifier/compare_results.py` to confirm the 200/200 bit-exact Vivado/XSim verifier report is clean.
    * Open the dashboard browser (`http://localhost:5000`) and simulator (`http://localhost:8000`) in side-by-side windows.
 2. **Narration Pacing**:
    * The total script is approximately **610 words**. Speaking at a moderate rate of 130 words per minute will leave around 45 seconds of buffer time for screen transitions and clicks.

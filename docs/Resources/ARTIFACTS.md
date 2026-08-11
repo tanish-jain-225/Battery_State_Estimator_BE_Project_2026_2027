@@ -50,10 +50,10 @@ The table below catalogs all model parameters, datasets and generated headers tr
 
 | File path | Format | Typical Size | Role | Source / Generator | Versioning Policy |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [`hardware/original_ev_battery_dataset_multiclass.csv`](../hardware/original_ev_battery_dataset_multiclass.csv) | CSV | ~360 KB | Training and validation data for thermal state classification. | Synthesized battery sensor logs. | Immutable. Only updated on structural schema shifts. |
+| [`hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv`](../hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv) | CSV | ~360 KB | Training and validation data for thermal state classification. | Synthesized battery sensor logs. | Immutable. Only updated on structural schema shifts. |
 | [`software/visualiser/model_rc.pkl`](../software/visualiser/model_rc.pkl) | PKL | ~140 KB | Local fallback model for the visualiser ESN estimator (used when MongoDB is offline). | Trained via [`train_rc.py`](../software/visualiser/training/train_rc.py). | Regenerated upon tuning model hyperparameters. |
-| [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) | H (C Header) | ~13 KB | Generated sparse classifier weights consumed by [`main.c`](../hardware/main.c). | Exported via [`train_classifier.py`](../hardware/train_classifier.py). | Re-exported whenever the classifier ESN is retrained. |
-| [`hardware/esn_estimator_weights.h`](../hardware/esn_estimator_weights.h) | H (C Header) | ~5.8 MB | Generated estimator weights for embedded testing. | Exported via [`train_estimator.py`](../hardware/train_estimator.py). | Updated on observer pipeline refinements. |
+| [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h) | H (C Header) | ~13 KB | Generated sparse classifier weights consumed by [`main.c`](../hardware/STM_Verifier/main.c). | Exported via [`train_classifier.py`](../hardware/STM_Verifier/train_classifier.py). | Re-exported whenever the classifier ESN is retrained. |
+| [`hardware/STM_Verifier/esn_estimator_weights.h`](../hardware/STM_Verifier/esn_estimator_weights.h) | H (C Header) | ~5.8 MB | Generated estimator weights for embedded testing. | Exported via [`train_estimator.py`](../hardware/STM_Verifier/train_estimator.py). | Updated on observer pipeline refinements. |
 
 ---
 

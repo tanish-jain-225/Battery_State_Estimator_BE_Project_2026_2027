@@ -171,7 +171,7 @@ The table below contrasts the three methodologies evaluated in the project. Note
 
 ## 5. Embedded Edge Optimizations
 
-For resource-constrained edge hardware (implemented in [`main.c`](../hardware/main.c)), the firmware features specific performance enhancements:
+For resource-constrained edge hardware (implemented in [`main.c`](../hardware/STM_Verifier/main.c)), the firmware features specific performance enhancements:
 
 ### A. Compressed Sparse Row (CSR) SpMV
 A $50 \times 50$ reservoir matrix has $2,500$ floating-point multiplication operations. By introducing $85\%$ sparsity during reservoir generation ($\mathbf{W}_{\text{res}}$ entries set to zero), non-zero elements (NNZ) reduce to only $375$ operations.

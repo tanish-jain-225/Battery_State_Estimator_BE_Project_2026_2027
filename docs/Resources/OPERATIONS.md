@@ -21,13 +21,17 @@ This guide describes local setup, environment configuration, training pipelines,
    ```
 2. Install the necessary Python packages:
    ```bash
-   python -m pip install -r requirements.txt
+   pip install -r software/simulator/requirements.txt
+   pip install -r software/visualiser/requirements.txt
+   pip install -r hardware/STM_Verifier/requirements.txt
    ```
 
 ### ⚡ 1-Click Automated Validation Pipeline
-You can run the entire model training, hardware weight generation, unit testing, and C simulator benchmarking pipeline in one command:
-- **Windows**: `run_all_validation.bat`
-- **Linux / macOS**: `chmod +x run_all_validation.sh && ./run_all_validation.sh`
+
+Run the entire end-to-end training, testing and C simulator verification suite:
+```cmd
+run_all_validation.bat
+```
 
 ### Local Environment Settings
 
@@ -72,16 +76,16 @@ python software/visualiser/training/train_rc.py
 ### B. Train the Hardware ESN Classifier
 Trains the 3-class thermal safety classification network using the database records and generates the optimized C headers.
 ```bash
-python hardware/train_classifier.py
+python hardware/STM_Verifier/train_classifier.py
 ```
-* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details and code generation of [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h).
+* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details and code generation of [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h).
 
 ### C. Train the Hardware ESN Estimator (Optional)
 Generates sparse estimator weights for running advanced regressions on-chip.
 ```bash
-python hardware/train_estimator.py
+python hardware/STM_Verifier/train_estimator.py
 ```
-* **Expected Output:** Exports weight vectors into [`hardware/esn_estimator_weights.h`](../hardware/esn_estimator_weights.h).
+* **Expected Output:** Exports weight vectors into [`hardware/STM_Verifier/esn_estimator_weights.h`](../hardware/STM_Verifier/esn_estimator_weights.h).
 
 ---
 
@@ -129,12 +133,12 @@ The desktop C simulator runs a verification dataset through the CSR-compressed E
 
 - **On Windows (PowerShell/CMD):**
   ```powershell
-  hardware/run_c_simulator.bat
+  hardware/STM_Verifier/run_c_simulator.bat
   ```
 - **On Linux or macOS:**
   ```bash
-  chmod +x hardware/run_c_simulator.sh
-  ./hardware/run_c_simulator.sh
+  chmod +x hardware/STM_Verifier/run_c_simulator.sh
+  ./hardware/STM_Verifier/run_c_simulator.sh
   ```
 
 * **Expected Output:**
@@ -149,7 +153,7 @@ The desktop C simulator runs a verification dataset through the CSR-compressed E
   ```
 
 ### Microcontroller Deployment (STM32)
-1. Import [`hardware/main.c`](../hardware/main.c), [`hardware/main.h`](../hardware/main.h) and [`hardware/esn_classifier_weights.h`](../hardware/esn_classifier_weights.h) into STM32CubeIDE.
+1. Import [`hardware/STM_Verifier/main.c`](../hardware/STM_Verifier/main.c), [`hardware/STM_Verifier/main.h`](../hardware/STM_Verifier/main.h) and [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h) into STM32CubeIDE.
 2. In the pin configuration tool, configure **`PA5`** as a standard digital output pin (maps to the on-board user LED on Nucleo boards).
 3. Configure **`USART2`** (pins `PA2`/`PA3`) for UART communication at **115200 baud, 8 data bits, 1 stop bit**.
 4. Compile and flash the code.

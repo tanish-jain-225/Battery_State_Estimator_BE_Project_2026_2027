@@ -7,10 +7,9 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![Embedded C](https://img.shields.io/badge/Embedded_C-C99-orange?style=flat)](https://en.cppreference.com/w/c/99)
-[![Verilog HDL](https://img.shields.io/badge/Verilog_HDL-Q6.10_FPGA-purple?style=flat)](hardware/verilog_verifier/README.md)
+[![Verilog HDL](https://img.shields.io/badge/Verilog_HDL-Q6.10_FPGA-purple?style=flat)](hardware/FPGA_Verifier/README.md)
 [![Flask](https://img.shields.io/badge/Flask-2.0%2B-black?style=flat&logo=flask)](https://flask.palletsprojects.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0%2B-green?style=flat&logo=mongodb)](https://www.mongodb.com/)
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=flat)](.github/workflows/ci.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027?style=flat)](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main)
 
 A cyber-physical battery state estimator system that delivers accurate, real-time State of Charge (SOC) and State of Health (SOH) estimation. The software algorithm represents the final product, while embedded C99 microcontrollers and an **ARTIX A7100T FPGA** hardware RTL environment serve as the testing and verification platform. It combines a 2-RC physics simulator, traditional observers (Sage-Husa EKF, Coulomb Counting), Echo State Networks (ESNs), and low-power embedded hardware verification.
@@ -312,14 +311,14 @@ To support production-grade deployment guidelines, the system implements the fol
 
 | File Type | File Name / Link | Description |
 | :--- | :--- | :--- |
-| **System Specification** | [`docs/SYSTEM_SPECIFICATION.md`](docs/SYSTEM_SPECIFICATION.md) | Interfaces, data flow, APIs, security and validation scope |
-| **Operations Guide** | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Local setup, run, security settings and verification steps |
-| **Render Deployment** | [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md) | Standalone Render deployment instructions |
-| **Demo Checklist** | [`docs/DEMO_CHECKLIST.md`](docs/DEMO_CHECKLIST.md) | Review and viva demonstration checklist |
-| **Literature Survey & Foundations** | [`docs/LITERATURE_SURVEY.md`](docs/LITERATURE_SURVEY.md) | Theoretical electro-chemical and neural reservoir modeling equations |
-| **Circuit / Pinout Reference** | [`hardware/main.h`](hardware/main.h) | Host HAL mocks and STM32-style pin assumptions |
+| **System Specification** | [`docs/Resources/SYSTEM_SPECIFICATION.md`](docs/Resources/SYSTEM_SPECIFICATION.md) | Interfaces, data flow, APIs, security and validation scope |
+| **Operations Guide** | [`docs/Resources/OPERATIONS.md`](docs/Resources/OPERATIONS.md) | Local setup, run, security settings and verification steps |
+| **Render Deployment** | [`docs/Resources/DEPLOY_RENDER.md`](docs/Resources/DEPLOY_RENDER.md) | Standalone Render deployment instructions |
+| **Demo Checklist** | [`docs/Resources/DEMO_CHECKLIST.md`](docs/Resources/DEMO_CHECKLIST.md) | Review and viva demonstration checklist |
+| **Literature Survey & Foundations** | [`docs/literature_survey.md`](docs/literature_survey.md) | Theoretical electro-chemical and neural reservoir modeling equations |
+| **Circuit / Pinout Reference** | [`hardware/STM_Verifier/main.h`](hardware/STM_Verifier/main.h) | Host HAL mocks and STM32-style pin assumptions |
 | **Simulation File** | [`software/simulator/battery_simulator.py`](software/simulator/battery_simulator.py) | 2-RC electro-thermal battery model |
-| **Embedded Firmware** | [`hardware/main.c`](hardware/main.c) | C99 ESN edge classifier |
+| **Embedded Firmware** | [`hardware/STM_Verifier/main.c`](hardware/STM_Verifier/main.c) | C99 ESN edge classifier |
 
 ---
 
@@ -507,24 +506,45 @@ The visualiser features real-time diagnostics that identify three distinct categ
 
 ```text
 Battery_State_Estimator_BE_Project_2026_2027/
-├── run_all_validation.bat                   # Windows 1-click training, testing and validation
-├── run_all_validation.sh                    # Linux/macOS 1-click training, testing and validation
+├── run_all_validation.bat                   # 1-Click end-to-end training, testing and validation
 ├── README.md                                # This document
-├── requirements.txt                         # Python dependencies
 ├── docs/
+│   ├── literature_survey.md                 # Theoretical foundations and equations
+│   ├── Resources/                           # Project documentation and guides
+│   │   ├── SYSTEM_SPECIFICATION.md          # Interfaces, data flow, APIs, security
+│   │   ├── OPERATIONS.md                    # Local setup, run and verification steps
+│   │   ├── DEPLOY_RENDER.md                 # Render cloud deployment instructions
+│   │   ├── DEMO_CHECKLIST.md                # Review and viva demonstration checklist
+│   │   ├── ARTIFACTS.md                     # Model, dataset and header artifact policy
+│   │   ├── PRESENTATION.md                  # Slide blueprint
+│   │   ├── VIDEO_WALKTHROUGH_1.md           # Video walkthrough timeline
+│   │   └── WALKTHROUGH_SCRIPT_1.md          # Walkthrough script
+│   └── Review_1/                            # Review 1 deliverables
 ├── hardware/
-│   ├── train_classifier.py                  # Trains 3-class ESN and exports C headers
-│   ├── train_estimator.py                   # Trains SOC/SOH ESN and exports weights
-│   ├── esn_classifier_weights.h             # Generated sparse classifier weight arrays
-│   ├── esn_estimator_weights.h              # Generated sparse estimator weight arrays
-│   ├── run_c_simulator.bat                  # Windows build-and-run script
-│   ├── run_c_simulator.sh                   # Linux/macOS build-and-run script
-│   └── original_ev_battery_dataset_multiclass.csv  # Synthesized multiclass drive-cycle data
+│   ├── hardware.md                          # Hardware subsystem documentation
+│   ├── STM_Verifier/                        # C99 embedded firmware and training scripts
+│   │   ├── main.c                           # C99 ESN classifier runtime & test simulation
+│   │   ├── main.h                           # Host-side HAL shims & microcontroller config
+│   │   ├── train.py                         # Core ESN Python implementation
+│   │   ├── train_classifier.py              # Trains 3-class ESN and exports C headers
+│   │   ├── train_estimator.py               # Trains SOC/SOH ESN and exports weights
+│   │   ├── config.py                        # Dimensions, thresholds and dataset settings
+│   │   ├── esn_classifier_weights.h         # Generated sparse classifier weight arrays
+│   │   ├── esn_estimator_weights.h          # Generated sparse estimator weight arrays
+│   │   ├── original_ev_battery_dataset_multiclass.csv  # Multiclass drive-cycle data
+│   │   ├── run_c_simulator.bat              # Windows build-and-run script
+│   │   └── run_c_simulator.sh               # Linux/macOS build-and-run script
+│   └── FPGA_Verifier/                       # Verilog RTL FPGA verification module
+│       ├── README.md                        # FPGA module documentation
+│       ├── esn_top.v                        # Top-level Verilog ESN wrapper
+│       ├── esn_neuron.v                     # Neuron datapath module
+│       ├── reservoir_controller.v           # Recurrent execution state machine
+│       ├── tanh_lut.v                       # Hardware tanh lookup table module
+│       ├── tb_esn_top.v                     # Testbench for Vivado / XSim simulation
+│       ├── golden.py                        # Independent Python golden reference model
+│       └── compare_results.py               # Verifies Vivado CSV output against golden
 ├── software/
-│   ├── tests/
-│   │   ├── test_estimators.py               # Unit tests for EKF/ESN accuracy
-│   │   ├── test_api_auth.py                 # Security and API auth checks
-│   │   └── test_production_train.py         # End-to-end training verification
+│   ├── software.md                          # Software subsystem documentation
 │   ├── simulator/
 │   │   ├── app.py                           # Simulator Flask application
 │   │   ├── battery_simulator.py             # 2-RC transient equation solvers
@@ -547,10 +567,8 @@ Battery_State_Estimator_BE_Project_2026_2027/
 │       └── static/                          # Dashboard CSS/JS/images
 ├── images/
 │   └── assets/                              # Screenshots and visual materials
-├── reference/
-│   └── paper.md                             # Research paper draft
-└── .github/
-    └── workflows/ci.yml                     # CI pipeline configuration
+└── reference/
+    └── paper.md                             # Research paper draft
 ```
 
 ---
@@ -560,8 +578,8 @@ Battery_State_Estimator_BE_Project_2026_2027/
 ### Automated End-to-End Validation (Recommended)
 
 > [!TIP]
-> You can run the entire training, testing, and simulator verification pipeline in one step:
-> ```bash
+> You can run the entire training, testing, hardware simulation, and automatically launch the live web dashboards (Port 8000 & 5000) in one step:
+> ```cmd
 > run_all_validation.bat
 > ```
 
@@ -573,7 +591,12 @@ cd Battery_State_Estimator_BE_Project_2026_2027
 
 ### Step 2: Install Dependencies
 ```bash
-python -m pip install -r requirements.txt
+# For the Physics Simulator:
+python -m pip install -r software/simulator/requirements.txt
+# For the Visualiser Dashboard:
+python -m pip install -r software/visualiser/requirements.txt
+# For the STM32 Hardware training scripts:
+python -m pip install -r hardware/STM_Verifier/requirements.txt
 ```
 
 ### Step 3: Train the ESN Estimators and Hardware Weights
@@ -583,11 +606,11 @@ python software/visualiser/training/train_rc.py
 ```
 Train the hardware classification weights:
 ```bash
-python hardware/train_classifier.py
+python hardware/STM_Verifier/train_classifier.py
 ```
 Train the hardware estimator weights (optional):
 ```bash
-python hardware/train_estimator.py
+python hardware/STM_Verifier/train_estimator.py
 ```
 
 ### Step 4: Run the Code
@@ -601,14 +624,14 @@ Start the visualiser dashboard in a second terminal:
 python software/visualiser/app.py
 ```
 
-Run the hardware C simulator:
+Run the hardware C simulator (from the `hardware/STM_Verifier/` directory):
 ```bash
-hardware/run_c_simulator.bat
+hardware/STM_Verifier/run_c_simulator.bat
 ```
 On Linux or macOS:
 ```bash
-chmod +x hardware/run_c_simulator.sh
-hardware/run_c_simulator.sh
+chmod +x hardware/STM_Verifier/run_c_simulator.sh
+hardware/STM_Verifier/run_c_simulator.sh
 ```
 
 ### Step 5: Observe the Output
@@ -621,9 +644,10 @@ hardware/run_c_simulator.sh
 
 ## Testing and Results
 
-Verified locally with:
-```bash
-python -m unittest discover -s software/tests -t .
+The end-to-end testing suite covers both **software** (Flask physics simulator, multi-estimator pipeline, ESN training) and **hardware** (STM32 C99 CSR sparse classifier, SOC/SOH estimator weight exporter, and FPGA Artix-7 Verilog RTL golden model):
+
+```cmd
+run_all_validation.bat
 ```
 
 <details>
@@ -739,8 +763,8 @@ Minimum expected updates:
 - Push code changes with meaningful commit messages.
 - Keep `.env` files, credentials, caches and compiled binaries out of Git.
 - Add tests when changing simulator, estimator, or feature logic.
-- Document model, dataset and generated-header changes in [`docs/ARTIFACTS.md`](docs/ARTIFACTS.md).
-- Keep deployment settings documented in [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md).
+- Document model, dataset and generated-header changes in [`docs/Resources/ARTIFACTS.md`](docs/Resources/ARTIFACTS.md).
+- Keep deployment settings documented in [`docs/Resources/DEPLOY_RENDER.md`](docs/Resources/DEPLOY_RENDER.md).
 
 ---
 
