@@ -93,9 +93,7 @@ The proposed system develops a standalone data-driven Echo State Network (ESN) s
 
 ## System Architecture
 
-```markdown
 ![System Architecture](images/system_architecture.png)
-```
 
 ```mermaid
 flowchart LR
@@ -164,8 +162,6 @@ The system architecture follows a decoupled cyber-physical design:
 
 ## Methodology
 
-Explain the step-by-step approach:
-
 1. **Literature survey**: Conduct comprehensive research on battery electrochemistry, 2-RC Equivalent Circuit Models, Extended Kalman Filters, Reservoir Computing (ESN), and embedded fixed-point optimization.
 2. **Problem identification**: Define existing BMS challenges including parameter dependence, EKF matrix computation overhead, open-loop Coulomb Counting drift, and edge MCU resource constraints.
 3. **Requirement analysis**: Establish target performance metrics (sub-1.5% SOC RMSE, sub-1.0% SOH RMSE, sub-1 ms execution latency, 6.7× MCU speedup, bit-exact hardware RTL verification).
@@ -194,8 +190,6 @@ Explain the step-by-step approach:
 
 ## Weekly Progress Updates
 
-Students must update this section every week.
-
 | Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | Status | GitHub Commit Link |
 | ------ | ---- | -------------- | -------------------------- | ------------------- | ------ | ------------------ |
 | Week 1 | 2026-05-07 | Finalized problem statement, repository structure, and core scope | Literature review on battery ECM and ESNs | Defining scope boundaries | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
@@ -212,8 +206,6 @@ Students must update this section every week.
 
 ## Design Files
 
-Upload and link all design files here.
-
 | File Type | File Name / Link | Description |
 | --------------- | ---------------- | ----------- |
 | CAD Model | [`hardware/FPGA_Verifier/README.md`](hardware/FPGA_Verifier/README.md) | Hardware FPGA verifier architecture and BRAM timing specification |
@@ -228,11 +220,7 @@ Upload and link all design files here.
 
 ## Circuit Diagram
 
-Add circuit diagram image here.
-
-```markdown
 ![Circuit Diagram](images/circuit_diagram.png)
-```
 
 ```mermaid
 flowchart LR
@@ -270,11 +258,7 @@ The battery cell is modeled using a **Second-Order RC Equivalent Circuit Model (
 
 ## Flowchart / Algorithm
 
-Add flowchart image here.
-
-```markdown
 ![Flowchart](images/flowchart.png)
-```
 
 ```mermaid
 flowchart TD
@@ -301,8 +285,6 @@ flowchart TD
 ---
 
 ## Implementation Details
-
-Explain the actual implementation of the project.
 
 ### Hardware Implementation
 
@@ -505,11 +487,7 @@ python hardware/FPGA_Verifier/compare_results.py
 
 ## Result Images / Videos
 
-Add images or videos of the working prototype.
-
-```markdown
 ![Prototype](images/prototype_photo.jpg)
-```
 
 ### Visualiser Comparison Dashboard
 
@@ -525,15 +503,11 @@ Add images or videos of the working prototype.
 
 Video Link:
 
-```markdown
 [Project Demo Video](https://drive.google.com/your-video-link)
-```
 
 ---
 
 ## Applications
-
-Mention real-world applications of the project.
 
 1. Electric Vehicle Battery Management Systems (BMS) for real-time SOC and SOH tracking.
 2. Grid-Scale Battery Energy Storage Systems (BESS) state estimation and degradation monitoring.
@@ -562,8 +536,6 @@ Mention real-world applications of the project.
 
 ## Future Scope
 
-Mention possible improvements.
-
 1. **Full MCU SOC/SOH Estimator Firmware Porting**: Deploy continuous SOC/SOH readout weights (`esn_estimator_weights.h`) onto physical STM32 microcontrollers.
 2. **Hardware-in-the-Loop (HIL) Physical Cell Interface**: Connect physical lithium-ion cells and programmable load hardware via UART/CAN links.
 3. **Online Adaptive Readout Weight Tuning**: Implement Recursive Least Squares (RLS) on MCU readout weights for live continuous adaptation under cell aging.
@@ -584,8 +556,6 @@ Mention possible improvements.
 ---
 
 ## References
-
-Add references in IEEE format.
 
 ```text
 [1] P. Li, H. Wang, Z. Xing, K. Ye, and Q. Li, "Joint estimation of SOC and SOH for lithium-ion batteries based on EKF multiple time scales," Journal of Intelligent Manufacturing and Special Equipment, vol. 1, no. 1, pp. 107-120, 2020.
