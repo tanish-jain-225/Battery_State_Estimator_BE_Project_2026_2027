@@ -1,0 +1,32 @@
+# Makefile for STM32 Cyber-Physical ESN Estimator (ARM Cortex-M4)
+
+CC = arm-none-eabi-gcc
+OBJCOPY = arm-none-eabi-objcopy
+
+CPU = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+
+CFLAGS = $(CPU) -std=c99 -Wall -Wextra -O2 \
+         -DSTM32F407xx -DUSE_HAL_DRIVER \
+         -I.
+
+LDFLAGS = $(CPU) -specs=nano.specs -specs=nosys.specs -lm
+
+SRCS = main.c
+OBJS = $(SRCS:.c=.o)
+TARGET = stm32_esn_verifier
+
+all: $(TARGET).elf $(TARGET).bin
+
+$(TARGET).elf: $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET).bin: $(TARGET).elf
+	$(OBJCOPY) -O binary $< $@
+
+clean:
+	rm -f $(OBJS) $(TARGET).elf $(TARGET).bin
+
+.PHONY: all clean

@@ -8,18 +8,18 @@ from train import EchoStateNetwork
 def generate_full_range_dataset():
     """
     Generates a high-fidelity synthetic battery dataset covering the full range
-    of SOC (0% to 100%) and SOH (80% to 100%) using the physics simulator.
+    of SOC (0% to 100%) and SOH (80% to 100%) with continuous degradation profiles.
     """
     import sys
     import os
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    visualiser_path = os.path.join(base_dir, 'software', 'visualiser')
-    if visualiser_path not in sys.path:
-        sys.path.append(visualiser_path)
+    from pathlib import Path
+    root_dir = Path(__file__).resolve().parent.parent.parent
+    shared_path = str(root_dir / 'software' / 'shared')
+    if shared_path not in sys.path:
+        sys.path.insert(0, shared_path)
     try:
-        from battery_simulator import BatterySimulator
+        from software.shared.battery_simulator import BatterySimulator
     except ImportError:
-        sys.path.append(os.path.join(base_dir, 'software', 'simulator'))
         from battery_simulator import BatterySimulator
         
     import pandas as pd
@@ -27,8 +27,10 @@ def generate_full_range_dataset():
     records = []
     soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
     dt = 1.0
+    global_time = 0.0
     
-    for soh_target in soh_levels:
+    for idx, soh_target in enumerate(soh_levels):
+        next_soh = soh_levels[idx + 1] if idx + 1 < len(soh_levels) else soh_target - 0.05
         # 1. Discharging Cycle (Constant + Pulsed)
         sim = BatterySimulator()
         sim.reset("li_ion")
@@ -37,7 +39,13 @@ def generate_full_range_dataset():
         sim.temperature = 25.0
         
         t = 0.0
-        while sim.soc > 0.01:
+        total_steps = 1500
+        step_count = 0
+        while sim.soc > 0.01 and step_count < total_steps:
+            step_count += 1
+            # Smoothly decay SOH over step progress to prevent artificial step shocks
+            sim.soh = max(0.80, soh_target - (soh_target - next_soh) * (step_count / float(total_steps)))
+            sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - sim.soh)
             I = 2.0
             if int(t) % 100 < 20:
                 I = 4.5
@@ -46,14 +54,15 @@ def generate_full_range_dataset():
                 
             out = sim.step(I, dt, accelerated_aging=False)
             records.append({
-                'Time': t,
+                'Time': global_time,
                 'Voltage': 3.0 * out['voltage'],
                 'Current': I,
                 'Temperature': out['temperature'],
                 'SOC': out['true_soc'],
-                'SOH': out['true_soh']
+                'SOH': sim.soh
             })
             t += dt
+            global_time += dt
             
         # 2. Charging Cycle (CCCV Charge)
         sim = BatterySimulator()
@@ -64,21 +73,26 @@ def generate_full_range_dataset():
         sim.temperature = 25.0
         
         t = 0.0
-        while sim.soc < 0.99:
+        step_count = 0
+        while sim.soc < 0.99 and step_count < total_steps:
+            step_count += 1
+            sim.soh = max(0.80, soh_target - (soh_target - next_soh) * (step_count / float(total_steps)))
+            sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - sim.soh)
             I_charge = 2.0
             if sim.voltage > 4.15:
                 I_charge = max(0.1, 2.0 * (4.2 - sim.voltage) / 0.05)
                 
-            out = sim.step(I_charge, dt, accelerated_aging=False)
+            out = sim.step(-I_charge, dt, accelerated_aging=False)
             records.append({
-                'Time': t,
+                'Time': global_time,
                 'Voltage': 3.0 * out['voltage'],
                 'Current': -I_charge,
                 'Temperature': out['temperature'],
                 'SOC': out['true_soc'],
-                'SOH': out['true_soh']
+                'SOH': sim.soh
             })
             t += dt
+            global_time += dt
             
     return pd.DataFrame(records)
 

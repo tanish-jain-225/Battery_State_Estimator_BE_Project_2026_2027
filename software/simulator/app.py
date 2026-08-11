@@ -24,13 +24,11 @@ app = Flask(__name__)
 app_start_time = time.time()
 
 def get_shared_secret():
-    import hashlib
-    # Read database connection URI which is already required and configured
-    uri = os.environ.get("MONGODB_URI", Config.MONGODB_URI)
-    if not uri or "localhost" in uri or "127.0.0.1" in uri:
-        return None
-    # Hash the connection URI to create a secure 64-character secret
-    return hashlib.sha256(uri.encode('utf-8')).hexdigest()
+    # Use explicit API_KEY environment variable or fallback configuration
+    secret = os.environ.get("API_KEY", getattr(Config, "API_KEY", None))
+    if secret and secret != "change_this_to_a_secure_random_key_in_production":
+        return secret
+    return None
 
 def verify_request_auth():
     # Loopback addresses (localhost) bypass auth checks in dev/local environments
@@ -40,7 +38,8 @@ def verify_request_auth():
         
     secret = get_shared_secret()
     if not secret:
-        return True # Fails-open for local developer runs
+        is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+        return not is_prod
     
     # Check header
     header_key = request.headers.get("X-API-Key")
@@ -97,6 +96,7 @@ db = None
 # Non-blocking async cache variables
 _mongodb_connected = False
 _mongodb_error = None
+_last_state_load_time = 0.0
 
 def _ensure_db():
     global mongodb_connected, db_client, db
@@ -117,14 +117,18 @@ def _ensure_db():
             
     return _mongodb_connected and db is not None
 
-def load_sim_state():
-    global local_state
-    if _ensure_db():
+def load_sim_state(force_db_read=False):
+    global local_state, _last_state_load_time
+    now = time.time()
+    # Cache state locally and only query remote DB Atlas once every 10 seconds unless forced
+    if (force_db_read or (now - _last_state_load_time > 10.0)) and _ensure_db():
         try:
             doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
+            _last_state_load_time = now
             if doc:
                 doc.pop('_id', None)
-                return doc
+                local_state.update(doc)
+                return local_state
         except Exception as e:
             print(f"Battery State Estimator — Error loading state from MongoDB: {e}")
     return local_state
@@ -292,9 +296,6 @@ def generator_loop():
         except Exception as e:
             print(f"Simulator thread exception: {e}")
             time.sleep(1.0)
-
-# Serverless support detection
-IS_SERVERLESS = os.environ.get('SERVERLESS') == '1'
 
 def sync_simulation_on_demand():
     global current_chemistry, simulator, local_telemetry_buffer

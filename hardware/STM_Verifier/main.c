@@ -1,21 +1,3 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
@@ -144,7 +126,8 @@ void esn_predict_float(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
     // 1. Scale inputs using means and standard deviations
     float u_scaled[ESN_N_INPUTS];
     for (int i = 0; i < ESN_N_INPUTS; i++) {
-        u_scaled[i] = (u[i] - esn_input_means[i]) / esn_input_stds[i];
+        float std_val = esn_input_stds[i] > 1e-6f ? esn_input_stds[i] : 1.0f;
+        u_scaled[i] = (u[i] - esn_input_means[i]) / std_val;
     }
 
     // 2. Update reservoir states using CSR Sparse Matrix Multiplication
@@ -191,7 +174,8 @@ void esn_predict_fixed(const float u[ESN_N_INPUTS], float y_pred[ESN_N_OUTPUTS])
     // 1. Scale inputs and convert to Q12 format (range +/- 8.0)
     int16_t u_scaled_q12[ESN_N_INPUTS];
     for (int i = 0; i < ESN_N_INPUTS; i++) {
-        float val = (u[i] - esn_input_means[i]) / esn_input_stds[i];
+        float std_val = esn_input_stds[i] > 1e-6f ? esn_input_stds[i] : 1.0f;
+        float val = (u[i] - esn_input_means[i]) / std_val;
         u_scaled_q12[i] = float_to_q12(val);
     }
 

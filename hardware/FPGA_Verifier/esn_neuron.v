@@ -242,6 +242,7 @@ wire signed [15:0]      tanh_output;
 // CSV debug logging (Rev 0.10)
 /////////////////////////////////////////////////////////
 
+`ifdef SIMULATION
 integer csv_file;
 
 initial
@@ -250,6 +251,7 @@ begin
     $fwrite(csv_file,
             "time,passbuf,neuron,mac,bias,sum,tanh_in,tanh_out\n");
 end
+`endif
 
 /////////////////////////////////////////////////////////
 // Shared MAC Accumulator
@@ -603,8 +605,10 @@ begin
                 // the point this $display executes within the same
                 // always-block evaluation; tanh_output already holds
                 // the value that will land in x_next once this edge
-                // settles.
+                // settles.                //------------------------------------------------------
+                // Golden-model debug output (Rev 0.09)
                 //------------------------------------------------------
+`ifdef SIMULATION
                 $display(
                     "TIME=%0t PASSBUF=%0d NEURON=%0d MAC=%h BIAS=%h SUM=%h TANH_IN=%h TANH_OUT=%h",
                     $time,
@@ -617,13 +621,6 @@ begin
                     tanh_output
                 );
 
-                //------------------------------------------------------
-                // CSV logging for automated golden-model comparison
-                // (Rev 0.10). Same fields, same order, same source
-                // signals as the $display immediately above -- kept
-                // side-by-side deliberately so the console log and the
-                // CSV can never diverge.
-                //------------------------------------------------------
                 $fwrite(csv_file,
                         "%0t,%0d,%0d,%h,%h,%h,%h,%h\n",
                         $time,
@@ -635,6 +632,7 @@ begin
                         tanh_input,
                         tanh_output
                 );
+`endif
 
                 x_next <= tanh_output;
                 state  <= S_DONE;

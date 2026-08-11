@@ -1,5 +1,6 @@
 import csv
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 golden_path = os.path.join(BASE_DIR, 'golden.csv')
@@ -9,7 +10,7 @@ if not os.path.exists(golden_path):
     golden_script = os.path.join(BASE_DIR, 'golden.py')
     if os.path.exists(golden_script):
         import subprocess
-        subprocess.run(['python', golden_script], check=True)
+        subprocess.run([sys.executable, golden_script], check=True)
 
 def load(path, key_pass='pass', key_neuron='neuron'):
     if not os.path.exists(path):

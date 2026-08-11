@@ -2,10 +2,13 @@ import time
 import numpy as np
 import sys
 import os
-import importlib.util
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
 
 from config import Config
-from traditional_estimator import ExtendedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
+from traditional_estimator import ExtendedKalmanFilter, UnscentedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
 from battery_chemistry import get_chemistry
 
 try:
@@ -52,6 +55,7 @@ class EstimatorPipeline:
         
         self.chem_obj = get_chemistry(chemistry_name)
         self.ekf = ExtendedKalmanFilter(chemistry_name, mismatch=mismatch)
+        self.ukf = UnscentedKalmanFilter(chemistry_name, mismatch=mismatch)
         self.soh_tracker = ResistanceSOH(chemistry_name)
         self.rls = RecursiveLeastSquares(dt=1.0)
         
@@ -70,6 +74,11 @@ class EstimatorPipeline:
         self.ekf_v1 = 0.0
         self.ekf_v2 = 0.0
         self.ekf_p = np.array([[0.01, 0.0, 0.0], [0.0, 0.01, 0.0], [0.0, 0.0, 0.01]])
+
+        self.ukf_soc = 1.0
+        self.ukf_v1 = 0.0
+        self.ukf_v2 = 0.0
+        self.ukf_p = np.array([[0.01, 0.0, 0.0], [0.0, 0.01, 0.0], [0.0, 0.0, 0.01]])
         
         self.trad_r0 = self.chem_obj.R0_nom
         self.trad_soh = 1.0
@@ -303,6 +312,11 @@ class EstimatorPipeline:
         self.prev_fault_dropout = fault_dropout
         self.prev_fault_thermal = fault_thermal
 
+        # Append reading to rolling_history for feature extraction and thermal runaway rate-of-change diagnostics
+        self.rolling_history.append({'voltage': float(V_meas), 'current': float(I_meas_discharge), 'temperature': float(T_meas)})
+        if len(self.rolling_history) > 50:
+            self.rolling_history.pop(0)
+
         # EKF/Coulomb Counting expects positive current for charge, negative for discharge
         I_meas_ekf = -I_meas_discharge
         
@@ -315,8 +329,8 @@ class EstimatorPipeline:
             
         # Thermal Runaway Diagnostic
         dT_dt = 0.0
-        if len(self.rolling_history) >= 1:
-            prev_t_val = self.rolling_history[-1]['temperature']
+        if len(self.rolling_history) >= 2:
+            prev_t_val = self.rolling_history[-2]['temperature']
             raw_rate = (T_meas - prev_t_val) / dt
             if not hasattr(self, 'dT_dt_filtered'):
                 self.dT_dt_filtered = 0.0
@@ -373,6 +387,11 @@ class EstimatorPipeline:
                 I_meas_ekf, V_meas, dt, T_meas=T_meas, soh_est=self.trad_soh,
                 rls_r0=use_rls_r0, rls_r1=use_rls_r1, rls_c1=use_rls_c1
             )
+            self.ukf_soc, self.ukf_v1, self.ukf_v2, self.ukf_p = self.ukf.step(
+                self.ukf_soc, self.ukf_v1, self.ukf_v2, self.ukf_p,
+                I_meas_ekf, V_meas, dt, T_meas=T_meas, soh_est=self.trad_soh,
+                rls_r0=use_rls_r0, rls_r1=use_rls_r1, rls_c1=use_rls_c1
+            )
             ekf_time = (time.perf_counter() - t_ekf_start) * 1000.0 # ms
             
             # Calculate EKF measurement innovation error (residual)
@@ -410,7 +429,8 @@ class EstimatorPipeline:
             denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
             
             V_equiv = 3.0 * (V_min_nmc + (V_meas - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
-            I_equiv = I_meas_discharge * (nmc_chem.nominal_capacity / self.chem_obj.nominal_capacity)
+            denom_cap = max(self.chem_obj.nominal_capacity, 1e-6)
+            I_equiv = I_meas_discharge * (nmc_chem.nominal_capacity / denom_cap)
             
             if not self.primed:
                 self.prime_esn(
@@ -437,7 +457,7 @@ class EstimatorPipeline:
             esn_history = []
             for r in self.rolling_history:
                 r_v_equiv = 3.0 * (V_min_nmc + (r['voltage'] - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
-                r_i_equiv = r['current'] * (nmc_chem.nominal_capacity / self.chem_obj.nominal_capacity)
+                r_i_equiv = r['current'] * (nmc_chem.nominal_capacity / denom_cap)
                 esn_history.append({'voltage': r_v_equiv, 'current': r_i_equiv, 'temperature': r['temperature']})
             
             # Feature extraction (extract_features_step expects discharge positive current)
@@ -552,6 +572,7 @@ class EstimatorPipeline:
         return {
             'cc_soc': self.cc_soc,
             'ekf_soc': self.ekf_soc,
+            'ukf_soc': self.ukf_soc,
             'ekf_v1': self.ekf_v1,
             'ekf_v2': self.ekf_v2,
             'ekf_p_diag': [float(self.ekf_p[0, 0]), float(self.ekf_p[1, 1]), float(self.ekf_p[2, 2])],

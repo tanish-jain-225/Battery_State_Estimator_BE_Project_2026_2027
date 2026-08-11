@@ -41,13 +41,10 @@ except Exception:
 app = Flask(__name__)
 
 def get_shared_secret():
-    import hashlib
-    # Read database connection URI which is already required and configured
-    uri = os.environ.get("MONGODB_URI", Config.MONGODB_URI)
-    if not uri or "localhost" in uri or "127.0.0.1" in uri:
-        return None
-    # Hash the connection URI to create a secure 64-character secret
-    return hashlib.sha256(uri.encode('utf-8')).hexdigest()
+    secret = os.environ.get("API_KEY", getattr(Config, "API_KEY", None))
+    if secret and secret != "change_this_to_a_secure_random_key_in_production":
+        return secret
+    return None
 
 def verify_request_auth():
     # Loopback addresses (localhost) bypass auth checks in dev/local environments
@@ -57,7 +54,8 @@ def verify_request_auth():
         
     secret = get_shared_secret()
     if not secret:
-        return True # Fails-open for local developer runs
+        is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+        return not is_prod
     
     # Check header
     header_key = request.headers.get("X-API-Key")

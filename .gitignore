@@ -1,0 +1,27 @@
+# Environment variables and secrets
+.env
+*.env
+!.env.example
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# C / C++ build outputs
+*.o
+*.obj
+*.exe
+*.out
+*.so
+*.dylib
+*.a
+
+# IDEs & System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

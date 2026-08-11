@@ -141,12 +141,150 @@ class ExtendedKalmanFilter:
         v2_updated = float(x_updated[2, 0])
         
         I_mat = np.eye(3)
-        P_updated = np.dot((I_mat - np.dot(K, H)), P_pred)
+        I_KH = I_mat - np.dot(K, H)
+        # Joseph stabilized form: P = (I-KH)*P*(I-KH)^T + K*R*K^T
+        P_updated = np.dot(np.dot(I_KH, P_pred), I_KH.T) + np.dot(K, np.dot(np.array([[self.R_meas]]), K.T))
         
         # Trace guard and positive-definite check to prevent EKF filter divergence
         if np.trace(P_updated) > 10.0 or np.any(np.diag(P_updated) < 0) or np.any(np.isnan(P_updated)) or np.any(np.isinf(P_updated)):
             P_updated = np.diag([0.01, 0.01, 0.01])
             
+        return soc_updated, v1_updated, v2_updated, P_updated
+
+class UnscentedKalmanFilter:
+    def __init__(self, chemistry_name="li_ion", mismatch=1.0, alpha=1e-3, beta=2.0, kappa=0.0):
+        self.chemistry_name = chemistry_name
+        self.chemistry = get_chemistry(chemistry_name)
+        self.Cn_nom = self.chemistry.nominal_capacity
+        self.R0_nom = self.chemistry.R0_nom * mismatch
+        self.R1_nom = self.chemistry.R1_nom * mismatch
+        self.C1_nom = self.chemistry.C1_nom * mismatch
+        self.R2_nom = self.chemistry.R2_nom * mismatch
+        self.C2_nom = self.chemistry.C2_nom * mismatch
+
+        self.Q = np.diag([1e-7, 1e-6, 1e-6])
+        self.R_meas = 0.01
+
+        # Unscented Transform weights
+        self.n = 3
+        self.alpha = alpha
+        self.beta = beta
+        self.kappa = kappa
+        
+        self.lmbda = (self.alpha ** 2) * (self.n + self.kappa) - self.n
+        self.gamma = np.sqrt(self.n + self.lmbda)
+
+        # Weights for mean and covariance
+        self.Wm = np.zeros(2 * self.n + 1)
+        self.Wc = np.zeros(2 * self.n + 1)
+        
+        self.Wm[0] = self.lmbda / (self.n + self.lmbda)
+        self.Wc[0] = self.lmbda / (self.n + self.lmbda) + (1.0 - (self.alpha ** 2) + self.beta)
+        
+        for i in range(1, 2 * self.n + 1):
+            self.Wm[i] = 1.0 / (2.0 * (self.n + self.lmbda))
+            self.Wc[i] = 1.0 / (2.0 * (self.n + self.lmbda))
+
+    def update_noise_params(self, q_soc=1e-7, q_v1=1e-6, q_v2=1e-6, r_meas=0.01):
+        self.Q = np.diag([q_soc, q_v1, q_v2])
+        self.R_meas = r_meas
+
+    def _generate_sigma_points(self, x, P):
+        try:
+            P_sym = 0.5 * (P + P.T) + np.eye(self.n) * 1e-9
+            L = np.linalg.cholesky(P_sym)
+        except np.linalg.LinAlgError:
+            L = np.diag(np.sqrt(np.maximum(1e-6, np.diag(P))))
+            
+        sigmas = np.zeros((self.n, 2 * self.n + 1))
+        sigmas[:, 0] = x[:, 0]
+        for i in range(self.n):
+            sigmas[:, i + 1] = x[:, 0] + self.gamma * L[:, i]
+            sigmas[:, i + 1 + self.n] = x[:, 0] - self.gamma * L[:, i]
+        return sigmas
+
+    def step(self, soc, v1, v2, P, I_meas, V_meas, dt, T_meas=25.0, soh_est=1.0, rls_r0=None, rls_r1=None, rls_c1=None):
+        T_c = max(-20.0, min(60.0, T_meas))
+        temp_kelvin = T_c + 273.15
+        temp_ref_kelvin = 25.0 + 273.15
+        temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+        temp_cap_factor = 1.0 - 0.0075 * (25.0 - T_c) if T_c < 25.0 else 1.0
+        Cn_active = self.Cn_nom * soh_est * temp_cap_factor
+        resistance_growth = 1.0 + (1.0 - soh_est) * 1.5
+
+        R0 = rls_r0 if rls_r0 is not None else self.R0_nom * resistance_growth * temp_effect
+        R1 = rls_r1 if rls_r1 is not None else self.R1_nom * temp_effect
+        C1 = rls_c1 if rls_c1 is not None else self.C1_nom / temp_effect
+        R2 = self.R2_nom * temp_effect
+        C2 = self.C2_nom / temp_effect
+
+        tau1 = R1 * C1
+        tau2 = R2 * C2
+        a1 = np.exp(-dt / tau1) if tau1 > 0 else 0.0
+        b1 = R1 * (1.0 - a1)
+        a2 = np.exp(-dt / tau2) if tau2 > 0 else 0.0
+        b2 = R2 * (1.0 - a2)
+
+        x = np.array([[soc], [v1], [v2]])
+        sigmas = self._generate_sigma_points(x, P)
+
+        # 1. State Prediction
+        sigmas_pred = np.zeros_like(sigmas)
+        for i in range(2 * self.n + 1):
+            s_soc = sigmas[0, i]
+            s_v1 = sigmas[1, i]
+            s_v2 = sigmas[2, i]
+            
+            s_soc_pred = np.clip(s_soc + (I_meas * dt) / (Cn_active * 3600.0), 0.0, 1.0)
+            s_v1_pred = a1 * s_v1 + b1 * I_meas
+            s_v2_pred = a2 * s_v2 + b2 * I_meas
+            
+            sigmas_pred[:, i] = [s_soc_pred, s_v1_pred, s_v2_pred]
+
+        x_pred = np.zeros((self.n, 1))
+        for i in range(2 * self.n + 1):
+            x_pred += self.Wm[i] * sigmas_pred[:, i:i+1]
+
+        P_pred = np.copy(self.Q)
+        for i in range(2 * self.n + 1):
+            diff = sigmas_pred[:, i:i+1] - x_pred
+            P_pred += self.Wc[i] * np.dot(diff, diff.T)
+
+        # 2. Measurement Prediction
+        Z_sigmas = np.zeros(2 * self.n + 1)
+        for i in range(2 * self.n + 1):
+            s_soc = sigmas_pred[0, i]
+            s_v1 = sigmas_pred[1, i]
+            s_v2 = sigmas_pred[2, i]
+            ocv = self.chemistry.lookup_ocv(s_soc)
+            Z_sigmas[i] = ocv + I_meas * R0 + s_v1 + s_v2
+
+        z_pred = 0.0
+        for i in range(2 * self.n + 1):
+            z_pred += self.Wm[i] * Z_sigmas[i]
+
+        P_zz = self.R_meas
+        P_xz = np.zeros((self.n, 1))
+        for i in range(2 * self.n + 1):
+            diff_x = sigmas_pred[:, i:i+1] - x_pred
+            diff_z = Z_sigmas[i] - z_pred
+            P_zz += self.Wc[i] * (diff_z ** 2)
+            P_xz += self.Wc[i] * diff_x * diff_z
+
+        # 3. State & Covariance Update
+        K = P_xz / max(P_zz, 1e-9)
+        residual = V_meas - z_pred
+        x_updated = x_pred + K * residual
+
+        soc_updated = float(np.clip(x_updated[0, 0], 0.0, 1.0))
+        v1_updated = float(x_updated[1, 0])
+        v2_updated = float(x_updated[2, 0])
+
+        P_updated = P_pred - np.dot(K, np.dot(np.array([[P_zz]]), K.T))
+
+        if np.trace(P_updated) > 10.0 or np.any(np.diag(P_updated) < 0) or np.any(np.isnan(P_updated)) or np.any(np.isinf(P_updated)):
+            P_updated = np.diag([0.01, 0.01, 0.01])
+
         return soc_updated, v1_updated, v2_updated, P_updated
 
 class ResistanceSOH:

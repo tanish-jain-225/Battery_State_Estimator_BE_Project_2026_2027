@@ -18,6 +18,11 @@ if !errorlevel! neq 0 (
     goto summary
 )
 echo [OK] Python environment detected.
+python -c "import sys; sys.path.insert(0, '.'); from software.shared.battery_simulator import BatterySimulator; from software.shared.battery_chemistry import get_chemistry; sim = BatterySimulator(); chem = get_chemistry('li_ion'); print('[OK] Microservice shared physics package (software.shared) strictly verified.')"
+if !errorlevel! neq 0 (
+    echo [ERROR] Microservice shared physics package check failed.
+    set /a FAILURES+=1
+)
 echo.
 
 :: ── STEP 2: Software Model Training ──────────────────────────────────────
@@ -33,7 +38,7 @@ echo.
 
 :: ── STEP 3: Software Estimator & Simulator Verification ─────────────────
 echo [3/7] [SOFTWARE] Testing Physics Simulator and Estimator Pipeline...
-python -c "import sys; sys.path.insert(0, r'%ROOT_DIR%software\visualiser'); sys.path.insert(0, r'%ROOT_DIR%software\simulator'); from battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V | EKF SOC=', round(res['ekf_soc'],4))"
+python -c "import sys; sys.path.insert(0, '.'); sys.path.insert(0, 'software/visualiser'); from software.shared.battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V | EKF SOC=', round(res['ekf_soc'],4))"
 if !errorlevel! neq 0 (
     echo [ERROR] Software Estimator and Simulator verification failed.
     set /a FAILURES+=1
@@ -87,7 +92,7 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── SUMMARY & LIVE SERVICE LAUNCH ─────────────────────────────────────────
+:: ── SUMMARY & USER INSTRUCTIONS ───────────────────────────────────────────
 :summary
 echo =======================================================================
 if !FAILURES! equ 0 goto passed
@@ -97,13 +102,16 @@ goto failed
 echo   [ALL PASSED] END-TO-END HARDWARE AND SOFTWARE VALIDATION SUCCESSFUL!
 echo =======================================================================
 echo.
-echo Launching Live Software Web Services in separate windows...
-echo   - Physics Simulator: http://localhost:8000
-echo   - Visualiser Dashboard: http://localhost:5000
+echo  To run the Software Web Services manually, open two terminal windows:
 echo.
-start "Battery Physics Simulator (Port 8000)" cmd /k "cd /d %ROOT_DIR%software\simulator && python app.py"
-start "Battery Visualiser Dashboard (Port 5000)" cmd /k "cd /d %ROOT_DIR%software\visualiser && python app.py"
-echo [LAUNCHED] Live Software services are now running!
+echo    Terminal 1 (Physics Simulator - Port 8000):
+echo      python software/simulator/app.py
+echo.
+echo    Terminal 2 (Visualiser Dashboard - Port 5000):
+echo      python software/visualiser/app.py
+echo.
+echo  Access Visualiser Dashboard UI at: http://localhost:5000
+echo =======================================================================
 goto finish
 
 :failed
