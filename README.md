@@ -183,12 +183,12 @@ Explain the step-by-step approach:
 | ------------ | --------------------- | --------------------------------- |
 | Week 1 | Problem finalization | Completed |
 | Week 2 | Literature survey | Completed |
-| Week 3 | Requirement analysis | Completed |
-| Week 4 | System design | Completed |
-| Week 5 | Prototype development | Completed |
-| Week 6 | Testing | Completed |
-| Week 7 | Documentation | Completed |
-| Week 8 | Paper writing | Completed |
+| Week 3 | Requirement analysis & Specification | Completed |
+| Week 4 | Physics Simulator & Observer Baseline | Completed |
+| Week 5 | Software ESN Model & Dashboard | Completed |
+| Week 6 | MCU & FPGA Hardware Validation | Completed |
+| Week 7 | Hardware-in-the-Loop & CI Matrix Optimization | In Progress |
+| Week 8 | Capstone Thesis & Research Paper Submission | Planned |
 
 ---
 
@@ -196,16 +196,17 @@ Explain the step-by-step approach:
 
 Students must update this section every week.
 
-| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | GitHub Commit Link |
-| ------ | ---- | -------------- | -------------------------- | ------------------- | ------------------ |
-| Week 1 | 2026-05-07 | Finalized problem statement, repository structure, and core scope | Literature review on battery ECM and ESNs | Defining scope boundaries | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 2 | 2026-05-14 | Conducted literature survey on 2-RC ECM, EKF observers, and Reservoir Computing | Architecture design & module planning | Parameter identification methods | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 3 | 2026-05-21 | Defined microservice responsibilities, API endpoints, and MCU fixed-point spec | Implement 2-RC physics model | Fixed-point quantization precision | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 4 | 2026-05-28 | Implemented 2-RC electro-thermal physics simulator and OCV lookup tables | Build visualiser dashboard and EKF | OCV curve interpolation & thermal dynamics | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 5 | 2026-06-04 | Implemented Flask visualiser dashboard, EKF, Coulomb Counting, and ESN training | Embedded C99 firmware development | ESN weight compression & C export | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 6 | 2026-06-11 | Integrated CSR sparse SpMV (6.7× speedup) and Q12/Q15 LUT Tanh math in C99 | FPGA Verilog RTL design & Vivado setup | Memory optimization on Cortex-M | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 7 | 2026-06-18 | Built 100-neuron Verilog RTL datapath for ARTIX A7100T FPGA & bit-exact verifier | Automated test suite & security | Verilog BRAM timing & MAC pipeline | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
-| Week 8 | 2026-06-25 | Integrated 31 automated pytest cases, SHA-256 API key security, and Render deployment | Review 1 audit & IEEE paper drafting | Zero-config security gating | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | Status | GitHub Commit Link |
+| ------ | ---- | -------------- | -------------------------- | ------------------- | ------ | ------------------ |
+| Week 1 | 2026-05-07 | Finalized problem statement, repository structure, and core scope | Literature review on battery ECM and ESNs | Defining scope boundaries | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 2 | 2026-05-14 | Conducted literature survey on 2-RC ECM, EKF observers, and Reservoir Computing | Architecture design & module planning | Parameter identification methods | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 3 | 2026-05-21 | Defined microservice responsibilities, API endpoints, and MCU fixed-point spec | Implement 2-RC physics model | Fixed-point quantization precision | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 4 | 2026-05-28 | Implemented 2-RC electro-thermal physics simulator and OCV lookup tables | Build visualiser dashboard and EKF | OCV curve interpolation & thermal dynamics | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 5 | 2026-06-04 | Implemented Flask visualiser dashboard, EKF, Coulomb Counting, and ESN training | Embedded C99 firmware development | ESN weight compression & C export | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 6 | 2026-06-11 | Integrated CSR sparse SpMV (6.7× speedup) and Q12/Q15 LUT Tanh math in C99 | FPGA Verilog RTL design & Vivado setup | Memory optimization on Cortex-M | Completed | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 7 | 2026-06-18 | Built 100-neuron Verilog RTL datapath for ARTIX A7100T FPGA & bit-exact verifier | Automated CI testing & HIL bench test | Verilog BRAM timing & cross-platform CI matrix | In Progress | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+| Week 8 | 2026-06-25 | Finalizing documentation, unit test suites, and paper draft | Review 2 presentation & camera-ready submission | Paper formatting & viva preparation | Planned | [Commit History](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commits/main) |
+
 
 ---
 

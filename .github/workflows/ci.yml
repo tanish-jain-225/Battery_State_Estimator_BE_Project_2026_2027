@@ -8,8 +8,15 @@ on:
 
 jobs:
   validate:
-    name: Build, Lint & Test (ubuntu-latest, Python 3.10)
-    runs-on: ubuntu-latest
+    name: Build, Lint & Test (${{ matrix.os }}, Python 3.10)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    env:
+      NON_INTERACTIVE: "1"
 
     steps:
       - name: Checkout Repository
@@ -31,13 +38,20 @@ jobs:
 
       - name: Code Quality & Syntax Linting
         run: |
-          # Stop build if there are syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Run Pytest Suite
         run: |
           pytest tests/
 
-      - name: Run End-to-End Validation Script
+      - name: Run End-to-End Validation Script (POSIX bash)
+        if: runner.os != 'Windows'
         run: |
           bash run_all_validation.sh
+
+      - name: Run End-to-End Validation Script (Windows cmd)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          run_all_validation.bat
+

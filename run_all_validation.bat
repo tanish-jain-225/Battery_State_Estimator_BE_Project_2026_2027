@@ -121,3 +121,5 @@ echo =======================================================================
 :finish
 echo.
 if not defined NON_INTERACTIVE pause
+if !FAILURES! neq 0 exit /b 1
+

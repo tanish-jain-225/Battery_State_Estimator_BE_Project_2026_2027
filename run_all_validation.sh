@@ -69,7 +69,9 @@ echo ""
 echo "======================================================================="
 if [ $FAILURES -eq 0 ]; then
     echo "  [ALL PASSED] END-TO-END HARDWARE AND SOFTWARE VALIDATION SUCCESSFUL!"
+    exit 0
 else
     echo "  [FAILED] VALIDATION COMPLETED WITH $FAILURES ERROR(S)."
+    exit 1
 fi
-echo "======================================================================="
+
