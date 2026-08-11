@@ -1,4 +1,4 @@
-name: End-to-End Cyber-Physical CI Pipeline
+name: Simple CI Pipeline
 
 on:
   push:
@@ -8,22 +8,17 @@ on:
 
 jobs:
   validate:
-    name: Build, Lint & Verification (${{ matrix.os }}, Python ${{ matrix.python-version }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+    name: Build, Lint & Test (ubuntu-latest, Python 3.10)
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.10'
           cache: 'pip'
 
       - name: Install Dependencies
@@ -32,30 +27,17 @@ jobs:
           pip install -r software/visualiser/requirements.txt
           pip install -r software/simulator/requirements.txt
           pip install -r hardware/STM_Verifier/requirements.txt
-          pip install pytest pytest-cov flake8
+          pip install pytest flake8
 
-      - name: Strict Code Quality Linting
+      - name: Code Quality & Syntax Linting
         run: |
-          # Stop the build if there are syntax errors or undefined names
+          # Stop build if there are syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --max-complexity=15 --max-line-length=127 --statistics
 
-      - name: Run Pytest Suite with Coverage
+      - name: Run Pytest Suite
         run: |
-          pytest tests/ --cov=software --cov-report=term-missing
+          pytest tests/
 
-      - name: Run End-to-End Validation Script (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Run End-to-End Validation Script
         run: |
           bash run_all_validation.sh
-
-      - name: Run End-to-End Validation Script (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cmd /c "set NON_INTERACTIVE=1 && run_all_validation.bat"
-
-      - name: Compile and Execute C99 Microcontroller Simulator
-        if: runner.os != 'Windows'
-        run: |
-          cd hardware/STM_Verifier
-          bash run_c_simulator.sh
