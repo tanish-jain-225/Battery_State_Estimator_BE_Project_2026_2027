@@ -191,9 +191,9 @@ The system architecture feeds 2-RC battery telemetry into a multi-estimator pipe
 | Week 3 | Requirement analysis & Telemetry Setup | Completed |
 | Week 4 | Conventional Estimators (EKF, Coulomb Counting, VFF-RLS) | Completed |
 | Week 5 | Echo State Network (ESN) Model Training & Readout Optimization | Completed |
-| Week 6 | Embedded C99 Firmware & CSR Sparse Matrix Optimization | Completed |
-| Week 7 | Verilog RTL 100-Neuron Datapath & FPGA Golden Verification | Completed |
-| Week 8 | Web Dashboard Visualiser, Documentation & Paper Writing | Completed |
+| Week 6 | Embedded C99 Firmware & CSR Sparse Matrix Optimization | In Progress |
+| Week 7 | Verilog RTL 100-Neuron Datapath & FPGA Golden Verification | In Progress |
+| Week 8 | Web Dashboard Visualiser, Documentation & Paper Writing | In Progress |
 
 ---
 
