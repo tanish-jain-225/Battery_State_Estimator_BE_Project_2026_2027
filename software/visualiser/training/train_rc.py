@@ -98,8 +98,8 @@ class EchoStateNetwork:
         X = np.empty((n_effective, state_dim))
         
         for t in range(n_samples):
-            if t % 100 == 0:
-                time.sleep(0.0001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
+            if t % 500 == 0:
+                time.sleep(0.00001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
                 if timeout_check is not None:
                     timeout_check()
             # Advance state using precomputed input term
