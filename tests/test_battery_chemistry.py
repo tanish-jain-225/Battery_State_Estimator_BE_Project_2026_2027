@@ -1,5 +1,4 @@
-import pytest
-from software.shared.battery_chemistry import get_chemistry, register_chemistry, CHEMISTRIES
+from software.shared.battery_chemistry import get_chemistry, register_chemistry
 
 def test_get_chemistry():
     chem = get_chemistry("nmc")

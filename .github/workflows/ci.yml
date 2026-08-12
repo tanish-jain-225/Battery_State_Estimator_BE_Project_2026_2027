@@ -31,10 +31,12 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install -r software/visualiser/requirements.txt
           pip install -r software/simulator/requirements.txt
           pip install -r hardware/STM_Verifier/requirements.txt
           pip install pytest flake8
+
 
       - name: Code Quality & Syntax Linting
         run: |

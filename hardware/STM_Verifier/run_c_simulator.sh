@@ -18,6 +18,7 @@ if command -v gcc &> /dev/null; then
         rm esn_simulator
     else
         echo "[ERROR] Compilation failed."
+        exit 1
     fi
 # Check for clang
 elif command -v clang &> /dev/null; then
@@ -30,8 +31,11 @@ elif command -v clang &> /dev/null; then
         rm esn_simulator
     else
         echo "[ERROR] Compilation failed."
+        exit 1
     fi
 else
     echo "[ERROR] No compatible C compiler (gcc or clang) was found in your PATH."
     echo "Please install a C compiler and try again."
+    exit 1
 fi
+

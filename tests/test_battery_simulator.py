@@ -1,5 +1,3 @@
-import pytest
-import numpy as np
 from software.shared.battery_simulator import BatterySimulator, DriveCycles
 
 def test_simulator_initialization():

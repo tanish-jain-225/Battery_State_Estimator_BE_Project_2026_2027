@@ -63,5 +63,7 @@ for stage in stages:
 print("="*60)
 if stopped_at:
     print(f"First stage with divergence: {stopped_at.upper()}")
+    sys.exit(1)
 else:
     print("All stages match bit-exactly across all 200 rows.")
+

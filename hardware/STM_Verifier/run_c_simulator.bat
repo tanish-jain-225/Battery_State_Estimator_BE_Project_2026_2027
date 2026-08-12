@@ -19,6 +19,7 @@ if !errorlevel! equ 0 (
         del esn_simulator.exe
     ) else (
         echo [ERROR] Compilation failed.
+        exit /b 1
     )
     goto end
 )
@@ -35,6 +36,7 @@ if !errorlevel! equ 0 (
         del esn_simulator.exe
     ) else (
         echo [ERROR] Compilation failed.
+        exit /b 1
     )
     goto end
 )
@@ -52,12 +54,15 @@ if !errorlevel! equ 0 (
         del main.obj
     ) else (
         echo [ERROR] Compilation failed.
+        exit /b 1
     )
     goto end
 )
 
 echo [ERROR] No compatible C compiler (gcc, clang, or cl) was found in your PATH.
 echo Please install GCC (MinGW), Clang, or MSVC and try again.
+exit /b 1
 
 :end
 if not defined VALIDATION_PIPELINE pause
+

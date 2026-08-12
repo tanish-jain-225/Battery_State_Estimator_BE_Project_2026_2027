@@ -662,12 +662,17 @@ The project documentation reports **200/200 bit-exact stage matches** during ver
 ```text
 BE-Capstone-Project/
 │
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── README.md
+├── pytest.ini
 ├── requirements.txt
 ├── run_all_validation.bat
 ├── run_all_validation.sh
 │
 ├── docs/
+
 │   ├── literature_survey.md
 │   └── Resources/
 │       ├── SYSTEM_SPECIFICATION.md

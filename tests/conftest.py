@@ -1,6 +1,5 @@
 import sys
 import os
-import pytest
 
 # Ensure root directory is in sys.path for test resolution
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
