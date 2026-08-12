@@ -479,9 +479,15 @@ class EstimatorPipeline:
             
             # Online adaptation: Calibrate the ESN SOC & SOH networks online using EKF/Observer as a reference
             if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
-                self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.15, mode='rls')
+                try:
+                    self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.15, mode='rls')
+                except Exception as adapt_err:
+                    print(f"Online ESN SOC adaptation step warning: {adapt_err}")
             if hasattr(self.esn_soh, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
-                self.esn_soh.adapt_online(u_scaled, self.trad_soh, learning_rate=0.15, mode='rls')
+                try:
+                    self.esn_soh.adapt_online(u_scaled, self.trad_soh, learning_rate=0.15, mode='rls')
+                except Exception as adapt_err:
+                    print(f"Online ESN SOH adaptation step warning: {adapt_err}")
             
             # Save updated states
             self.esn_soc_state = self.esn_soc.get_state()

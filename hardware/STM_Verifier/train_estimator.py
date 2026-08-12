@@ -1,8 +1,14 @@
 import os
+import sys
 import pandas as pd
 import numpy as np
 import pickle
 import argparse
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+if base_dir not in sys.path:
+    sys.path.insert(0, base_dir)
+
 from train import EchoStateNetwork
 
 def generate_full_range_dataset():
@@ -74,15 +80,17 @@ def generate_full_range_dataset():
         
         t = 0.0
         step_count = 0
+        last_cell_v = 3.5
         while sim.soc < 0.99 and step_count < total_steps:
             step_count += 1
             sim.soh = max(0.80, soh_target - (soh_target - next_soh) * (step_count / float(total_steps)))
             sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - sim.soh)
             I_charge = 2.0
-            if sim.voltage > 4.15:
-                I_charge = max(0.1, 2.0 * (4.2 - sim.voltage) / 0.05)
+            if last_cell_v > 4.15:
+                I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
                 
             out = sim.step(-I_charge, dt, accelerated_aging=False)
+            last_cell_v = out['voltage'] / float(sim.n_cells)
             records.append({
                 'Time': global_time,
                 'Voltage': 3.0 * out['voltage'],

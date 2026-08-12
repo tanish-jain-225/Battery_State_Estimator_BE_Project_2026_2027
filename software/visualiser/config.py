@@ -98,8 +98,32 @@ class Config:
     # so the UI can mark the ESN estimate as 'Converging' rather than 'Active'.
     ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 30))
 
-    # Detect production cloud environment (Render sets RENDER=true automatically)
-    _IS_PRODUCTION = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+    # Detect production cloud environment (Render, Vercel, Railway, Fly.io, Serverless, or production ENV flags)
+    _IS_PRODUCTION = (
+        os.environ.get('RENDER') == 'true' or
+        os.environ.get('VERCEL') == '1' or
+        os.environ.get('SERVERLESS') == '1' or
+        os.environ.get('RAILWAY_ENVIRONMENT') is not None or
+        os.environ.get('FLY_APP_NAME') is not None or
+        os.environ.get('FLASK_ENV', '').lower() in ('production', 'prod') or
+        os.environ.get('ENV', '').lower() in ('production', 'prod') or
+        os.environ.get('ENVIRONMENT', '').lower() in ('production', 'prod') or
+        os.environ.get('NODE_ENV', '').lower() in ('production', 'prod')
+    )
+
+    @classmethod
+    def is_production(cls):
+        return (
+            os.environ.get('RENDER') == 'true' or
+            os.environ.get('VERCEL') == '1' or
+            os.environ.get('SERVERLESS') == '1' or
+            os.environ.get('RAILWAY_ENVIRONMENT') is not None or
+            os.environ.get('FLY_APP_NAME') is not None or
+            os.environ.get('FLASK_ENV', '').lower() in ('production', 'prod') or
+            os.environ.get('ENV', '').lower() in ('production', 'prod') or
+            os.environ.get('ENVIRONMENT', '').lower() in ('production', 'prod') or
+            os.environ.get('NODE_ENV', '').lower() in ('production', 'prod')
+        )
 
     # Production cloud decimation limit (maximum number of training samples to load)
     PRODUCTION_DECIMATION_LIMIT = int(os.environ.get("PRODUCTION_DECIMATION_LIMIT", 2500))

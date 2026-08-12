@@ -70,14 +70,13 @@ class EchoStateNetwork:
         self.x = (1.0 - self.leak_rate) * self.x + self.leak_rate * np.tanh(arg)
         return self.x
 
-    def train(self, U, Y, washout=50):
+    def train(self, U, Y, washout=50, timeout_check=None):
         """
         Train the readout weights W_out using Ridge Regression.
         :param U: input sequence, shape (n_samples, n_inputs)
         :param Y: target sequence, shape (n_samples, n_outputs)
         :param washout: number of initial steps to discard so reservoir settles before learning.
-                        This prevents cold-start reservoir states (all zeros) from biasing the
-                        output weights. Typically 50-100 steps.
+        :param timeout_check: optional callable that raises TimeoutError if deadline exceeded.
         """
         n_samples = U.shape[0]
         self.reset_state()
@@ -97,6 +96,8 @@ class EchoStateNetwork:
         for t in range(n_samples):
             if t % 100 == 0:
                 time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
+                if timeout_check is not None:
+                    timeout_check()
             # Advance state using precomputed input term
             input_term = W_in_U[t].reshape(-1, 1)
             x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
@@ -108,6 +109,9 @@ class EchoStateNetwork:
                 
         self.x = x # Save final state back
         
+        if timeout_check is not None:
+            timeout_check()
+
         # Design matrix X: (1 + n_inputs + n_reservoir, n_samples - washout)
         X = np.array(states).T
         
@@ -133,6 +137,9 @@ class EchoStateNetwork:
         u_t = np.array(u).reshape(-1, 1)
         state_vec = np.vstack(([1.0], u_t, self.x)) # shape (1 + n_inputs + n_reservoir, 1)
         
+        if self.W_out.shape[1] != state_vec.shape[0]:
+            return
+
         y_pred = np.dot(self.W_out, state_vec).item()
         error = y_target - y_pred
         
@@ -141,10 +148,12 @@ class EchoStateNetwork:
             vec_norm_sq = np.sum(state_vec ** 2)
             denom = vec_norm_sq + 1e-4
             update = learning_rate * (error / denom) * state_vec.T
-            self.W_out += update
+            new_W_out = self.W_out + update
+            if not np.any(np.isnan(new_W_out)) and not np.any(np.isinf(new_W_out)):
+                self.W_out = new_W_out
         elif mode == 'rls':
             # Recursive Least Squares online update:
-            if not hasattr(self, 'P_adapt') or self.P_adapt is None:
+            if not hasattr(self, 'P_adapt') or self.P_adapt is None or self.P_adapt.shape[0] != state_vec.shape[0]:
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
             
             lmbda = 0.9995  # Forgetting factor
@@ -153,11 +162,15 @@ class EchoStateNetwork:
             denom = lmbda + np.dot(state_vec.T, P_s).item()
             K = P_s / max(denom, 1e-6)
             
-            self.W_out += error * K.T
-            self.P_adapt = (self.P_adapt - np.dot(K, np.dot(state_vec.T, self.P_adapt))) / lmbda
+            new_W_out = self.W_out + error * K.T
+            new_P_adapt = (self.P_adapt - np.dot(K, np.dot(state_vec.T, self.P_adapt))) / lmbda
             
-            if np.any(np.isnan(self.P_adapt)) or np.any(np.isinf(self.P_adapt)):
+            if not np.any(np.isnan(new_W_out)) and not np.any(np.isinf(new_W_out)):
+                self.W_out = new_W_out
+            if np.any(np.isnan(new_P_adapt)) or np.any(np.isinf(new_P_adapt)):
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
+            else:
+                self.P_adapt = new_P_adapt
 
     def predict_step(self, u, quantize_mode='float32'):
         """
@@ -207,10 +220,11 @@ class EchoStateNetwork:
             y_pred = np.dot(self.W_out, state_vec)
             return np.clip(y_pred, 0.0, 1.0).flatten()
 
-    def predict(self, U):
+    def predict(self, U, timeout_check=None):
         """
         Predict output sequence for a series of inputs U.
         :param U: shape (n_samples, n_inputs)
+        :param timeout_check: optional callable that raises TimeoutError if deadline exceeded.
         """
         n_samples = U.shape[0]
         self.reset_state()
@@ -229,6 +243,8 @@ class EchoStateNetwork:
         for t in range(n_samples):
             if t % 100 == 0:
                 time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
+                if timeout_check is not None:
+                    timeout_check()
             input_term = W_in_U[t].reshape(-1, 1)
             x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
             
@@ -239,7 +255,7 @@ class EchoStateNetwork:
         self.x = x
         return np.array(predictions)
 
-def generate_full_range_dataset():
+def generate_full_range_dataset(timeout_check=None, max_rows=None):
     """
     Generates a high-fidelity synthetic battery dataset covering the full range
     of SOC (0% to 100%) and SOH (80% to 100%) using the physics simulator.
@@ -255,10 +271,14 @@ def generate_full_range_dataset():
     import pandas as pd
     
     records = []
-    soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
-    dt = 1.0
+    is_prod = getattr(Config, 'is_production', lambda: False)()
+    soh_levels = [1.0, 0.90, 0.80] if is_prod else [1.0, 0.95, 0.90, 0.85, 0.80]
+    dt = 2.0 if is_prod else 1.0
     
+    step_counter = 0
     for soh_target in soh_levels:
+        if timeout_check is not None:
+            timeout_check()
         # 1. Discharging Cycle (Constant + Pulsed)
         sim = BatterySimulator()
         sim.reset("li_ion")
@@ -268,6 +288,9 @@ def generate_full_range_dataset():
         
         t = 0.0
         while sim.soc > 0.01:
+            step_counter += 1
+            if step_counter % 100 == 0 and timeout_check is not None:
+                timeout_check()
             I = 2.0
             if int(t) % 100 < 20:
                 I = 4.5
@@ -284,7 +307,12 @@ def generate_full_range_dataset():
                 'SOH': out['true_soh']
             })
             t += dt
-            
+            if max_rows and len(records) >= max_rows:
+                break
+                
+        if max_rows and len(records) >= max_rows:
+            break
+
         # 2. Charging Cycle (CCCV Charge)
         sim = BatterySimulator()
         sim.reset("li_ion")
@@ -294,12 +322,17 @@ def generate_full_range_dataset():
         sim.temperature = 25.0
         
         t = 0.0
+        last_cell_v = 3.5
         while sim.soc < 0.99:
+            step_counter += 1
+            if step_counter % 100 == 0 and timeout_check is not None:
+                timeout_check()
             I_charge = 2.0
-            if sim.voltage > 4.15:
-                I_charge = max(0.1, 2.0 * (4.2 - sim.voltage) / 0.05)
+            if last_cell_v > 4.15:
+                I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
                 
-            out = sim.step(I_charge, dt, accelerated_aging=False)
+            out = sim.step(-I_charge, dt, accelerated_aging=False)
+            last_cell_v = out['voltage'] / float(sim.n_cells)
             records.append({
                 'Time': t,
                 'Voltage': 3.0 * out['voltage'],
@@ -309,6 +342,11 @@ def generate_full_range_dataset():
                 'SOH': out['true_soh']
             })
             t += dt
+            if max_rows and len(records) >= max_rows:
+                break
+                
+        if max_rows and len(records) >= max_rows:
+            break
             
     return pd.DataFrame(records)
 
@@ -384,7 +422,7 @@ def main():
         df.rename(columns=rename_dict, inplace=True)
 
     # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
-    is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+    is_production = Config.is_production()
     limit = Config.PRODUCTION_DECIMATION_LIMIT
     if is_production and len(df) > limit:
         step = int(np.ceil(len(df) / limit))

@@ -19,7 +19,10 @@ if training_dir not in sys.path:
 
 from flask import Flask, jsonify, request, render_template
 from pymongo import MongoClient
-from config import Config
+try:
+    from software.visualiser.config import Config
+except ImportError:
+    from config import Config
 from train_rc import EchoStateNetwork
 sys.modules['__main__'].EchoStateNetwork = EchoStateNetwork
 
@@ -793,10 +796,11 @@ def run_training_async():
     timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 60.0)
 
     def check_timeout():
-        if (time.time() - start_time) > timeout_limit:
-            raise TimeoutError(f"Online training exceeded time limit of {int(timeout_limit)} seconds (1 minute).")
+        if (time.time() - start_time) >= timeout_limit:
+            raise TimeoutError(f"Online training exceeded time limit of {timeout_limit:.2f} seconds.")
 
     try:
+        check_timeout()
         from train_rc import EchoStateNetwork, generate_full_range_dataset
         from feature_engineering import extract_features_df
         
@@ -807,7 +811,10 @@ def run_training_async():
         if csv_url:
             # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
             training_status['training_source'] = 'remote_url'
-            req_timeout = min(10.0, max(1.0, timeout_limit - (time.time() - start_time)))
+            rem = timeout_limit - (time.time() - start_time)
+            if rem <= 0:
+                raise TimeoutError(f"Online training exceeded time limit of {timeout_limit:.2f} seconds.")
+            req_timeout = min(10.0, max(0.1, rem))
             training_status['logs'] += f"Fetching remote dataset from URL (timeout: {req_timeout:.1f}s)...\n"
             try:
                 import io
@@ -837,7 +844,7 @@ def run_training_async():
             training_status['logs'] += "Generating high-fidelity full-range dataset from physical battery simulator...\n"
             try:
                 check_timeout()
-                df = generate_full_range_dataset()
+                df = generate_full_range_dataset(timeout_check=check_timeout)
                 training_status['logs'] += f"Full-range dataset generated successfully: {len(df)} rows.\n"
             except Exception as gen_err:
                 training_status['logs'] += f"Backup generator failed: {gen_err}.\n"
@@ -881,7 +888,7 @@ def run_training_async():
             df.rename(columns=rename_dict, inplace=True)
 
         # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
-        is_production = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
+        is_production = Config.is_production()
         limit = Config.PRODUCTION_DECIMATION_LIMIT
         if is_production and len(df) > limit:
             step = int(np.ceil(len(df) / limit))
@@ -916,8 +923,8 @@ def run_training_async():
             sparsity=Config.ESN_SOC_SPARSITY
         )
         training_status['logs'] += "Fitting Readout weights via Ridge Regression (SOC)...\n"
-        local_esn_soc.train(U_scaled, Y_soc, washout=Config.ESN_WASHOUT_STEPS)
-        pred_soc = local_esn_soc.predict(U_scaled)
+        local_esn_soc.train(U_scaled, Y_soc, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
+        pred_soc = local_esn_soc.predict(U_scaled, timeout_check=check_timeout)
         soc_rmse = float(np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:] - pred_soc[Config.ESN_WASHOUT_STEPS:]) ** 2)))
         training_status['logs'] += f"  SOC RMSE post-washout: {soc_rmse:.6f}\n"
 
@@ -935,8 +942,8 @@ def run_training_async():
             sparsity=Config.ESN_SOH_SPARSITY
         )
         training_status['logs'] += "Fitting Readout weights via Ridge Regression (SOH)...\n"
-        local_esn_soh.train(U_scaled, Y_soh, washout=Config.ESN_WASHOUT_STEPS)
-        pred_soh = local_esn_soh.predict(U_scaled)
+        local_esn_soh.train(U_scaled, Y_soh, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
+        pred_soh = local_esn_soh.predict(U_scaled, timeout_check=check_timeout)
         soh_rmse = float(np.sqrt(np.mean((Y_soh[Config.ESN_WASHOUT_STEPS:] - pred_soh[Config.ESN_WASHOUT_STEPS:]) ** 2)))
         training_status['logs'] += f"  SOH RMSE post-washout: {soh_rmse:.6f}\n"
 
@@ -1285,6 +1292,11 @@ def trigger_training():
 
     if training_status['status'] == 'running':
         return jsonify({'status': 'running', 'message': 'Model retraining is already executing.'})
+
+    is_sync = request.args.get('sync', '').lower() in ('true', '1', 'yes') or IS_SERVERLESS
+    if is_sync:
+        run_training_async()
+        return jsonify(training_status)
         
     thread = threading.Thread(target=run_training_async, daemon=True)
     thread.start()

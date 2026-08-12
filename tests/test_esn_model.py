@@ -51,3 +51,16 @@ def test_esn_online_adaptation():
         
     pred = esn.predict_step(u)
     assert abs(pred[0] - target) < 0.5
+
+def test_generate_full_range_dataset_fallback():
+    from software.visualiser.training.train_rc import generate_full_range_dataset as gen_rc
+    from hardware.STM_Verifier.train_estimator import generate_full_range_dataset as gen_est
+
+    df_rc = gen_rc(max_rows=50)
+    assert not df_rc.empty
+    assert set(['Time', 'Voltage', 'Current', 'Temperature', 'SOC', 'SOH']).issubset(df_rc.columns)
+
+    df_est = gen_est()
+    assert not df_est.empty
+    assert set(['Time', 'Voltage', 'Current', 'Temperature', 'SOC', 'SOH']).issubset(df_est.columns)
+
