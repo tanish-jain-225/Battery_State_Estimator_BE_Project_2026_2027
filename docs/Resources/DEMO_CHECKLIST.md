@@ -4,6 +4,8 @@
 
 Use this interactive checklist to prepare for a review, viva, project exhibition, or pull request verification.
 
+▶️ **YouTube Video Walkthrough**: [https://youtu.be/kgQQ2Otf5K4](https://youtu.be/kgQQ2Otf5K4)
+
 ---
 
 ## 🗺️ Demonstration Workflow
