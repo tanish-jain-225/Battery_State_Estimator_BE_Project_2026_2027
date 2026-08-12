@@ -43,6 +43,14 @@ def clean_df_columns(df_in):
             elif col_lower == 'time':
                 rename_dict[col] = 'Time'
         df_in.rename(columns=rename_dict, inplace=True)
+        
+        # Coerce numeric columns and drop NaNs
+        req_cols = ['Voltage', 'Current', 'Temperature']
+        for col in req_cols:
+            if col in df_in.columns:
+                df_in[col] = pd.to_numeric(df_in[col], errors='coerce')
+        df_in.dropna(subset=[c for c in req_cols if c in df_in.columns], inplace=True)
+        df_in.reset_index(drop=True, inplace=True)
     return df_in
 
 def get_labels(df_in):

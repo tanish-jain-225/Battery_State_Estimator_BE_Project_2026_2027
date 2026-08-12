@@ -86,34 +86,31 @@ class EchoStateNetwork:
         U_biased = np.hstack((np.ones((n_samples, 1)), U))
         W_in_U = np.dot(U_biased, self.W_in.T) # shape (n_samples, n_reservoir)
         
-        # Cache variables locally to avoid attribute lookup overhead inside loop
-        x = self.x
+        # Cache variables locally using 1D vector representation for fast operations
+        x_vec = self.x.ravel().copy()
         W_res = self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
         
-        import time
         n_effective = max(0, n_samples - washout)
         state_dim = 1 + self.n_inputs + self.n_reservoir
         X = np.empty((n_effective, state_dim))
         
         for t in range(n_samples):
-            if t % 500 == 0:
-                time.sleep(0.00001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
-                if timeout_check is not None:
-                    timeout_check()
-            # Advance state using precomputed input term
-            input_term = W_in_U[t].reshape(-1, 1)
-            x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
+            if t % 2000 == 0 and timeout_check is not None:
+                timeout_check()
+            
+            # Fast 1D vector recurrence update (avoids allocations & reshapes)
+            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
             
             # Skip the washout phase
             if t >= washout:
                 idx = t - washout
                 X[idx, 0] = 1.0
                 X[idx, 1:1+self.n_inputs] = U[t]
-                X[idx, 1+self.n_inputs:] = x.ravel()
+                X[idx, 1+self.n_inputs:] = x_vec
                 
-        self.x = x # Save final state back
+        self.x = x_vec.reshape(-1, 1) # Save final state back
         
         if timeout_check is not None:
             timeout_check()
@@ -241,28 +238,24 @@ class EchoStateNetwork:
         U_biased = np.hstack((np.ones((n_samples, 1)), U))
         W_in_U = np.dot(U_biased, self.W_in.T)
         
-        x = self.x
+        x_vec = self.x.ravel().copy()
         W_res = self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
         
-        import time
         state_dim = 1 + self.n_inputs + self.n_reservoir
         state_matrix = np.empty((n_samples, state_dim))
         
         for t in range(n_samples):
-            if t % 100 == 0:
-                time.sleep(0.0001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
-                if timeout_check is not None:
-                    timeout_check()
-            input_term = W_in_U[t].reshape(-1, 1)
-            x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
+            if t % 2000 == 0 and timeout_check is not None:
+                timeout_check()
+            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
             
             state_matrix[t, 0] = 1.0
             state_matrix[t, 1:1+self.n_inputs] = U[t]
-            state_matrix[t, 1+self.n_inputs:] = x.ravel()
+            state_matrix[t, 1+self.n_inputs:] = x_vec
             
-        self.x = x
+        self.x = x_vec.reshape(-1, 1)
         predictions = np.clip(np.dot(state_matrix, self.W_out.T), 0.0, 1.0)
         return predictions
 
@@ -431,8 +424,22 @@ def main():
             elif col_lower == 'time':
                 rename_dict[col] = 'Time'
         df.rename(columns=rename_dict, inplace=True)
-
-    # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
+        
+        # Coerce numeric columns, drop NaNs, and normalize percentage values
+        req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
+        for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
+        if 'SOH' not in df.columns:
+            df['SOH'] = 1.0
+        
+        # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
+        if df['SOC'].max() > 1.5:
+            df['SOC'] = df['SOC'] / 100.0
+        if df['SOH'].max() > 1.5:
+            df['SOH'] = df['SOH'] / 100.0
+        df.reset_index(drop=True, inplace=True)
     is_production = Config.is_production()
     limit = Config.PRODUCTION_DECIMATION_LIMIT
     if is_production and len(df) > limit:

@@ -1,91 +1,115 @@
+import os
+import sys
 import numpy as np
 
-class EchoStateNetwork:
-    def __init__(self, n_inputs, n_reservoir, n_outputs, spectral_radius=0.95, leak_rate=0.3, input_scaling=1.0, ridge_param=1e-4, sparsity=0.85):
-        self.n_inputs = n_inputs
-        self.n_reservoir = n_reservoir
-        self.n_outputs = n_outputs
-        self.spectral_radius = spectral_radius
-        self.leak_rate = leak_rate
-        self.input_scaling = input_scaling
-        self.ridge_param = ridge_param
-        self.sparsity = sparsity
-        
-        # Initialize input weights
-        np.random.seed(42)  # For reproducible weights
-        self.W_in = (np.random.rand(n_reservoir, 1 + n_inputs) - 0.5) * 2.0 * input_scaling
-        
-        # Initialize reservoir weights
-        W = np.random.randn(n_reservoir, n_reservoir)
-        
-        # Apply sparsity (zero out random elements)
-        if sparsity > 0.0:
-            mask = np.random.rand(*W.shape) < sparsity
-            W[mask] = 0.0
-            
-        # Scale reservoir weights to have desired spectral radius
-        eigenvalues = np.linalg.eigvals(W)
-        max_eigenval = np.max(np.abs(eigenvalues))
-        if max_eigenval > 0:
-            self.W_res = W * (spectral_radius / max_eigenval)
-        else:
-            self.W_res = W
-            
-        # Readout weights
-        self.W_out = None
-        
-        # Reservoir state vector
-        self.x = np.zeros((n_reservoir, 1))
+# Try importing the canonical EchoStateNetwork class from software module for single-source-of-truth logic
+try:
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    train_rc_dir = os.path.join(root_dir, "software", "visualiser", "training")
+    if train_rc_dir not in sys.path:
+        sys.path.insert(0, train_rc_dir)
+    from train_rc import EchoStateNetwork as CanonicalEchoStateNetwork
+    _CANONICAL_ESN_AVAILABLE = True
+except Exception:
+    _CANONICAL_ESN_AVAILABLE = False
 
-    def reset_state(self, state_vector=None):
-        if state_vector is not None:
-            self.x = np.array(state_vector).reshape(self.n_reservoir, 1)
-        else:
-            self.x = np.zeros((self.n_reservoir, 1))
-
-    def get_state(self):
-        return self.x.flatten().tolist()
-
-    def _update(self, u):
-        # u is shape (n_inputs, 1)
-        u_biased = np.vstack(([1.0], u))
-        # Reservoir state update:
-        # x(t) = (1 - alpha)*x(t-1) + alpha * tanh(W_in * u_biased + W_res * x(t-1))
-        arg = np.dot(self.W_in, u_biased) + np.dot(self.W_res, self.x)
-        self.x = (1.0 - self.leak_rate) * self.x + self.leak_rate * np.tanh(arg)
-        return self.x
-
-    def train(self, U, Y, washout=50):
+if _CANONICAL_ESN_AVAILABLE:
+    class EchoStateNetwork(CanonicalEchoStateNetwork):
         """
-        Train the readout weights W_out using Ridge Regression.
-        :param U: input sequence, shape (n_samples, n_inputs)
-        :param Y: target sequence, shape (n_samples, n_outputs)
-        :param washout: number of initial steps to discard so reservoir settles before learning.
-                        This prevents cold-start reservoir states (all zeros) from biasing the
-                        output weights. Typically 50-100 steps.
+        Hardware verifier ESN class wrapping canonical software implementation for 100% logic alignment.
         """
-        n_samples = U.shape[0]
-        self.reset_state()
-        
-        states = []
-        for t in range(n_samples):
-            u_t = U[t].reshape(-1, 1)
-            x_t = self._update(u_t)
-            # Skip the washout phase — reservoir states are unreliable when starting from zero
-            if t >= washout:
-                state_vec = np.vstack(([1.0], u_t, x_t))
-                states.append(state_vec.flatten())
+        def _clip_output(self, y_pred):
+            return np.clip(y_pred, 0.0, 1.0)
+else:
+    class EchoStateNetwork:
+        def __init__(self, n_inputs, n_reservoir, n_outputs, spectral_radius=0.95, leak_rate=0.3, input_scaling=1.0, ridge_param=1e-4, sparsity=0.85):
+            self.n_inputs = n_inputs
+            self.n_reservoir = n_reservoir
+            self.n_outputs = n_outputs
+            self.spectral_radius = spectral_radius
+            self.leak_rate = leak_rate
+            self.input_scaling = input_scaling
+            self.ridge_param = ridge_param
+            self.sparsity = sparsity
             
-        # Design matrix X: (1 + n_inputs + n_reservoir, n_samples - washout)
-        X = np.array(states).T
-        
-        # Target matrix Y_target: (n_outputs, n_samples - washout)
-        Y_target = Y[washout:].reshape(-1, self.n_outputs).T
-        
-        # Ridge Regression: W_out = Y_target * X^T * (X * X^T + lambda * I)^-1
-        X_XT = np.dot(X, X.T)
-        reg_matrix = self.ridge_param * np.eye(X.shape[0])
-        self.W_out = np.dot(np.dot(Y_target, X.T), np.linalg.inv(X_XT + reg_matrix))
+            # Initialize input weights
+            np.random.seed(42)  # For reproducible weights
+            self.W_in = (np.random.rand(n_reservoir, 1 + n_inputs) - 0.5) * 2.0 * input_scaling
+            
+            # Initialize reservoir weights
+            W = np.random.randn(n_reservoir, n_reservoir)
+            
+            # Apply sparsity (zero out random elements)
+            if sparsity > 0.0:
+                mask = np.random.rand(*W.shape) < sparsity
+                W[mask] = 0.0
+                
+            # Scale reservoir weights to have desired spectral radius
+            eigenvalues = np.linalg.eigvals(W)
+            max_eigenval = np.max(np.abs(eigenvalues))
+            if max_eigenval > 0:
+                self.W_res = W * (spectral_radius / max_eigenval)
+            else:
+                self.W_res = W
+                
+            # Readout weights
+            self.W_out = None
+            
+            # Reservoir state vector
+            self.x = np.zeros((n_reservoir, 1))
+
+        def reset_state(self, state_vector=None):
+            if state_vector is not None:
+                self.x = np.array(state_vector).reshape(self.n_reservoir, 1)
+            else:
+                self.x = np.zeros((self.n_reservoir, 1))
+
+        def get_state(self):
+            return self.x.flatten().tolist()
+
+        def _update(self, u):
+            u_biased = np.vstack(([1.0], np.array(u).reshape(-1, 1)))
+            arg = np.dot(self.W_in, u_biased) + np.dot(self.W_res, self.x)
+            self.x = (1.0 - self.leak_rate) * self.x + self.leak_rate * np.tanh(arg)
+            return self.x
+
+        def train(self, U, Y, washout=50, timeout_check=None):
+            n_samples = U.shape[0]
+            self.reset_state()
+            
+            U_biased = np.hstack((np.ones((n_samples, 1)), U))
+            W_in_U = np.dot(U_biased, self.W_in.T)
+            
+            x_vec = self.x.ravel().copy()
+            W_res = self.W_res
+            leak = self.leak_rate
+            one_minus_leak = 1.0 - leak
+            
+            n_effective = max(0, n_samples - washout)
+            state_dim = 1 + self.n_inputs + self.n_reservoir
+            X = np.empty((n_effective, state_dim))
+            
+            for t in range(n_samples):
+                if t % 2000 == 0 and timeout_check is not None:
+                    timeout_check()
+                x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
+                if t >= washout:
+                    idx = t - washout
+                    X[idx, 0] = 1.0
+                    X[idx, 1:1+self.n_inputs] = U[t]
+                    X[idx, 1+self.n_inputs:] = x_vec
+                    
+            self.x = x_vec.reshape(-1, 1)
+            if timeout_check is not None:
+                timeout_check()
+
+            X_T = X.T
+            Y_target = Y[washout:].reshape(-1, self.n_outputs).T
+            X_XT = np.dot(X_T, X)
+            reg_matrix = self.ridge_param * np.eye(state_dim)
+            self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
+            
+            return np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
         
     def adapt_online(self, u, y_target, learning_rate=0.01, mode='rls'):
         """

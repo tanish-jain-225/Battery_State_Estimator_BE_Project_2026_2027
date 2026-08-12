@@ -166,6 +166,22 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
                 rename_dict[col] = 'Time'
         df.rename(columns=rename_dict, inplace=True)
 
+        # Coerce numeric columns, drop NaNs, and normalize percentage values
+        req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
+        for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
+        if 'SOH' not in df.columns:
+            df['SOH'] = 1.0
+
+        # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
+        if df['SOC'].max() > 1.5:
+            df['SOC'] = df['SOC'] / 100.0
+        if df['SOH'].max() > 1.5:
+            df['SOH'] = df['SOH'] / 100.0
+        df.reset_index(drop=True, inplace=True)
+
     # 3. Feature engineering
     print("Performing feature engineering...")
     df = df.copy()

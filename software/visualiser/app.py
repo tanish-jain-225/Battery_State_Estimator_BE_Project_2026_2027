@@ -884,6 +884,22 @@ def run_training_async():
                     rename_dict[col] = 'Time'
             df.rename(columns=rename_dict, inplace=True)
 
+            # Coerce numeric columns, drop NaNs, and normalize percentage values
+            req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
+            for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+            df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
+            if 'SOH' not in df.columns:
+                df['SOH'] = 1.0
+
+            # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
+            if df['SOC'].max() > 1.5:
+                df['SOC'] = df['SOC'] / 100.0
+            if df['SOH'].max() > 1.5:
+                df['SOH'] = df['SOH'] / 100.0
+            df.reset_index(drop=True, inplace=True)
+
         # Dynamic decimation: Caps training dataset in production, for cloud URLs, or when dataset size > limit to guarantee sub-5s training
         is_production = Config.is_production()
         limit = Config.PRODUCTION_DECIMATION_LIMIT
@@ -1008,7 +1024,7 @@ def run_training_async():
     except Exception as err:
         elapsed = time.time() - start_time
         if isinstance(err, TimeoutError) or elapsed >= timeout_limit:
-            training_status['logs'] += f"\n[TIMEOUT] Online training exceeded 1-minute time limit ({int(timeout_limit)}s).\n"
+            training_status['logs'] += f"\n[TIMEOUT] Online training exceeded time limit ({int(timeout_limit)}s).\n"
             if model_loaded and esn_soc is not None:
                 training_status['status'] = 'completed'
                 training_status['soc_rmse'] = loaded_soc_rmse if loaded_soc_rmse is not None else 0.0
