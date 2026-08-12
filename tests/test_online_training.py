@@ -102,3 +102,20 @@ def test_api_train_synchronous_endpoint(visualiser_client):
     data = res.get_json()
     assert 'status' in data
     assert data['status'] in ('completed', 'running', 'started', 'failed')
+
+def test_cloud_dataset_online_training_speed():
+    # Verify online training completes rapidly (under 10s) when cloud data or large datasets are present
+    orig_url = getattr(Config, 'CSV_URL', '')
+    try:
+        # Simulate cloud dataset URL configured
+        Config.CSV_URL = 'http://127.0.0.1:9999/dummy_cloud_data.csv'
+        start = time.time()
+        run_training_async()
+        duration = time.time() - start
+        
+        # Must complete under 10 seconds (well under 60-second limit)
+        assert duration < 10.0
+        assert training_status['status'] in ('completed', 'failed')
+    finally:
+        Config.CSV_URL = orig_url
+

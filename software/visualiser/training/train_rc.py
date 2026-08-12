@@ -77,6 +77,7 @@ class EchoStateNetwork:
         :param Y: target sequence, shape (n_samples, n_outputs)
         :param washout: number of initial steps to discard so reservoir settles before learning.
         :param timeout_check: optional callable that raises TimeoutError if deadline exceeded.
+        :returns: y_pred_washout (array of post-washout target predictions)
         """
         n_samples = U.shape[0]
         self.reset_state()
@@ -92,10 +93,13 @@ class EchoStateNetwork:
         one_minus_leak = 1.0 - leak
         
         import time
-        states = []
+        n_effective = max(0, n_samples - washout)
+        state_dim = 1 + self.n_inputs + self.n_reservoir
+        X = np.empty((n_effective, state_dim))
+        
         for t in range(n_samples):
             if t % 100 == 0:
-                time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
+                time.sleep(0.0001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
                 if timeout_check is not None:
                     timeout_check()
             # Advance state using precomputed input term
@@ -104,25 +108,30 @@ class EchoStateNetwork:
             
             # Skip the washout phase
             if t >= washout:
-                state_vec = np.vstack(([1.0], U[t].reshape(-1, 1), x))
-                states.append(state_vec.flatten())
+                idx = t - washout
+                X[idx, 0] = 1.0
+                X[idx, 1:1+self.n_inputs] = U[t]
+                X[idx, 1+self.n_inputs:] = x.ravel()
                 
         self.x = x # Save final state back
         
         if timeout_check is not None:
             timeout_check()
 
-        # Design matrix X: (1 + n_inputs + n_reservoir, n_samples - washout)
-        X = np.array(states).T
+        # Design matrix transpose X_T: shape (state_dim, n_effective)
+        X_T = X.T
         
-        # Target matrix Y_target: (n_outputs, n_samples - washout)
+        # Target matrix Y_target: (n_outputs, n_effective)
         Y_target = Y[washout:].reshape(-1, self.n_outputs).T
         
-        # Ridge Regression: W_out = Y_target * X^T * (X * X^T + lambda * I)^-1
-        X_XT = np.dot(X, X.T)
-        reg_matrix = self.ridge_param * np.eye(X.shape[0])
-        self.W_out = np.dot(np.dot(Y_target, X.T), np.linalg.inv(X_XT + reg_matrix))
+        # Ridge Regression: W_out = Y_target * X * (X^T * X + lambda * I)^-1
+        X_XT = np.dot(X_T, X)
+        reg_matrix = self.ridge_param * np.eye(state_dim)
+        self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
         
+        y_pred_washout = np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
+        return y_pred_washout
+
     def adapt_online(self, u, y_target, learning_rate=0.01, mode='rls'):
         """
         Adapt the readout weights W_out online based on target feedback.
@@ -236,24 +245,26 @@ class EchoStateNetwork:
         W_res = self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
-        W_out = self.W_out
         
         import time
-        predictions = []
+        state_dim = 1 + self.n_inputs + self.n_reservoir
+        state_matrix = np.empty((n_samples, state_dim))
+        
         for t in range(n_samples):
             if t % 100 == 0:
-                time.sleep(0.001)  # Yield GIL to allow Gunicorn status pings and telemetry requests to execute
+                time.sleep(0.0001)  # Yield GIL briefly to allow Gunicorn status pings and telemetry requests to execute
                 if timeout_check is not None:
                     timeout_check()
             input_term = W_in_U[t].reshape(-1, 1)
             x = one_minus_leak * x + leak * np.tanh(input_term + np.dot(W_res, x))
             
-            state_vec = np.vstack(([1.0], U[t].reshape(-1, 1), x))
-            y_pred = np.dot(W_out, state_vec)
-            predictions.append(np.clip(y_pred, 0.0, 1.0).flatten())
+            state_matrix[t, 0] = 1.0
+            state_matrix[t, 1:1+self.n_inputs] = U[t]
+            state_matrix[t, 1+self.n_inputs:] = x.ravel()
             
         self.x = x
-        return np.array(predictions)
+        predictions = np.clip(np.dot(state_matrix, self.W_out.T), 0.0, 1.0)
+        return predictions
 
 def generate_full_range_dataset(timeout_check=None, max_rows=None):
     """

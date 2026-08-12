@@ -1,8 +1,10 @@
+[← Back to README](../../README.md)
+
 # ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
 
-**Department:** Automation and Robotics  
-**Institute:** Vivekanand Education Society's Institute of Technology  
-**Guide:** Kadambari Sharma  
+**Department:** Department of Automation and Robotics / Instrumentation  
+**Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Mumbai  
+**Guide:** Dr. Kadambari Sharma  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Path:** [`docs/Review_1/Review_1_Progress.md`](file:///d:/_Deployed_Projects_Vercel/Battery_State_Estimator_BE_Project_2026_2027/docs/Review_1/Review_1_Progress.md)
 

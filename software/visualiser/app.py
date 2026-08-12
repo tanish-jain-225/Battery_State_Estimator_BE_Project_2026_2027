@@ -288,11 +288,8 @@ _last_sim_port_check_time = 0.0
 def check_simulator_port(force=False):
     global _simulator_port_online, _simulator_port_data, _last_sim_port_check_time
     now = time.time()
-    if IS_SERVERLESS:
-        # Rate limit status port check in serverless mode to once every 20 seconds to prevent thread block lag
-        if not force and (now - _last_sim_port_check_time < 20.0):
-            return _simulator_port_online, _simulator_port_data
-            
+    check_interval = 20.0 if IS_SERVERLESS else 1.5
+    if force or (now - _last_sim_port_check_time >= check_interval):
         _last_sim_port_check_time = now
         try:
             with make_simulator_request("/api/status", timeout=0.8) as response:
@@ -887,10 +884,10 @@ def run_training_async():
                     rename_dict[col] = 'Time'
             df.rename(columns=rename_dict, inplace=True)
 
-        # Dynamic decimation: Caps training dataset only in production/cloud environments to scale gracefully
+        # Dynamic decimation: Caps training dataset in production, for cloud URLs, or when dataset size > limit to guarantee sub-5s training
         is_production = Config.is_production()
         limit = Config.PRODUCTION_DECIMATION_LIMIT
-        if is_production and len(df) > limit:
+        if (is_production or csv_url or len(df) > limit) and len(df) > limit:
             step = int(np.ceil(len(df) / limit))
             df = df.iloc[::step].reset_index(drop=True)
             training_status['logs'] += f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.\n"
@@ -923,9 +920,8 @@ def run_training_async():
             sparsity=Config.ESN_SOC_SPARSITY
         )
         training_status['logs'] += "Fitting Readout weights via Ridge Regression (SOC)...\n"
-        local_esn_soc.train(U_scaled, Y_soc, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
-        pred_soc = local_esn_soc.predict(U_scaled, timeout_check=check_timeout)
-        soc_rmse = float(np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:] - pred_soc[Config.ESN_WASHOUT_STEPS:]) ** 2)))
+        pred_soc_washout = local_esn_soc.train(U_scaled, Y_soc, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
+        soc_rmse = float(np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:].flatten() - pred_soc_washout.flatten()) ** 2)))
         training_status['logs'] += f"  SOC RMSE post-washout: {soc_rmse:.6f}\n"
 
         check_timeout()
@@ -942,9 +938,8 @@ def run_training_async():
             sparsity=Config.ESN_SOH_SPARSITY
         )
         training_status['logs'] += "Fitting Readout weights via Ridge Regression (SOH)...\n"
-        local_esn_soh.train(U_scaled, Y_soh, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
-        pred_soh = local_esn_soh.predict(U_scaled, timeout_check=check_timeout)
-        soh_rmse = float(np.sqrt(np.mean((Y_soh[Config.ESN_WASHOUT_STEPS:] - pred_soh[Config.ESN_WASHOUT_STEPS:]) ** 2)))
+        pred_soh_washout = local_esn_soh.train(U_scaled, Y_soh, washout=Config.ESN_WASHOUT_STEPS, timeout_check=check_timeout)
+        soh_rmse = float(np.sqrt(np.mean((Y_soh[Config.ESN_WASHOUT_STEPS:].flatten() - pred_soh_washout.flatten()) ** 2)))
         training_status['logs'] += f"  SOH RMSE post-washout: {soh_rmse:.6f}\n"
 
         package = {
@@ -1222,10 +1217,8 @@ def control_simulation():
             
         save_sim_state(state)
 
-        # Invalidate telemetry cache if configuration has structurally changed
-        reset_trigger = data.get('command') == 'reset' or 'chemistry' in data
-        if reset_trigger or 'ekf_mismatch' in data or 'quantize_mode' in data:
-            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+        # Invalidate telemetry cache whenever control state or command changes to ensure immediate UI sync
+        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         
         # Forward control payload to Config.SIMULATOR_URL if online (force live check)
         port_online, _ = check_simulator_port(force=True)

@@ -920,24 +920,24 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStart.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'start' });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (btnPause) {
         btnPause.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'pause' });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (btnStop) {
         btnStop.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'stop' });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (btnReset) {
@@ -945,8 +945,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm('Reset simulator and purge all historical database records?')) {
                 resumeLiveMode();
                 await apiRequest('/api/control', 'POST', { command: 'reset' });
-                refreshStatus();
-                refreshTelemetry();
+                if (chartSOC) { chartSOC.data.datasets.forEach(d => d.data = []); chartSOC.update(); }
+                if (chartSOH) { chartSOH.data.datasets.forEach(d => d.data = []); chartSOH.update(); }
+                await refreshStatus();
+                await refreshTelemetry();
             }
         });
     }
@@ -956,24 +958,24 @@ document.addEventListener('DOMContentLoaded', () => {
         chemSelect.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { chemistry: e.target.value });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (cycleSelect) {
         cycleSelect.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { cycle_type: e.target.value });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (agingToggle) {
         agingToggle.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { accelerated_aging: e.target.checked });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
 
@@ -985,32 +987,32 @@ document.addEventListener('DOMContentLoaded', () => {
         tempSlider.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { T_ambient: parseFloat(e.target.value) });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (faultShortToggle) {
         faultShortToggle.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { fault_short: e.target.checked });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (faultThermalToggle) {
         faultThermalToggle.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { fault_thermal: e.target.checked });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
     if (faultDropoutToggle) {
         faultDropoutToggle.addEventListener('change', async (e) => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { fault_dropout: e.target.checked });
-            refreshStatus();
-            refreshTelemetry();
+            await refreshStatus();
+            await refreshTelemetry();
         });
     }
 

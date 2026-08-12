@@ -5,7 +5,7 @@
 **Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting**
 
 <p align="left">
-  <a href="https://youtu.be/kgQQ2Otf5K4" target="_blank">
+  <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
   </a>
   <a href="https://battery-visualizer.onrender.com" target="_blank">
@@ -29,11 +29,12 @@
 
 ---
 
-## Guide Details
+## Guide & Department Details
 
 **Project Guide:** Dr. Kadambari Sharma  
-**Department:** Automation and Robotics  
-**Institute:** VESIT, Mumbai  
+**Department:** Department of Automation and Robotics / Instrumentation  
+**Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Hashu Advani Memorial Complex, Chembur, Mumbai - 400074  
+**Project Coordinator / Department Notice:** Mr. Gopalakrishnan Narayanan (Assistant Professor, Instrumentation Dept)  
 
 ---
 
@@ -180,35 +181,42 @@ The system architecture feeds 2-RC battery telemetry into a multi-estimator pipe
 7. **Testing and Validation:** Automated pytest suite, hardware CSR benchmarking (6.7x speedup), bit-exact RTL verification (200/200 matches).
 8. **Documentation and Publication:** Comprehensive technical documentation, demo checklist, research paper drafting.
 
+## Department BE Project Timeline & Milestones
+
+As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Department), the official timeline for BE Project 2026-2027 is:
+
+| Milestone / Review Event | Scheduled Date | Mode | Status |
+| :--- | :---: | :---: | :---: |
+| **Proposal of Project** | 12/08/2026 | Online | **Ready for Submission** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
+| **Acceptance / Modification** | 17/08/2026 | Online | Pending Guide Feedback |
+| **First Review** | 21/09/2026 – 24/09/2026 | Offline | Pre-built ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf)) |
+| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | Scheduled |
+| **Final External Review** | 21/11/2026 | Offline | Scheduled |
+
+### Marks Allocation & Evaluation Policy
+* **10 Marks — GitHub Log Book:** Weekly progress updates maintained directly in `README.md`.
+* **20 Marks — Paper Publication:**
+  * **10 Marks:** Proof of paper publication submission.
+  * **10 Marks:** Proof of paper publication acceptance.
+
 ---
 
-## Project Timeline
+## GitHub Log Book & Weekly Progress Updates (10 Marks Allocated)
 
-| Week / Month | Task Planned | Status |
-| :---: | :--- | :---: |
-| Week 1 | Problem finalization & Literature Survey | Completed |
-| Week 2 | Battery Model Development (2-RC ECM) | Completed |
-| Week 3 | Requirement analysis & Telemetry Setup | Completed |
-| Week 4 | Conventional Estimators (EKF, Coulomb Counting, VFF-RLS) | Completed |
-| Week 5 | Echo State Network (ESN) Model Training & Readout Optimization | Completed |
-| Week 6 | Embedded C99 Firmware & CSR Sparse Matrix Optimization | In Progress |
-| Week 7 | Verilog RTL 100-Neuron Datapath & FPGA Golden Verification | In Progress |
-| Week 8 | Web Dashboard Visualiser, Documentation & Paper Writing | In Progress |
+> 📌 **Note:** As per department policy, this GitHub Log Book is maintained directly in `README.md` and updated weekly to track project milestones, task distribution, hardware/software implementations, and challenges.  
+> 📑 **Project Proposal Document:** [`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)
 
----
-
-## Weekly Progress Updates
-
-| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | GitHub Link |
+| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges & Solution | GitHub Link |
 | :---: | :---: | :--- | :--- | :--- | :---: |
-| Week 1 | 2026-06-15 | Finalized project scope, literature survey on ESN & EKF | Battery model equation modeling | Reservoir size vs memory tradeoff | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 2 | 2026-06-22 | Developed 2-RC Electro-Thermal battery physics simulator | Telemetry storage & MongoDB integration | Dynamic driving thermal drift modeling | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 3 | 2026-06-29 | Implemented EKF with covariance guards, Coulomb Counting, VFF-RLS | ESN model training pipeline | EKF numerical divergence under noise | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 4 | 2026-07-06 | Trained ESN reservoir computing model for SOC/SOH estimation | Embedded C99 firmware creation | Hyperparameter tuning for spectral radius | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 5 | 2026-07-13 | Implemented CSR sparse matrix ESN inference in C99 (6.7x speedup) | Verilog RTL hardware design | Fixed-point Q12/Q15 overflow control | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 6 | 2026-07-20 | Designed 100-Neuron Verilog RTL datapath for ARTIX-7 FPGA | Vivado simulation & Golden model test | Tanh LUT precision matching | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 7 | 2026-07-27 | Achieved 200/200 bit-exact RTL matches; built Flask visualiser | Fault injection testing & docs | Thermal runaway fault UI integration | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 8 | 2026-08-03 | Finalized automated test suite, paper draft, and video walkthrough | Project presentation & viva review | GitHub Actions CI environment | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 1** | 2026-06-15 | Finalized project scope, literature survey on ESN & EKF | Battery model equation modeling | Reservoir size vs memory tradeoff; selected 50-node leaky integrator ESN | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 2** | 2026-06-22 | Developed 2-RC Electro-Thermal battery physics simulator | Telemetry storage & MongoDB integration | Dynamic driving thermal drift modeling; implemented Arrhenius temperature scaling | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 3** | 2026-06-29 | Implemented EKF with covariance guards, Coulomb Counting, VFF-RLS | ESN model training pipeline | EKF numerical divergence under noise; added matrix conditioning guards | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 4** | 2026-07-06 | Trained ESN reservoir computing model for SOC/SOH estimation | Embedded C99 firmware creation | Hyperparameter tuning for spectral radius $\rho=0.95$ | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 5** | 2026-07-13 | Implemented CSR sparse matrix ESN inference in C99 (6.7x speedup) | Verilog RTL hardware design | Fixed-point Q12/Q15 overflow control; added 33-point LUT linear interpolation | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 6** | 2026-07-20 | Designed 100-Neuron Verilog RTL datapath for ARTIX-7 FPGA | Vivado simulation & Golden model test | Tanh LUT precision matching; verified double-buffered BRAM state arrays | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 7** | 2026-07-27 | Achieved 200/200 bit-exact RTL matches; built Flask visualiser | Fault injection testing & docs | Thermal runaway fault UI integration; implemented live Chart.js streaming | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 8** | 2026-08-03 | Finalized automated test suite (31 tests), paper draft, and video walkthrough | Project presentation & online proposal submission | GitHub Actions CI environment integration | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 9** | 2026-08-10 | Prepared BE Project Proposal and verified GitHub Log Book compliance | Paper submission to IEEE conference & Review 1 preparation | Ensuring online submission proof generation | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 
 ---
 
@@ -280,6 +288,7 @@ BE-Capstone-Project/
 ├── docs/
 │   ├── literature_survey.md
 │   └── Resources/
+│       ├── PROJECT_PROPOSAL.md
 │       ├── SYSTEM_SPECIFICATION.md
 │       ├── OPERATIONS.md
 │       ├── DEPLOY_RENDER.md
@@ -456,15 +465,19 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 
 ---
 
-## Research Paper / Publication
+## Research Paper / Publication (20 Marks Allocated)
+
+> 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof.
 
 | Item | Details |
 | :--- | :--- |
-| Paper Title | Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems |
-| Conference / Journal Name | IEEE / International Conference on Automation and Robotics 2026 |
-| Paper Status | Drafting / Ready for Submission |
-| Submission Date | August 2026 |
-| Paper Link | [Paper Draft (reference/paper.md)](reference/paper.md) |
+| **Paper Title** | Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems |
+| **Target Venue** | IEEE / International Conference on Automation and Robotics 2026 |
+| **Paper Status** | Drafting Complete / Ready for Submission |
+| **Submission Deadline** | August 2026 |
+| **Paper Manuscript** | [`reference/paper.md`](reference/paper.md) |
+| **Submission Proof (10 Marks)** | Pending Submission (Confirmation PDF/Email will be saved to `docs/Paper_Proof/`) |
+| **Acceptance Proof (10 Marks)** | Pending Acceptance Notification |
 
 ---
 
