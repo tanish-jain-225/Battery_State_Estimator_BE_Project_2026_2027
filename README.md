@@ -4,6 +4,23 @@
 
 **Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting**
 
+<p align="left">
+  <a href="https://youtu.be/kgQQ2Otf5K4">
+    <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
+  </a>
+  <a href="https://battery-visualizer.onrender.com/">
+    <img src="https://img.shields.io/badge/Live%20Demo-Visualiser%20Dashboard-4B0082?style=for-the-badge&logo=render" alt="Visualiser Dashboard" />
+  </a>
+  <a href="https://battery-physics-simulator.onrender.com/">
+    <img src="https://img.shields.io/badge/Live%20Demo-Physics%20Simulator-008080?style=for-the-badge&logo=render" alt="Physics Simulator" />
+  </a>
+</p>
+
+> 🔗 **Live Links:**
+> - 📺 **YouTube Video Walkthrough:** [https://youtu.be/kgQQ2Otf5K4](https://youtu.be/kgQQ2Otf5K4)
+> - 📊 **Live Visualiser Dashboard:** [https://battery-visualizer.onrender.com](https://battery-visualizer.onrender.com)
+> - ⚡ **Live Physics Simulator API:** [https://battery-physics-simulator.onrender.com](https://battery-physics-simulator.onrender.com)
+
 ---
 
 ## Team Details

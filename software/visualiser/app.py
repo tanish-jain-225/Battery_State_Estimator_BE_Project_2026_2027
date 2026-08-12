@@ -170,6 +170,7 @@ input_stds = None
 model_path = Config.MODEL_PATH
 loaded_soc_rmse = None
 loaded_soh_rmse = None
+_last_fetched_df = None  # Cache for last successfully fetched/generated dataset for fallback
 
 # Shared state for background ESN training
 training_status = {
@@ -783,11 +784,18 @@ def _lazy_init():
 
 # ── ESN Model Retraining Background Worker ────────────────────────────
 def run_training_async():
-    global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
+    global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse, _last_fetched_df
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
     current_model_score = _model_score(loaded_soc_rmse, loaded_soh_rmse)
     
+    start_time = time.time()
+    timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 60.0)
+
+    def check_timeout():
+        if (time.time() - start_time) > timeout_limit:
+            raise TimeoutError(f"Online training exceeded time limit of {int(timeout_limit)} seconds (1 minute).")
+
     try:
         from train_rc import EchoStateNetwork, generate_full_range_dataset
         from feature_engineering import extract_features_df
@@ -799,11 +807,12 @@ def run_training_async():
         if csv_url:
             # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
             training_status['training_source'] = 'remote_url'
-            training_status['logs'] += f"Fetching remote dataset from URL (timeout: 10s)...\n"
+            req_timeout = min(10.0, max(1.0, timeout_limit - (time.time() - start_time)))
+            training_status['logs'] += f"Fetching remote dataset from URL (timeout: {req_timeout:.1f}s)...\n"
             try:
                 import io
                 import requests
-                response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+                response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=req_timeout)
                 response.raise_for_status()
                 csv_data = response.text
                 if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
@@ -827,12 +836,22 @@ def run_training_async():
             training_status['training_source'] = 'physical_simulator_generator'
             training_status['logs'] += "Generating high-fidelity full-range dataset from physical battery simulator...\n"
             try:
+                check_timeout()
                 df = generate_full_range_dataset()
                 training_status['logs'] += f"Full-range dataset generated successfully: {len(df)} rows.\n"
             except Exception as gen_err:
                 training_status['logs'] += f"Backup generator failed: {gen_err}.\n"
-                raise RuntimeError("No training data source available.") from gen_err
+                if _last_fetched_df is not None:
+                    df = _last_fetched_df.copy()
+                    training_status['logs'] += f"Falling back to last successfully fetched dataset from memory ({len(df)} rows).\n"
+                else:
+                    raise RuntimeError("No training data source available.") from gen_err
         
+        if df is not None:
+            _last_fetched_df = df.copy()
+
+        check_timeout()
+
         if df is not None:
             # Recover if CSV was pasted into a single column
             if len(df.columns) == 1 and ',' in str(df.columns[0]):
@@ -883,6 +902,8 @@ def run_training_async():
         Y_soc = df[['SOC']].values
         Y_soh = df[['SOH']].values
 
+        check_timeout()
+
         training_status['logs'] += f"Initializing Reservoir (nodes={Config.ESN_SOC_RESERVOIR}, radius={Config.ESN_SOC_SPECTRAL_RADIUS}) for SOC prediction...\n"
         local_esn_soc = EchoStateNetwork(
             n_inputs=n_features,
@@ -899,6 +920,8 @@ def run_training_async():
         pred_soc = local_esn_soc.predict(U_scaled)
         soc_rmse = float(np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:] - pred_soc[Config.ESN_WASHOUT_STEPS:]) ** 2)))
         training_status['logs'] += f"  SOC RMSE post-washout: {soc_rmse:.6f}\n"
+
+        check_timeout()
 
         training_status['logs'] += f"Initializing Reservoir (nodes={Config.ESN_SOH_RESERVOIR}, radius={Config.ESN_SOH_SPECTRAL_RADIUS}) for SOH prediction...\n"
         local_esn_soh = EchoStateNetwork(
@@ -981,6 +1004,17 @@ def run_training_async():
         _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
 
     except Exception as err:
+        elapsed = time.time() - start_time
+        if isinstance(err, TimeoutError) or elapsed >= timeout_limit:
+            training_status['logs'] += f"\n[TIMEOUT] Online training exceeded 1-minute time limit ({int(timeout_limit)}s).\n"
+            if model_loaded and esn_soc is not None:
+                training_status['status'] = 'completed'
+                training_status['soc_rmse'] = loaded_soc_rmse if loaded_soc_rmse is not None else 0.0
+                training_status['soh_rmse'] = loaded_soh_rmse if loaded_soh_rmse is not None else 0.0
+                training_status['timestamp'] = datetime.utcnow().isoformat()
+                training_status['logs'] += "Safely preserved and fell back to the last active ESN model weights & fetched state.\n"
+                print(f"Online training timed out after {int(elapsed)}s. Preserved last active model weights.")
+                return
         training_status['status'] = 'failed'
         training_status['logs'] += f"\nTRAINING FAILURE ENCOUNTERED: {err}\n"
         print(f"ESN Training failed: {err}")
