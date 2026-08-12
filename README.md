@@ -5,28 +5,23 @@
 **Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting**
 
 <p align="left">
-  <a href="https://youtu.be/kgQQ2Otf5K4">
+  <a href="https://youtu.be/kgQQ2Otf5K4" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
   </a>
-  <a href="https://battery-visualizer.onrender.com/">
+  <a href="https://battery-visualizer.onrender.com" target="_blank">
     <img src="https://img.shields.io/badge/Live%20Demo-Visualiser%20Dashboard-4B0082?style=for-the-badge&logo=render" alt="Visualiser Dashboard" />
   </a>
-  <a href="https://battery-physics-simulator.onrender.com/">
+  <a href="https://battery-physics-simulator.onrender.com" target="_blank">
     <img src="https://img.shields.io/badge/Live%20Demo-Physics%20Simulator-008080?style=for-the-badge&logo=render" alt="Physics Simulator" />
   </a>
 </p>
-
-> 🔗 **Live Links:**
-> - 📺 **YouTube Video Walkthrough:** [https://youtu.be/kgQQ2Otf5K4](https://youtu.be/kgQQ2Otf5K4)
-> - 📊 **Live Visualiser Dashboard:** [https://battery-visualizer.onrender.com](https://battery-visualizer.onrender.com)
-> - ⚡ **Live Physics Simulator API:** [https://battery-physics-simulator.onrender.com](https://battery-physics-simulator.onrender.com)
 
 ---
 
 ## Team Details
 
 | Sr. No. | Name of Student | Roll No. | Branch | Email ID |
-|---|---|---|---|---|
+| :---: | :--- | :---: | :---: | :--- |
 | 1 | Sanjna Patankar | 2023.sanjna.patankar | Automation and Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) |
 | 2 | Akshay Nambiar | 2023.akshay.nambiar | Automation and Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) |
 | 3 | Satvik Verma | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) |
@@ -44,11 +39,11 @@
 
 ## Problem Statement
 
-Battery State of Charge (SOC) and State of Health (SOH) are critical parameters for the safe and efficient operation of Battery Management Systems (BMS). Conventional estimation techniques such as Coulomb Counting and Extended Kalman Filter (EKF) have limitations including cumulative integration drift, dependence on battery-model parameters, calibration requirements, and computational overhead.
+Accurate Battery State of Charge (SOC) and State of Health (SOH) estimation is critical for safe and efficient Battery Management System (BMS) operations. Conventional estimation methods suffer from severe drawbacks:
+* **Coulomb Counting:** Open-loop current integration causes cumulative drift and sensor offset errors over time.
+* **Extended Kalman Filter (EKF):** Requires complex battery parameter identification, frequent recalibration, and high matrix calculation overhead on microcontrollers.
 
-The problem addressed by this project is to develop a lightweight, data-driven battery state estimation system that can estimate SOC and SOH from battery voltage, current, and temperature measurements while reducing the limitations associated with conventional model-based and integration-based methods.
-
-The proposed system uses an Echo State Network (ESN) based Reservoir Computing approach and compares its performance with conventional estimation methods. The system is also designed with embedded hardware validation using an STM32-class microcontroller and FPGA-based RTL implementation.
+This project addresses these challenges by developing a lightweight, data-driven battery state estimation system using Reservoir Computing (Echo State Networks) to accurately estimate SOC and SOH from battery voltage, current, and temperature measurements while reducing computational overhead.
 
 ---
 
@@ -81,21 +76,19 @@ A Flask-based visualiser provides real-time monitoring and comparison of the dif
 
 ## Scope of the Project
 
-- Design and development of 2-RC Electro-Thermal Battery Physics Simulator
-- SOC and SOH estimation using ESN / Reservoir Computing
-- Comparative analysis against EKF, Coulomb Counting, and VFF-RLS
-- Real-time telemetry web visualiser with Flask and Chart.js
-- Embedded C99 optimization using CSR sparse matrix representation (6.7x speedup)
-- 100-Neuron Verilog RTL datapath implementation and FPGA verification (ARTIX A7100T)
-- Fault condition injection testing (Thermal Runaway, Sensor Dropout, Micro-Shorts)
-- Comprehensive automated test suite and documentation
+- **Physics-Based Simulation:** 2-RC Electro-Thermal Battery Physics Engine supporting dynamic driving cycles (DST, US06, FUDS).
+- **ML Estimator Pipeline:** Echo State Network (ESN) Reservoir Computing for SOC and SOH tracking.
+- **Comparative Analysis:** Benchmark ESN against EKF, Coulomb Counting, and VFF-RLS.
+- **Real-Time Web Dashboard:** Flask-based visualiser with interactive Chart.js graphs and live fault injection controls.
+- **Embedded C99 Optimization:** Compressed Sparse Row (CSR) matrix representation delivering a **6.7× inference speedup**.
+- **FPGA Hardware RTL:** 100-neuron Verilog datapath verified bit-exactly on an ARTIX A7100T FPGA against a Python golden model.
+- **Safety Diagnostics:** Automated detection of Thermal Runaway, Sensor Dropouts, and Micro-Short Circuits.
 
 ---
 
 ## Existing System
 
 Battery state estimation is traditionally performed using methods such as:
-
 * Coulomb Counting
 * Open Circuit Voltage (OCV)
 * Equivalent Circuit Models (ECM)
@@ -103,10 +96,10 @@ Battery state estimation is traditionally performed using methods such as:
 
 ### Limitations of Existing Methods
 
-- **High cost & computation:** Matrix inversion during each EKF cycle requires significant processing power.
-- **Low accuracy / cumulative drift:** Coulomb counting accumulates current sensor offset integration errors over time.
-- **Model sensitivity:** EKF requires precise battery parameter identification and continuous recalibration under battery aging.
-- **Lack of automation:** Manual tuning of noise covariance matrices ($Q$ and $R$) is needed for dynamic driving cycles.
+- **High Computational Overhead:** Matrix inversion during each EKF cycle demands significant processing cycles on low-power MCUs.
+- **Cumulative Integration Drift:** Coulomb counting accumulates current measurement errors and sensor offset drift over time.
+- **Parameter Sensitivity:** EKF requires precise model parameter identification and continuous recalibration under battery aging.
+- **Manual Tuning Requirements:** Noise covariance matrices ($Q$ and $R$) require manual tuning for dynamic driving conditions.
 
 ---
 
@@ -115,19 +108,19 @@ Battery state estimation is traditionally performed using methods such as:
 The proposed system uses an **Echo State Network (ESN)** based Reservoir Computing architecture for battery SOC and SOH estimation.
 
 ### Main Working Principle
-1. The 2-RC battery physics simulator generates voltage, current, and temperature telemetry under drive cycles (DST, US06, FUDS).
-2. Data is streamed into MongoDB Atlas / in-memory buffer and fetched by the Flask web visualiser.
-3. Conventional estimators (EKF, Coulomb Counting, VFF-RLS) execute alongside the ESN reservoir.
-4. The ESN updates its recurrent state and linear readout generates SOC and SOH predictions.
-5. Optimized ESN inference is validated using C99 firmware (STM32) and verified on a 100-neuron FPGA RTL datapath.
+1. The 2-RC battery physics simulator generates voltage, current, and temperature telemetry under dynamic drive cycles.
+2. Telemetry is streamed into MongoDB Atlas (or in-memory fallback) and fetched by the Flask web visualiser.
+3. Conventional estimators (EKF, Coulomb Counting, VFF-RLS) execute in parallel with the ESN reservoir.
+4. The ESN updates its recurrent reservoir state and trained linear readout outputs SOC and SOH predictions.
+5. ESN inference is validated via C99 firmware on an STM32 platform and verified on an ARTIX-7 FPGA Verilog RTL datapath.
 
 ### Major Components
-- **Battery Physics Simulator:** 2-RC ECM, electro-thermal dynamics, drive cycles, fault injection.
+- **Battery Physics Simulator:** 2-RC ECM, electro-thermal dynamics, drive cycle generator, fault injector.
 - **ESN Estimator:** Fixed recurrent reservoir, sparse matrix representation, trained linear readout.
 - **Conventional Estimators:** Extended Kalman Filter (EKF), Coulomb Counting, VFF-RLS.
 - **STM32 Embedded Verifier:** C99 implementation, CSR SpMV, Q12/Q15 fixed-point, LUT Tanh.
 - **FPGA Verifier:** 100-neuron Verilog RTL, BRAM state storage, Python golden model verifier.
-- **Web Visualiser:** Flask backend, Chart.js frontend dashboard.
+- **Web Visualiser:** Flask REST backend, Chart.js frontend dashboard.
 
 ---
 
@@ -135,14 +128,14 @@ The proposed system uses an **Echo State Network (ESN)** based Reservoir Computi
 
 ![System Architecture](images/system_architecture.png)
 
-The system architecture consists of a 2-RC battery physics engine that feeds voltage, current, and temperature telemetry into a multi-estimator pipeline. Estimator outputs drive real-time safety diagnostics and dashboard visualization, while firmware and RTL verifiers benchmark low-power edge execution performance.
+The system architecture feeds 2-RC battery telemetry into a multi-estimator pipeline. Predictions drive safety diagnostics and dashboard visualization, while firmware and RTL verifiers benchmark low-power edge execution performance.
 
 ---
 
 ## Hardware Requirements
 
 | Sr. No. | Component | Specification | Quantity | Purpose |
-| ------- | --------- | ------------- | -------- | ------- |
+| :---: | :--- | :--- | :---: | :--- |
 | 1 | STM32 Development Board | ARM Cortex-M based (STM32F4/F7) | 1 | Embedded ESN C99 firmware validation |
 | 2 | ARTIX A7100T FPGA | Xilinx 7-Series FPGA | 1 | 100-Neuron ESN Verilog RTL verification |
 | 3 | USB / UART Interface | USB-to-TTL Serial Bridge | 1 | Hardware telemetry debugging & data transfer |
@@ -153,7 +146,7 @@ The system architecture consists of a 2-RC battery physics engine that feeds vol
 ## Software Requirements
 
 | Sr. No. | Software / Tool | Version | Purpose |
-| ------- | --------------- | ------- | ------- |
+| :---: | :--- | :---: | :--- |
 | 1 | Python | 3.8+ | Core simulation, ML training & data processing |
 | 2 | Flask | 2.x | Real-time web visualiser & telemetry simulator API |
 | 3 | Gunicorn | 20.x | Web application production deployment |
@@ -192,37 +185,37 @@ The system architecture consists of a 2-RC battery physics engine that feeds vol
 ## Project Timeline
 
 | Week / Month | Task Planned | Status |
-| ------------ | ------------ | ------ |
+| :---: | :--- | :---: |
 | Week 1 | Problem finalization & Literature Survey | Completed |
 | Week 2 | Battery Model Development (2-RC ECM) | Completed |
 | Week 3 | Requirement analysis & Telemetry Setup | Completed |
 | Week 4 | Conventional Estimators (EKF, Coulomb Counting, VFF-RLS) | Completed |
 | Week 5 | Echo State Network (ESN) Model Training & Readout Optimization | Completed |
-| Week 6 | Embedded C99 Firmware & CSR Sparse Matrix Optimization | In Progress |
-| Week 7 | Verilog RTL 100-Neuron Datapath & FPGA Golden Verification | In Progress |
-| Week 8 | Web Dashboard Visualiser, Documentation & Paper Writing | Planned |
+| Week 6 | Embedded C99 Firmware & CSR Sparse Matrix Optimization | Completed |
+| Week 7 | Verilog RTL 100-Neuron Datapath & FPGA Golden Verification | Completed |
+| Week 8 | Web Dashboard Visualiser, Documentation & Paper Writing | Completed |
 
 ---
 
 ## Weekly Progress Updates
 
-| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | GitHub Commit Link |
-| ------ | ---- | -------------- | -------------------------- | ------------------- | ------------------ |
-| Week 1 | 2026-06-15 | Finalized project scope, literature survey on ESN & EKF | Battery model equation modeling | Reservoir size vs memory tradeoff | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 2 | 2026-06-22 | Developed 2-RC Electro-Thermal battery physics simulator | Telemetry storage & MongoDB integration | Dynamic driving thermal drift modeling | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 3 | 2026-06-29 | Implemented EKF with covariance guards, Coulomb Counting, VFF-RLS | ESN model training pipeline | EKF numerical divergence under noise | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 4 | 2026-07-06 | Trained ESN reservoir computing model for SOC/SOH estimation | Embedded C99 firmware creation | Hyperparameter tuning for spectral radius | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 5 | 2026-07-13 | Implemented CSR sparse matrix ESN inference in C99 (6.7x speedup) | Verilog RTL hardware design | Fixed-point Q12/Q15 overflow control | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 6 | 2026-07-20 | Designed 100-Neuron Verilog RTL datapath for ARTIX-7 FPGA | Vivado simulation & Golden model test | Tanh LUT precision matching | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 7 | 2026-07-27 | Achieved 200/200 bit-exact RTL matches; built Flask visualiser | Fault injection testing & docs | Thermal runaway fault UI integration | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
-| Week 8 | 2026-08-03 | Finalized automated test suite, paper draft, and video walkthrough | Project presentation & viva review | GitHub Actions CI environment | [Commit](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week | Date | Work Completed | Work Planned for Next Week | Issues / Challenges | GitHub Link |
+| :---: | :---: | :--- | :--- | :--- | :---: |
+| Week 1 | 2026-06-15 | Finalized project scope, literature survey on ESN & EKF | Battery model equation modeling | Reservoir size vs memory tradeoff | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 2 | 2026-06-22 | Developed 2-RC Electro-Thermal battery physics simulator | Telemetry storage & MongoDB integration | Dynamic driving thermal drift modeling | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 3 | 2026-06-29 | Implemented EKF with covariance guards, Coulomb Counting, VFF-RLS | ESN model training pipeline | EKF numerical divergence under noise | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 4 | 2026-07-06 | Trained ESN reservoir computing model for SOC/SOH estimation | Embedded C99 firmware creation | Hyperparameter tuning for spectral radius | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 5 | 2026-07-13 | Implemented CSR sparse matrix ESN inference in C99 (6.7x speedup) | Verilog RTL hardware design | Fixed-point Q12/Q15 overflow control | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 6 | 2026-07-20 | Designed 100-Neuron Verilog RTL datapath for ARTIX-7 FPGA | Vivado simulation & Golden model test | Tanh LUT precision matching | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 7 | 2026-07-27 | Achieved 200/200 bit-exact RTL matches; built Flask visualiser | Fault injection testing & docs | Thermal runaway fault UI integration | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| Week 8 | 2026-08-03 | Finalized automated test suite, paper draft, and video walkthrough | Project presentation & viva review | GitHub Actions CI environment | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 
 ---
 
 ## Design Files
 
-| File Type | File Name / Link | Description |
-| --------- | ---------------- | ----------- |
+| File Type | File Link | Description |
+| :--- | :--- | :--- |
 | Hardware Specs | [Hardware Overview](hardware/hardware.md) | Enclosure and hardware target specifications |
 | Circuit Diagram | [Circuit Diagram](images/circuit_diagram.png) | 2-RC ECM Equivalent Electrical Schematic |
 | System Architecture | [System Architecture Diagram](images/system_architecture.png) | End-to-end telemetry & hardware verifier architecture |
@@ -343,7 +336,6 @@ BE-Capstone-Project/
 │   ├── system_architecture.png
 │   ├── circuit_diagram.png
 │   ├── flowchart.png
-│   ├── prototype_photo.jpg
 │   └── assets/
 │
 ├── tests/
@@ -376,7 +368,7 @@ cd Battery_State_Estimator_BE_Project_2026_2027
 pip install -r requirements.txt
 ```
 
-### Step 3: Upload / Run the Code
+### Step 3: Run the Services
 
 Start Battery Simulator (Port 8000):
 ```bash
@@ -407,7 +399,7 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 ## Testing and Results
 
 | Test No. | Test Description | Expected Result | Actual Result | Status |
-| -------- | ---------------- | --------------- | ------------- | ----------- |
+| :---: | :--- | :--- | :--- | :---: |
 | 1 | 2-RC Physics Telemetry Generation | Dynamic V, I, T streams under drive cycles | Telemetry generated smoothly | Pass |
 | 2 | Multi-Estimator Pipeline Execution | Parallel tracking of ESN, EKF, Coulomb Counting | SOC RMSE < 1.5% achieved | Pass |
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
@@ -417,22 +409,13 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 
 ---
 
-## Result Images / Videos
-
-### Prototype Screenshots
+## Result Screenshots
 
 ![Battery Simulator](images/assets/screenshot_simulator_aging.png)
 
 ![Visualiser Dashboard](images/assets/screenshot_visualiser_overview.png)
 
 ![SOC SOH Estimation](images/assets/screenshot_estimation_charts.png)
-
-
-### Video Link
-
-[![YouTube Walkthrough](https://img.shields.io/badge/YouTube-Watch%20Walkthrough%20Video-red?style=for-the-badge&logo=youtube)](https://youtu.be/kgQQ2Otf5K4)
-
-[Project Demo Video](https://youtu.be/kgQQ2Otf5K4)
 
 ---
 
@@ -451,13 +434,13 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 2. **Drift-Free Estimation:** Prevents cumulative integration drift inherent to Coulomb Counting.
 3. **Ultra-Low Memory Footprint:** CSR sparse matrix representation yields 85% memory savings and 6.7x speedup.
 4. **FPGA RTL Verified:** Proven hardware feasibility with a 100-neuron Verilog datapath.
-5. **Real-time Fault Tolerance:** Detects thermal runaway, sensor dropouts, and micro-shorts instantly.
+5. **Real-Time Fault Tolerance:** Detects thermal runaway, sensor dropouts, and micro-shorts instantly.
 
 ---
 
 ## Limitations
 
-1. **Simulated Telemetry Target:** Physical HIL load-cell testing is target for next deployment phase.
+1. **Simulated Telemetry Target:** Physical HIL load-cell testing is targeted for next deployment phase.
 2. **Data Dependence:** ESN accuracy relies on diverse dynamic drive cycle training data.
 3. **Single-Cell Scope:** Extension to multi-cell balanced battery packs is planned in future scope.
 4. **Hardware Verification Target:** Currently validated on STM32 C99 and Artix-7 RTL simulation platform.
@@ -476,7 +459,7 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 ## Research Paper / Publication
 
 | Item | Details |
-| ---- | ------- |
+| :--- | :--- |
 | Paper Title | Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems |
 | Conference / Journal Name | IEEE / International Conference on Automation and Robotics 2026 |
 | Paper Status | Drafting / Ready for Submission |
@@ -501,7 +484,6 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 Each student team must update the GitHub repository regularly.
 
 Minimum expected updates:
-
 * Update README every week.
 * Push code changes regularly.
 * Upload circuit diagrams, CAD files, PCB files, reports and presentations.
@@ -511,7 +493,6 @@ Minimum expected updates:
 * Each major update should have a meaningful commit message.
 
 Example commit messages:
-
 ```text
 Added problem statement and objectives
 Updated system architecture diagram
