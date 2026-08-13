@@ -360,41 +360,51 @@ def main():
     model_save_path = Config.MODEL_PATH
 
     df = None
-    # 1. Primary: Remote Google Sheets docs URL
+    source_name = None
+
+    # Priority 1: Doc Link Data (if CSV_URL is configured and accessible)
     if csv_url:
-        print(f"Fetching remote dataset from URL (timeout: 10s): {csv_url}...")
+        print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
             import requests
             response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
-            response.raise_for_status()
-            csv_data = response.text
-            if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
-                df = pd.read_csv(io.StringIO(csv_data))
-                print(f"Remote dataset loaded ({len(df)} rows).")
+            if response.status_code == 200:
+                csv_data = response.text
+                if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
+                    loaded_df = pd.read_csv(io.StringIO(csv_data))
+                    if not loaded_df.empty:
+                        df = loaded_df
+                        source_name = "Doc Link Data"
+                        print(f"Doc link accessible! Loaded dataset ({len(df)} rows). Stored as latest.")
+                else:
+                    print("Warning: Doc link returned HTML webpage instead of raw CSV.")
             else:
-                print("Warning: Remote URL returned HTML webpage instead of raw CSV. Falling back to local/simulated dataset.")
+                print(f"Warning: Doc link returned status {response.status_code}.")
         except Exception as e:
-            print(f"Error loading remote CSV from CSV_URL: {e}")
+            print(f"Doc link not accessible: {e}")
 
-    # 2. Secondary: Local CSV dataset
+    # Priority 2 / 3: Local trained file data or generator
     if df is None and os.path.exists(csv_path):
-        print(f"Loading local dataset from {csv_path}...")
+        print(f"Loading local trained file data from {csv_path}...")
         try:
             df = pd.read_csv(csv_path)
-            print(f"Local dataset loaded ({len(df)} rows).")
+            source_name = "Local Trained File Data"
+            print(f"Local trained file data loaded successfully ({len(df)} rows).")
         except Exception as e:
-            print(f"Error loading local dataset: {e}")
+            print(f"Error loading local CSV file: {e}")
 
-    # 3. Fallback: Physics simulator dataset generator
     if df is None:
-        print("Generating high-fidelity full-range fallback dataset from physics battery simulator...")
+        print("Generating high-fidelity fallback dataset from physics battery simulator...")
         try:
             df = generate_full_range_dataset()
+            source_name = "Local Trained File Data"
             print(f"Fallback dataset generated successfully: {len(df)} rows.")
         except Exception as gen_err:
             print(f"Failed to generate fallback dataset: {gen_err}")
             return
+
+    print(f"[DATA SOURCE] Training model using: {source_name}")
 
     if df is not None:
         # Recover if CSV was pasted into a single column

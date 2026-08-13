@@ -119,24 +119,54 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     if header_path is None:
         header_path = HWConfig.ESTIMATOR_WEIGHTS_HEADER
 
-    # 2. Load dataset
+    # 2. Load dataset with 3-tier fallback logic
     df = None
-    if csv_path is not None and os.path.exists(csv_path):
-        print(f"Loading local dataset from {csv_path}...")
+    source_name = None
+    csv_url = getattr(HWConfig, 'CSV_URL', '').strip()
+
+    # Priority 1: Doc Link Data (if CSV_URL is configured and accessible)
+    if csv_url:
+        print(f"Checking doc link accessibility ({csv_url})...")
+        try:
+            import io
+            import requests
+            response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+            if response.status_code == 200:
+                csv_data = response.text
+                if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
+                    loaded_df = pd.read_csv(io.StringIO(csv_data))
+                    if not loaded_df.empty:
+                        df = loaded_df
+                        source_name = "Doc Link Data"
+                        print(f"Doc link accessible! Loaded dataset ({len(df)} rows). Stored as latest.")
+                else:
+                    print("Warning: Doc link returned HTML webpage instead of raw CSV.")
+            else:
+                print(f"Warning: Doc link returned status {response.status_code}.")
+        except Exception as e:
+            print(f"Doc link not accessible: {e}")
+
+    # Priority 2 / 3: Local trained file data or generator
+    if df is None and csv_path is not None and os.path.exists(csv_path):
+        print(f"Loading local trained file dataset from {csv_path}...")
         try:
             df = pd.read_csv(csv_path)
-            print(f"Local CSV loaded successfully ({len(df)} rows).")
+            source_name = "Local Trained File Data"
+            print(f"Local trained file data loaded successfully ({len(df)} rows).")
         except Exception as e:
             print(f"Error loading CSV file: {e}")
-            
+
     if df is None:
-        print("Generating high-fidelity full-range fallback dataset from physical battery simulator...")
+        print("Generating high-fidelity fallback dataset from physical battery simulator...")
         try:
             df = generate_full_range_dataset()
+            source_name = "Local Trained File Data"
             print(f"Fallback dataset generated successfully: {len(df)} rows.")
         except Exception as gen_err:
             print(f"Failed to generate fallback dataset: {gen_err}")
             raise gen_err
+
+    print(f"[DATA SOURCE] Training hardware estimator using: {source_name}")
 
     if df is not None:
         # Recover if CSV was pasted into a single column

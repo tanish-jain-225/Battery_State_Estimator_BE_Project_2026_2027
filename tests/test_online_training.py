@@ -113,9 +113,33 @@ def test_cloud_dataset_online_training_speed():
         run_training_async()
         duration = time.time() - start
         
-        # Must complete under 10 seconds (well under 60-second limit)
+        # Must complete under 10 seconds (well under 120-second limit)
         assert duration < 10.0
         assert training_status['status'] in ('completed', 'failed')
+    finally:
+        Config.CSV_URL = orig_url
+
+def test_startup_data_prefetch():
+    from software.visualiser.app import init_previous_data, _last_fetched_df
+    df = init_previous_data()
+    assert df is not None
+    assert len(df) > 0
+
+def test_tiered_fallback_logic():
+    import software.visualiser.app as app_mod
+    orig_url = Config.CSV_URL
+    try:
+        # Scenario 1: Doc link inaccessible -> uses previously loaded data
+        Config.CSV_URL = 'http://127.0.0.1:9999/inaccessible_doc_link.csv'
+        app_mod.init_previous_data()
+        app_mod.run_training_async()
+        assert app_mod.training_status['training_source'] in ('Previously Loaded Data', 'Local Trained File Data')
+
+        # Scenario 2: No doc link and no previous data -> uses local trained file data
+        Config.CSV_URL = ''
+        app_mod._last_fetched_df = None
+        app_mod.run_training_async()
+        assert app_mod.training_status['training_source'] == 'Local Trained File Data'
     finally:
         Config.CSV_URL = orig_url
 

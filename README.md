@@ -351,9 +351,13 @@ BE-Capstone-Project/
 │   ├── conftest.py
 │   ├── test_battery_chemistry.py
 │   ├── test_battery_simulator.py
+│   ├── test_data_preprocessing.py
+│   ├── test_diagnostic_cps.py
 │   ├── test_esn_model.py
 │   ├── test_estimator_pipeline.py
 │   ├── test_flask_api.py
+│   ├── test_online_training.py
+│   ├── test_telemetry_cache.py
 │   └── test_traditional_estimator.py
 │
 └── reference/

@@ -554,19 +554,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const valTrainingSource = document.getElementById('val-training-source');
         const btnRetrainEl = document.getElementById('btn-retrain');
         if (valTrainingSource) {
-            if (status.training_source === 'local_csv') {
-                valTrainingSource.textContent = '📁 Local CSV';
-                valTrainingSource.style.color = 'var(--accent-emerald)';
-                if (btnRetrainEl) btnRetrainEl.disabled = false;
-            } else if (status.training_source === 'remote_url') {
-                valTrainingSource.textContent = '🌐 Google Sheets';
+            const src = status.training_source || '';
+            if (src.includes('Doc Link') || src === 'remote_url') {
+                valTrainingSource.textContent = '🌐 Doc Link Data';
                 valTrainingSource.style.color = 'var(--accent-blue)';
                 if (btnRetrainEl) btnRetrainEl.disabled = false;
+            } else if (src.includes('Previously Loaded') || src === 'previously_loaded') {
+                valTrainingSource.textContent = '💾 Previously Loaded Data';
+                valTrainingSource.style.color = 'var(--accent-purple, #a855f7)';
+                if (btnRetrainEl) btnRetrainEl.disabled = false;
+            } else if (src.includes('Local Trained') || src === 'local_csv' || src === 'physical_simulator_generator') {
+                valTrainingSource.textContent = '📁 Local Trained File Data';
+                valTrainingSource.style.color = 'var(--accent-emerald)';
+                if (btnRetrainEl) btnRetrainEl.disabled = false;
             } else {
-                valTrainingSource.textContent = '⚠ Not Configured';
-                valTrainingSource.style.color = 'var(--accent-rose)';
-                // Disable retrain if no source is available
-                if (btnRetrainEl && !isTraining) btnRetrainEl.disabled = true;
+                valTrainingSource.textContent = src ? src : '📁 Local Trained File Data';
+                valTrainingSource.style.color = 'var(--accent-emerald)';
+                if (btnRetrainEl) btnRetrainEl.disabled = false;
             }
         }
 

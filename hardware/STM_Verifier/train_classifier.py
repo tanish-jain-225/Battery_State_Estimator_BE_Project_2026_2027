@@ -65,21 +65,48 @@ def get_labels(df_in):
             labels_in[idx] = 2  # Critical
     return labels_in
 
-# Load dataset and check if it contains all 3 classes required for classification training
-df = pd.read_csv(csv_path)
-df = clean_df_columns(df)
-labels = get_labels(df)
+# Load dataset using 3-tier fallback logic
+df = None
+source_name = None
+csv_url = getattr(Config, 'CSV_URL', '').strip()
 
-if len(np.unique(labels)) < 3:
-    # Silently attempt to load the fallback multiclass dataset containing all three classes
-    fallback_path = os.path.join(os.path.dirname(csv_path), "original_ev_battery_dataset_multiclass.csv")
-    if os.path.exists(fallback_path):
-        csv_path = fallback_path
+if csv_url:
+    print(f"Checking doc link accessibility ({csv_url})...")
+    try:
+        import io
+        import requests
+        response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
+        if response.status_code == 200:
+            csv_data = response.text
+            if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
+                loaded_df = pd.read_csv(io.StringIO(csv_data))
+                if not loaded_df.empty:
+                    df = loaded_df
+                    source_name = "Doc Link Data"
+                    print(f"Doc link accessible! Loaded dataset ({len(df)} rows).")
+    except Exception as e:
+        print(f"Doc link not accessible: {e}")
+
+if df is None and os.path.exists(csv_path):
+    print(f"Loading local trained file dataset from {csv_path}...")
+    try:
         df = pd.read_csv(csv_path)
-        df = clean_df_columns(df)
-        labels = get_labels(df)
+        source_name = "Local Trained File Data"
+    except Exception as e:
+        print(f"Error loading local CSV: {e}")
 
-print(f"Loading dataset from {csv_path}...")
+if df is not None:
+    df = clean_df_columns(df)
+    labels = get_labels(df)
+    if len(np.unique(labels)) < 3:
+        fallback_path = os.path.join(os.path.dirname(csv_path), "original_ev_battery_dataset_multiclass.csv")
+        if os.path.exists(fallback_path):
+            csv_path = fallback_path
+            df = pd.read_csv(csv_path)
+            df = clean_df_columns(df)
+            labels = get_labels(df)
+
+print(f"[DATA SOURCE] Training hardware classifier using: {source_name or 'Local Trained File Data'}")
 
 # Extract features: Voltage, Current, Temperature
 U = df[['Voltage', 'Current', 'Temperature']].values

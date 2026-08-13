@@ -175,6 +175,32 @@ loaded_soc_rmse = None
 loaded_soh_rmse = None
 _last_fetched_df = None  # Cache for last successfully fetched/generated dataset for fallback
 
+def init_previous_data():
+    """Fetch/load previous dataset into memory on start always."""
+    global _last_fetched_df
+    if _last_fetched_df is not None and not _last_fetched_df.empty:
+        return _last_fetched_df
+
+    csv_path = Config.CSV_PATH
+    if os.path.exists(csv_path):
+        try:
+            _last_fetched_df = pd.read_csv(csv_path)
+            training_status['training_source'] = 'Previously Loaded Data'
+            print(f"[STARTUP] Loaded previous dataset into memory from {csv_path} ({len(_last_fetched_df)} rows).")
+            return _last_fetched_df
+        except Exception as e:
+            print(f"[STARTUP] Could not read local CSV at startup: {e}")
+
+    try:
+        from train_rc import generate_full_range_dataset
+        _last_fetched_df = generate_full_range_dataset()
+        training_status['training_source'] = 'Previously Loaded Data'
+        print(f"[STARTUP] Generated initial previous dataset in memory ({len(_last_fetched_df)} rows).")
+        return _last_fetched_df
+    except Exception as e:
+        print(f"[STARTUP] Could not generate initial dataset: {e}")
+        return None
+
 # Shared state for background ESN training
 training_status = {
     'status': 'idle',
@@ -182,7 +208,7 @@ training_status = {
     'soc_rmse': 0.0,
     'soh_rmse': 0.0,
     'timestamp': None,
-    'training_source': None   # 'local_csv' | 'remote_url' | None
+    'training_source': None   # 'Doc Link Data' | 'Previously Loaded Data' | 'Local Trained File Data'
 }
 
 # Incremental pipeline state cache for /api/telemetry
@@ -805,54 +831,70 @@ def run_training_async():
         csv_url  = Config.CSV_URL
 
         df = None
+        source_name = None
+
+        # Priority 1: Doc Link (if CSV_URL is configured and accessible)
         if csv_url:
-            # Remote dataset via Google Sheets / public CSV URL (Prioritized in Production)
-            training_status['training_source'] = 'remote_url'
             rem = timeout_limit - (time.time() - start_time)
             if rem <= 0:
                 raise TimeoutError(f"Online training exceeded time limit of {timeout_limit:.2f} seconds.")
             req_timeout = min(10.0, max(0.1, rem))
-            training_status['logs'] += f"Fetching remote dataset from URL (timeout: {req_timeout:.1f}s)...\n"
+            training_status['logs'] += f"Checking doc link accessibility ({csv_url}, timeout: {req_timeout:.1f}s)...\n"
             try:
                 import io
                 import requests
                 response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=req_timeout)
-                response.raise_for_status()
-                csv_data = response.text
-                if "<html" in csv_data.lower() or "<!doctype" in csv_data.lower():
-                    raise ValueError("URL returned an HTML webpage instead of raw CSV data. Ensure the link format ends with /export?format=csv")
-                df = pd.read_csv(io.StringIO(csv_data))
-                training_status['logs'] += f"Remote dataset loaded ({len(df)} rows).\n"
+                if response.status_code == 200:
+                    csv_data = response.text
+                    if "<html" not in csv_data.lower() and "<!doctype" not in csv_data.lower():
+                        loaded_df = pd.read_csv(io.StringIO(csv_data))
+                        if not loaded_df.empty:
+                            df = loaded_df
+                            source_name = "Doc Link Data"
+                            training_status['logs'] += f"Doc link accessible! Loaded dataset ({len(df)} rows).\n"
+                            # Store doc link data as latest loaded data!
+                            _last_fetched_df = df.copy()
+                            training_status['logs'] += "Stored doc link data as latest loaded dataset.\n"
+                    else:
+                        training_status['logs'] += "Doc link returned HTML page instead of raw CSV data.\n"
+                else:
+                    training_status['logs'] += f"Doc link HTTP error status: {response.status_code}.\n"
             except Exception as url_err:
-                training_status['logs'] += f"Remote CSV load failed: {url_err}.\n"
+                training_status['logs'] += f"Doc link not accessible: {url_err}.\n"
 
-        if df is None and os.path.exists(csv_path):
-            # Local dataset available (development / self-hosted environment)
-            training_status['training_source'] = 'local_csv'
-            training_status['logs'] += "Loading local EV battery dataframe into memory...\n"
-            try:
-                df = pd.read_csv(csv_path)
-                training_status['logs'] += f"Local CSV loaded successfully ({len(df)} rows).\n"
-            except Exception as local_err:
-                training_status['logs'] += f"Local CSV load failed: {local_err}.\n"
+        # Priority 2: Doc link not accessible -> use previously loaded data
+        if df is None and _last_fetched_df is not None and not _last_fetched_df.empty:
+            df = _last_fetched_df.copy()
+            source_name = "Previously Loaded Data"
+            training_status['logs'] += f"Doc link not available. Using previously loaded dataset from memory ({len(df)} rows).\n"
 
+        # Priority 3: Both doc link and previously loaded data not accessible -> use local trained file data
         if df is None:
-            training_status['training_source'] = 'physical_simulator_generator'
-            training_status['logs'] += "Generating high-fidelity full-range dataset from physical battery simulator...\n"
+            if os.path.exists(csv_path):
+                training_status['logs'] += f"Loading local trained file data from {csv_path}...\n"
+                try:
+                    df = pd.read_csv(csv_path)
+                    source_name = "Local Trained File Data"
+                    training_status['logs'] += f"Local trained file data loaded successfully ({len(df)} rows).\n"
+                    _last_fetched_df = df.copy()
+                except Exception as local_err:
+                    training_status['logs'] += f"Local trained file load failed: {local_err}.\n"
+
+        # Fallback to physical simulator dataset generator if local file also fails
+        if df is None:
+            training_status['logs'] += "Generating high-fidelity dataset from physical battery simulator...\n"
             try:
                 check_timeout()
                 df = generate_full_range_dataset(timeout_check=check_timeout)
-                training_status['logs'] += f"Full-range dataset generated successfully: {len(df)} rows.\n"
+                source_name = "Local Trained File Data"
+                training_status['logs'] += f"Simulator dataset generated successfully: {len(df)} rows.\n"
+                _last_fetched_df = df.copy()
             except Exception as gen_err:
-                training_status['logs'] += f"Backup generator failed: {gen_err}.\n"
-                if _last_fetched_df is not None:
-                    df = _last_fetched_df.copy()
-                    training_status['logs'] += f"Falling back to last successfully fetched dataset from memory ({len(df)} rows).\n"
-                else:
-                    raise RuntimeError("No training data source available.") from gen_err
-        
-        if df is not None:
-            _last_fetched_df = df.copy()
+                training_status['logs'] += f"Backup dataset generator failed: {gen_err}.\n"
+                raise RuntimeError("No training data source available.") from gen_err
+
+        training_status['training_source'] = source_name
+        training_status['logs'] += f"[DATA SOURCE] Training model using: {source_name}\n"
 
         check_timeout()
 
@@ -1138,10 +1180,13 @@ def get_status():
             'soh_rmse': loaded_soh_rmse,
             'graph_slice_limit': Config.GRAPH_SLICE_LIMIT,
             'csv_url_configured': bool(Config.CSV_URL),
-            'training_available': os.path.exists(Config.CSV_PATH) or bool(Config.CSV_URL),
+            'training_available': bool(Config.CSV_URL) or os.path.exists(Config.CSV_PATH) or (_last_fetched_df is not None and not _last_fetched_df.empty),
             'training_source': (
-                'remote_url' if Config.CSV_URL
-                else ('local_csv' if os.path.exists(Config.CSV_PATH) else None)
+                training_status.get('training_source') or (
+                    "Doc Link Data" if Config.CSV_URL
+                    else ("Previously Loaded Data" if _last_fetched_df is not None and not _last_fetched_df.empty
+                          else ("Local Trained File Data" if os.path.exists(Config.CSV_PATH) else None))
+                )
             ),
             'esn_converged': (
                 getattr(_telemetry_cache.get('pipeline'), '_esn_step_count', 0) >= Config.ESN_CONVERGENCE_STEPS
@@ -1291,12 +1336,10 @@ def control_simulation():
 def trigger_training():
     # In serverless / read-only-filesystem environments, retraining requires
     # a remote dataset source. Block only if neither local CSV nor CSV_URL is set.
-    if IS_SERVERLESS and not os.path.exists(Config.CSV_PATH) and not Config.CSV_URL:
+    if IS_SERVERLESS and not os.path.exists(Config.CSV_PATH) and not Config.CSV_URL and (_last_fetched_df is None or _last_fetched_df.empty):
         return jsonify({
             'status': 'unsupported',
-            'message': 'No training data source available in serverless mode. '
-                       'Set the CSV_URL environment variable to a public Google Sheets export URL '
-                       '(File → Share → Publish to web → CSV) to enable production retraining.'
+            'message': 'No training data source available.'
         }), 501
 
     if training_status['status'] == 'running':
@@ -1553,9 +1596,10 @@ def get_telemetry():
         _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# Battery State Estimator — load ESN model at startup (lazy retry on first /api/status if this fails)
+# Battery State Estimator — load ESN model & initialize dataset at startup
 try:
     load_ml_model()
+    init_previous_data()
 except Exception as _startup_err:
     print(f"Battery State Estimator — ESN model cold-start load skipped: {_startup_err}")
 

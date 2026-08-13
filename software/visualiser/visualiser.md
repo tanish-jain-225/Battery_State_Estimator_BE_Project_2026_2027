@@ -339,6 +339,8 @@ All settings are configured inside **[config.py](config.py)** and can be overrid
 
 | Setting | Default Value | Description |
 | :--- | :--- | :--- |
+| `CSV_URL` | `""` | Optional public Google Sheets / direct CSV URL for cloud retraining. |
+| `ONLINE_TRAINING_TIMEOUT` | `120.0` | Maximum time limit (seconds) for online training and dataset fetching. |
 | `MONGODB_URI` | `"mongodb://localhost:27017/"` | Database host string. Falls back to RAM store if offline. |
 | `SIMULATION_STEP_DELAY` | `1.0` | Simulator tick interval (seconds). |
 | `TELEMETRY_RESPONSE_LIMIT` | `150` | Maximum points sent to the browser to prevent lag. |
@@ -350,6 +352,18 @@ All settings are configured inside **[config.py](config.py)** and can be overrid
 | `ESN_SOH_RESERVOIR` | `200` | Number of recurrent nodes in the SOH ESN. |
 | `ESN_SOH_SPECTRAL_RADIUS` | `0.70` | Spectral radius of the SOH ESN (slower transients). |
 | `ESN_SOH_LEAK_RATE` | `0.05` | Leak rate of the SOH ESN. |
+
+---
+
+## 🧠 Online Retraining Engine & 3-Tier Data Fallback
+
+The visualiser features an on-demand, asynchronous Echo State Network (ESN) retraining engine (`run_training_async()`). It automatically pre-fetches previous data on app startup and executes a robust 3-tier fallback strategy when the Retrain button is clicked:
+
+1. **Tier 1 (`Doc Link Data`)**: If `CSV_URL` is set and accessible, it downloads the remote dataset over HTTP, fits the ESN readout weights, and stores the fetched dataframe in memory (`_last_fetched_df`) as the latest dataset. UI tag: `🌐 Doc Link Data`.
+2. **Tier 2 (`Previously Loaded Data`)**: If the doc link is inaccessible or invalid, it falls back to the dataset previously fetched and stored in memory. UI tag: `💾 Previously Loaded Data`.
+3. **Tier 3 (`Local Trained File Data`)**: If both the doc link and memory cache are inaccessible, it loads the packaged CSV (`CSV_PATH`) or generates a high-fidelity dataset using the physical battery simulator. UI tag: `📁 Local Trained File Data`.
+
+* **Bounded Execution**: Online retraining strictly enforces a **120-second timeout limit** (`ONLINE_TRAINING_TIMEOUT`). In cloud production environments, dynamic dataset decimation samples up to 2,500 rows, ensuring retraining finishes in 2–4 seconds.
 
 ---
 
