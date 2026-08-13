@@ -317,17 +317,22 @@ def check_simulator_port(force=False):
     check_interval = 20.0 if IS_SERVERLESS else 1.5
     if force or (now - _last_sim_port_check_time >= check_interval):
         _last_sim_port_check_time = now
+        was_online = _simulator_port_online
         try:
             with make_simulator_request("/api/status", timeout=0.8) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
                     _simulator_port_online = True
                     _simulator_port_data = data
+                    if not was_online:
+                        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
                     return True, data
         except Exception:
             pass
         _simulator_port_online = False
         _simulator_port_data = None
+        if was_online:
+            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         return False, None
         
     return _simulator_port_online, _simulator_port_data
@@ -1090,7 +1095,7 @@ def get_status():
         if not model_loaded:
             load_ml_model()
             
-        port_online, port_data = check_simulator_port()
+        port_online, port_data = check_simulator_port(force=True)
         
         # If the simulator service is offline, step the simulation inside the visualizer process
         if not port_online:
@@ -1496,7 +1501,7 @@ def get_telemetry():
                 new_readings = []
         else:
             # Fallback when database is offline
-            port_online, _ = check_simulator_port()
+            port_online, _ = check_simulator_port(force=True)
             raw_readings = []
             if port_online:
                 try:

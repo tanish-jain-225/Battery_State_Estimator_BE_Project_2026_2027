@@ -121,6 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (actualIndex < 0 || actualIndex >= telemetryHistory.length) return;
         
+        if (!isLocked) {
+            updateNumericalReadouts(telemetryHistory[actualIndex]);
+        }
+
         const otherChart = (chart === chartSOC) ? chartSOH : chartSOC;
         if (otherChart && otherChart.data && otherChart.data.datasets && otherChart.data.datasets.length > 0 && otherChart.data.datasets[0].data) {
             const otherDataLength = otherChart.data.datasets[0].data.length;
@@ -130,16 +134,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     index: index
                 }));
                 otherChart.setActiveElements(activeElements);
-                otherChart.update();
+                otherChart.update('none');
             }
         }
     }
 
     function handleChartHoverEnd(chart) {
+        if (!isLocked) {
+            if (telemetryHistory.length > 0) {
+                updateNumericalReadouts(telemetryHistory[telemetryHistory.length - 1]);
+            } else {
+                updateNumericalReadouts(null);
+            }
+        }
         const otherChart = (chart === chartSOC) ? chartSOH : chartSOC;
         if (otherChart && otherChart.data && otherChart.data.datasets && otherChart.data.datasets.length > 0) {
             otherChart.setActiveElements([]);
-            otherChart.update();
+            otherChart.update('none');
         }
     }
 
@@ -164,11 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (chartSOC && chartSOC.data && chartSOC.data.datasets && chartSOC.data.datasets.length > 0) {
             chartSOC.setActiveElements([]);
-            chartSOC.update();
+            chartSOC.update('none');
         }
         if (chartSOH && chartSOH.data && chartSOH.data.datasets && chartSOH.data.datasets.length > 0) {
             chartSOH.setActiveElements([]);
-            chartSOH.update();
+            chartSOH.update('none');
         }
 
         if (telemetryHistory.length > 0) {
@@ -418,10 +429,17 @@ document.addEventListener('DOMContentLoaded', () => {
         descEl.textContent = descText;
     }
 
+    let prevSimPortOnline = null;
+
     // Refresh status and configuration parameters
     async function refreshStatus() {
         const status = await apiRequest('/api/status');
         if (!status) return;
+
+        if (prevSimPortOnline !== null && prevSimPortOnline !== status.simulator_port_online) {
+            telemetryHistory = [];
+        }
+        prevSimPortOnline = status.simulator_port_online;
 
         if (status.graph_slice_limit !== undefined) {
             graphSliceLimit = status.graph_slice_limit;
@@ -902,12 +920,12 @@ document.addEventListener('DOMContentLoaded', () => {
         chartSOC.data.datasets[0].data = socTrueData;
         chartSOC.data.datasets[1].data = socEkfData;
         chartSOC.data.datasets[2].data = socEsnData;
-        chartSOC.update();
+        chartSOC.update('none');
 
         chartSOH.data.datasets[0].data = sohTrueData;
         chartSOH.data.datasets[1].data = sohEkfData;
         chartSOH.data.datasets[2].data = sohEsnData;
-        chartSOH.update();
+        chartSOH.update('none');
     }
 
     if (btnResumeLive) {
