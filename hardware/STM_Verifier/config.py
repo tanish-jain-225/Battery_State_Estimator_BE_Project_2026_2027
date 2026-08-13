@@ -54,7 +54,7 @@ class Config:
         BASE_DIR / os.getenv("CSV_FILE", "training_ev_battery_dataset_multiclass.csv")
     )
     CSV_URL: str = os.getenv("CSV_URL", "").strip()
-    ONLINE_TRAINING_TIMEOUT: float = float(os.getenv("ONLINE_TRAINING_TIMEOUT", "120.0"))
+    ONLINE_TRAINING_TIMEOUT: float = float(os.getenv("ONLINE_TRAINING_TIMEOUT", "300.0"))
 
     # ══════════════════════════════════════════════════════════════════════════
     # PIPELINE 1 — ESN CLASSIFIER (50-node, embedded on STM32)

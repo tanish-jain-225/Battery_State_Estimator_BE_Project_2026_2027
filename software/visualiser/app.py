@@ -816,7 +816,7 @@ def run_training_async():
     current_model_score = _model_score(loaded_soc_rmse, loaded_soh_rmse)
     
     start_time = time.time()
-    timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 60.0)
+    timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 300.0)
 
     def check_timeout():
         if (time.time() - start_time) >= timeout_limit:

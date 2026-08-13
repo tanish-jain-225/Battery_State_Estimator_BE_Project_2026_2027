@@ -129,9 +129,8 @@ class Config:
     PRODUCTION_DECIMATION_LIMIT = int(os.environ.get("PRODUCTION_DECIMATION_LIMIT", 2500))
 
     # Maximum time limit for online training and dataset fetching (seconds).
-    # Defaults to 120.0 seconds. If training/fetching exceeds this,
-    # the system safely falls back to whatever dataset or active model was last fetched.
-    ONLINE_TRAINING_TIMEOUT = float(os.environ.get("ONLINE_TRAINING_TIMEOUT", 120.0))
+    # Defaults to 300.0 seconds everywhere to match Gunicorn timeout and support 2500-sample training.
+    ONLINE_TRAINING_TIMEOUT = float(os.environ.get("ONLINE_TRAINING_TIMEOUT", 300.0))
 
     # -------------------------------------------------------------------------
     # SOC Echo State Network hyperparameters
