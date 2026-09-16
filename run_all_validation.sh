@@ -24,7 +24,7 @@ $PYTHON_BIN -c "import sys; sys.path.insert(0, '$ROOT_DIR'); from software.share
 echo ""
 
 # ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
-echo "[2/8] Running Complete Pytest Suite (30+ Unit/Integration Tests)..."
+echo "[2/8] Running Complete Pytest Suite (46 Unit/Integration Tests)..."
 $PYTHON_BIN -m pytest "$ROOT_DIR/tests/" || FAILURES=$((FAILURES+1))
 echo "[SUCCESS] Pytest suite executed."
 echo ""

@@ -16,7 +16,7 @@ if training_dir not in sys.path:
 
 import software.visualiser.config as visualiser_config
 from software.visualiser.app import app as visualiser_app, run_training_async, training_status
-from software.visualiser.training.train_rc import EchoStateNetwork, generate_full_range_dataset
+from software.visualiser.training.train_rc import EchoStateNetwork
 
 Config = visualiser_config.Config
 
@@ -120,7 +120,7 @@ def test_cloud_dataset_online_training_speed():
         Config.CSV_URL = orig_url
 
 def test_startup_data_prefetch():
-    from software.visualiser.app import init_previous_data, _last_fetched_df
+    from software.visualiser.app import init_previous_data
     df = init_previous_data()
     assert df is not None
     assert len(df) > 0

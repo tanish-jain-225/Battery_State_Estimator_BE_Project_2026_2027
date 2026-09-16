@@ -17,9 +17,11 @@ flowchart TD
     subgraph Phase 1: Environment & Setup
         Setup_1["Install requirements.txt"]
         Setup_2["Train ESN models (Software/Hardware)"]
-        Setup_3["Verify tests (unittest suite)"]
+        Setup_3["Run automated tests (pytest: 46 tests)"]
+        Setup_4["Master Validation (run_all_validation.bat)"]
         Setup_1 --> Setup_2
         Setup_2 --> Setup_3
+        Setup_3 --> Setup_4
     end
 
     subgraph Phase 2: Live System Run
@@ -38,7 +40,7 @@ flowchart TD
         HW_1 --> HW_2
     end
 
-    Setup_3 --> Run_1
+    Setup_4 --> Run_1
     Run_4 --> HW_1
 ```
 
@@ -49,11 +51,12 @@ flowchart TD
 ### 1. Pre-Run Verification
 - [ ] **Install Prerequisites**: Run `python -m pip install -r requirements.txt`.
 - [ ] **Clean Configuration**: Confirm `.env` files contain only local config values and are excluded from Git tracking.
+- [ ] **Execute Master 1-Click Validation**: Run `.\run_all_validation.bat` (Windows) or `./run_all_validation.sh` (Linux) and confirm all 8 pipeline stages pass with 0 errors.
+- [ ] **Run Complete Automated Test Suite**: Run `pytest tests/ -v` and verify that all **46 automated tests pass**.
 - [ ] **Train ESN Estimator Model**: Execute `python software/visualiser/training/train_rc.py` and confirm `model_rc.pkl` is exported.
-- [ ] **Train Hardware Classifier**: Execute `python hardware/STM_Verifier/train_classifier.py` and confirm [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h) is created.
-- [ ] **Train Hardware Estimator**: Execute `python hardware/STM_Verifier/train_estimator.py` and check [`hardware/STM_Verifier/esn_estimator_weights.h`](../hardware/STM_Verifier/esn_estimator_weights.h).
+- [ ] **Train Hardware Classifier**: Execute `python hardware/STM_Verifier/train_classifier.py` and confirm [`hardware/STM_Verifier/esn_classifier_weights.h`](../../hardware/STM_Verifier/esn_classifier_weights.h) is created.
+- [ ] **Train Hardware Estimator**: Execute `python hardware/STM_Verifier/train_estimator.py` and check [`hardware/STM_Verifier/esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h).
 - [ ] **Verify FPGA Verilog RTL Golden Model**: Execute `python hardware/FPGA_Verifier/compare_results.py` and confirm all 200/200 neuron updates match bit-exactly between Vivado/XSim output and Python golden model.
-- [ ] **Install Prerequisites**: Run `pip install -r hardware/STM_Verifier/requirements.txt`.
 - [ ] **Build C Simulator**: Execute `hardware/STM_Verifier/run_c_simulator.bat` (Windows) or `hardware/STM_Verifier/run_c_simulator.sh` (Unix) and confirm compile success.
 
 ### 2. Live Interactive Demo
@@ -63,7 +66,7 @@ flowchart TD
   - Visualiser UI: `http://localhost:5000`
   - Simulator status: `http://localhost:8000/api/status`
 - [ ] **Telemetry Playback**: Trigger playback from the dashboard and watch live data updating.
-- [ ] **Observe Estimators**: Compare ground truth SOC against EKF (physics-based), Coulomb Counting and ESN (machine learning).
+- [ ] **Observe Estimators**: Compare ground truth SOC against EKF (physics-based), UKF (unscented transform), Coulomb Counting and ESN (machine learning).
 - [ ] **Inject Faults**:
   - **Thermal Runaway**: Toggle on and watch the temperature graph spike, triggering the "Thermal Warning" status.
   - **Sensor Dropout**: Toggle on and watch voltage/current drop to zero; check that estimators filter the transient.

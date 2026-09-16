@@ -22,26 +22,34 @@ The tree layout below maps out the key modules within the software package:
 ```text
 software/
 ├── software.md                      # This architecture overview
-├── simulator/                       # Physics Engine Service
+├── shared/                          # Common physics & chemistry modules
+│   ├── battery_simulator.py         # 2-RC transient equations solver
+│   └── battery_chemistry.py         # Chemistry parameters & OCV lookup tables
+├── simulator/                       # Physics Engine Service (Port 8000)
 │   ├── app.py                       # Simulator Flask application
 │   ├── battery_simulator.py         # 2-RC transient equations solvers
 │   ├── battery_chemistry.py         # Chemistry loading & OCV lookup tables
 │   └── config.py                    # Environment settings for simulator
-├── visualiser/                      # Visualisation & Observer Service
+├── visualiser/                      # Visualisation & Observer Service (Port 5000)
 │   ├── app.py                       # Dashboard Flask app & thread managers
 │   ├── config.py                    # Environment settings for visualizer
 │   ├── battery_chemistry.py         # Visualizer OCV lookup tables
 │   ├── battery_simulator.py         # Visualizer side physics classes
-│   ├── traditional_estimator.py     # EKF and Coulomb Counting classes
+│   ├── traditional_estimator.py     # EKF, UKF, Coulomb Counting, RLS classes
 │   ├── estimator_pipeline.py        # Joint observer and diagnostics manager
 │   ├── model_rc.pkl                 # Pre-trained software ESN model
 │   ├── templates/                   # HTML view layouts
 │   └── training/                    # ESN training scripts
 │       └── train_rc.py              # Script to build software weights
-└── tests/                           # Verification test suites
-    ├── test_estimators.py           # Unit tests for EKF/ESN accuracy
-    ├── test_api_auth.py             # Security & API Auth checks
-    └── test_production_train.py     # End-to-end training verification
+└── [Root tests/](../tests/)          # Unified pytest test suite (46 tests)
+    ├── test_battery_chemistry.py    # Chemistry loading & OCV curve monotonicity
+    ├── test_battery_simulator.py    # 2-RC transient solver, thermal, aging & faults
+    ├── test_esn_model.py            # ESN inference, spectral radius & echo state property
+    ├── test_estimator_pipeline.py   # State serialization & joint observer pipeline
+    ├── test_flask_api.py            # Microservice API authentication & endpoints
+    ├── test_fpga_verifier.py        # RTL parity, signed hex, LUT, and sequence tests
+    ├── test_online_training.py      # ESN online adaptation & RLS weight updates
+    └── test_traditional_estimator.py# EKF, UKF convergence, covariance guards & VFF-RLS
 ```
 
 ---
@@ -91,12 +99,14 @@ Below is a breakdown of the key files and classes implementing the battery estim
 - **[`visualiser/traditional_estimator.py`](visualiser/traditional_estimator.py)**: Defines the mathematical observer classes.
   - `CoulombCounting`: Integrates current inputs directly.
   - `ExtendedKalmanFilter`: Implements the 3-state EKF (predicts states, computes measurement Jacobians, updates covariance and applies Kalman corrections). Includes **Trace Reset Guards** (resets covariance $P$ to initial values if trace exceeds $10.0$ or if diagonal entries become negative, preventing float overflow).
+  - `UnscentedKalmanFilter`: Implements the 3-state UKF utilizing the Merwe scaled unscented transform with $(2n+1=7)$ sigma points and Cholesky matrix decomposition. Propagates non-linear state and measurement transitions without requiring explicit analytic Jacobian linearizations, maintaining superior convergence under aggressive drive cycles.
   - `RecursiveLeastSquares`: Implements online parameter identification for electrochemistry ($R_0$, $R_1$, $C_1$) running on a macro-timescale. Features a **Variable Forgetting Factor (VFF-RLS)** adjusting $\lambda$ dynamically to prediction errors.
   - `ResistanceSOH`: Computes capacity degradation and estimates state-of-health (SOH).
 - **[`visualiser/estimator_pipeline.py`](visualiser/estimator_pipeline.py)**: Features the `EstimatorPipeline` and `StateEstimator` classes.
-  - Integrates the EKF, Coulomb Counting, RLS and the loaded machine learning ESN estimators.
+  - Integrates the EKF, UKF, Coulomb Counting, RLS and the loaded machine learning ESN estimators.
+  - Full state serialization and hydration support (`get_state()` / `set_state()`) for seamless catch-up simulation across server restarts and serverless invocations.
   - Evaluates real-time diagnostic safety thresholds (`DIAG_DROPOUT_VOLTAGE_THRESHOLD`, `DIAG_THERMAL_TEMP_THRESHOLD` and `DIAG_SHORT_SOC_DIFF_THRESHOLD`).
-- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, runs the comparative EKF and ESN estimation pipelines with standardized configuration parameters and manages the asynchronous ESN model retraining thread.
+- **[`visualiser/app.py`](visualiser/app.py)**: Serves the HTML views, hosts the telemetry fetch routes, runs the comparative EKF, UKF and ESN estimation pipelines with standardized configuration parameters and manages the asynchronous ESN model retraining thread.
 
 ---
 
@@ -124,7 +134,14 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 ## 🧪 Verification and Testing
 
-Verify the ESN training pipeline runs correctly:
+### 1. Unified Automated Test Suite (46 Tests)
+Run the complete automated pytest verification suite covering physics solvers, EKF, UKF, ESN online RLS adaptation, pipeline state serialization, and FPGA RTL bit-exact parity:
+```bash
+pytest tests/ -v
+```
+
+### 2. Standalone Model Training Verification
+Verify the ESN offline training pipeline:
 ```bash
 python software/visualiser/training/train_rc.py
 ```
@@ -132,3 +149,14 @@ The training script verifies:
 - Model dynamics and observer convergence.
 - ESN feature engineering and prediction pipeline.
 - Exported `model_rc.pkl` weight integrity.
+
+### 3. Master End-to-End Validation
+Run the 8-step master validation script validating physics, C99 compilation, FPGA parity, and the full test suite in one command:
+```bash
+# Windows
+.\run_all_validation.bat
+
+# Linux / macOS
+chmod +x run_all_validation.sh
+./run_all_validation.sh
+```

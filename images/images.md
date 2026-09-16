@@ -8,6 +8,27 @@ This folder stores screenshots and visual material used by the project documenta
 
 ## Current Assets
 
+### System Architecture Diagram
+End-to-end multi-estimator pipeline architecture from 2-RC battery telemetry through ML/EKF observers to embedded MCU and FPGA verifiers.
+
+![System Architecture](system_architecture.png)
+
+---
+
+### Circuit Diagram (2-RC ECM)
+Second-order Equivalent Circuit Model schematic showing bulk OCV, ohmic resistance $R_0$, and dual polarization branches ($R_1-C_1$ and $R_2-C_2$).
+
+![Circuit Diagram](circuit_diagram.png)
+
+---
+
+### System Flowchart
+Execution algorithm and decision flowchart for telemetry generation, observer estimation, and CPS fault detection.
+
+![System Flowchart](flowchart.png)
+
+---
+
 ### Physics Simulator Dashboard
 Active drive-cycle playback with UDDS profile, fault injection controls and live telemetry feed.
 

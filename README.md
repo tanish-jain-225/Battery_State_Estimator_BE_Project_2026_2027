@@ -38,6 +38,19 @@
 
 ---
 
+## 📑 Project Milestones & Review Reports
+
+| Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
+| :---: | :--- | :--- | :---: |
+| **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 46-test regression suite | **Completed / Ready** |
+| **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
+| **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
+| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
+| **Research Paper** | [Paper Manuscript](reference/paper.md) | Full IEEE conference publication manuscript draft | Drafted |
+
+---
+
 ## Problem Statement
 
 Accurate Battery State of Charge (SOC) and State of Health (SOH) estimation is critical for safe and efficient Battery Management System (BMS) operations. Conventional estimation methods suffer from severe drawbacks:
@@ -77,7 +90,7 @@ A Flask-based visualiser provides real-time monitoring and comparison of the dif
 
 ## Scope of the Project
 
-- **Physics-Based Simulation:** 2-RC Electro-Thermal Battery Physics Engine supporting dynamic driving cycles (DST, US06, FUDS).
+- **Physics-Based Simulation:** 2-RC Electro-Thermal Battery Physics Engine supporting dynamic driving cycles (UDDS, HWFET, US06, Constant Discharge, Constant Charge, Pulse).
 - **ML Estimator Pipeline:** Echo State Network (ESN) Reservoir Computing for SOC and SOH tracking.
 - **Comparative Analysis:** Benchmark ESN against EKF, Coulomb Counting, and VFF-RLS.
 - **Real-Time Web Dashboard:** Flask-based visualiser with interactive Chart.js graphs and live fault injection controls.
@@ -189,8 +202,8 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | :--- | :---: | :---: | :---: |
 | **Proposal of Project** | 12/08/2026 | Online | **Ready for Submission** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
 | **Acceptance / Modification** | 17/08/2026 | Online | Pending Guide Feedback |
-| **First Review** | 21/09/2026 – 24/09/2026 | Offline | Pre-built ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf)) |
-| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | Scheduled |
+| **First Review** | 21/09/2026 – 24/09/2026 | Offline | Completed ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)) |
+| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **Ready for Review 2** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md)) |
 | **Final External Review** | 21/11/2026 | Offline | Scheduled |
 
 ### Marks Allocation & Evaluation Policy
@@ -228,8 +241,8 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | Circuit Diagram | [Circuit Diagram](images/circuit_diagram.png) | 2-RC ECM Equivalent Electrical Schematic |
 | System Architecture | [System Architecture Diagram](images/system_architecture.png) | End-to-end telemetry & hardware verifier architecture |
 | Flowchart | [System Flowchart](images/flowchart.png) | Flowchart for simulator and estimator execution |
-| RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn_top.v) | Top-level 100-neuron Verilog RTL module |
-| Simulation File | [golden.py](hardware/FPGA_Verifier/golden.py) | Python fixed-point golden model for FPGA verification |
+| RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn_top.v) | Top-level 100-neuron Verilog RTL module with multi-timestep support |
+| Simulation File | [golden_model.py](hardware/FPGA_Verifier/golden_model.py) | Python fixed-point golden model for FPGA verification (--full & --tiny) |
 
 ---
 
@@ -287,14 +300,20 @@ BE-Capstone-Project/
 │
 ├── docs/
 │   ├── literature_survey.md
-│   └── Resources/
-│       ├── PROJECT_PROPOSAL.md
-│       ├── SYSTEM_SPECIFICATION.md
-│       ├── OPERATIONS.md
-│       ├── DEPLOY_RENDER.md
-│       ├── DEMO_CHECKLIST.md
-│       ├── ARTIFACTS.md
-│       └── PRESENTATION.md
+│   ├── Resources/
+│   │   ├── PROJECT_PROPOSAL.md
+│   │   ├── SYSTEM_SPECIFICATION.md
+│   │   ├── OPERATIONS.md
+│   │   ├── DEPLOY_RENDER.md
+│   │   ├── DEMO_CHECKLIST.md
+│   │   ├── ARTIFACTS.md
+│   │   ├── PRESENTATION.md
+│   │   └── WEB_RESEARCH.md
+│   ├── Review_1/
+│   │   ├── Review_1_Progress.md
+│   │   └── Review_1_PPT.pdf
+│   └── Review_2/
+│       └── Review_2_Progress.md
 │
 ├── hardware/
 │   ├── hardware.md
@@ -302,10 +321,14 @@ BE-Capstone-Project/
 │   ├── STM_Verifier/
 │   │   ├── main.c
 │   │   ├── main.h
+│   │   ├── config.py
+│   │   ├── train.py
 │   │   ├── train_classifier.py
 │   │   ├── train_estimator.py
 │   │   ├── esn_classifier_weights.h
 │   │   ├── esn_estimator_weights.h
+│   │   ├── original_ev_battery_dataset_multiclass.csv
+│   │   ├── training_ev_battery_dataset_multiclass.csv
 │   │   ├── run_c_simulator.bat
 │   │   └── run_c_simulator.sh
 │   │
@@ -314,26 +337,40 @@ BE-Capstone-Project/
 │       ├── esn_top.v
 │       ├── esn_neuron.v
 │       ├── reservoir_controller.v
+│       ├── address_generator.v
+│       ├── mac_accum_q6_10.v
+│       ├── mult_q6_10.v
 │       ├── tanh_lut.v
 │       ├── tb_esn_top.v
-│       ├── golden.py
-│       └── compare_results.py
+│       ├── tb_esn_top_tiny.v
+│       ├── tiny_bram_models.v
+│       ├── golden_model.py
+│       ├── compare_results.py
+│       ├── golden_results.csv
+│       ├── golden_tiny.csv
+│       └── vivado_esn_results.csv
 │
 ├── software/
 │   ├── software.md
 │   │
+│   ├── shared/
+│   │   ├── __init__.py
+│   │   ├── battery_chemistry.py
+│   │   └── battery_simulator.py
+│   │
 │   ├── simulator/
+│   │   ├── simulator.md
 │   │   ├── app.py
-│   │   ├── battery_simulator.py
 │   │   ├── config.py
 │   │   ├── templates/
 │   │   └── static/
 │   │
 │   └── visualiser/
+│       ├── visualiser.md
 │       ├── app.py
+│       ├── config.py
 │       ├── estimator_pipeline.py
 │       ├── traditional_estimator.py
-│       ├── config.py
 │       ├── model_rc.pkl
 │       ├── templates/
 │       ├── static/
@@ -351,17 +388,17 @@ BE-Capstone-Project/
 │   ├── conftest.py
 │   ├── test_battery_chemistry.py
 │   ├── test_battery_simulator.py
-│   ├── test_data_preprocessing.py
-│   ├── test_diagnostic_cps.py
 │   ├── test_esn_model.py
 │   ├── test_estimator_pipeline.py
 │   ├── test_flask_api.py
+│   ├── test_fpga_verifier.py
 │   ├── test_online_training.py
-│   ├── test_telemetry_cache.py
 │   └── test_traditional_estimator.py
 │
 └── reference/
-    └── paper.md
+    ├── paper.md
+    ├── paper_ekf_soc_soh.pdf
+    └── paper_rc_soc_soh.pdf
 ```
 
 ---
@@ -418,7 +455,7 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
 | 4 | Embedded C99 CSR Inference | CSR sparse SpMV execution speedup | 6.7× speedup verified | Pass |
 | 5 | FPGA RTL Golden Model Test | 100-neuron Verilog datapath vs Python model | 200/200 bit-exact matches | Pass |
-| 6 | Automated Pytest Suite | 31 test cases execution | 100% test pass rate | Pass |
+| 6 | Automated Pytest Suite | 46 test cases execution across all modules | 100% test pass rate | Pass |
 
 ---
 
@@ -462,10 +499,10 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 
 ## Future Scope
 
-1. Hardware-in-the-loop (HIL) integration with physical lithium-ion battery cells and electronic loads.
-2. Deployment of C99 firmware directly to physical STM32 and CAN bus transceiver hardware.
-3. Multi-cell series-parallel battery pack SOC/SOH state estimation and active cell balancing.
-4. Online adaptive ESN readout weight update via recursive least squares.
+1. Physical Hardware-in-the-Loop (HIL) benchtop testing with physical lithium-ion cells and programmable electronic loads.
+2. Direct flashing of C99 firmware onto physical STM32 Nucleo boards with CAN bus transceiver interfacing.
+3. Multi-cell series-parallel battery pack SOC/SOH state estimation with active cell balancing.
+4. On-chip Artix A7100T FPGA bitstream synthesis and dynamic power consumption profiling.
 
 ---
 

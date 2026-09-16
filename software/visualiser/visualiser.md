@@ -49,12 +49,12 @@ The visualizer's code and assets are organized as follows:
 | **[datasets/](datasets/)** | Time-series datasets (Voltage, Current, Temp, SOC, SOH) used to train the Reservoir ML estimators. |
 | **[training/](training/)** | Offline ESN model training scripts and online/offline feature engineering extraction routines. |
 | **[battery_simulator.py](battery_simulator.py)** | Core 2-RC electro-thermal battery physics simulation logic used for local execution fallback. |
-| **[traditional_estimator.py](traditional_estimator.py)** | Extended Kalman Filter (EKF) and Resistance SOH / RLS traditional observers. |
-| **[estimator_pipeline.py](estimator_pipeline.py)** | Multi-estimator runtime wrapper that paces simulation updates, tracks fault flags and feeds data to ESN/EKF models. |
+| **[traditional_estimator.py](traditional_estimator.py)** | Extended Kalman Filter (EKF), Unscented Kalman Filter (UKF), Coulomb Counting and Resistance SOH / RLS observers. |
+| **[estimator_pipeline.py](estimator_pipeline.py)** | Multi-estimator runtime wrapper that paces simulation updates, tracks fault flags and feeds data to ESN/EKF/UKF models. |
 | **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[../tests/](../tests/)** | Extensive Unit Test suites validating chemistry tables, equivalent circuit step physics, EKF diagonal stability and ESN quantization mappings. |
+| **[../../tests/](../../tests/)** | Comprehensive 46-test automated test suite validating physics, EKF, UKF, RLS online adaptation, and FPGA bit-exact parity. |
 
 ---
 
@@ -175,7 +175,30 @@ To prevent floating-point blowup or divergence due to non-linearities and mismat
 
 ---
 
-### 2. Traditional SOH & Online Parameter Identification (VFF-RLS)
+### 2. Unscented Kalman Filter (UKF)
+Implemented in [`traditional_estimator.py`](traditional_estimator.py). Unlike the EKF, which approximates non-linear models using first-order Taylor series linearizations (Jacobians $\mathbf{H}$ and $\mathbf{F}$), the **Unscented Kalman Filter** addresses non-linearities directly through the **Merwe Scaled Unscented Transform**:
+
+#### A. Sigma Points Generation ($n=3$, $2n+1=7$ points)
+Given state vector $\hat{\mathbf{x}} = [SOC, V_1, V_2]^T$ and covariance $\mathbf{P}$:
+$$\lambda = \alpha^2(n + \kappa) - n, \quad \gamma = \sqrt{n + \lambda}$$
+$$\mathbf{\chi}_0 = \hat{\mathbf{x}}$$
+$$\mathbf{\chi}_i = \hat{\mathbf{x}} + \left(\gamma \sqrt{\mathbf{P}}\right)_i, \quad \mathbf{\chi}_{i+n} = \hat{\mathbf{x}} - \left(\gamma \sqrt{\mathbf{P}}\right)_i, \quad i = 1, \dots, n$$
+where $\sqrt{\mathbf{P}}$ is obtained via Cholesky decomposition ($L L^T = \mathbf{P}$) with jitter stabilization ($10^{-9} \cdot \mathbf{I}$).
+
+#### B. Sigma Point Propagation & Non-Linear Measurement Update
+1. **Time Propagation**: Each sigma point is propagated through the exact non-linear 2RC physics equations:
+   $$\chi_{0, i, k|k-1} = \chi_{0, i, k-1} + \frac{I_k \Delta t}{3600 \cdot C_n}$$
+   $$\chi_{j, i, k|k-1} = \chi_{j, i, k-1} e^{-\Delta t / (R_j C_j)} + I_k R_j (1 - e^{-\Delta t / (R_j C_j)}), \quad j=1,2$$
+2. **Measurement Transformation**:
+   $$\mathcal{Y}_{i} = V_{\text{OCV}}(\chi_{0, i, k|k-1}) + I_k R_0 + \chi_{1, i, k|k-1} + \chi_{2, i, k|k-1}$$
+3. **Kalman Gain & Correction**:
+   $$\mathbf{K} = \mathbf{P}_{xy} \mathbf{P}_{yy}^{-1}, \quad \hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}(V_{\text{meas}} - \hat{y}), \quad \mathbf{P}_{k|k} = \mathbf{P}_{k|k-1} - \mathbf{K} \mathbf{P}_{yy} \mathbf{K}^T$$
+
+UKF achieves superior robustness in steep OCV-SOC inflection zones (e.g. knee curves in LFP chemistry) where first-order Jacobian Taylor approximations introduce truncation errors.
+
+---
+
+### 3. Traditional SOH & Online Parameter Identification (VFF-RLS)
 The SOH tracking module estimates resistance growth from step voltage changes and steady-state conditions:
 - **Arrhenius Temperature Correction**: Estimates are compensated for temperature variations to prevent cold temperatures or self-heating spikes from biasing SOH calculations:
   $$\text{temp\_effect} = \exp\left(1500.0 \cdot \left(\frac{1}{T_{\text{meas}} + 273.15} - \frac{1}{298.15}\right)\right)$$

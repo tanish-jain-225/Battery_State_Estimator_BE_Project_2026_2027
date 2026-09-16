@@ -1,4 +1,4 @@
-[← Back to README](../../README.md)
+[← Back to README](../../README.md) · [Web Research & Industrial Audit](WEB_RESEARCH.md)
 
 # System Specification
 
@@ -29,12 +29,12 @@ The table below outlines the key software and hardware components of the system:
 
 | Component | Location | Responsibility |
 | :--- | :--- | :--- |
-| **Physics Simulator** | [`software/simulator/app.py`](../software/simulator/app.py) | Generates 2-RC ECM telemetry, thermal behavior, aging and injected faults. |
-| **Visualiser Dashboard** | [`software/visualiser/app.py`](../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics and controls. |
-| **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN and CPS diagnostics. |
-| **Hardware Classifier (C99)** | [`hardware/STM_Verifier/main.c`](../hardware/STM_Verifier/main.c) | Runs sparse ESN inference (CSR 6.7× speedup) for edge safety state classification. |
-| **FPGA Verilog ESN Verifier** | [`hardware/FPGA_Verifier/`](../hardware/FPGA_Verifier/README.md) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
-| **Training & Export Pipelines** | [`hardware/STM_Verifier/train_classifier.py`](../hardware/STM_Verifier/train_classifier.py)<br>[`hardware/STM_Verifier/train_estimator.py`](../hardware/STM_Verifier/train_estimator.py) | Train ESN models and export Python/C weight headers. |
+| **Physics Simulator** | [`software/simulator/app.py`](../../software/simulator/app.py) | Generates 2-RC ECM telemetry, thermal behavior, aging and injected faults. |
+| **Visualiser Dashboard** | [`software/visualiser/app.py`](../../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics and controls. |
+| **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN and CPS diagnostics. |
+| **Hardware Classifier (C99)** | [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) | Runs sparse ESN inference (CSR 6.7× speedup) for edge safety state classification. |
+| **FPGA Verilog ESN Verifier** | [`hardware/FPGA_Verifier/`](../../hardware/FPGA_Verifier/README.md) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
+| **Training & Export Pipelines** | [`hardware/STM_Verifier/train_classifier.py`](../../hardware/STM_Verifier/train_classifier.py)<br>[`hardware/STM_Verifier/train_estimator.py`](../../hardware/STM_Verifier/train_estimator.py) | Train ESN models and export Python/C weight headers. |
 
 ---
 
@@ -230,6 +230,7 @@ Retrieves time-series data augmented with the estimators pipeline outputs (EKF, 
       "temperature": 27.4,
       "true_soc": 0.892,
       "ekf_soc": 0.894,
+      "ukf_soc": 0.893,
       "esn_soc": 0.891,
       "cc_soc": 0.895,
       "true_soh": 0.999,
@@ -275,8 +276,8 @@ $$\text{Key} = \text{SHA-256}(\text{MONGODB\_URI})$$
 
 ## Estimator Pipeline Architecture
 
-The visualiser enriches telemetry data with dynamic state observations computed in the background, implementing EKF and CC strictly as baseline benchmarks to quantify the ESN's standalone performance:
-- **State of Charge (SOC)**: Runs Coulomb Counting (CC) and a Sage-Husa Adaptive Extended Kalman Filter (EKF) concurrently purely as accuracy baselines, compared side-by-side with the proposed production Echo State Network (ESN) estimator.
+The visualiser enriches telemetry data with dynamic state observations computed in the background, implementing EKF, UKF, and CC strictly as baseline benchmarks to quantify the ESN's standalone performance:
+- **State of Charge (SOC)**: Runs Coulomb Counting (CC), a Sage-Husa Adaptive Extended Kalman Filter (EKF), and a 3-state Unscented Kalman Filter (UKF with Merwe scaled unscented transform) concurrently purely as accuracy baselines, compared side-by-side with the proposed production Echo State Network (ESN) estimator.
 - **State of Health (SOH)**: Decoupled to track slowly varying capacity and internal resistance trends via online RLS resistance-growth parameters identification (baseline benchmarking) compared against the proposed data-driven ESN SOH model.
 - **Diagnostics Outputs**: Monitors anomalies to classify faults:
   - `DIAG_DROPOUT_VOLTAGE_THRESHOLD` (< 1.0 V) -> **Sensor Dropout**.
@@ -302,14 +303,15 @@ The embedded classifier running on the STM32 microcontroller serves as a feasibi
 Robustness and estimation accuracy limits are verified using automated unit suites:
 - Chemistry loading correctness & OCV curve monotonicity checks.
 - Dynamic 2-RC transient equations solvers accuracy.
-- Observer convergence bounds and covariance matrix health tests.
+- Observer convergence bounds and covariance matrix health tests (EKF & UKF).
 - High-noise and drop-out fault resilience validation.
+- FPGA Verilog RTL bit-exact parity against golden reference models.
 
-Run the test runner locally using:
+Run the test suite locally using:
 ```bash
-python software/visualiser/training/train_rc.py
-```
+# Automated 46-test regression suite
+pytest tests/ -v
 
-```bash
-python hardware/STM_Verifier/train_classifier.py
+# Master one-click end-to-end validation (Windows)
+.\run_all_validation.bat
 ```

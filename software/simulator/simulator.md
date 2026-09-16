@@ -112,11 +112,17 @@ $$R_0(t) = R_{0,\text{nom}} \cdot \left[1.0 + 1.5 \cdot (1.0 - SOH)\right]$$
 ## 🎛️ Drive Cycles & Injected Faults
 
 ### 1. Excitation Cycles (`DriveCycles`)
+The engine models dynamic driving and duty cycles:
 - **UDDS (Urban Dynamometer Driving Schedule)**: Standard stop-and-go city driving current profiles.
-- **HWFET (Highway Fuel Economy Test)**: Consistent, high-speed highway current profiles.
-- **US06**: Aggressive, highly transient acceleration current profiles.
+- **HWFET (Highway Fuel Economy Test)**: Consistent, high-speed highway cruising current profiles.
+- **US06**: Aggressive, highly transient acceleration and braking current profiles.
+- **WLTP (Worldwide Harmonised Light Vehicles Test Procedure)**: Contemporary multi-phase testing standard.
+- **NEDC (New European Driving Cycle)**: Classical repeated urban and extra-urban cycles.
+- **EV Aggressive**: Severe dynamic current fluctuations modeling sport driving modes.
+- **Intermittent Solar**: Irregular micro-charging surges modeling renewables or intermittent regenerative braking.
 - **Constant**: Continuous discharge load rate at -2.5 A (1C rate equivalent).
-- **CCCV Charge**: Constant-Current Constant-Voltage charging cycle profile.
+- **Pulse Discharge**: Pulsed high-current bursts with relaxation intervals.
+- **CCCV Charge**: Constant-Current Constant-Voltage battery charging cycle profile.
 
 ### 2. Injected Faults
 - **Thermal Runaway**: Injecting `fault_thermal` triggers self-heating runaway:

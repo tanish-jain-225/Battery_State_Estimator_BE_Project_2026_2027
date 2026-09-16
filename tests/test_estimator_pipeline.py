@@ -44,3 +44,23 @@ def test_fault_diagnostics():
     # Thermal runaway fault
     res_thermal = ep.step(V_meas=3.7, I_meas_discharge=2.0, T_meas=80.0, fault_thermal=True)
     assert 'thermal_runaway' in res_thermal['faults']
+
+
+def test_estimator_pipeline_state_serialization():
+    ep = EstimatorPipeline()
+    ep.step(V_meas=3.65, I_meas_discharge=3.0, T_meas=28.0)
+    state = ep.get_state()
+    
+    assert 'ukf_soc' in state
+    assert 'ukf_p' in state
+    assert 'ekf_soc' in state
+    assert 'rls_r0' in state
+    
+    ep_restored = EstimatorPipeline()
+    ep_restored.set_state(state)
+    
+    assert ep_restored.ukf_soc == ep.ukf_soc
+    assert ep_restored.ekf_soc == ep.ekf_soc
+    assert ep_restored.cc_soc == ep.cc_soc
+    assert ep_restored.trad_r0 == ep.trad_r0
+

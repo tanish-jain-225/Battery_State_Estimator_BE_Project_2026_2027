@@ -10,7 +10,7 @@ set FAILURES=0
 set "ROOT_DIR=%~dp0"
 
 :: ── STEP 1: Verify Python Environment ────────────────────────────────────
-echo [1/7] Verifying Environment and Python Dependencies...
+echo [1/8] Verifying Environment and Python Dependencies...
 python --version >nul 2>&1
 if !errorlevel! neq 0 (
     echo [ERROR] Python is not installed or not in PATH.
@@ -25,8 +25,19 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 2: Software Model Training ──────────────────────────────────────
-echo [2/7] [SOFTWARE] Training and Exporting Software ESN (model_rc.pkl)...
+:: ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
+echo [2/8] Running Complete Pytest Suite (46 Unit/Integration Tests)...
+python -m pytest "%ROOT_DIR%tests"
+if !errorlevel! neq 0 (
+    echo [ERROR] Pytest suite execution failed.
+    set /a FAILURES+=1
+) else (
+    echo [SUCCESS] Full Pytest suite executed and all tests passed.
+)
+echo.
+
+:: ── STEP 3: Software Model Training ──────────────────────────────────────
+echo [3/8] [SOFTWARE] Training and Exporting Software ESN (model_rc.pkl)...
 python "%ROOT_DIR%software\visualiser\training\train_rc.py"
 if !errorlevel! neq 0 (
     echo [ERROR] Software ESN training failed.
@@ -36,9 +47,9 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 3: Software Estimator & Simulator Verification ─────────────────
-echo [3/7] [SOFTWARE] Testing Physics Simulator and Estimator Pipeline...
-python -c "import sys; sys.path.insert(0, '.'); sys.path.insert(0, 'software/visualiser'); from software.shared.battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V | EKF SOC=', round(res['ekf_soc'],4))"
+:: ── STEP 4: Software Estimator & Simulator Verification ─────────────────
+echo [4/8] [SOFTWARE] Testing Physics Simulator and Estimator Pipeline...
+python -c "import sys; sys.path.insert(0, '.'); sys.path.insert(0, 'software/visualiser'); from software.shared.battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V | EKF SOC=', round(res['ekf_soc'],4), '| UKF SOC=', round(res['ukf_soc'],4))"
 if !errorlevel! neq 0 (
     echo [ERROR] Software Estimator and Simulator verification failed.
     set /a FAILURES+=1
@@ -47,8 +58,8 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 4: Hardware STM32 ESN Classifier Training & Export ─────────────
-echo [4/7] [HARDWARE - STM32] Training ESN Classifier and Exporting C Headers...
+:: ── STEP 5: Hardware STM32 ESN Classifier Training & Export ─────────────
+echo [5/8] [HARDWARE - STM32] Training ESN Classifier and Exporting C Headers...
 python "%ROOT_DIR%hardware\STM_Verifier\train_classifier.py"
 if !errorlevel! neq 0 (
     echo [ERROR] STM32 ESN Classifier training failed.
@@ -58,8 +69,8 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 5: Hardware STM32 ESN Estimator Training & Export ──────────────
-echo [5/7] [HARDWARE - STM32] Training ESN Estimator and Exporting C Headers...
+:: ── STEP 6: Hardware STM32 ESN Estimator Training & Export ──────────────
+echo [6/8] [HARDWARE - STM32] Training ESN Estimator and Exporting C Headers...
 python "%ROOT_DIR%hardware\STM_Verifier\train_estimator.py"
 if !errorlevel! neq 0 (
     echo [ERROR] STM32 ESN Estimator training failed.
@@ -69,8 +80,8 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 6: Hardware FPGA Verilog RTL Golden Model Verification ──────────
-echo [6/7] [HARDWARE - FPGA] Verifying Verilog RTL vs Python Golden Model...
+:: ── STEP 7: Hardware FPGA Verilog RTL Golden Model Verification ──────────
+echo [7/8] [HARDWARE - FPGA] Verifying Verilog RTL vs Python Golden Model...
 python "%ROOT_DIR%hardware\FPGA_Verifier\compare_results.py"
 if !errorlevel! neq 0 (
     echo [ERROR] FPGA Verilog RTL comparison failed.
@@ -80,8 +91,8 @@ if !errorlevel! neq 0 (
 )
 echo.
 
-:: ── STEP 7: C99 Microcontroller Desktop Simulator Compilation & Run ──────
-echo [7/7] [HARDWARE - C99] Compiling and Executing C99 Edge Simulator...
+:: ── STEP 8: C99 Microcontroller Desktop Simulator Compilation & Run ──────
+echo [8/8] [HARDWARE - C99] Compiling and Executing C99 Edge Simulator...
 set VALIDATION_PIPELINE=1
 call "%ROOT_DIR%hardware\STM_Verifier\run_c_simulator.bat"
 if !errorlevel! neq 0 (

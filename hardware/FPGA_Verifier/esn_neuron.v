@@ -118,6 +118,7 @@ module esn_neuron
     //--------------------------------------------------
     input  wire [$clog2(N_RES)-1:0] neuron_idx,
     input  wire                     buf_sel,
+    input  wire [15:0]              timestep,
 
     //--------------------------------------------------
     // Win memory
@@ -610,8 +611,9 @@ begin
                 //------------------------------------------------------
 `ifdef SIMULATION
                 $display(
-                    "TIME=%0t PASSBUF=%0d NEURON=%0d MAC=%h BIAS=%h SUM=%h TANH_IN=%h TANH_OUT=%h",
+                    "TIME=%0t TIMESTEP=%0d PASSBUF=%0d NEURON=%0d MAC=%h BIAS=%h SUM=%h TANH_IN=%h TANH_OUT=%h",
                     $time,
+                    timestep,
                     buf_sel,
                     neuron_idx,
                     mac_result,
@@ -624,7 +626,7 @@ begin
                 $fwrite(csv_file,
                         "%0t,%0d,%0d,%h,%h,%h,%h,%h\n",
                         $time,
-                        buf_sel,
+                        timestep,
                         neuron_idx,
                         mac_result,
                         bias,

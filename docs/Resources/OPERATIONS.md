@@ -38,7 +38,7 @@ run_all_validation.bat
 Configure local environment settings by creating `.env` files in the respective app directories. 
 
 #### Simulator Environment Configuration
-Create [`software/simulator/.env`](../software/simulator/.env) (refer to [`software/simulator/.env.example`](../software/simulator/.env.example)):
+Create [`software/simulator/.env`](../../software/simulator/.env) (refer to [`software/simulator/.env.example`](../../software/simulator/.env.example)):
 ```text
 PORT=8000
 MONGODB_URI=mongodb://localhost:27017
@@ -48,7 +48,7 @@ MONGODB_READINGS_COLLECTION=telemetry
 ```
 
 #### Visualiser Environment Configuration
-Create [`software/visualiser/.env`](../software/visualiser/.env) (refer to [`software/visualiser/.env.example`](../software/visualiser/.env.example)):
+Create [`software/visualiser/.env`](../../software/visualiser/.env) (refer to [`software/visualiser/.env.example`](../../software/visualiser/.env.example)):
 ```text
 PORT=5000
 SIMULATOR_URL=http://localhost:8000
@@ -78,14 +78,14 @@ Trains the 3-class thermal safety classification network using the database reco
 ```bash
 python hardware/STM_Verifier/train_classifier.py
 ```
-* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details and code generation of [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h).
+* **Expected Output:** Logs confirming classification accuracy (typically 98.40%), matrix sparsity details and code generation of [`hardware/STM_Verifier/esn_classifier_weights.h`](../../hardware/STM_Verifier/esn_classifier_weights.h).
 
 ### C. Train the Hardware ESN Estimator (Optional)
 Generates sparse estimator weights for running advanced regressions on-chip.
 ```bash
 python hardware/STM_Verifier/train_estimator.py
 ```
-* **Expected Output:** Exports weight vectors into [`hardware/STM_Verifier/esn_estimator_weights.h`](../hardware/STM_Verifier/esn_estimator_weights.h).
+* **Expected Output:** Exports weight vectors into [`hardware/STM_Verifier/esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h).
 
 ---
 
@@ -153,7 +153,7 @@ The desktop C simulator runs a verification dataset through the CSR-compressed E
   ```
 
 ### Microcontroller Deployment (STM32)
-1. Import [`hardware/STM_Verifier/main.c`](../hardware/STM_Verifier/main.c), [`hardware/STM_Verifier/main.h`](../hardware/STM_Verifier/main.h) and [`hardware/STM_Verifier/esn_classifier_weights.h`](../hardware/STM_Verifier/esn_classifier_weights.h) into STM32CubeIDE.
+1. Import [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c), [`hardware/STM_Verifier/main.h`](../../hardware/STM_Verifier/main.h) and [`hardware/STM_Verifier/esn_classifier_weights.h`](../../hardware/STM_Verifier/esn_classifier_weights.h) into STM32CubeIDE.
 2. In the pin configuration tool, configure **`PA5`** as a standard digital output pin (maps to the on-board user LED on Nucleo boards).
 3. Configure **`USART2`** (pins `PA2`/`PA3`) for UART communication at **115200 baud, 8 data bits, 1 stop bit**.
 4. Compile and flash the code.
@@ -164,7 +164,33 @@ The desktop C simulator runs a verification dataset through the CSR-compressed E
 
 ---
 
-## ⚠️ 5. Troubleshooting & Solutions
+## 🔬 5. FPGA RTL Verification (Artix-7 FPGA Target)
+
+To test the Verilog HDL FPGA RTL models against the Python golden reference:
+
+### Step 1: Generate Python Golden Parity Model
+```bash
+# Generate full 100-neuron golden reference (200 updates across 2 passes)
+python hardware/FPGA_Verifier/golden_model.py
+
+# Generate 3-timestep sequence reference (tiny model)
+python hardware/FPGA_Verifier/golden_model.py --tiny
+```
+
+### Step 2: Compare Vivado XSim Simulation Output
+```bash
+# Automated bit-exact comparison against golden reference (200/200 matches)
+python hardware/FPGA_Verifier/compare_results.py
+```
+
+### Step 3: Run Automated FPGA Verifier Unit Tests
+```bash
+pytest tests/test_fpga_verifier.py -v
+```
+
+---
+
+## ⚠️ 6. Troubleshooting & Solutions
 
 > [!WARNING]
 > **Issue: Port 5000 or 8000 already in use**

@@ -138,6 +138,10 @@ class EstimatorPipeline:
             'ekf_v1': float(self.ekf_v1),
             'ekf_v2': float(self.ekf_v2),
             'ekf_p': self.ekf_p.tolist() if isinstance(self.ekf_p, np.ndarray) else self.ekf_p,
+            'ukf_soc': float(getattr(self, 'ukf_soc', 1.0)),
+            'ukf_v1': float(getattr(self, 'ukf_v1', 0.0)),
+            'ukf_v2': float(getattr(self, 'ukf_v2', 0.0)),
+            'ukf_p': self.ukf_p.tolist() if isinstance(getattr(self, 'ukf_p', None), np.ndarray) else getattr(self, 'ukf_p', None),
             'trad_r0': float(self.trad_r0),
             'trad_soh': float(self.trad_soh),
             'prev_voltage': float(self.prev_voltage),
@@ -168,6 +172,7 @@ class EstimatorPipeline:
         self.mismatch = state_dict.get('mismatch', self.mismatch)
         self.chem_obj = get_chemistry(self.chemistry_name)
         self.ekf = ExtendedKalmanFilter(self.chemistry_name, mismatch=self.mismatch)
+        self.ukf = UnscentedKalmanFilter(self.chemistry_name, mismatch=self.mismatch)
         self.soh_tracker = ResistanceSOH(self.chemistry_name)
         self.rls = RecursiveLeastSquares(dt=1.0)
         
@@ -179,6 +184,13 @@ class EstimatorPipeline:
         ekf_p_val = state_dict.get('ekf_p')
         if ekf_p_val is not None:
             self.ekf_p = np.array(ekf_p_val)
+
+        self.ukf_soc = state_dict.get('ukf_soc', 1.0)
+        self.ukf_v1 = state_dict.get('ukf_v1', 0.0)
+        self.ukf_v2 = state_dict.get('ukf_v2', 0.0)
+        ukf_p_val = state_dict.get('ukf_p')
+        if ukf_p_val is not None:
+            self.ukf_p = np.array(ukf_p_val)
             
         self.trad_r0 = state_dict.get('trad_r0', self.chem_obj.R0_nom)
         self.trad_soh = state_dict.get('trad_soh', 1.0)
