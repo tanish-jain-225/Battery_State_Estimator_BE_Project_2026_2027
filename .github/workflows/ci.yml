@@ -2,13 +2,13 @@ name: Simple CI Pipeline
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   validate:
-    name: Build, Lint & Test (${{ matrix.os }}, Python 3.10)
+    name: Build, Lint & Test (${{ matrix.os }}, Python 3.11)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -22,11 +22,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install Dependencies
         run: |
@@ -36,7 +36,6 @@ jobs:
           pip install -r software/simulator/requirements.txt
           pip install -r hardware/STM_Verifier/requirements.txt
           pip install pytest flake8
-
 
       - name: Code Quality & Syntax Linting
         run: |
@@ -56,4 +55,3 @@ jobs:
         shell: cmd
         run: |
           run_all_validation.bat
-
