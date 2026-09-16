@@ -56,13 +56,27 @@ def clean_df_columns(df_in):
 def get_labels(df_in):
     T_in = df_in['Temperature'].values
     labels_in = np.zeros(len(T_in), dtype=int)
-    for idx in range(len(T_in)):
-        if T_in[idx] < Config.TEMP_NORMAL_MAX:
-            labels_in[idx] = 0  # Normal
-        elif T_in[idx] < Config.TEMP_WARNING_MAX:
-            labels_in[idx] = 1  # Warning
-        else:
-            labels_in[idx] = 2  # Critical
+    t_max = np.max(T_in)
+    if t_max > Config.TEMP_NORMAL_MAX:
+        # Absolute temperature thresholds for wide-range datasets
+        for idx in range(len(T_in)):
+            if T_in[idx] < Config.TEMP_NORMAL_MAX:
+                labels_in[idx] = 0  # Normal
+            elif T_in[idx] < Config.TEMP_WARNING_MAX:
+                labels_in[idx] = 1  # Warning
+            else:
+                labels_in[idx] = 2  # Critical
+    else:
+        # Quantile-based thermal stress partitioning for narrow-range datasets
+        q33 = np.percentile(T_in, 33.3)
+        q66 = np.percentile(T_in, 66.6)
+        for idx in range(len(T_in)):
+            if T_in[idx] < q33:
+                labels_in[idx] = 0  # Class 0: Nominal Thermal State
+            elif T_in[idx] < q66:
+                labels_in[idx] = 1  # Class 1: Moderate Thermal Stress
+            else:
+                labels_in[idx] = 2  # Class 2: Elevated Thermal Stress
     return labels_in
 
 # Load dataset using 3-tier fallback logic
@@ -98,13 +112,6 @@ if df is None and os.path.exists(csv_path):
 if df is not None:
     df = clean_df_columns(df)
     labels = get_labels(df)
-    if len(np.unique(labels)) < 3:
-        fallback_path = os.path.join(os.path.dirname(csv_path), "original_ev_battery_dataset_multiclass.csv")
-        if os.path.exists(fallback_path):
-            csv_path = fallback_path
-            df = pd.read_csv(csv_path)
-            df = clean_df_columns(df)
-            labels = get_labels(df)
 
 print(f"[DATA SOURCE] Training hardware classifier using: {source_name or 'Local Trained File Data'}")
 

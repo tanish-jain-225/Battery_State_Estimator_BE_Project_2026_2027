@@ -38,6 +38,9 @@ software/
 │   ├── traditional_estimator.py     # EKF, UKF, Coulomb Counting, RLS classes
 │   ├── estimator_pipeline.py        # Joint observer and diagnostics manager
 │   ├── model_rc.pkl                 # Pre-trained software ESN model
+│   ├── datasets/                    # Time-series EV battery datasets
+│   │   ├── original_ev_battery_dataset_multiclass.csv  # Reference ground-truth dataset
+│   │   └── training_ev_battery_dataset_multiclass.csv  # Primary ML training dataset
 │   ├── templates/                   # HTML view layouts
 │   └── training/                    # ESN training scripts
 │       └── train_rc.py              # Script to build software weights

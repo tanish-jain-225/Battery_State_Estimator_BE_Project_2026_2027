@@ -37,7 +37,8 @@ hardware/
 │   ├── config.py                                # Dimensions, thresholds and dataset settings
 │   ├── esn_classifier_weights.h                 # Generated sparse classifier weight arrays
 │   ├── esn_estimator_weights.h                  # Generated sparse estimator weight arrays
-│   ├── original_ev_battery_dataset_multiclass.csv   # Synthesized multiclass drive-cycle data
+│   ├── original_ev_battery_dataset_multiclass.csv   # Reference ground-truth multiclass drive-cycle data
+│   ├── training_ev_battery_dataset_multiclass.csv   # Primary training multiclass drive-cycle data
 │   ├── run_c_simulator.bat                      # Windows build-and-run script
 │   └── run_c_simulator.sh                       # Linux/macOS build-and-run script
 └── FPGA_Verifier/                               # Verilog RTL FPGA verification module

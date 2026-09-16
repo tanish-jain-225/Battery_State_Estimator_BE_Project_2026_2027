@@ -26,7 +26,8 @@ def generate_full_range_dataset():
     try:
         from software.shared.battery_simulator import BatterySimulator
     except ImportError:
-        from battery_simulator import BatterySimulator
+        print("Battery simulator not found.")
+        sys.exit(1)
         
     import pandas as pd
     
@@ -110,10 +111,8 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     # 1. Resolve paths
     if csv_path is None:
         csv_path = os.path.join(base_dir, "training_ev_battery_dataset_multiclass.csv")
-        if not os.path.exists(csv_path):
-            csv_path = os.path.join(base_dir, "original_ev_battery_dataset_multiclass.csv")
     if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"Dataset not found at {csv_path}. Please place the CSV in the hardware directory.")
+        raise FileNotFoundError(f"Training dataset not found at {csv_path}. Please place training_ev_battery_dataset_multiclass.csv in the directory.")
 
     from config import Config as HWConfig
     if header_path is None:

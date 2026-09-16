@@ -69,9 +69,22 @@ echo ""
 echo "======================================================================="
 if [ $FAILURES -eq 0 ]; then
     echo "  [ALL PASSED] END-TO-END HARDWARE AND SOFTWARE VALIDATION SUCCESSFUL!"
+    echo "======================================================================="
+    echo ""
+    echo " To run the Software Web Services manually, open two terminal windows:"
+    echo ""
+    echo "   Terminal 1 (Physics Simulator - Port 8000):"
+    echo "     $PYTHON_BIN software/simulator/app.py"
+    echo ""
+    echo "   Terminal 2 (Visualiser Dashboard - Port 5000):"
+    echo "     $PYTHON_BIN software/visualiser/app.py"
+    echo ""
+    echo " Access Visualiser Dashboard UI at: http://localhost:5000"
+    echo "======================================================================="
     exit 0
 else
     echo "  [FAILED] VALIDATION COMPLETED WITH $FAILURES ERROR(S)."
+    echo "======================================================================="
     exit 1
 fi
 

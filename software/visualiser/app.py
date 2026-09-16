@@ -818,7 +818,6 @@ def run_training_async():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse, _last_fetched_df
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
-    current_model_score = _model_score(loaded_soc_rmse, loaded_soh_rmse)
     
     start_time = time.time()
     timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 300.0)
@@ -1013,18 +1012,6 @@ def run_training_async():
             'soc_rmse': soc_rmse,
             'soh_rmse': soh_rmse
         }
-
-        new_model_score = _model_score(soc_rmse, soh_rmse)
-        if current_model_score < float('inf') and new_model_score > current_model_score:
-            training_status['status'] = 'completed'
-            training_status['soc_rmse'] = loaded_soc_rmse
-            training_status['soh_rmse'] = loaded_soh_rmse
-            training_status['timestamp'] = datetime.utcnow().isoformat()
-            training_status['logs'] += (
-                f"Candidate ESN score {new_model_score:.6f} was worse than the active model score "
-                f"{current_model_score:.6f}; keeping the current model.\n"
-            )
-            return
 
         # 1. Try to save locally (development environment)
         try:

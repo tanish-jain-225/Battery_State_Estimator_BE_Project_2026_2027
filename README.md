@@ -373,6 +373,9 @@ BE-Capstone-Project/
 │       ├── estimator_pipeline.py
 │       ├── traditional_estimator.py
 │       ├── model_rc.pkl
+│       ├── datasets/
+│       │   ├── original_ev_battery_dataset_multiclass.csv
+│       │   └── training_ev_battery_dataset_multiclass.csv
 │       ├── templates/
 │       ├── static/
 │       └── training/

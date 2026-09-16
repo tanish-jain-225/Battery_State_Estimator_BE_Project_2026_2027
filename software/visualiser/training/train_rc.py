@@ -267,10 +267,13 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
     try:
         from battery_simulator import BatterySimulator
     except ImportError:
-        import sys
-        import os
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from battery_simulator import BatterySimulator
+        try:
+            from software.shared.battery_simulator import BatterySimulator
+        except ImportError:
+            import sys
+            import os
+            sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            from battery_simulator import BatterySimulator
         
     import pandas as pd
     
