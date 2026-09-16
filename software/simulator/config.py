@@ -69,3 +69,5 @@ class Config:
     ESN_CONVERGENCE_STEPS = int(os.environ.get("ESN_CONVERGENCE_STEPS", 100))
     ESN_WASHOUT_STEPS    = int(os.environ.get("ESN_WASHOUT_STEPS", 50))
 
+    ENABLE_ESN_STANDALONE = os.environ.get("ENABLE_ESN_STANDALONE", "False").lower() in ("true", "1", "t", "yes")
+

@@ -14,27 +14,22 @@ from battery_chemistry import get_chemistry
 try:
     from training.feature_engineering import extract_features_step
 except ImportError:
-    # Fallback to local import if training is in the PYTHONPATH root
-    try:
-        from feature_engineering import extract_features_step
-    except ImportError:
-        # Fallback feature engineering logic
-        def extract_features_step(V_current, I_current, T_current, history, rolling_window=5):
-            lookback = rolling_window - 1
-            if len(history) == 0:
-                V_prev = V_current
-                V_history = [V_current]
-                I_history = [I_current]
-                T_history = [T_current]
-            else:
-                V_prev = history[-1]['voltage']
-                V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
-                I_history = [r['current'] for r in history[-lookback:]] + [I_current]
-                T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
-            V_grad = V_current - V_prev
-            I_ma = np.mean(I_history)
-            T_ma = np.mean(T_history)
-            return np.array([V_current, I_current, T_current, V_grad, I_ma, T_ma])
+    def extract_features_step(V_current, I_current, T_current, history, rolling_window=5):
+        lookback = rolling_window - 1
+        if len(history) == 0:
+            V_prev = V_current
+            V_history = [V_current]
+            I_history = [I_current]
+            T_history = [T_current]
+        else:
+            V_prev = history[-1]['voltage']
+            V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
+            I_history = [r['current'] for r in history[-lookback:]] + [I_current]
+            T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
+        V_grad = V_current - V_prev
+        I_ma = np.mean(I_history)
+        T_ma = np.mean(T_history)
+        return np.array([V_current, I_current, T_current, V_grad, I_ma, T_ma])
 
 def _trapezoidal_integration(y, x):
     # Pure Python implementation of trapezoidal integration
@@ -263,9 +258,9 @@ class EstimatorPipeline:
         for _ in range(priming_steps):
             self.esn_soc._update(u_scaled.reshape(-1, 1))
             self.esn_soh._update(u_scaled.reshape(-1, 1))
-            if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
+            if hasattr(self.esn_soc, 'adapt_online') and not getattr(Config, 'ENABLE_ESN_STANDALONE', False):
                 self.esn_soc.adapt_online(u_scaled, initial_soc, learning_rate=0.1)
-            if hasattr(self.esn_soh, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
+            if hasattr(self.esn_soh, 'adapt_online') and not getattr(Config, 'ENABLE_ESN_STANDALONE', False):
                 self.esn_soh.adapt_online(u_scaled, initial_soh, learning_rate=0.1)
             
         self.esn_soc_state = self.esn_soc.get_state()
@@ -490,12 +485,12 @@ class EstimatorPipeline:
             pred_soh_val = self.esn_soh.predict_step(u_scaled, quantize_mode=quantize_mode)
             
             # Online adaptation: Calibrate the ESN SOC & SOH networks online using EKF/Observer as a reference
-            if hasattr(self.esn_soc, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
+            if hasattr(self.esn_soc, 'adapt_online') and not getattr(Config, 'ENABLE_ESN_STANDALONE', False):
                 try:
                     self.esn_soc.adapt_online(u_scaled, self.ekf_soc, learning_rate=0.15, mode='rls')
                 except Exception as adapt_err:
                     print(f"Online ESN SOC adaptation step warning: {adapt_err}")
-            if hasattr(self.esn_soh, 'adapt_online') and not Config.ENABLE_ESN_STANDALONE:
+            if hasattr(self.esn_soh, 'adapt_online') and not getattr(Config, 'ENABLE_ESN_STANDALONE', False):
                 try:
                     self.esn_soh.adapt_online(u_scaled, self.trad_soh, learning_rate=0.15, mode='rls')
                 except Exception as adapt_err:
@@ -508,7 +503,7 @@ class EstimatorPipeline:
             esn_soc_raw = float(np.clip(pred_soc_val[0], 0.0, 1.0))
             esn_soh_raw = float(np.clip(pred_soh_val[0], 0.0, 1.0))
 
-            if Config.ENABLE_ESN_STANDALONE:
+            if getattr(Config, 'ENABLE_ESN_STANDALONE', False):
                 # Standalone Mode: Use pure data-driven ESN output
                 esn_soc_pred = esn_soc_raw
                 esn_soh_pred = esn_soh_raw
