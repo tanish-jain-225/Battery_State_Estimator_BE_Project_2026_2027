@@ -117,7 +117,7 @@ Evaluated against the ACM/IEEE Artifact Evaluation Guidelines:
 * **Artifact Functional (★★★★★):** 46 automated unit/integration tests passing with 100% pass rate in ~34 seconds; zero syntax errors under `flake8`.
 * **Results Replicated (★★★★★):** Single-click master runner (`run_all_validation.bat` / `.sh`) reproduces all claimed physics, firmware, FPGA parity, and benchmark figures in under 45 seconds with 0 errors.
 * **Artifact Reusable (★★★★★):** Complete modular separation between 2-RC physics, observers, C99 firmware, and Verilog RTL.
-* **Manuscript Aligned (★★★★★):** Complete camera-ready IEEE paper manuscript drafted in [`reference/paper.md`](../../reference/paper.md) matching the codebase numbers exactly.
+* **Manuscripts Aligned (★★★★★):** Complete camera-ready IEEE / Q3 Scopus manuscripts drafted in [`reference/paper.md`](../../reference/paper.md) (Original Experimental Research) and [`reference/review_paper.md`](../../reference/review_paper.md) (Comprehensive Review/Survey) matching the codebase numbers exactly.
 
 ---
 
@@ -195,12 +195,13 @@ Your project delivers **6 concrete deliverables** across the software, firmware,
 * **Master 1-Click Runner (Linux/macOS):** [`run_all_validation.sh`](../../run_all_validation.sh)
 * **Function:** Executes all 8 verification stages end-to-end (physics, C99 compilation, FPGA parity, and full test suite) with zero errors.
 
-### 📦 Deliverable 6: The Research Paper Manuscript & Capstone Documentation
-* **IEEE Paper Manuscript:** [`reference/paper.md`](../../reference/paper.md)
+### 📦 Deliverable 6: The Research Paper Manuscripts & Capstone Documentation
+* **Target Paper 1 (Original Research):** [`reference/paper.md`](../../reference/paper.md) — *Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems* (IEEE / Q3 Scopus Target)
+* **Target Paper 2 (Comprehensive Review):** [`reference/review_paper.md`](../../reference/review_paper.md) — *State of Charge and State of Health Estimation in Battery Management Systems: A Comprehensive Review of Classical Observers, Industry Practice, and Reservoir Computing Paradigms* (IEEE / Q3 Scopus Target)
 * **Review 2 Defense Report:** [`docs/Review_2/Review_2_Progress.md`](../Review_2/Review_2_Progress.md)
 * **System Specification:** [`docs/Resources/SYSTEM_SPECIFICATION.md`](SYSTEM_SPECIFICATION.md)
 * **Operations Runbook:** [`docs/Resources/OPERATIONS.md`](OPERATIONS.md)
-* **Function:** Full academic conference manuscript and defense documentation containing mathematical derivations, comparative benchmark tables, and examiner talking points.
+* **Function:** Two full academic journal manuscripts and defense documentation containing mathematical derivations, comparative benchmark tables, and examiner talking points.
 
 ---
 

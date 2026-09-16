@@ -66,8 +66,8 @@
 
 **Final Goal:** Deploy and validate a lightweight ESN-based SOC/SOH estimator on embedded hardware (Artix A7100T) using real / representative battery drive-cycle data.
 
-* **Aug 31**: Literature review / IEEE target
-* **Oct 15**: Final ESN software
+* **Aug 31**: Review paper manuscript completed (IEEE / Q3 Scopus target)
+* **Oct 15**: Final ESN software & Research paper manuscript (IEEE / Q3 Scopus target)
 * **3rd Wk Oct**: **Review II**
 * **Oct 25**: Hardware HIL validation
 * **Nov 20**: Final thesis

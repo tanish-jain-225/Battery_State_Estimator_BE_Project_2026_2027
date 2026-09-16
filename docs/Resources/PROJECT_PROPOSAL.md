@@ -54,7 +54,7 @@ Existing Battery Management Systems face two main challenges:
 3. Optimize ESN inference for microcontrollers using Compressed Sparse Row (CSR) SpMV and Q12/Q15 fixed-point arithmetic.
 4. Synthesize and verify a 100-neuron ESN Verilog RTL datapath on FPGA against a Python golden model.
 5. Create a web-based Flask dashboard for real-time telemetry visualization and estimator benchmarking.
-6. Publish research findings in a peer-reviewed conference/journal (IEEE target).
+6. Publish research findings in peer-reviewed IEEE / Q3 Scopus-indexed journals (Review Paper & Experimental Research Paper).
 
 ---
 
@@ -70,5 +70,5 @@ Existing Battery Management Systems face two main challenges:
 * Operational Flask Web Dashboard with real-time Chart.js telemetry graphs.
 * Optimized C99 firmware with 6.7× CSR SpMV speedup.
 * Verilog RTL 100-neuron reservoir datapath verified bit-exactly (200/200 matches).
-* Peer-reviewed research paper submission to IEEE conference.
+* Two peer-reviewed manuscripts submitted to IEEE / Q3 Scopus-indexed journals (Review Paper & Research Paper).
 * Comprehensive GitHub repository & GitHub Log Book.

@@ -124,8 +124,8 @@ This document serves as an end-to-end slide-by-slide blueprint for your first ca
   * **Final Architecture**:
     `Battery Dataset` ➔ `2-RC / Battery Model` ➔ `ESN Estimator` ➔ `SOC / SOH` ➔ `Embedded System (ARTIX A7100T | RTL / HIL Validation)`
   * **Timeline Milestones**:
-    * **Aug 31**: Literature review / IEEE target
-    * **Oct 15**: Final ESN software
+    * **Aug 31**: Review paper manuscript completed (IEEE / Q3 Scopus target)
+    * **Oct 15**: Final ESN software & Research paper manuscript (IEEE / Q3 Scopus target)
     * **3rd wk Oct**: Review II
     * **Oct 25**: Hardware HIL validation
     * **Nov 20**: Final thesis
@@ -133,4 +133,4 @@ This document serves as an end-to-end slide-by-slide blueprint for your first ca
   * Top banner framing the final goal statement.
   * Center architecture flow block.
   * Bottom timeline axis with green milestone markers from August through November.
-* **Speaker Delivery Notes**: "Our final goal for Phase 3 is to deploy and validate the lightweight ESN SOC/SOH estimator on ARTIX A7100T FPGA hardware using representative drive-cycle data. Our timeline targets completing our literature review paper for IEEE by August 31st, delivering final ESN software by October 15th, hardware HIL validation by October 25th, and submitting our capstone thesis by November 20th."
+* **Speaker Delivery Notes**: "Our final goal for Phase 3 is to deploy and validate the lightweight ESN SOC/SOH estimator on ARTIX A7100T FPGA hardware using representative drive-cycle data. Our timeline targets completing our literature review paper for IEEE / Q3 Scopus journals by August 31st, delivering final ESN software and experimental research paper by October 15th, hardware HIL validation by October 25th, and submitting our capstone thesis by November 20th."

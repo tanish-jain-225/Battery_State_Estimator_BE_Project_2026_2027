@@ -280,4 +280,5 @@ With all Phase 2 / Review 2 goals 100% completed and verified, our final phase f
 
 1. **Physical Artix A7100T Synthesis & Flashing**: Generate final bitstream (`.bit`) with Vivado 2024.x, record on-chip utilization (LUTs, BRAMs, DSP slices) and dynamic power consumption.
 2. **Hardware-in-the-Loop (HIL) UART Bridge**: Connect PC-based real-time simulator via USB-UART (FTDI / CH340) directly to FPGA Pmod pins to perform hardware-in-the-loop state estimation.
-3. **Publication & Thesis Submission**: Finalize IEEE conference manuscript and B.E. dissertation documentation.
+3. **Publication Milestones (20 Marks)**: Submit both official manuscripts to peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**: (1) Comprehensive Review Paper ([`reference/review_paper.md`](../../reference/review_paper.md)), and (2) Original Experimental Research Paper ([`reference/paper.md`](../../reference/paper.md)).
+4. **Final Thesis Submission**: Complete comprehensive B.E. dissertation defense documentation.

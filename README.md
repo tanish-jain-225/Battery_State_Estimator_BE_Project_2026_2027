@@ -47,7 +47,8 @@
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
-| **Research Paper** | [Paper Manuscript](reference/paper.md) | Full IEEE conference publication manuscript draft | Drafted |
+| **Review Paper** | [Review Paper Manuscript](reference/review_paper.md) | Comprehensive review of classical observers & reservoir computing (IEEE / Q3 Scopus target) | **Drafted / Ready** |
+| **Research Paper** | [Research Paper Manuscript](reference/paper.md) | Original edge-optimized ESN & FPGA RTL experimental paper (IEEE / Q3 Scopus target) | **Drafted / Ready** |
 
 ---
 
@@ -379,6 +380,7 @@ BE-Capstone-Project/
 │           └── feature_engineering.py
 │
 ├── images/
+│   ├── images.md
 │   ├── system_architecture.png
 │   ├── circuit_diagram.png
 │   ├── flowchart.png
@@ -397,6 +399,7 @@ BE-Capstone-Project/
 │
 └── reference/
     ├── paper.md
+    ├── review_paper.md
     ├── paper_ekf_soc_soh.pdf
     └── paper_rc_soc_soh.pdf
 ```
@@ -506,19 +509,29 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 
 ---
 
-## Research Paper / Publication (20 Marks Allocated)
+## Research Papers & Publications (20 Marks Allocated)
 
-> 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof.
+> 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof. Both official documentations strictly target peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**.
 
+### Target Paper 1: Comprehensive Review Paper (IEEE / Q3 Scopus Review Journal Target)
+| Item | Details |
+| :--- | :--- |
+| **Paper Title** | State of Charge and State of Health Estimation in Battery Management Systems: A Comprehensive Review of Classical Observers, Industry Practice, and Reservoir Computing Paradigms |
+| **Target Venue** | IEEE Transactions / Q3 Scopus-Indexed Review Journal (Automotive Electronics / Energy Storage) |
+| **Paper Status** | **Drafting Complete / Ready for Submission** |
+| **Paper Manuscript** | [`reference/review_paper.md`](reference/review_paper.md) |
+| **Review Scope** | Theoretical foundations, 2-RC ECM, multi-timescale EKF, industrial standards (ISO 26262), and ESN alternatives |
+| **Submission Proof (10 Marks)** | Official submission receipt and Paper ID to be logged in `docs/Paper_Proof/` |
+
+### Target Paper 2: Original Experimental Research Paper (IEEE / Q3 Scopus Journal Target)
 | Item | Details |
 | :--- | :--- |
 | **Paper Title** | Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems |
-| **Target Venue** | IEEE / International Conference on Automation and Robotics 2026 |
-| **Paper Status** | Drafting Complete / Ready for Submission |
-| **Submission Deadline** | August 2026 |
+| **Target Venue** | IEEE / Q3 Scopus-Indexed Journal on Industrial Electronics / Cyber-Physical Systems |
+| **Paper Status** | **Drafting Complete / Ready for Submission** |
 | **Paper Manuscript** | [`reference/paper.md`](reference/paper.md) |
-| **Submission Proof (10 Marks)** | Pending Submission (Confirmation PDF/Email will be saved to `docs/Paper_Proof/`) |
-| **Acceptance Proof (10 Marks)** | Pending Acceptance Notification |
+| **Experimental Scope** | Co-designed 2-RC physics, 6.7× CSR SpMV embedded C99 speedup, Q15 fixed-point LUT math, 200/200 bit-exact FPGA RTL parity |
+| **Submission Proof (10 Marks)** | Official submission confirmation PDF and tracking ID to be logged in `docs/Paper_Proof/` |
 
 ---
 
