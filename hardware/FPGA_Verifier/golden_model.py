@@ -82,6 +82,64 @@ def parse_coe_file(filepath):
     return values
 
 
+def generate_reservoir_weights(n_in=4, n_res=100, seed=42, spectral_radius=0.9, density=0.10, excitatory_ratio=0.80):
+    """
+    Generates reservoir weights freshly as documented in outcomes (seed=42):
+      - Win ~ U(-0.5, 0.5), dense
+      - W: 10% connection density, 80% excitatory / 20% inhibitory (magnitude U(0,1)), spectral radius = 0.9
+      - Bias: zero
+    Returns (Win_q610, W_q610, bias_q610, Win_float, W_float)
+    """
+    rng = np.random.RandomState(seed)
+
+    # Input weights Win ~ U(-0.5, 0.5), dense
+    Win_float = rng.uniform(-0.5, 0.5, size=(n_res, n_in))
+
+    # Recurrent weights W
+    W_float = np.zeros((n_res, n_res), dtype=np.float64)
+    mask = rng.rand(n_res, n_res) < density
+
+    # Determine excitatory/inhibitory signs for non-zero elements
+    mags = rng.uniform(0.0, 1.0, size=(n_res, n_res))
+    signs = np.where(rng.rand(n_res, n_res) < excitatory_ratio, 1.0, -1.0)
+
+    W_float[mask] = mags[mask] * signs[mask]
+
+    # Rescale spectral radius to 0.9
+    eigenvalues = np.linalg.eigvals(W_float)
+    max_ev = np.max(np.abs(eigenvalues))
+    if max_ev > 0:
+        W_float = W_float * (spectral_radius / max_ev)
+
+    # Quantize to Q6.10 signed fixed point (multiply by 1024 and round)
+    Win_q610 = np.round(Win_float * 1024.0).astype(np.int64)
+    W_q610 = np.round(W_float * 1024.0).astype(np.int64)
+    bias_q610 = np.zeros(n_res, dtype=np.int64)
+
+    return Win_q610, W_q610, bias_q610, Win_float, W_float
+
+
+def export_coe(values, filename, radix=10, comment="COE File"):
+    """Exports flat 1D / 2D numpy array or list into Xilinx .coe memory file."""
+    filepath = os.path.join(BASE_DIR, filename)
+    flat = np.array(values, dtype=np.int64).flatten()
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(f"; {comment}\n")
+        f.write(f"memory_initialization_radix={radix};\n")
+        f.write("memory_initialization_vector=\n")
+        lines = []
+        for i, val in enumerate(flat):
+            sep = ";" if i == len(flat) - 1 else ","
+            if radix == 16:
+                hex_str = format(int(val) & 0xFFFF, '04x')
+                lines.append(f"{hex_str}{sep}")
+            else:
+                lines.append(f"{int(val)}{sep}")
+        f.write("\n".join(lines) + "\n")
+    print(f"Exported {len(flat)} entries to {filepath}")
+
+
+
 class GoldenESN:
     def __init__(self, n_in, n_res, Win, W, bias, lut=None):
         self.n_in = n_in

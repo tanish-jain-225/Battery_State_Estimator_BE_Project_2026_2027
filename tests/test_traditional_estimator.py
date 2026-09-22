@@ -98,3 +98,51 @@ def test_rls_initialization_and_step():
         r0, r1, c1, conv = rls.step(3.7 - 0.005*i, -2.0, 3.8)
         
     assert rls.steps >= 50
+
+
+def test_rls_vff_convergence():
+    """Validates that Variable Forgetting Factor (VFF-RLS) adapts lambda and converges under dynamic current."""
+    rls = RecursiveLeastSquares(dt=1.0)
+    ocv = 3.8
+    r0_true = 0.05
+    r1_true = 0.03
+    c1_true = 500.0
+    tau = r1_true * c1_true
+    v1 = 0.0
+    dt = 1.0
+
+    lambdas = []
+    for k in range(120):
+        current = -3.0 if (k // 15) % 2 == 0 else -1.0
+        v1 = np.exp(-dt / tau) * v1 + r1_true * (1.0 - np.exp(-dt / tau)) * abs(current)
+        vt = ocv - abs(current) * r0_true - v1
+        r0, r1, c1, conv = rls.step(V_meas=vt, I_meas_ekf=current, ocv=ocv)
+        lambdas.append(rls.lmbda)
+
+    assert rls.steps > 100
+    assert min(lambdas) < 0.999, "VFF should dynamically reduce lambda on error transients"
+    assert 0.005 <= rls.r0 <= 0.5, f"Estimated R0 should be reasonable, got {rls.r0}"
+
+
+def test_ekf_temperature_adaptation():
+    """Validates that EKF and ResistanceSOH adapt to temperature variations using Arrhenius scaling."""
+    soh_tracker = ResistanceSOH("li_ion")
+    r0_cold, soh_cold = soh_tracker.step(
+        current_r0=0.03, prev_v=3.8, prev_i=0.0,
+        V_meas=3.65, I_meas=2.0, soc_est=0.9, T_meas=0.0
+    )
+    r0_warm, soh_warm = soh_tracker.step(
+        current_r0=0.03, prev_v=3.8, prev_i=0.0,
+        V_meas=3.65, I_meas=2.0, soc_est=0.9, T_meas=25.0
+    )
+    assert r0_cold != r0_warm
+    assert 0.2 <= soh_cold <= 1.0
+    assert 0.2 <= soh_warm <= 1.0
+
+    ekf = ExtendedKalmanFilter("li_ion")
+    P = np.eye(3) * 0.01
+    soc_c, _, _, _ = ekf.step(soc=0.8, v1=0.0, v2=0.0, P=P, I_meas=-2.0, V_meas=3.6, dt=1.0, T_meas=5.0)
+    soc_w, _, _, _ = ekf.step(soc=0.8, v1=0.0, v2=0.0, P=P, I_meas=-2.0, V_meas=3.6, dt=1.0, T_meas=35.0)
+    assert 0.0 <= soc_c <= 1.0
+    assert 0.0 <= soc_w <= 1.0
+

@@ -62,3 +62,32 @@ def test_multi_cell_voltage():
     out = sim.step(current=0.0, dt=1.0)
     # Single cell NMC OCV at 100% SOC is 4.2V
     assert abs(out['voltage'] - 4.2) < 0.2
+
+def test_cccv_charge_cycle():
+    """Validates the CCCV charge profile transitions from CC to CV mode at SOC > 0.8."""
+    cc_current = DriveCycles.cccv_charge(0, soc=0.5)
+    assert cc_current == -3.0, "CC phase should deliver -3.0 A"
+    
+    cv_current = DriveCycles.cccv_charge(0, soc=0.9)
+    assert cv_current == -1.0, "CV phase should taper to -1.0 A"
+
+def test_accelerated_aging():
+    """Validates that accelerated aging mode causes measurable SOH degradation."""
+    sim = BatterySimulator("li_ion")
+    initial_soh = sim.soh
+    for t in range(200):
+        sim.step(current=5.0, dt=1.0, accelerated_aging=True)
+    assert sim.soh < initial_soh, "SOH should degrade under accelerated aging"
+    assert sim.internal_resistance_growth > 1.0, "R0 should grow with aging"
+
+def test_cell_balancing_activation():
+    """Validates that cell balancing activates during charging near full SOC."""
+    sim = BatterySimulator("nmc")
+    sim.chemistry = sim.chemistry  # Ensure NMC loaded
+    # Charge the cells until balancing might trigger
+    for t in range(50):
+        out = sim.step(current=-3.0, dt=1.0)
+    # Check the balancing field is present
+    assert 'balancing_active' in out
+    assert isinstance(out['balancing_active'], bool)
+

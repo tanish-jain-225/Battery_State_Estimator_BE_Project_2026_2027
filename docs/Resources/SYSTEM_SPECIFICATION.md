@@ -33,7 +33,7 @@ The table below outlines the key software and hardware components of the system:
 | **Visualiser Dashboard** | [`software/visualiser/app.py`](../../software/visualiser/app.py) | Presents telemetry, estimator outputs, diagnostics and controls. |
 | **Estimator Pipeline** | [`software/visualiser/estimator_pipeline.py`](../../software/visualiser/estimator_pipeline.py) | Runs EKF, Coulomb Counting, ESN and CPS diagnostics. |
 | **Hardware Classifier (C99)** | [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) | Runs sparse ESN inference (CSR 6.7× speedup) for edge safety state classification. |
-| **FPGA Verilog ESN Verifier** | [`hardware/FPGA_Verifier/`](../../hardware/FPGA_Verifier/README.md) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
+| **FPGA Verilog ESN Verifier** | [`hardware/FPGA_Verifier/`](../../hardware/hardware.md#-fpga-verilog-esn-verifier-artix-a7100t-target) | 100-neuron Q6.10 fixed-point ESN RTL targeting **ARTIX A7100T FPGA**, matched 200/200 bit-exactly against Python golden model in Vivado/XSim. |
 | **Training & Export Pipelines** | [`hardware/STM_Verifier/train_classifier.py`](../../hardware/STM_Verifier/train_classifier.py)<br>[`hardware/STM_Verifier/train_estimator.py`](../../hardware/STM_Verifier/train_estimator.py) | Train ESN models and export Python/C weight headers. |
 
 ---
@@ -309,7 +309,7 @@ Robustness and estimation accuracy limits are verified using automated unit suit
 
 Run the test suite locally using:
 ```bash
-# Automated 46-test regression suite
+# Automated 49-test regression suite
 pytest tests/ -v
 
 # Master one-click end-to-end validation (Windows)

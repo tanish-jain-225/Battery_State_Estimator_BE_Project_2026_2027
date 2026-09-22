@@ -64,3 +64,53 @@ def test_estimator_pipeline_state_serialization():
     assert ep_restored.cc_soc == ep.cc_soc
     assert ep_restored.trad_r0 == ep.trad_r0
 
+
+def test_soe_calculation():
+    """Validates State of Energy (SOE) output is bounded and monotonic with SOC."""
+    ep = EstimatorPipeline()
+    soe_full = ep.calculate_soe(1.0)
+    soe_half = ep.calculate_soe(0.5)
+    soe_empty = ep.calculate_soe(0.0)
+    
+    assert 0.99 <= soe_full <= 1.0, f"SOE at SOC=1.0 should be ~1.0, got {soe_full}"
+    assert soe_empty == 0.0, "SOE at SOC=0.0 should be 0.0"
+    assert soe_half < soe_full, "SOE should decrease with lower SOC"
+    assert soe_empty < soe_half, "SOE should be monotonically increasing with SOC"
+
+
+def test_sop_calculation():
+    """Validates State of Power (SOP) charge/discharge limits are non-negative."""
+    ep = EstimatorPipeline()
+    res = ep.step(V_meas=3.7, I_meas_discharge=2.0, T_meas=25.0)
+    
+    assert 'sop_charge_curr' in res
+    assert 'sop_discharge_curr' in res
+    assert 'sop_charge_pwr' in res
+    assert 'sop_discharge_pwr' in res
+    assert res['sop_charge_curr'] >= 0.0
+    assert res['sop_discharge_curr'] >= 0.0
+    assert res['sop_charge_pwr'] >= 0.0
+    assert res['sop_discharge_pwr'] >= 0.0
+
+
+def test_rul_calculation():
+    """Validates Remaining Useful Life (RUL) output is present and non-negative."""
+    ep = EstimatorPipeline()
+    res = ep.step(V_meas=3.7, I_meas_discharge=1.0, T_meas=25.0)
+    
+    assert 'ekf_rul_cycles' in res
+    assert 'esn_rul_cycles' in res
+    assert res['ekf_rul_cycles'] >= 0.0
+    assert res['esn_rul_cycles'] >= 0.0
+
+
+def test_chemistry_switching():
+    """Validates the estimator pipeline works correctly with non-default chemistries."""
+    for chem in ['lfp', 'lead_acid', 'nmc']:
+        ep = EstimatorPipeline(chemistry_name=chem)
+        res = ep.step(V_meas=3.2, I_meas_discharge=1.0, T_meas=25.0)
+        assert 0.0 <= res['ekf_soc'] <= 1.0, f"EKF SOC out of bounds for {chem}"
+        assert 0.0 <= res['ukf_soc'] <= 1.0, f"UKF SOC out of bounds for {chem}"
+        assert 0.0 <= res['cc_soc'] <= 1.0, f"CC SOC out of bounds for {chem}"
+
+

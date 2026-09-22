@@ -1,4 +1,4 @@
-[← Back to README](../../README.md)
+[← Back to README](../../README.md) · [Review 2 Slide Deck (PDF)](../Review_2/Review_2_PPT.pdf)
 
 # PowerPoint Presentation Plan: First Progress Review
 

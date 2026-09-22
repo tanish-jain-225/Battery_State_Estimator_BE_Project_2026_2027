@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [← Back to Review 1](../Review_1/Review_1_Progress.md)
+[← Back to README](../../README.md) · [← Back to Review 1](../Review_1/Review_1_Progress.md) · [Review 2 Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes Report (PDF)](Resources/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
 
 # ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
 ## Phase 2 Comprehensive Progress Report (Review 2 Deliverable)
@@ -13,7 +13,7 @@
 - Tanish Sanghvi  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (46 / 46 Automated Tests, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests, 200 / 200 FPGA Parity Stages)**
 
 ---
 
@@ -24,7 +24,7 @@
 4. [Multi-Model Comparative Estimation Benchmark (ESN vs. UKF vs. EKF vs. CC)](#4-multi-model-comparative-estimation-benchmark)
 5. [C99 Embedded Firmware Validation (Float32 vs. Fixed-Point Q15 & CSR SpMV)](#5-c99-embedded-firmware-validation)
 6. [Verilog HDL FPGA Hardware Verifier on Artix A7100T](#6-verilog-hdl-fpga-hardware-verifier-on-artix-a7100t)
-7. [Automated Verification Test Suite (46 Tests, 100% Pass)](#7-automated-verification-test-suite-46-tests)
+7. [Automated Verification Test Suite (62 Tests, 100% Pass)](#7-automated-verification-test-suite-62-tests-100-pass)
 8. [Master End-to-End One-Click Validation Pipeline](#8-master-end-to-end-one-click-validation-pipeline)
 9. [Review 2 Demonstration Script & Talking Points](#9-review-2-demonstration-script--talking-points)
 10. [Phase 3 Roadmap Towards Final Defense](#10-phase-3-roadmap-towards-final-defense)
@@ -46,7 +46,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 2. **Unscented Kalman Filter (UKF)** implementation as a rigorous non-linear benchmark alongside EKF and Coulomb Counting.
 3. **Dual C99 Microcontroller Execution**: Floating-point (99.80% acc) and integer-only Q15 fixed-point (98.40% acc) with **6.7× CSR SpMV acceleration**.
 4. **Verilog HDL FPGA RTL Verification on Artix A7100T**: Bit-exact stage parity (200/200 stages verified) and multi-timestep temporal sequence processing.
-5. **Comprehensive Automated Test Suite**: 46 automated unit and integration tests passing with 100% pass rate.
+5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing with 100% pass rate.
 
 ---
 
@@ -59,7 +59,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 | **Online ESN Adaptation** | In Progress (Target) | **Fully Verified RLS Readout Tracking** | Model updates dynamically to capacity fade without full matrix recomputation. |
 | **C99 Embedded Firmware** | Conceptual CSR code | **Fully Benchmarked Dual C99 Engine** | Float32 (99.80%) vs Q15 (98.40%), 0.0031 RMSE, 6.7× CSR SpMV speedup. |
 | **FPGA RTL Verification** | Single-pass 100-neuron test | **200/200 Stages Parity + Multi-Step Sequence** | Bit-exact matching in Vivado XSim and temporal sequence input indexing (`tb_esn_top_tiny.v`). |
-| **Automated Testing Suite** | Partial ad-hoc tests | **46 Automated Tests (100% Pass)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
+| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
 | **One-Click Validation** | Separate build scripts | **Unified 8-Step Runner (`.bat` / `.sh`)** | Zero-configuration validation across hardware and software in under 45 seconds. |
 
 ---
@@ -178,7 +178,7 @@ u(t) ────►│ Win MAC ──► (+) ──► Bias ──► Saturatio
 
 ---
 
-## 7. Automated Verification Test Suite (46 Tests)
+## 7. Automated Verification Test Suite (62 Tests, 100% Pass)
 
 The repository includes a comprehensive, automated test suite in the [`tests/`](../../tests/) directory. All tests run via `pytest`:
 
@@ -186,29 +186,32 @@ The repository includes a comprehensive, automated test suite in the [`tests/`](
 ============================= test session starts =============================
 platform win32 -- Python 3.10.0, pytest-8.3.3
 rootdir: D:\_Deployed_Projects_Vercel\Battery_State_Estimator_BE_Project_2026_2027
-collected 46 items
+configfile: pytest.ini
+collected 62 items
 
-tests\test_battery_chemistry.py ...                                      [  6%]
-tests\test_battery_simulator.py .......                                  [ 21%]
-tests\test_esn_model.py .....                                            [ 32%]
-tests\test_estimator_pipeline.py .....                                   [ 43%]
-tests\test_flask_api.py .....                                            [ 54%]
-tests\test_fpga_verifier.py ....                                         [ 63%]
-tests\test_online_training.py .........                                  [ 82%]
-tests\test_traditional_estimator.py ........                             [100%]
+tests\test_battery_chemistry.py ...                                      [  4%]
+tests\test_battery_simulator.py ..........                               [ 20%]
+tests\test_esn_model.py .....                                            [ 29%]
+tests\test_estimator_pipeline.py .........                               [ 43%]
+tests\test_flask_api.py .....                                            [ 51%]
+tests\test_fpga_verifier.py .......                                      [ 62%]
+tests\test_integration.py ....                                           [ 69%]
+tests\test_online_training.py .........                                  [ 83%]
+tests\test_traditional_estimator.py ..........                           [100%]
 
-============================= 46 passed in 35.33s =============================
+============================= 62 passed in 50.61s =============================
 ```
 
 ### Summary of Test Coverage
 1. **`test_battery_chemistry.py` (3 tests)**: Chemistry loading correctness, OCV curve interpolation, and monotonic voltage checks.
-2. **`test_battery_simulator.py` (7 tests)**: 2-RC transient equations solvers, Arrhenius thermal coupling, capacity degradation (SOH fade), and injected fault handling.
+2. **`test_battery_simulator.py` (10 tests)**: 2-RC transient equations solvers, Arrhenius thermal coupling, capacity degradation (SOH fade), injected fault handling, CCCV charge cycles, accelerated aging degradation, and active cell balancing.
 3. **`test_esn_model.py` (5 tests)**: Reservoir weight initialization, spectral radius scaling ($\rho < 1$), echo state property verification, and forward inference.
-4. **`test_estimator_pipeline.py` (5 tests)**: Joint observer integration, state serialization and hydration (`get_state()` / `set_state()`), and CPS safety threshold triggers.
+4. **`test_estimator_pipeline.py` (9 tests)**: Joint observer integration, state serialization and hydration (`get_state()` / `set_state()`), CPS safety threshold triggers, State of Energy (SOE), State of Power (SOP), Remaining Useful Life (RUL) projections, and multi-chemistry switching.
 5. **`test_flask_api.py` (5 tests)**: Microservice API authentication, control commands, telemetry retrieval, status payload formatting, and CSRF protection.
-6. **`test_fpga_verifier.py` (4 tests)**: Signed 16-bit hex COE parsing, hardware $\tanh$ LUT symmetry, tiny sequence golden model parity, and full 200-row Vivado bit-exact parity.
-7. **`test_online_training.py` (9 tests)**: ESN online adaptation, RLS covariance updates, forgetting factor bounds, and adaptive weight tracking under cell aging.
-8. **`test_traditional_estimator.py` (8 tests)**: Coulomb Counting, EKF covariance positive-definiteness & trace reset guards, UKF sigma-point generation & Cholesky stability, and VFF-RLS parameter tracking.
+6. **`test_fpga_verifier.py` (7 tests)**: Signed 16-bit hex COE parsing, hardware $\tanh$ LUT symmetry, tiny sequence golden model parity, full 200-row Vivado bit-exact parity, seed=42 weight generation, NASA dataset coverage, and full outcomes evaluation.
+7. **`test_integration.py` (4 tests)**: End-to-end BatterySimulator → EstimatorPipeline real-time coupling, multi-chemistry tracking (NMC, LFP, Lead-Acid), standard automotive drive cycle sweeps (UDDS, HWFET, US06), and FPGA COE file export/import roundtrip parity.
+8. **`test_online_training.py` (9 tests)**: ESN online adaptation, RLS covariance updates, forgetting factor bounds, and adaptive weight tracking under cell aging.
+9. **`test_traditional_estimator.py` (10 tests)**: Coulomb Counting, EKF covariance positive-definiteness & trace reset guards, UKF sigma-point generation & Cholesky stability, VFF-RLS dynamic parameter tracking with adaptive forgetting factor, and Arrhenius temperature compensation.
 
 ---
 
@@ -231,7 +234,7 @@ To guarantee 100% reproducibility for examiners and evaluators, the repository f
            -> Bias Stage:     200/200 bit-exact matches (100%)
            -> Sum Stage:      200/200 bit-exact matches (100%)
            -> Tanh In/Out:    200/200 bit-exact matches (100%)
-[STEP 7/8] Running Complete Automated Test Suite (46 Tests via Pytest)... [OK]
+[STEP 7/8] Running Complete Automated Test Suite (62 Tests via Pytest)... [OK]
 [STEP 8/8] Performing Final Integrity Check... [OK]
 
 ========================================================================
@@ -249,7 +252,7 @@ When presenting to the review panel, follow this structured demonstration flow:
 ```powershell
 .\run_all_validation.bat
 ```
-* **Talking Point**: *"Every single layer of our stack—from 2-RC physics, through UKF and online adaptive ESN, down to C99 firmware and FPGA RTL bit-exact parity—is verified by an automated 46-test regression suite that passes with 0 errors in under a minute."*
+* **Talking Point**: *"Every single layer of our stack—from 2-RC physics, through UKF and online adaptive ESN, down to C99 firmware and FPGA RTL bit-exact parity—is verified by an automated 62-test regression suite that passes with 0 errors in under a minute."*
 
 ### Step 2: Show Live Dashboard Comparison (Software Product)
 1. Start simulator: `python software/simulator/app.py` (Port 8000).
@@ -275,7 +278,7 @@ With all Phase 2 / Review 2 goals 100% completed and verified, our final phase f
 - 2-RC Physics           - Online RLS ESN         - Artix A7100T Flashing
 - EKF & CC Baselines     - UKF Implementation     - UART HIL Testbench
 - C99 CSR & Q15          - 200/200 FPGA Parity    - Real Battery Pack Tests
-- Verilog RTL Core       - 46 Automated Tests     - Final B.E. Thesis
+- Verilog RTL Core       - 62 Automated Tests     - Final B.E. Thesis
 ```
 
 1. **Physical Artix A7100T Synthesis & Flashing**: Generate final bitstream (`.bit`) with Vivado 2024.x, record on-chip utilization (LUTs, BRAMs, DSP slices) and dynamic power consumption.

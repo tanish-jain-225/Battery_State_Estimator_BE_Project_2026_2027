@@ -43,11 +43,11 @@
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 46-test regression suite | **Completed / Ready** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 62-test regression suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
-| **Review Paper** | [Review Paper Manuscript](reference/review_paper.md) | Comprehensive review of classical observers & reservoir computing (IEEE / Q3 Scopus target) | **Drafted / Ready** |
+| **Review Paper** | [Review Paper Manuscript](reference/review_paper.md) · [PDF Draft](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Drafted / Ready** |
 | **Research Paper** | [Research Paper Manuscript](reference/paper.md) | Original edge-optimized ESN & FPGA RTL experimental paper (IEEE / Q3 Scopus target) | **Drafted / Ready** |
 
 ---
@@ -204,7 +204,7 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | **Proposal of Project** | 12/08/2026 | Online | **Ready for Submission** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
 | **Acceptance / Modification** | 17/08/2026 | Online | Pending Guide Feedback |
 | **First Review** | 21/09/2026 – 24/09/2026 | Offline | Completed ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)) |
-| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **Ready for Review 2** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md)) |
+| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **10/10 Ready** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md), [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf), [`Outcomes PDF`](docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)) |
 | **Final External Review** | 21/11/2026 | Offline | Scheduled |
 
 ### Marks Allocation & Evaluation Policy
@@ -231,6 +231,18 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | **Week 7** | 2026-07-27 | Achieved 200/200 bit-exact RTL matches; built Flask visualiser | Fault injection testing & docs | Thermal runaway fault UI integration; implemented live Chart.js streaming | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 | **Week 8** | 2026-08-03 | Finalized automated test suite (31 tests), paper draft, and video walkthrough | Project presentation & online proposal submission | GitHub Actions CI environment integration | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 | **Week 9** | 2026-08-10 | Prepared BE Project Proposal and verified GitHub Log Book compliance | Paper submission to IEEE conference & Review 1 preparation | Ensuring online submission proof generation | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 10** | 2026-08-17 | Implemented Unscented Kalman Filter (UKF) with Merwe scaled unscented transform as non-linear baseline | Online adaptive ESN formulation | Matrix square root Cholesky numerical breakdown under steep OCV slopes; added positive semi-definiteness guard | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 11** | 2026-08-24 | Formulated Online Recursive Least Squares (RLS) adaptive readout filter for ESN reservoir | Embedded C99 firmware refinement | Cell aging causes static ML models to drift; derived recursive rank-1 update reducing SOC tracking error to < 0.8% | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 12** | 2026-08-31 | Developed dual-mode C99 embedded firmware (Float32 vs Fixed-Point Q15) with CSR SpMV acceleration | Verilog RTL sequential input extension | Integer overflow in fixed-point recurrent accumulator; implemented Q12 input / Q15 weight scaling with 33-point Tanh LUT | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 13** | 2026-09-07 | Designed multi-timestep sequential input addressing (`u_addr`) in Verilog RTL (`tb_esn_top_tiny.v`) | Vivado XSim full 100-neuron simulation | Memory collision during recurrent state updates; added double-buffered ping-pong BRAM architecture | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 14** | 2026-09-14 | Executed Vivado XSim two-pass simulation; verified 200/200 bit-exact stage matches vs Python golden model | Review 1 progress report & presentation deck | Radix-16 COE negative hex signed parsing bug; resolved two's complement sign conversion in golden model | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 15** | 2026-09-21 | Conducted First Progress Review (Review 1) defense; synthesized committee feedback | NASA battery aging dataset integration | Evaluators requested multi-cycle cross-validation; scheduled NASA Ames 32-cycle telemetry evaluation | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 16** | 2026-09-28 | Evaluated ESN reservoir on 32 NASA battery cycles (2,048 timesteps); achieved Test SOC $R^2 = 0.8783$ beating EKF (0.7818) | Post-implementation Artix-7 synthesis audit | Golden CSV file clobbering by tiny test; segregated full 100-neuron and tiny model export targets | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 17** | 2026-10-05 | Completed Artix-7 synthesis and power closure (77 LUTs, 0 DSPs, 0.099W, 428.1 us update latency) | Test suite expansion & regression hardening | Power estimation under dynamic clock; validated 23x real-time headroom at 100 Hz BMS sampling rate | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 18** | 2026-10-12 | Expanded automated pytest regression suite to 49 tests with 100% pass rate in ~45 seconds | Master 1-click validation runner script | Estimator state serialization dropping UKF states; added UKF covariance & state hydration | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 19** | 2026-10-19 | Developed cross-platform master 8-step validation runner (`run_all_validation.bat` and `run_all_validation.sh`) | Comprehensive Review Paper drafting | Windows PowerShell UTF-8 BOM encoding breaking DictReader; enforced utf-8-sig across all CSV parsers | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 20** | 2026-10-26 | Completed 29-page academic review paper manuscript on Neuromorphic BMS & Reservoir Computing | Review 2 presentation deck & report | Consolidating 90+ citations and neuromorphic silicon comparisons (Loihi 2, Akida, SpiNNaker, Artix-7) | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 21** | 2026-11-02 | Finalized Review 2 deliverables: 16:9 presentation deck, progress report, defense playbook, and live demo | Review 2 defense & transition to Phase 3 | Ensuring seamless end-to-end reproducibility across software, C99 firmware, and FPGA RTL | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 
 ---
 
@@ -243,6 +255,8 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | System Architecture | [System Architecture Diagram](images/system_architecture.png) | End-to-end telemetry & hardware verifier architecture |
 | Flowchart | [System Flowchart](images/flowchart.png) | Flowchart for simulator and estimator execution |
 | RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn_top.v) | Top-level 100-neuron Verilog RTL module with multi-timestep support |
+| RTL Schematic | [FPGA RTL Schematic](images/assets/screenshot_fpga_schematic.png) | Vivado synthesized ESN top datapath schematic |
+| RTL Waveform | [Vivado Simulation Waveform](images/assets/screenshot_fpga_waveform.png) | Vivado XSim behavioral simulation timing waveform |
 | Simulation File | [golden_model.py](hardware/FPGA_Verifier/golden_model.py) | Python fixed-point golden model for FPGA verification (--full & --tiny) |
 
 ---
@@ -294,6 +308,7 @@ BE-Capstone-Project/
 │   └── workflows/
 │       └── ci.yml
 ├── README.md
+├── pyproject.toml
 ├── pytest.ini
 ├── requirements.txt
 ├── run_all_validation.bat
@@ -314,7 +329,11 @@ BE-Capstone-Project/
 │   │   ├── Review_1_Progress.md
 │   │   └── Review_1_PPT.pdf
 │   └── Review_2/
-│       └── Review_2_Progress.md
+│       ├── Review_2_Progress.md
+│       ├── Review_2_PPT.pdf
+│       └── Outcomes/
+│           ├── FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf
+│           └── Neuromorphic-BMS-Review-Paper-Draft.pdf
 │
 ├── hardware/
 │   ├── hardware.md
@@ -322,19 +341,21 @@ BE-Capstone-Project/
 │   ├── STM_Verifier/
 │   │   ├── main.c
 │   │   ├── main.h
+│   │   ├── Makefile.arm
 │   │   ├── config.py
 │   │   ├── train.py
 │   │   ├── train_classifier.py
 │   │   ├── train_estimator.py
 │   │   ├── esn_classifier_weights.h
 │   │   ├── esn_estimator_weights.h
+│   │   ├── requirements.txt
 │   │   ├── original_ev_battery_dataset_multiclass.csv
 │   │   ├── training_ev_battery_dataset_multiclass.csv
 │   │   ├── run_c_simulator.bat
 │   │   └── run_c_simulator.sh
 │   │
 │   └── FPGA_Verifier/
-│       ├── README.md
+│       ├── eval_fpga_outcomes.py
 │       ├── esn_top.v
 │       ├── esn_neuron.v
 │       ├── reservoir_controller.v
@@ -348,8 +369,15 @@ BE-Capstone-Project/
 │       ├── golden_model.py
 │       ├── compare_results.py
 │       ├── golden_results.csv
+│       ├── golden.csv
 │       ├── golden_tiny.csv
-│       └── vivado_esn_results.csv
+│       ├── vivado_esn_results.csv
+│       ├── tanh.mem
+│       ├── input_bram.coe
+│       ├── win_bram.coe
+│       ├── w_bram.coe
+│       ├── bias_bram.coe
+│       └── state_bram.coe
 │
 ├── software/
 │   ├── software.md
@@ -363,6 +391,10 @@ BE-Capstone-Project/
 │   │   ├── simulator.md
 │   │   ├── app.py
 │   │   ├── config.py
+│   │   ├── battery_chemistry.py
+│   │   ├── battery_simulator.py
+│   │   ├── gunicorn.conf.py
+│   │   ├── requirements.txt
 │   │   ├── templates/
 │   │   └── static/
 │   │
@@ -372,6 +404,10 @@ BE-Capstone-Project/
 │       ├── config.py
 │       ├── estimator_pipeline.py
 │       ├── traditional_estimator.py
+│       ├── battery_chemistry.py
+│       ├── battery_simulator.py
+│       ├── gunicorn.conf.py
+│       ├── requirements.txt
 │       ├── model_rc.pkl
 │       ├── datasets/
 │       │   ├── original_ev_battery_dataset_multiclass.csv
@@ -388,6 +424,12 @@ BE-Capstone-Project/
 │   ├── circuit_diagram.png
 │   ├── flowchart.png
 │   └── assets/
+│       ├── screenshot_simulator_aging.png
+│       ├── screenshot_simulator_dashboard.png
+│       ├── screenshot_visualiser_overview.png
+│       ├── screenshot_estimation_charts.png
+│       ├── screenshot_fpga_schematic.png
+│       └── screenshot_fpga_waveform.png
 │
 ├── tests/
 │   ├── conftest.py
@@ -397,6 +439,7 @@ BE-Capstone-Project/
 │   ├── test_estimator_pipeline.py
 │   ├── test_flask_api.py
 │   ├── test_fpga_verifier.py
+│   ├── test_integration.py
 │   ├── test_online_training.py
 │   └── test_traditional_estimator.py
 │
@@ -461,17 +504,30 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
 | 4 | Embedded C99 CSR Inference | CSR sparse SpMV execution speedup | 6.7× speedup verified | Pass |
 | 5 | FPGA RTL Golden Model Test | 100-neuron Verilog datapath vs Python model | 200/200 bit-exact matches | Pass |
-| 6 | Automated Pytest Suite | 46 test cases execution across all modules | 100% test pass rate | Pass |
+| 6 | Automated Pytest Suite | 62 test cases execution across all modules | 100% test pass rate | Pass |
 
 ---
 
 ## Result Screenshots
 
+### Software Web Services & Visualiser
+
+**Battery Physics Simulator (2-RC ECM Drive Cycle Telemetry & Accelerated Aging):**
 ![Battery Simulator](images/assets/screenshot_simulator_aging.png)
 
+**Real-Time BMS Visualiser Dashboard:**
 ![Visualiser Dashboard](images/assets/screenshot_visualiser_overview.png)
 
+**SOC & SOH Estimation Observer Comparison (ESN vs EKF vs Coulomb Counting):**
 ![SOC SOH Estimation](images/assets/screenshot_estimation_charts.png)
+
+### Hardware FPGA RTL Verification (Artix-7 xc7a100tcsg324-1)
+
+**Vivado Synthesized RTL Datapath Schematic (`esn_neuron` & `reservoir_controller` Interconnects):**
+![FPGA RTL Schematic](images/assets/screenshot_fpga_schematic.png)
+
+**Vivado XSim RTL Simulation Waveform (`tb_esn_top.v` — 100-Neuron Recurrent Pipeline & Tanh Timing):**
+![FPGA Simulation Waveform](images/assets/screenshot_fpga_waveform.png)
 
 ---
 

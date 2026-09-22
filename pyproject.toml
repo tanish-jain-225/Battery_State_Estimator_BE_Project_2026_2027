@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "battery-state-estimator"
+version = "2.0.0"
+description = "ESN-Based Battery State Estimator: An Alternative to EKF and Coulomb Counting"
+readme = "README.md"
+license = {text = "Academic Use Only"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Sanjna Patankar"},
+    {name = "Akshay Nambiar"},
+    {name = "Satvik Verma"},
+    {name = "Tanish Sanghvi"},
+]
+dependencies = [
+    "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "scikit-learn>=1.0.0",
+    "flask>=2.0.0",
+    "gunicorn>=20.1.0",
+    "pymongo>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-flask>=1.2.0",
+    "flake8>=5.0.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["software*", "hardware*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::pytest.PytestDeprecationWarning",
+]
+
+[tool.flake8]
+max-line-length = 120
+select = ["E9", "F63", "F7", "F82"]
+exclude = [".git", "__pycache__", ".pytest_cache", "*.egg-info"]

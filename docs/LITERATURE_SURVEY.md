@@ -1,119 +1,105 @@
 [← Back to README](../README.md) · [Web Research & Industrial Audit](Resources/WEB_RESEARCH.md) · [IEEE / Q3 Review Paper Manuscript](../reference/review_paper.md)
 
-# Literature Survey: Battery State Estimation Methodologies, Industrial Standards, and Reservoir Computing Alternatives
+# Literature Survey: Neuromorphic Computing, Spiking Networks, and Reservoir Computing for Intelligent Battery Management Systems
 
-This document synthesizes the academic literature, theoretical foundations, and commercial automotive state-of-the-art in battery State of Charge (SOC) and State of Health (SOH) estimation. It reviews conventional control-theoretic observers, examines recent advances in multi-timescale and reservoir computing paradigms, and identifies the engineering research gap addressed by this repository.
+This document synthesizes the academic literature, theoretical foundations, and state-of-the-art estimation paradigms for Battery Management Systems (BMS). It traces the field from conventional control-theoretic observers and deep learning architectures to neuromorphic computing, Spiking Neural Networks (SNNs), Reservoir Computing (RC), Liquid State Machines (LSMs), event-driven sensing, and hardware acceleration platforms.
+
+> **Full Manuscript Reference:** [`reference/review_paper.md`](../reference/review_paper.md) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Edition).
 
 ---
 
 ## 📑 Table of Contents
-1. [Context & State Estimation Challenges](#1-context--state-estimation-challenges)
-2. [Physics-Based & Control-Theoretic Observers](#2-physics-based--control-theoretic-observers)
-3. [Data-Driven & Reservoir Computing Paradigms](#3-data-driven--reservoir-computing-paradigms)
-4. [Commercial Automotive Landscape & Compliance Standards](#4-commercial-automotive-landscape--compliance-standards)
-5. [Comparative Evaluation Matrix](#5-comparative-evaluation-matrix)
-6. [Identified Research Gap & Proposed Alternative](#6-identified-research-gap--proposed-alternative)
-7. [Key Literature References](#7-key-literature-references)
+1. [BMS Estimation Tasks & Shared Operational Challenges](#1-bms-estimation-tasks--shared-operational-challenges)
+2. [Conventional Estimation Methods (Classical & Observers)](#2-conventional-estimation-methods-classical--observers)
+3. [Deep Learning Approaches & The Edge-Deployment Limit](#3-deep-learning-approaches--the-edge-deployment-limit)
+4. [Spiking Neural Networks (SNNs) for BMS](#4-spiking-neural-networks-snns-for-bms)
+5. [Reservoir Computing (RC) & Liquid State Machines (LSMs)](#5-reservoir-computing-rc--liquid-state-machines-lsms)
+6. [Neuromorphic Hardware Platforms & Event-Driven Sensing](#6-neuromorphic-hardware-platforms--event-driven-sensing)
+7. [Multi-Dimensional Benchmarking & Research Roadmap](#7-multi-dimensional-benchmarking--research-roadmap)
 
 ---
 
-## 1. Context & State Estimation Challenges
+## 1. BMS Estimation Tasks & Shared Operational Challenges
 
-In Lithium-ion battery systems powering Electric Vehicles (EVs) and Battery Energy Storage Systems (BESS), internal chemical states cannot be measured directly using physical sensors:
-* **State of Charge (SOC)**: Represents remaining chemical capacity relative to nominal capacity, defining instantaneous driving range and preventing over-charge/over-discharge.
-* **State of Health (SOH)**: Represents irreversible capacity loss ($C_n$ fade) and internal resistance growth ($R_0$ increase) caused by solid-electrolyte interphase (SEI) growth and active material degradation.
+A BMS supervises cell safety, remaining capacity, peak power, and battery longevity by estimating four unmeasurable internal states:
+* **State of Charge (SOC)**: Usable chemical energy percentage ($\text{SOC} \in [0, 100\%]$). Target accuracy $\le \pm 2–5\%$ under sub-second real-time constraints.
+* **State of Health (SOH)**: Structural capacity retention ($\text{SOH} = C_{\text{present}}/C_{\text{rated}} \times 100\%$) and internal resistance ($R_0$) growth.
+* **State of Power (SOP)**: Peak deliverable/absorbable power over short horizons (2–10 s).
+* **Remaining Useful Life (RUL)**: Cycle or time horizon forecasting before reaching end-of-life threshold (70–80% retention).
 
-Accurate state tracking must operate reliably despite non-linear Open Circuit Voltage (OCV) characteristics, strong Arrhenius temperature dependencies, hysteresis, and sensor measurement noise.
-
----
-
-## 2. Physics-Based & Control-Theoretic Observers
-
-### A. Coulomb Counting (Ah Integration)
-* **Principle**: Integrates current over time: $\text{SOC}(t) = \text{SOC}(0) - \frac{1}{C_n}\int I(t)dt$.
-* **Strengths**: Computationally minimal ($O(1)$ scalar arithmetic); ubiquitous in automotive production.
-* **Weaknesses**: Open-loop nature; current sensor offset and ADC quantization errors accumulate linearly, producing **$5\% \text{ to } 10\%$ drift over a 2-hour drive cycle**. Requires complete cell relaxation (3–4 hours of parking) to recalibrate against OCV.
-
-### B. Equivalent Circuit Modeling & Classical EKF (*Plett, 2004*)
-* **Principle**: Employs a 1-RC or 2-RC Equivalent Circuit Model (ECM) capturing ohmic resistance ($R_0$) and polarization diffusion branches ($R_1-C_1, R_2-C_2$). The Extended Kalman Filter (EKF) linearizes the non-linear terminal voltage equation using Taylor-series Jacobians ($\mathbf{H}_k = \left.\frac{\partial h}{\partial x}\right|_{\hat{x}}$) to dynamically correct state estimates from voltage feedback.
-* **Limitations**: Highly sensitive to parameter identification errors; matrix inversion per step taxes low-power microcontrollers; linearization errors compound in flat OCV plateau regions (e.g., LFP chemistry).
-
-### C. Multi-Timescale EKF Framework (*Li et al., 2020*)
-* **Contribution**: Recognized that SOC fluctuates dynamically at a microscopic timescale ($1\text{ s}$), whereas capacity fade and internal resistance grow over hundreds of cycles at a macroscopic timescale.
-* **Innovation**: Separated estimation into a **dual-timescale observer**: microscopic EKF tracks SOC and polarization voltages ($V_1, V_2$), while macroscopic Recursive Least Squares (RLS) tracks capacity degradation ($C_k$) and resistance ($R_0$).
-* **Significance to this Repo**: Confirms that decoupling fast dynamic states from slow electrochemical aging parameters prevents covariance blowup and reduces computational redundancy.
-
-### D. Unscented Kalman Filtering (UKF)
-* **Principle**: Replaces analytical Jacobian linearizations with the Merwe Scaled Unscented Transform, propagating $2n+1$ deterministic sigma points through non-linear voltage curves.
-* **Trade-off**: Higher accuracy across dynamic transitions, but incurs **$2.5\times \text{ to } 3\times$ higher compute overhead** due to matrix Cholesky square roots.
+### Operational Distortions Across Benchmarks
+Real-world estimation faces electrochemical nonlinearity (steep OCV knees, LFP plateaus), Arrhenius temperature shifts ($-20\text{ }^\circ\text{C} \text{ to } +55\text{ }^\circ\text{C}$), dynamic load variations, sensor noise/bias drift, cell imbalance, and hysteresis. Benchmarks depend on standard corpora: **NASA PCoE** (18650 NCA), **CALCE** (prismatic LCO), **Oxford** (pouch cell), and **Panasonic** (cylindrical NMC dynamic profiles).
 
 ---
 
-## 3. Data-Driven & Reservoir Computing Paradigms
+## 2. Conventional Estimation Methods (Classical & Observers)
 
-### A. Limitations of Deep Recurrent Networks (LSTM / GRU)
-While Long Short-Term Memory (LSTM) and Gated Recurrent Unit (GRU) networks capture temporal dependencies without equivalent circuit models, their reliance on Backpropagation Through Time (BPTT), dense matrix-vector products, and millions of parameters makes real-time deployment on low-power automotive microcontrollers infeasible.
-
-### B. Echo State Networks (ESN) & Reservoir Computing (*Jaeger & Haas, 2004*)
-* **Principle**: Projects low-dimensional battery telemetry ($V, I, T$) into a high-dimensional recurrent reservoir $\mathbf{x}_t \in \mathbb{R}^{N_{res}}$ using fixed, randomly generated sparse matrices ($\mathbf{W}_{\text{in}}, \mathbf{W}_{\text{res}}$) scaled to spectral radius $\rho < 1$ (guaranteeing the **Echo State Property**).
-* **Training Efficiency**: The internal reservoir is never modified; only a linear output layer ($\mathbf{W}_{\text{out}}$) is solved analytically using regularized Ridge Regression:
-  $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T (\mathbf{X} \mathbf{X}^T + \lambda \mathbf{I})^{-1}$$
-
-### C. Neuromorphic & Reservoir BMS Applications (*Kamarudin et al., 2026*)
-* **Contribution**: Investigated Reservoir Spiking Neural Networks (RSNN) for battery SOC tracking, demonstrating that fixed recurrent topologies provide rich fading memory of input trajectories with dramatically lower computational overhead than traditional deep networks.
-* **Significance to this Repo**: Validates that recurrent reservoir architectures successfully capture non-linear battery dynamics. Our continuous-time leaky-integrator ESN with Compressed Sparse Row (CSR) optimization serves as the high-throughput, non-spiking counterpart for embedded edge BMS targets.
+* **Coulomb Counting & OCV Mapping**: Coulomb counting integrates net current ($O(1)$ complexity) but drifts $5–10\%$ over a 2-hour drive cycle due to sensor bias. OCV mapping requires extended rest (3–4 hours) and fails during active drive cycles or on flat LFP OCV plateaus.
+* **Equivalent Circuit Models (ECM)**: Lumped 1-RC and 2-RC networks balance physical accuracy against real-time execution. Extended Kalman Filters (EKF) linearize non-linear voltage equations via Taylor Jacobians ($\mathbf{H}_k$).
+* **Multi-Timescale Decoupling (*Li et al., 2020*)**: Decouples fast intra-cycle SOC tracking ($1\text{ s}$) from slow inter-cycle SOH capacity degradation ($100–1000\text{ s}$), preventing covariance blowup and computational redundancy.
+* **Unscented Kalman Filter (UKF)**: Propagates $2n+1$ deterministic sigma points through non-linear voltage curves via Merwe transform, eliminating Jacobians but increasing compute by $2.5\times–3\times$.
 
 ---
 
-## 4. Commercial Automotive Landscape & Compliance Standards
+## 3. Deep Learning Approaches & The Edge-Deployment Limit
 
-Web research across OEM BMS architectures (**Tesla, BYD, BMW, Bosch, Continental**) highlights the industrial constraints governing battery estimators:
-
-| Standard / Domain | Industrial Requirement | Impact on Algorithm Design |
-| :--- | :--- | :--- |
-| **ISO 26262 ASIL-C / D** | Functional safety requires deterministic execution bounds ($< 10\text{ ms}$ jitter) and proven fault containment. | Complex deep learning with iterative solver convergence risk is barred; fixed-cycle ESN inference or deterministic EKF is required. |
-| **AUTOSAR Classic** | Software components (SW-Cs) must fit static memory allocations without dynamic heap allocation (`malloc`). | Weight matrices must be statically declared in ROM/Flash via optimized C headers. |
-| **Hardware Constraints** | Automotive edge microcontrollers (ARM Cortex-M3/M4) often lack double-precision FPUs and have restricted RAM ($\le 64\text{ KB}$). | Algorithms require fixed-point (Q15) arithmetic and matrix compression (CSR). |
-| **Commercial Reality** | 100% of production EVs rely primarily on Coulomb Counting with rested-cell OCV recalibration during vehicle sleep. | Under continuous highway driving or fleet duty cycles where batteries never rest, **Coulomb Counting drifts unchecked**, necessitating robust model-free online estimators. |
+* **Feedforward & Recurrent Architectures**: Deep MLPs, LSTMs, GRUs, and Spatio-Temporal Attention LSTMs (STL-LSTM) achieve high accuracy ($R^2 > 0.99$), but Backpropagation Through Time (BPTT) and heavy parameter matrices ($> 500\text{ KB}$) exceed microcontroller RAM.
+* **Convolutional & Transformer Hybrids**: 1D-CNNs extract incremental capacity ($\text{d}Q/\text{d}V$) signatures. Dual-encoder Transformers and Cross-Attention Multitask Transformers (CA-MT-BHP) achieve sub-1% SOC/SOH error but strain edge compute budgets.
+* **Physics-Informed Neural Networks (PINNs)**: Embed Fick's law of solid-phase diffusion (Single Particle Model) directly into neural network loss functions, outperforming unconstrained MLPs under small-sample training.
+* **The Edge-Deployment Limit**: Quantization-Aware Training (QAT) and Neural Architecture Search (NAS) reduce model footprint but require heavy retraining overhead. On-device fine-tuning via backpropagation remains memory-prohibitive for embedded BMS microcontrollers.
 
 ---
 
-## 5. Comparative Evaluation Matrix
+## 4. Spiking Neural Networks (SNNs) for BMS
 
-The table below contrasts the primary estimation methodologies evaluated across the literature:
+SNNs replace continuous activations with sparse, event-driven discrete spikes, shifting execution from synchronous Multiply-Accumulate (MAC) to sparse Accumulate (AC) updates.
 
-| Criteria | Coulomb Counting (CC) | Extended Kalman Filter (EKF) | Unscented Kalman Filter (UKF) | Deep LSTM / GRU | Echo State Network (ESN) [Proposed] |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Model Dependency** | None (Current only) | High (2-RC ECM + OCV) | High (2-RC ECM + OCV) | None (Data-driven) | **None (Data-driven)** |
-| **Sensor Drift Vulnerability** | High (Unbounded drift) | Low (Corrected by $V_t$) | Low (Corrected by $V_t$) | Low (Learned mappings) | **Low (Bounded reservoir mapping)** |
-| **Computational Cost** | $O(1)$ (Negligible) | Medium ($O(n^3)$ Jacobians) | High ($O(n^3)$ Cholesky) | Prohibitive (BPTT / Gates) | **Low ($O(NNZ)$ Sparse SpMV)** |
-| **Non-linear Capture** | None | Fair (First-order Taylor) | High (Sigma points) | Excellent | **Excellent (High-dimensional state)** |
-| **Memory Footprint** | $< 1\text{ KB}$ | $\sim 5\text{ KB}$ | $\sim 8\text{ KB}$ | $> 500\text{ KB}$ | **$\sim 12\text{ KB}$ (Flash with CSR)** |
-| **Embedded Feasibility** | Trivial | Good | Moderate | Impractical | **Excellent (6.7× CSR speedup, Q15)** |
-| **Primary References** | Industry Standard | *Plett (2004)*; *Li (2020)* | Standard Control Theory | Machine Learning lit. | *Jaeger (2004)*; *Kamarudin (2026)* |
+* **Neuron Models**: Leaky Integrate-and-Fire (LIF) provides the optimal balance of biological fidelity and execution cost. Adaptive LIF (ALIF) adds spike-frequency adaptation for sequence credit assignment.
+* **Spike Encoding**: Step-Forward (SF) rate/temporal encoding cuts operations by $30–60\times$ compared to continuous inputs.
+* **Training Paradigms**: Surrogate-Gradient (SG) BPTT (smooths spike derivatives), ANN-to-SNN conversion (~20,000 spikes/inf), and STDP unsupervised Hebbian learning (~5 mJ/inf).
+* **BMS Benchmark**: *SpikeSOH* achieved **99.2% energy reduction and $>280\times$ speedup** over CNN-LSTM baselines ($0.36\text{ mJ/inference}$).
 
 ---
 
-## 6. Identified Research Gap & Proposed Alternative
+## 5. Reservoir Computing (RC) & Liquid State Machines (LSMs)
 
-### The Research Gap
-1. **Control-theoretic observers (EKF, UKF)** depend on accurate electro-thermal parameters that shift as batteries degrade, requiring cumbersome empirical recalibration.
-2. **Deep learning models (LSTM, GRU)** eliminate model dependency but require computational resources beyond the capabilities of cost-sensitive embedded automotive microcontrollers.
-3. **Existing reservoir computing literature** focuses largely on software simulations without addressing integer fixed-point quantization, sparse matrix acceleration, or RTL hardware parity on FPGA coprocessors.
+Reservoir Computing projects inputs into a high-dimensional recurrent reservoir ($\mathbf{x}_t \in \mathbb{R}^{N_{res}}$) with **fixed random weights** ($W_{in}, W$) satisfying the **Echo State Property** ($\rho(W) < 1$). Readout weights ($W_{out}$) are trained in a single shot via L2-regularized Ridge Regression without backpropagation:
+$$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T (\mathbf{X} \mathbf{X}^T + \lambda \mathbf{I})^{-1}$$
 
-### The Proposed Alternative in this Repository
-This repository addresses this gap by implementing a **lightweight Echo State Network (ESN)** designed as a direct replacement for traditional observers:
-* **Mathematical Parity**: Validated against baseline 2-RC physics, EKF, UKF, and Coulomb Counting.
-* **Embedded Optimization**: Compressed Sparse Row (CSR) matrix representation reducing reservoir multiplies by $85\%$, achieving a **6.7× speedup** in C99.
-* **Hardware Co-Design**: Fixed-point Q6.10 Verilog RTL datapath targeting the Artix A7100T FPGA, verified **200/200 bit-exactly** against a Python golden model.
+* **ESNs vs Spiking Reservoirs (RSNNs / LSMs)**: ESNs use continuous (tanh/sigmoid) synchronous neurons, ideal for near-term MCU/FPGA deployment. RSNNs/LSMs use spiking LIF neurons, natively suited for neuromorphic hardware.
+* **BMS Application (*Kamarudin et al., 2026*)**: RSNNs reached SOH RMSE of 0.029 with $12–26\text{ ms}$ latency. Our fixed-point Q6.10 Echo State Network (100 neurons, 4 inputs, seed=42) achieves $R^2 = 0.8783$ test SOC estimation with zero DSP usage on FPGA fabric.
 
 ---
 
-## 7. Key Literature References
+## 6. Neuromorphic Hardware Platforms & Event-Driven Sensing
 
-1. **Li, P., Wang, H., Xing, Z., Ye, K., & Li, Q.** (2020). *Joint estimation of SOC and SOH for lithium-ion batteries based on EKF multiple time scales*. Journal of Intelligent Manufacturing and Special Equipment, 1(1), 107–120. [[PDF Document](../reference/paper_ekf_soc_soh.pdf)]
-2. **Kamarudin, M. R., Mispan, M. S., Zainudin, M. N. S., & Sofian, H.** (2026). *Reservoir Spiking Neural Networks for Accurate State-of-Charge Estimation in Battery Management Systems*. Turkish Journal of Engineering, 10(2), 407–417. [[PDF Document](../reference/paper_rc_soc_soh.pdf)]
-3. **Plett, G. L.** (2004). *Extended Kalman filtering for battery management systems of LiPB-based HEV battery packs*. Journal of Power Sources, 134(2), 252–261.
-4. **Jaeger, H., & Haas, H.** (2004). *Harnessing nonlinearity: Predicting chaotic systems and saving energy in wireless communication*. Science, 304(5667), 78–80.
-5. **Rigutini, L., et al.** (2020). *State-of-charge estimation of lithium-ion batteries using reservoir computing*. IEEE Transactions on Industrial Electronics, 68(8), 7112–7121.
-6. **International Organization for Standardization.** (2018). *ISO 26262: Road vehicles — Functional safety*.
+### Neuromorphic Silicon Survey
+
+| Platform | Type / Architecture | Power Envelope | BMS Suitability Note |
+| :--- | :--- | :---: | :--- |
+| **Intel Loihi 2** | Digital async, custom LIF cores | 30–80 mW/core | High neuron density; Lava software stack |
+| **SpiNNaker2** | ARM-core software simulation | Scalable DVFS | Flexible ARM cluster; software SNN simulation |
+| **BrainChip Akida** | Digital feedforward commercial IP | $< 10\text{ mW}$ | Sub-10mW always-on; requires recurrence co-design |
+| **IBM TrueNorth** | Digital GALS 2D mesh | ~70 mW | High efficiency; limited on-chip learning |
+| **Memristor / RRAM** | Analog in-memory compute | Very low (fJ/SOP) | Analog Ohm/Kirchhoff MAC; lab-stage maturity |
+| **FPGA (Artix-7)** | Reconfigurable digital logic | 100s mW | **Best near-term prototyping flexibility for custom ESN/SNN** |
+
+### Event-Driven Sensing
+Fixed-rate ADC acquisition samples continuously regardless of signal change. Event-driven level-crossing (delta) sensing generates telemetry spikes only when signals change beyond threshold ($\Delta V, \Delta I, \Delta T$), reducing sample acquisition overhead by 1–2 orders of magnitude during rest and light-load regimes.
+
+---
+
+## 7. Multi-Dimensional Benchmarking & Research Roadmap
+
+### 6-Dimension Evaluation Framework
+1. **Accuracy**: MAE, RMSE, $R^2$ across train/test splits.
+2. **Energy/Power per Inference**: Sustained operating cost per cell.
+3. **Training Cost & Data Efficiency**: Single-shot closed-form ESN readout vs heavy DL backpropagation.
+4. **Latency & Real-Time Suitability**: Sub-second control-loop compatibility ($428.1\text{ }\mu\text{s}$ per update on Artix-7).
+5. **Hardware-Deployment Feasibility**: Memory footprint (CSR sparse SpMV saving 82.4% RAM) and integer quantization (Q15 / Q6.10).
+6. **Robustness Across Conditions**: Generalization to unseen drive cycles, temperatures, and aging fade.
+
+### Research Roadmap Horizons
+- **Near-term**: Standardized reporting of energy/inference on named hardware; fixed-point ESN FPGA/MCU verification.
+- **Medium-term**: Multi-chemistry, multi-temperature validation beyond NASA/CALCE datasets.
+- **Long-term**: End-to-end event-driven sensor-to-spike-to-decision pipelines on physical neuromorphic silicon.

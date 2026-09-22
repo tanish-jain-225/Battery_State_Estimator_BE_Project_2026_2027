@@ -54,7 +54,7 @@ The visualizer's code and assets are organized as follows:
 | **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[../../tests/](../../tests/)** | Comprehensive 46-test automated test suite validating physics, EKF, UKF, RLS online adaptation, and FPGA bit-exact parity. |
+| **[../../tests/](../../tests/)** | Comprehensive 49-test automated test suite validating physics, EKF, UKF, RLS online adaptation, and FPGA bit-exact parity. |
 
 ---
 

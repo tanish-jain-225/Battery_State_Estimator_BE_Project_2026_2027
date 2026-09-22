@@ -2,7 +2,7 @@
 
 # Hardware Subsystem
 
-This document provides a technical guide to the hardware subsystem, covering both the **C99 Embedded Microcontroller Firmware** (CSR matrix representation, fixed-point math, MCU pinouts) and the **Verilog HDL FPGA Hardware Verifier** targeting the **ARTIX A7100T FPGA** ([`FPGA_Verifier/README.md`](FPGA_Verifier/README.md)).
+This document provides a single, consolidated technical guide to the hardware subsystem, covering both the **C99 Embedded Microcontroller Firmware** (CSR matrix representation, fixed-point math, MCU pinouts) and the **Verilog HDL FPGA Hardware Verifier** targeting the **ARTIX A7100T FPGA**.
 
 > [!IMPORTANT]
 > **Project Scope & Feasibility Validation**: The primary deliverable of this project is a data-driven ESN estimator (software-validated for SOC/SOH), not a physical hardware product. The embedded C99 firmware and Verilog FPGA RTL modules serve strictly as a **testing and verification platform** to prove that the reservoir-computing execution pipeline is deployable under strict memory and computational constraints.
@@ -18,6 +18,7 @@ This document provides a technical guide to the hardware subsystem, covering bot
 6. [Offline Model Export Pipeline](#️-offline-model-export-pipeline)
 7. [Hardware Wiring & Pinout Reference](#-hardware-wiring--pinout-reference)
 8. [Running the Desktop Verification Simulator](#-running-the-desktop-verification-simulator)
+9. [Running the FPGA RTL Hardware Verifier](#-running-the-fpga-rtl-hardware-verifier)
 
 ---
 
@@ -27,7 +28,7 @@ The layout below maps out the key modules within the hardware directory:
 
 ```text
 hardware/
-├── hardware.md                                  # This hardware documentation
+├── hardware.md                                  # Consolidated hardware documentation
 ├── STM_Verifier/                                # C99 embedded firmware and training scripts
 │   ├── main.c                                   # C99 classifier runtime & test simulation
 │   ├── main.h                                   # Host-side HAL shims & microcontroller config
@@ -42,7 +43,7 @@ hardware/
 │   ├── run_c_simulator.bat                      # Windows build-and-run script
 │   └── run_c_simulator.sh                       # Linux/macOS build-and-run script
 └── FPGA_Verifier/                               # Verilog RTL FPGA verification module
-    ├── README.md                                # FPGA module documentation
+    ├── eval_fpga_outcomes.py                    # Master outcomes & dataset evaluation verifier
     ├── esn_top.v                                # Top-level Verilog ESN wrapper with multi-timestep support
     ├── esn_neuron.v                             # Single neuron datapath module & FSM
     ├── reservoir_controller.v                   # Recurrent execution state machine
@@ -53,43 +54,66 @@ hardware/
     ├── tb_esn_top.v                             # Testbench for 100-neuron Vivado / XSim simulation
     ├── tb_esn_top_tiny.v                        # Testbench for multi-timestep sequence input verification
     ├── tiny_bram_models.v                       # Behavioral BRAM models for tiny sequence testbench
-    ├── golden_model.py                          # Dynamic, bit-exact golden reference generator (--tiny / --full)
-    ├── compare_results.py                       # Automated bit-exact parity verifier (supports BOM & --tiny)
+    ├── golden_model.py                          # Dynamic, bit-exact golden reference generator (seed=42 support)
+    ├── compare_results.py                       # Automated bit-exact parity verifier (--outcomes support)
     ├── golden_results.csv                       # Full 100-neuron golden reference output (200 rows)
     ├── golden_tiny.csv                          # Tiny sequence golden reference output (6 rows)
     └── vivado_esn_results.csv                   # Vivado / XSim simulation outputs
+
 ```
 
 ---
 
 ## ⚡ FPGA Verilog ESN Verifier (ARTIX A7100T Target)
 
-The hardware subsystem includes a fully verified Verilog HDL Echo State Network targeting the **ARTIX A7100T FPGA** platform ([`FPGA_Verifier/README.md`](FPGA_Verifier/README.md)):
+The hardware subsystem includes a fully verified Verilog HDL Echo State Network targeting the **ARTIX A7100T FPGA** platform (`xc7a100tcsg324-1`):
 
 ### RTL Design Specifications
 - **Reservoir Size**: 100 neurons ($N=100$) for full model / 2 neurons for sequence model
-- **Input Dimension**: 4 features ($M=4$) for full battery telemetry / 2 features for tiny model
+- **Input Dimension**: 4 features ($M=4$: `voltage_measured`, `current_measured`, `temperature_measured`, `current_load`)
 - **Fixed-Point Data Format**: Q6.10 signed fixed point (6 integer bits, 10 fractional bits)
+- **Reservoir Seed**: `seed=42` ($W_{in} \sim U(-0.5, 0.5)$ dense; $W$ 10% density, spectral radius = 0.9, zero bias)
 - **Pipeline Stages**: $\text{Win}\cdot u + W\cdot x \text{ MAC} \rightarrow \text{bias addition} \rightarrow \text{saturation clipping} \rightarrow \text{tanh LUT}$
 - **Memory Architecture**: BRAM-based weight and state storage with double-buffered (ping-pong) recurrent reservoir state memory.
 - **Activation Function**: Hardware odd-symmetry $\tanh$ lookup table (5,121 entries in Q6.10).
 
-### Verification Suites & Parity Results
-1. **Full 100-Neuron Model (`tb_esn_top.v` vs `golden_model.py --full`)**:
-   - Evaluates two full recurrent passes ($x(0)\rightarrow x(1)$ and $x(1)\rightarrow x(2)$) across 100 neurons.
-   - **Total Neuron Updates Evaluated**: 200 stages
-   - **MAC Stage**: 200 / 200 matched (100%)
-   - **Bias Stage**: 200 / 200 matched (100%)
-   - **Sum Stage**: 200 / 200 matched (100%)
-   - **Tanh Input/Output Stages**: 200 / 200 matched (100%)
-   - **Result**: **100% bit-exact match across all 200 rows between Vivado XSim and Python golden model.**
+### Verification Audit & Estimation Outcomes Summary
+Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FPGA_Verifier/eval_fpga_outcomes.py) across **32 NASA battery cycles (2,048 labeled timesteps)**:
 
-2. **Multi-Timestep Sequence Verification (`tb_esn_top_tiny.v` vs `golden_model.py --tiny`)**:
-   - Tests temporal sequence processing over 3 distinct sequential timesteps: $u(0) \to u(1) \to u(2)$.
-   - Verifies runtime memory indexing: `u_addr = timestep * N_IN + feature_idx`.
-   - Output states: $x(1) = [0.4619, 0.7617] \to x(2) = [0.9209, 0.9736] \to x(3) = [0.9912, 0.9971]$ bit-exact.
+1. **Hardware Audit Checks**:
+   - **Bit-exact Python golden model vs. Vivado/XSim**: 100% matched across MAC, bias, sum, `tanh_in`, `tanh_out` stages.
+   - **X-corruption check**: 0 occurrences across 32 cycles $\times$ 6,400 rows each.
+   - **Timestep input addressing**: Verified correct (`u_addr = timestep * N_IN + win_count`).
+
+2. **SOC / SOH Estimation Results (Ridge Readout)**:
+   - **SOC Train (B0005)**: MAE 0.0118, RMSE 0.0151, $R^2 = 0.9663$
+   - **SOC Test (B0006/7/18 unseen)**: MAE 0.0220, RMSE 0.0289, $R^2 = 0.8783$
+   - **SOH Train (B0005)**: MAE 0.0420, RMSE 0.0554, $R^2 = 0.7367$
+   - **SOH Test (B0006/7/18 unseen)**: MAE 0.0614, RMSE 0.0851, $R^2 = 0.4766$
+
+3. **Baseline Comparison (1RC EKF vs FPGA ESN Readout)**:
+   - **EKF (1RC Baseline)**: Test MAE 0.0311, Test RMSE 0.0387, Test $R^2 = 0.7818$
+   - **FPGA ESN Readout**: Test MAE 0.0220, Test RMSE 0.0289, Test $R^2 = 0.8783$ (*FPGA ESN outperforms EKF baseline on all metrics*).
+
+4. **Post-Implementation Synthesis Utilization & Power**:
+   - **Slice LUTs**: 77 / 63,400 (0.12%)
+   - **Slice Registers**: 66 / 126,800 (0.05%)
+   - **Block RAM Tiles**: 7.5 / 135 (5.56%)
+   - **DSP48 Slices**: 0 / 240 (**0.00%** — entire datapath synthesizes into LUT fabric)
+   - **On-Chip Power**: 0.099 W @ 100 MHz (0.001 W dynamic, 0.097 W static leakage)
+   - **Latency & Headroom**: 428.1 $\mu$s per update @ 100 MHz (**23$\times$ headroom** at 100 Hz BMS sampling).
+
+### FPGA RTL Datapath Schematic & Simulation Waveforms
+
+#### Vivado Synthesized RTL Schematic
+![FPGA Synthesized RTL Schematic](../images/assets/screenshot_fpga_schematic.png)
+
+#### Vivado XSim RTL Simulation Waveform (`tb_esn_top.v`)
+![FPGA Vivado Simulation Waveform](../images/assets/screenshot_fpga_waveform.png)
 
 ---
+
+
 
 ## 📈 ESN Classifier Interface Specifications
 
@@ -258,7 +282,7 @@ To test the Verilog HDL FPGA RTL models against the Python golden reference:
    ```
 
 3. **Master End-to-End Validation**:
-   To execute C99 simulation, FPGA verification, and all 46 test cases simultaneously:
+   To execute C99 simulation, FPGA verification, and all 62 test cases simultaneously:
    ```bash
    .\run_all_validation.bat
    ```

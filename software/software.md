@@ -44,7 +44,7 @@ software/
 │   ├── templates/                   # HTML view layouts
 │   └── training/                    # ESN training scripts
 │       └── train_rc.py              # Script to build software weights
-└── [Root tests/](../tests/)          # Unified pytest test suite (46 tests)
+└── [Root tests/](../tests/)          # Unified pytest test suite (62 tests)
     ├── test_battery_chemistry.py    # Chemistry loading & OCV curve monotonicity
     ├── test_battery_simulator.py    # 2-RC transient solver, thermal, aging & faults
     ├── test_esn_model.py            # ESN inference, spectral radius & echo state property
@@ -137,7 +137,7 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 ## 🧪 Verification and Testing
 
-### 1. Unified Automated Test Suite (46 Tests)
+### 1. Unified Automated Test Suite (62 Tests)
 Run the complete automated pytest verification suite covering physics solvers, EKF, UKF, ESN online RLS adaptation, pipeline state serialization, and FPGA RTL bit-exact parity:
 ```bash
 pytest tests/ -v

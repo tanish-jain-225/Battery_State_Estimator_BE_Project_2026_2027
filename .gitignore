@@ -10,6 +10,11 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+*.egg-info/
+.hypothesis/
+
+# Serialized model files (rebuild via training scripts)
+*.pkl
 
 # C / C++ build outputs
 *.o

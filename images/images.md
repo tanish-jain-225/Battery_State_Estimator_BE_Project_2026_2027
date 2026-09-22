@@ -57,6 +57,21 @@ Simulator state showing capacity fade effects with accelerated aging enabled.
 
 ---
 
+### FPGA Synthesized RTL Datapath Schematic
+Xilinx Vivado post-synthesis elaborated top-level RTL schematic showing `esn_neuron` and `reservoir_controller` interconnects.
+
+![FPGA RTL Schematic](assets/screenshot_fpga_schematic.png)
+
+---
+
+### FPGA Vivado XSim Simulation Waveform
+Cycle-accurate behavioral simulation waveform in Vivado XSim (`tb_esn_top.v`) demonstrating MAC accumulation, ping-pong state addressing, and tanh evaluation timing.
+
+![FPGA Vivado Waveform](assets/screenshot_fpga_waveform.png)
+
+---
+
+
 ## Guidelines
 
 - Prefer screenshots that show real app state instead of decorative images.

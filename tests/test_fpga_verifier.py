@@ -69,3 +69,26 @@ def test_full_model_golden_parity():
             g_val = golden_map[k][stg].strip().lower().lstrip('0') or '0'
             v_val = vivado_map[k][stg].strip().lower().lstrip('0') or '0'
             assert g_val == v_val, f"Mismatch at pass={k[0]} neuron={k[1]} stage={stg}: golden={g_val} vs vivado={v_val}"
+
+
+def test_generate_reservoir_weights_seed42():
+    from golden_model import generate_reservoir_weights
+    Win_q, W_q, b_q, Win_f, W_f = generate_reservoir_weights(n_in=4, n_res=100, seed=42)
+    assert Win_q.shape == (100, 4)
+    assert W_q.shape == (100, 100)
+    assert b_q.shape == (100,)
+    assert (b_q == 0).all()
+
+
+def test_nasa_dataset_generation():
+    from eval_fpga_outcomes import generate_nasa_battery_dataset
+    raw_data, meta = generate_nasa_battery_dataset()
+    assert len(raw_data) == 2048  # 32 cycles * 64 timesteps
+    assert set(meta.keys()) == {'B0005', 'B0006', 'B0007', 'B0018'}
+
+
+def test_fpga_outcomes_evaluation():
+    from eval_fpga_outcomes import evaluate_fpga_outcomes
+    success = evaluate_fpga_outcomes()
+    assert success is True
+

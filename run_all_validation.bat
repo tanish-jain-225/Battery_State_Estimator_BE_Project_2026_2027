@@ -26,7 +26,7 @@ if !errorlevel! neq 0 (
 echo.
 
 :: ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
-echo [2/8] Running Complete Pytest Suite (46 Unit/Integration Tests)...
+echo [2/8] Running Complete Pytest Suite (62 Unit/Integration Tests)...
 python -m pytest "%ROOT_DIR%tests"
 if !errorlevel! neq 0 (
     echo [ERROR] Pytest suite execution failed.

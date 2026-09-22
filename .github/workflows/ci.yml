@@ -35,15 +35,15 @@ jobs:
           pip install -r software/visualiser/requirements.txt
           pip install -r software/simulator/requirements.txt
           pip install -r hardware/STM_Verifier/requirements.txt
-          pip install pytest flake8
+          pip install pytest flake8 pytest-cov
 
       - name: Code Quality & Syntax Linting
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      - name: Run Pytest Suite
+      - name: Run Pytest Suite with Coverage
         run: |
-          pytest tests/
+          pytest tests/ --cov=software/shared --cov-report=term --cov-report=xml --cov-fail-under=85
 
       - name: Run End-to-End Validation Script (POSIX bash)
         if: runner.os != 'Windows'

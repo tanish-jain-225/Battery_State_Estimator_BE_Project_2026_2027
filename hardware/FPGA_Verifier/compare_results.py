@@ -69,7 +69,14 @@ def main():
     parser.add_argument("--golden", type=str, default=None, help="Path to golden CSV")
     parser.add_argument("--vivado", type=str, default=None, help="Path to vivado results CSV")
     parser.add_argument("--tiny", action="store_true", help="Compare tiny 2-neuron sequence results")
+    parser.add_argument("--outcomes", action="store_true", help="Run full outcomes & dataset verification evaluation")
     args = parser.parse_args()
+
+    if args.outcomes:
+        from eval_fpga_outcomes import evaluate_fpga_outcomes
+        evaluate_fpga_outcomes()
+        sys.exit(0)
+
 
     # Determine golden file path
     if args.golden:

@@ -17,7 +17,7 @@ flowchart TD
     subgraph Phase 1: Environment & Setup
         Setup_1["Install requirements.txt"]
         Setup_2["Train ESN models (Software/Hardware)"]
-        Setup_3["Run automated tests (pytest: 46 tests)"]
+        Setup_3["Run automated tests (pytest: 62 tests)"]
         Setup_4["Master Validation (run_all_validation.bat)"]
         Setup_1 --> Setup_2
         Setup_2 --> Setup_3
@@ -52,12 +52,14 @@ flowchart TD
 - [ ] **Install Prerequisites**: Run `python -m pip install -r requirements.txt`.
 - [ ] **Clean Configuration**: Confirm `.env` files contain only local config values and are excluded from Git tracking.
 - [ ] **Execute Master 1-Click Validation**: Run `.\run_all_validation.bat` (Windows) or `./run_all_validation.sh` (Linux) and confirm all 8 pipeline stages pass with 0 errors.
-- [ ] **Run Complete Automated Test Suite**: Run `pytest tests/ -v` and verify that all **46 automated tests pass**.
+- [ ] **Run Complete Automated Test Suite**: Run `pytest tests/ -v` and verify that all **62 automated tests pass**.
 - [ ] **Train ESN Estimator Model**: Execute `python software/visualiser/training/train_rc.py` and confirm `model_rc.pkl` is exported.
 - [ ] **Train Hardware Classifier**: Execute `python hardware/STM_Verifier/train_classifier.py` and confirm [`hardware/STM_Verifier/esn_classifier_weights.h`](../../hardware/STM_Verifier/esn_classifier_weights.h) is created.
 - [ ] **Train Hardware Estimator**: Execute `python hardware/STM_Verifier/train_estimator.py` and check [`hardware/STM_Verifier/esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h).
 - [ ] **Verify FPGA Verilog RTL Golden Model**: Execute `python hardware/FPGA_Verifier/compare_results.py` and confirm all 200/200 neuron updates match bit-exactly between Vivado/XSim output and Python golden model.
+- [ ] **Verify FPGA NASA Outcomes & Synthesis**: Execute `python hardware/FPGA_Verifier/eval_fpga_outcomes.py` and confirm 100% pass across 32 cycles and post-implementation synthesis audit.
 - [ ] **Build C Simulator**: Execute `hardware/STM_Verifier/run_c_simulator.bat` (Windows) or `hardware/STM_Verifier/run_c_simulator.sh` (Unix) and confirm compile success.
+- [ ] **Verify Review 2 Presentation**: Confirm slide deck PDF [`docs/Review_2/Review_2_PPT.pdf`](../../docs/Review_2/Review_2_PPT.pdf) is ready and loaded.
 
 ### 2. Live Interactive Demo
 - [ ] **Boot Simulator**: Run `python software/simulator/app.py` in a separate terminal.
