@@ -61,6 +61,7 @@ The table below catalogs all model parameters, datasets and generated headers tr
 | [`docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf`](../Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) | PDF | ~150 KB | Official outcomes evaluation report for 32 NASA cycles, synthesis & timing closure. | Verified via [`eval_fpga_outcomes.py`](../../hardware/FPGA_Verifier/eval_fpga_outcomes.py). | Formal Review 2 outcome deliverable. |
 | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | PDF | ~500 KB | 29-page comprehensive review paper draft on Neuromorphic BMS & Reservoir Computing. | Compiled academic manuscript. | Review 2 deliverable (Review 3 submission scope). |
 | [`docs/Review_2/Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf) | PDF | ~60 KB | Official 16:9 widescreen presentation slide deck for Review 2 defense. | Standalone 16:9 widescreen presentation deck. | Formal Review 2 defense slide deck. |
+| [`CHANGELOG.md`](../../CHANGELOG.md) | MD | ~3 KB | Formal versioning history and release notes log for v2.0.0. | Maintained in repository root. | Updated upon every milestone/tag release. |
 
 ---
 

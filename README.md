@@ -5,6 +5,9 @@
 **Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting**
 
 <p align="left">
+  <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0" target="_blank">
+    <img src="https://img.shields.io/badge/Release-v2.0.0-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.0.0" />
+  </a>
   <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
   </a>
@@ -21,7 +24,7 @@
 ## Team Details
 
 | Sr. No. | Name of Student | Roll No. | Branch | Email ID |
-| :---: | :--- | :---: | :---: | :--- |
+| :---: | :--- | :--- | :--- | :--- |
 | 1 | Sanjna Patankar | 2023.sanjna.patankar | Automation and Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) |
 | 2 | Akshay Nambiar | 2023.akshay.nambiar | Automation and Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) |
 | 3 | Satvik Verma | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) |
@@ -43,7 +46,8 @@
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 62-test regression suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 62-test regression suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
+| **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.0.0 Active** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
