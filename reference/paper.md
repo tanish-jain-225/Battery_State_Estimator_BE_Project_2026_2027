@@ -102,7 +102,7 @@ The MCU execution metrics were verified on an ARM Cortex-M class microcontroller
 ---
 
 ## V. Conclusion
-We propose a data-driven Echo State Network (ESN) estimator as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting), which are utilized strictly as baseline benchmarks for comparison. By benchmarking the ESN against EKF and Coulomb Counting, we demonstrate that the ESN achieves sub-1.5% estimation errors without precise parameter models or drift. Furthermore, compiling ESNs with CSR matrix compression and Q12/Q15 fixed-point LUT math enables high-performance, real-time safety classification directly on low-power edge hardware as a feasibility check. Future research will explore porting the full SOC/SOH estimator to firmware, online reservoir tuning, and multi-cell configurations.
+We propose a data-driven Echo State Network (ESN) estimator as a direct, standalone replacement for traditional observers (EKF and Coulomb Counting), which are utilized strictly as baseline benchmarks for comparison. By benchmarking the ESN against EKF and Coulomb Counting, we demonstrate that the ESN achieves sub-1.5% estimation errors without precise parameter models or drift. Furthermore, compiling ESNs with CSR matrix compression and Q12/Q15 fixed-point LUT math enables high-performance, real-time safety classification directly on low-power edge hardware as a feasibility check. Future research will explore porting the full SOC/SOH estimator to firmware, online reservoir tuning, and multi-cell configurations. 
 
 ---
 
