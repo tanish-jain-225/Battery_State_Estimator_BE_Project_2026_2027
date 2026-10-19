@@ -36,7 +36,7 @@ A BMS functions as the central control intelligence keeping a lithium-ion pack w
 
 SOC expresses remaining electrochemical energy as a percentage of usable capacity. No sensor measures it directly; nonlinear resistance, C-rate shifts, capacity fade and voltage transients all distort real-time accuracy. Table 1 summarises the deployment requirements that any SOC estimator, classical, deep, or neuromorphic, must satisfy.
 
-#### Table 1. SOC estimation requirements.
+#### Table 1. SOC estimation requirements.                        
 
 | Metric | Target / Constraint | Significance |
 | :--- | :--- | :--- |
@@ -52,7 +52,7 @@ SOH tracks structural degradation, most commonly via capacity retention ($\text{
 
 SOP estimates peak deliverable/absorbable power over a short horizon (e.g., 2–10 s), computed as the tightest of four simultaneous limits: voltage, current, thermal and SOC headroom. Because SOP is derived downstream of SOC and SOH, errors in either propagate directly into the power estimate. RUL predicts the number of cycles or hours remaining before a cell reaches a failure threshold (typically 70–80% of rated capacity). Unlike SOH, which describes present conditions, RUL forecasts a future trajectory under uncertain future usage; because prediction error compounds over a multi-cycle horizon, recent frameworks move away from treating SOC, SOH and RUL as isolated single-state problems and instead co-estimate them simultaneously using attention mechanisms operating across dual time scales: intra-cycle dynamics coupled with inter-cycle ageing.
 
-### 2.3 Shared Operational Challenges and Benchmark Data
+### 2.3 Shared Operational Challenges and Benchmark Data  
 
 All four tasks share recurring distortions (Table 2). A cell's instantaneous response also depends on cycling history and rest duration, not just present inputs; memoryless algorithms discard this context. Modern architectures therefore use a dual time-scale framework: a fast, intra-cycle scale for second-by-second voltage/current dynamics and a slow, inter-cycle scale for capacity loss and resistance growth; capturing both at once requires a model with explicit temporal memory.
 
