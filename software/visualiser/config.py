@@ -17,6 +17,8 @@ class Config:
     MONGODB_DB_NAME = os.environ.get("MONGODB_DB_NAME", "battery_estimation_db")
     MONGODB_READINGS_COLLECTION = os.environ.get("MONGODB_READINGS_COLLECTION", "readings")
     MONGODB_STATE_COLLECTION = os.environ.get("MONGODB_STATE_COLLECTION", "sim_state")
+    # State synchronization interval with MongoDB (seconds)
+    MONGODB_SYNC_INTERVAL = float(os.environ.get("MONGODB_SYNC_INTERVAL", 1.0))
 
     # -------------------------------------------------------------------------
     # Flask server settings

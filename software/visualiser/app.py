@@ -113,34 +113,51 @@ mongodb_connected = False
 _last_db_ping_time = 0.0
 
 def check_db_connected():
-    global db_client, db, mongodb_connected, _last_db_ping_time
-    now = time.time()
-    if mongodb_connected and db is not None:
-        # Rate-limit database pings to once every 10 seconds to eliminate HTTP blocking lag
-        if now - _last_db_ping_time < 10.0:
+    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time
+    if IS_SERVERLESS:
+        if _mongodb_connected and db is not None:
             return True
         try:
+            db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
             db_client.admin.command('ping')
-            _last_db_ping_time = now
+            db = db_client[Config.MONGODB_DB_NAME]
+            _mongodb_connected = True
+            mongodb_connected = True
             return True
-        except Exception:
+        except Exception as e:
+            print(f"Visualiser Database connection failed: {e}")
+            _mongodb_connected = False
             mongodb_connected = False
             db_client = None
             db = None
-            
-    try:
-        db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
-        db_client.admin.command('ping')
-        _last_db_ping_time = now
-        db = db_client[Config.MONGODB_DB_NAME]
-        mongodb_connected = True
+            return False
+
+    now = time.time()
+    # Fast non-blocking check when already connected
+    if _mongodb_connected and db is not None:
         return True
-    except Exception as e:
-        print(f"Visualiser Database connection failed: {e}")
-        mongodb_connected = False
-        db_client = None
-        db = None
-        return False
+
+    # Reconnect check paced by MONGODB_SYNC_INTERVAL (1.0 second)
+    sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
+    if (now - _last_db_ping_time >= sync_interval):
+        _last_db_ping_time = now
+        try:
+            if db_client is None:
+                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
+            db_client.admin.command('ping')
+            db = db_client[Config.MONGODB_DB_NAME]
+            _mongodb_connected = True
+            mongodb_connected = True
+            return True
+        except Exception as e:
+            print(f"Visualiser Database connection failed: {e}")
+            _mongodb_connected = False
+            mongodb_connected = False
+            db_client = None
+            db = None
+            return False
+
+    return _mongodb_connected and db is not None
 
 # Establish connection at startup
 check_db_connected()
@@ -311,7 +328,7 @@ _last_sim_port_check_time = 0.0
 def check_simulator_port(force=False):
     global _simulator_port_online, _simulator_port_data, _last_sim_port_check_time
     now = time.time()
-    check_interval = 20.0 if IS_SERVERLESS else 1.5
+    check_interval = 20.0 if IS_SERVERLESS else getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
     if force or (now - _last_sim_port_check_time >= check_interval):
         _last_sim_port_check_time = now
         was_online = _simulator_port_online
@@ -339,22 +356,28 @@ local_sim_state = DEFAULT_SIM_STATE.copy()
 visualiser_simulator = BatterySimulator()
 current_chemistry = None
 local_telemetry_buffer = []
+_last_state_load_time = 0.0
 
-def load_sim_state():
-    if check_db_connected():
+def load_sim_state(force_db_read=False):
+    global _last_state_load_time
+    now = time.time()
+    sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
+    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and check_db_connected():
         try:
             state = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
+            _last_state_load_time = now
             if state is not None:
                 state.pop('_id', None)
                 local_sim_state.update(state)
-                return state
+                return local_sim_state
         except Exception as e:
             print(f"Error loading state from MongoDB: {e}")
     return local_sim_state
 
 def save_sim_state(state):
-    global local_sim_state
+    global local_sim_state, _last_state_load_time
     local_sim_state = state
+    _last_state_load_time = time.time()
     if check_db_connected():
         try:
             state_copy = state.copy()
@@ -513,7 +536,7 @@ def sync_simulation_locally():
 # ── Asynchronous Status Checker & Simulation Threads (Standalone mode) ──
 
 def status_checker_loop():
-    global _simulator_port_online, _simulator_port_data, _mongodb_connected, db_client, db
+    global _simulator_port_online, _simulator_port_data, _mongodb_connected, mongodb_connected, db_client, db
     print("Visualizer background status checker thread active.")
     
     # Try initial mongo connection
@@ -522,12 +545,14 @@ def status_checker_loop():
         db_client.server_info()
         db = db_client[Config.MONGODB_DB_NAME]
         _mongodb_connected = True
+        mongodb_connected = True
         try:
             db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
         except Exception:
             pass
     except Exception:
         _mongodb_connected = False
+        mongodb_connected = False
         db_client = None
         db = None
 
@@ -553,24 +578,28 @@ def status_checker_loop():
                 db_client.server_info()
                 db = db_client[Config.MONGODB_DB_NAME]
                 _mongodb_connected = True
+                mongodb_connected = True
                 try:
                     db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
                 except Exception:
                     pass
             except Exception:
                 _mongodb_connected = False
+                mongodb_connected = False
                 db_client = None
                 db = None
         else:
             try:
                 db_client.server_info()
                 _mongodb_connected = True
+                mongodb_connected = True
             except Exception:
                 _mongodb_connected = False
+                mongodb_connected = False
                 db_client = None
                 db = None
 
-        time.sleep(3.0)
+        time.sleep(getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0))
 
 def local_generator_loop():
     global current_chemistry
@@ -1477,7 +1506,7 @@ def get_telemetry():
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
                     new_readings = list(cursor)
                     new_readings.reverse() # Restore chronological order
-                    already_cached = max(0, len(new_readings))
+                    already_cached = 0
                     
                 cache['n_cached'] = already_cached + len(new_readings)
             except Exception as db_err:

@@ -99,18 +99,24 @@ _mongodb_error = None
 _last_state_load_time = 0.0
 
 def _ensure_db():
-    global mongodb_connected, db_client, db
+    global mongodb_connected, _mongodb_connected, db_client, db
     if IS_SERVERLESS:
-        if mongodb_connected and db is not None:
+        if _mongodb_connected and db is not None:
             return True
         try:
             db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
             db_client.server_info()
             db = db_client[Config.MONGODB_DB_NAME]
+            _mongodb_connected = True
             mongodb_connected = True
+            try:
+                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
+            except Exception:
+                pass
             print("Battery State Estimator — Physics Engine connected to MongoDB Atlas.")
             return True
         except Exception as e:
+            _mongodb_connected = False
             mongodb_connected = False
             print(f"Battery State Estimator — MongoDB connection attempt failed: {e}")
             return False
@@ -120,8 +126,9 @@ def _ensure_db():
 def load_sim_state(force_db_read=False):
     global _last_state_load_time
     now = time.time()
-    # Cache state locally and only query remote DB Atlas once every 10 seconds unless forced
-    if (force_db_read or (now - _last_state_load_time > 10.0)) and _ensure_db():
+    sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
+    # Cache state locally and query remote DB Atlas once every 1 second unless forced
+    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and _ensure_db():
         try:
             doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
             _last_state_load_time = now
@@ -134,8 +141,9 @@ def load_sim_state(force_db_read=False):
     return local_state
 
 def save_sim_state(state):
-    global local_state
+    global local_state, _last_state_load_time
     local_state = state
+    _last_state_load_time = time.time()
     if _ensure_db():
         try:
             doc_copy = state.copy()
@@ -726,7 +734,7 @@ atexit.register(_release_lock)
 
 
 def db_checker_loop():
-    global _mongodb_connected, db_client, db, _mongodb_error
+    global _mongodb_connected, mongodb_connected, db_client, db, _mongodb_error
     while True:
         if not _mongodb_connected or db_client is None:
             try:
@@ -734,9 +742,15 @@ def db_checker_loop():
                 db_client.server_info()
                 db = db_client[Config.MONGODB_DB_NAME]
                 _mongodb_connected = True
+                mongodb_connected = True
                 _mongodb_error = None
+                try:
+                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
+                except Exception:
+                    pass
             except Exception as e:
                 _mongodb_connected = False
+                mongodb_connected = False
                 db_client = None
                 db = None
                 _mongodb_error = str(e)
@@ -744,13 +758,15 @@ def db_checker_loop():
             try:
                 db_client.server_info()
                 _mongodb_connected = True
+                mongodb_connected = True
                 _mongodb_error = None
             except Exception as e:
                 _mongodb_connected = False
+                mongodb_connected = False
                 db_client = None
                 db = None
                 _mongodb_error = str(e)
-        time.sleep(3.0)
+        time.sleep(getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0))
 
 # Battery State Estimator — Physics Engine startup
 # Thread starts at module level so it works under gunicorn AND direct execution.

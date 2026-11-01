@@ -290,3 +290,196 @@ def test_simulator_visualiser_end_to_end_seamless():
         reset_resp = vis_client.post('/api/control', json={'command': 'reset', 'soc': 0.90})
         assert reset_resp.status_code == 200
 
+
+def test_simulator_visualiser_mongodb_1s_sync():
+    """Validates 1-second MongoDB synchronization interval between Simulator and Visualiser."""
+    from unittest.mock import patch
+    from datetime import datetime
+
+    class MockCollection:
+        def __init__(self, name):
+            self.name = name
+            self.docs = []
+
+        def insert_one(self, doc):
+            d = doc.copy()
+            self.docs.append(d)
+            return type('InsertResult', (), {'inserted_id': 'mock_id'})()
+
+        def find_one(self, filter_dict=None, sort=None):
+            matching = self.docs
+            if filter_dict:
+                matching = [d for d in matching if all(d.get(k) == v for k, v in filter_dict.items())]
+            if not matching:
+                return None
+            if sort:
+                key, direction = sort[0]
+                matching = sorted(matching, key=lambda x: x.get(key, 0), reverse=(direction == -1))
+            return matching[0].copy()
+
+        def find(self, filter_dict=None, projection=None):
+            results = self.docs
+            if filter_dict:
+                for k, v in filter_dict.items():
+                    if isinstance(v, dict):
+                        if '$gt' in v:
+                            results = [d for d in results if d.get(k, 0) > v['$gt']]
+                        elif '$gte' in v:
+                            results = [d for d in results if d.get(k, 0) >= v['$gte']]
+                    else:
+                        results = [d for d in results if d.get(k) == v]
+
+            class MockCursor:
+                def __init__(self, items):
+                    self.items = [i.copy() for i in items]
+                def sort(self, key, direction=1):
+                    self.items = sorted(self.items, key=lambda x: x.get(key, 0), reverse=(direction == -1))
+                    return self
+                def limit(self, n):
+                    self.items = self.items[:n]
+                    return self
+                def __iter__(self):
+                    return iter(self.items)
+                def __len__(self):
+                    return len(self.items)
+
+            return MockCursor(results)
+
+        def replace_one(self, filter_dict, doc, upsert=False):
+            d = doc.copy()
+            for idx, existing in enumerate(self.docs):
+                if all(existing.get(k) == v for k, v in filter_dict.items()):
+                    self.docs[idx] = d
+                    return type('ReplaceResult', (), {'matched_count': 1, 'modified_count': 1})()
+            if upsert:
+                self.docs.append(d)
+                return type('ReplaceResult', (), {'matched_count': 0, 'upserted_id': 'mock_id'})()
+            return type('ReplaceResult', (), {'matched_count': 0, 'modified_count': 0})()
+
+        def update_one(self, filter_dict, update_dict, upsert=False):
+            set_vals = update_dict.get('$set', {})
+            for existing in self.docs:
+                if all(existing.get(k) == v for k, v in filter_dict.items()):
+                    existing.update(set_vals)
+                    return type('UpdateResult', (), {'matched_count': 1, 'modified_count': 1})()
+            if upsert:
+                new_doc = filter_dict.copy()
+                new_doc.update(set_vals)
+                self.docs.append(new_doc)
+                return type('UpdateResult', (), {'matched_count': 0, 'upserted_id': 'mock_id'})()
+            return type('UpdateResult', (), {'matched_count': 0, 'modified_count': 0})()
+
+        def delete_many(self, filter_dict):
+            before = len(self.docs)
+            if not filter_dict:
+                self.docs.clear()
+            else:
+                self.docs = [d for d in self.docs if not all(d.get(k) == v for k, v in filter_dict.items())]
+            return type('DeleteResult', (), {'deleted_count': before - len(self.docs)})()
+
+        def create_index(self, keys, **kwargs):
+            return "index_created"
+
+        def count_documents(self, filter_dict=None):
+            if not filter_dict:
+                return len(self.docs)
+            return len([d for d in self.docs if all(d.get(k) == v for k, v in filter_dict.items())])
+
+    class MockDatabase:
+        def __init__(self):
+            self.collections = {}
+
+        def __getitem__(self, name):
+            if name not in self.collections:
+                self.collections[name] = MockCollection(name)
+            return self.collections[name]
+
+    shared_db = MockDatabase()
+
+    class MockMongoClient:
+        def __init__(self, *args, **kwargs):
+            self.admin = type('Admin', (), {'command': lambda *a, **kw: True})()
+        def server_info(self):
+            return {'version': '6.0.0'}
+        def __getitem__(self, name):
+            return shared_db
+
+    with patch('pymongo.MongoClient', MockMongoClient), \
+         patch('software.simulator.app.MongoClient', MockMongoClient), \
+         patch('software.visualiser.app.MongoClient', MockMongoClient):
+
+        import software.simulator.app as sim_app
+        import software.visualiser.app as vis_app
+
+        sim_app.db = shared_db
+        sim_app.db_client = MockMongoClient()
+        sim_app._mongodb_connected = True
+        sim_app.mongodb_connected = True
+
+        vis_app.db = shared_db
+        vis_app.db_client = MockMongoClient()
+        vis_app._mongodb_connected = True
+        vis_app.mongodb_connected = True
+
+        sim_client = sim_app.app.test_client()
+        vis_client = vis_app.app.test_client()
+
+        # 1. Initialize MongoDB singleton state
+        baseline = sim_app.DEFAULT_STATE.copy()
+        baseline['sim_running'] = False
+        sim_app.save_sim_state(baseline)
+        doc = shared_db[sim_app.Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
+        assert doc is not None
+
+        # 2. Visualiser reads state from MongoDB
+        v_state = vis_app.load_sim_state(force_db_read=True)
+        assert v_state['chemistry'] == doc['chemistry']
+
+        # 3. Visualiser issues control command, saving to MongoDB
+        vis_client.post('/api/control', json={'command': 'start', 'cycle_type': 'us06', 'chemistry': 'lfp'})
+        db_state = shared_db[sim_app.Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
+        assert db_state['sim_running'] is True
+        assert db_state['chemistry'] == 'lfp'
+
+        # 4. Simulator loads updated state on 1-second sync interval
+        sim_app._last_state_load_time = 0.0
+        s_state = sim_app.load_sim_state()
+        assert s_state['sim_running'] is True
+        assert s_state['chemistry'] == 'lfp'
+
+        # 5. Insert simulated readings at 1.0 second intervals into MongoDB
+        for t in [1.0, 2.0, 3.0]:
+            rec = {
+                'time': t,
+                'voltage': 3.3,
+                'current': -2.0,
+                'temperature': 25.0,
+                'timestamp': datetime.utcnow().isoformat(),
+                'fault_short': False,
+                'fault_thermal': False,
+                'fault_dropout': False,
+                'true_soc': 0.98,
+                'true_soh': 1.0,
+                'true_v1': 0.0,
+                'true_v2': 0.0,
+                'true_r0': 0.02,
+                'true_ocv': 3.3,
+                'true_voltage': 3.3,
+                'true_current': 2.0
+            }
+            shared_db[sim_app.Config.MONGODB_READINGS_COLLECTION].insert_one(rec)
+            sim_app.update_sim_progress({'time': t, 'soc': 0.98})
+
+        # 6. Visualiser fetches telemetry from MongoDB
+        t_resp = vis_client.get('/api/telemetry')
+        assert t_resp.status_code == 200
+        t_data = t_resp.get_json()
+        items = t_data.get('data') or t_data.get('readings')
+        assert len(items) >= 3
+
+        # 7. Reset clears MongoDB collection and syncs
+        r_resp = vis_client.post('/api/control', json={'command': 'reset', 'soc': 1.0})
+        assert r_resp.status_code == 200
+        assert len(shared_db[sim_app.Config.MONGODB_READINGS_COLLECTION].docs) == 0
+
+

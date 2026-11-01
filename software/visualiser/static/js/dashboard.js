@@ -1113,10 +1113,10 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshTelemetry();
     pollTrainingStatus();
 
-    // Start Polling loops using recursive setTimeout to prevent request stacking
+    // Start Polling loops using recursive setTimeout to prevent request stacking (1-second sync interval)
     async function statusPoll() {
         await refreshStatus();
-        setTimeout(statusPoll, 1500);
+        setTimeout(statusPoll, 1000);
     }
 
     async function telemetryPoll() {
