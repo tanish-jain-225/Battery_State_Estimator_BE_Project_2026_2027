@@ -31,7 +31,7 @@ This document synthesizes the comprehensive engineering audit, web research, aut
 The primary goals accomplished during this session:
 1. Conducted an end-to-end audit across all software, firmware, RTL hardware, test suites, and documentation.
 2. Resolved all detected defects (FPGA golden reference clobbering, COE signed hex parsing, Windows UTF-8 BOM compatibility, UKF pipeline state serialization).
-3. Expanded automated regression testing to **104 passing tests (100% pass rate in ~80s)** and verified the master 8-step validation runner (`run_all_validation.bat` / `.sh`) with zero errors.
+3. Expanded automated regression testing to **107 passing tests (100% pass rate in ~77s)** and verified the master 8-step validation runner (`run_all_validation.bat` / `.sh`) with zero errors.
 4. Synchronized all 19 Markdown documents across the repository and authored the formal [Review 2 Progress Report](../Review_2/Review_2_Progress.md).
 5. Conducted an extensive industrial benchmark of Coulomb Counting, EKF, and UKF against global automotive standards (ISO 26262, AUTOSAR, AEC-Q100).
 6. Confirmed mathematical and computational synchronization across Python, Embedded C99, and Verilog FPGA RTL.
@@ -46,7 +46,7 @@ The primary goals accomplished during this session:
 | **COE Radix-16 Signed Hex Bug** | In `parse_coe_file`, hex strings like `FE6A` were parsed as positive integers (`65130`) instead of signed 16-bit negative values (`-406`). | Added two's complement sign conversion: `if val >= 32768: val -= 65536`. | Fixed negative weight and bias arithmetic parity in golden reference model. |
 | **Windows UTF-8 BOM Encoding Issue** | PowerShell file piping introduced UTF-8 BOM headers (`\ufeffSTAGE`), breaking standard Python CSV reader lookups. | Standardized `encoding="utf-8-sig"` in `load_csv()` across [compare_results.py](../../hardware/FPGA_Verifier/compare_results.py) and [golden_model.py](../../hardware/FPGA_Verifier/golden_model.py). | Platform-agnostic CSV loading on Windows, Linux, and macOS. |
 | **UKF State Serialization Gap** | `EstimatorPipeline.get_state()` and `set_state()` did not extract or restore UKF states (`ukf_soc`, `ukf_v1`, `ukf_v2`, `ukf_p`), resetting the filter during catch-up cycles. | Added UKF state extraction to `get_state()` and restored them alongside `UnscentedKalmanFilter` in `set_state()`. | Validated via `test_estimator_pipeline_state_serialization`. |
-| **Test Suite Hygiene & Expansion** | Test suite expanded to cover document generation, advanced estimator priming, multi-chemistry, comprehensive APIs, and CSR quantization. | Cleaned up imports and added advanced test suites across all components. | Suite grew to **104 tests (100% pass rate)**. |
+| **Test Suite Hygiene & Expansion** | Test suite expanded to cover document generation, advanced estimator priming, multi-chemistry, comprehensive APIs, and CSR quantization. | Cleaned up imports and added advanced test suites across all components. | Suite grew to **107 tests (100% pass rate)**. |
 | **Documentation Discrepancies** | Relative links in `docs/Resources/` used `../software` instead of `../../software`; file trees omitted `software/shared/`; Review 2 progress was unrecorded. | Corrected all relative paths, updated trees across all 19 `.md` files, and created [Review_2_Progress.md](../Review_2/Review_2_Progress.md). | Zero broken links or outdated references across entire repository. |
 
 ---
@@ -114,7 +114,7 @@ Global automotive production launch requires:
 
 Evaluated against the ACM/IEEE Artifact Evaluation Guidelines:
 * **Artifact Available (★★★★★):** Publicly organized, clean `.gitignore`, clear licensing.
-* **Artifact Functional (★★★★★):** 104 automated unit/integration tests passing with 100% pass rate in ~80 seconds; zero syntax errors under `flake8`.
+* **Artifact Functional (★★★★★):** 107 automated unit/integration tests passing with 100% pass rate in ~77 seconds; zero syntax errors under `flake8`.
 * **Results Replicated (★★★★★):** Single-click master runner (`run_all_validation.bat` / `.sh`) reproduces all claimed physics, firmware, FPGA parity, and benchmark figures in under 45 seconds with 0 errors.
 * **Artifact Reusable (★★★★★):** Complete modular separation between 2-RC physics, observers, C99 firmware, and Verilog RTL.
 * **Manuscripts Aligned (★★★★★):** Complete camera-ready IEEE / Q3 Scopus manuscripts drafted in [`reference/paper.md`](../../reference/paper.md) (Original Experimental Research) and [`reference/review_paper.md`](../../reference/review_paper.md) (Comprehensive Review/Survey) matching the codebase numbers exactly.
@@ -190,7 +190,7 @@ Your project delivers **6 concrete deliverables** across the software, firmware,
 * **Function:** Dual microservice suite generating 2-RC physics telemetry across 10 drive cycles (UDDS, US06, HWFET, WLTP, NEDC, EV Aggressive, Solar, etc.) with real-time fault injection (Thermal Runaway, Sensor Dropout, Micro-Short) and live Chart.js visualization.
 
 ### 📦 Deliverable 5: The Automated Regression Test Suite & 1-Click Validation Pipeline
-* **Automated Pytest Suite:** [`tests/`](../../tests/) (104 automated tests passing in ~80s)
+* **Automated Pytest Suite:** [`tests/`](../../tests/) (107 automated tests passing in ~77s)
 * **Master 1-Click Runner (Windows):** [`run_all_validation.bat`](../../run_all_validation.bat)
 * **Master 1-Click Runner (Linux/macOS):** [`run_all_validation.sh`](../../run_all_validation.sh)
 * **Function:** Executes all 8 verification stages end-to-end (physics, C99 compilation, FPGA parity, and full test suite) with zero errors.
@@ -217,7 +217,7 @@ Your project delivers **6 concrete deliverables** across the software, firmware,
 | **Comparative Benchmarking** | **10 / 10** | ESN ($0.72\%$) vs UKF ($1.76\%$) vs EKF ($2.48\%$) vs CC ($8.42\%$ drift). |
 | **Embedded C99 Firmware** | **10 / 10** | CSR SpMV 6.7× speedup, Fixed-Point Q15, 98.40% accuracy, < 15 KB RAM. |
 | **FPGA RTL Verilog Verifier** | **10 / 10** | Artix-7 target, 200/200 bit-exact stage parity, multi-timestep sequence indexing. |
-| **Automated Testing & QA** | **10 / 10** | 104/104 passed tests, 1-click 8-step master validation runner with 0 errors. |
+| **Automated Testing & QA** | **10 / 10** | 107/107 passed tests, 1-click 8-step master validation runner with 0 errors. |
 | **Documentation & Publication** | **10 / 10** | All 19 `.md` files synchronized, complete review paper draft (29 pages) and experimental paper drafted. |
 
 ---

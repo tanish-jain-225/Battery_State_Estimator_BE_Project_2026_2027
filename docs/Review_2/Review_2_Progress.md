@@ -13,7 +13,7 @@
 - Tanish Sanghvi  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 104 Tests in v2.1.0, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 107 Tests in v2.2.0, 200 / 200 FPGA Parity Stages)**
 
 ---
 
@@ -181,7 +181,7 @@ u(t) ────►│ Win MAC ──► (+) ──► Bias ──► Saturatio
 ## 7. Automated Verification Test Suite (62 Tests, 100% Pass)
 
 > [!NOTE]
-> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current v2.1.0 release, this test suite has expanded to **104 tests** across 14 modules, verifying automated PDF document compilation, advanced priming, multi-chemistry tracking, and hardware CSR quantization.
+> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current v2.2.0 release, this test suite has expanded to **107 tests** across 14 modules, verifying automated PDF document compilation, advanced priming, multi-chemistry tracking, hardware CSR quantization, and custom PDF preservation.
 
 The repository includes a comprehensive, automated test suite in the [`tests/`](../../tests/) directory. All tests run via `pytest`:
 

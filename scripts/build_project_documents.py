@@ -30,7 +30,10 @@ def add_header_footer(canvas_obj, doc, title_text, doc_type="MANUSCRIPT PREPRINT
     canvas_obj.drawRightString(doc.pagesize[0] - 54, 32, f"Page {canvas_obj._pageNumber}")
     canvas_obj.restoreState()
 
-def build_poster_pdf(output_path):
+def build_poster_pdf(output_path, force=False):
+    if not force and os.path.exists(output_path) and os.path.getsize(output_path) > 10000:
+        print(f"[PRESERVED] Existing custom PDF found ({os.path.getsize(output_path):,} bytes) at: {output_path}. Skipping overwrite.")
+        return output_path
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     pagesize = landscape(A4)
     doc = SimpleDocTemplate(
@@ -242,7 +245,10 @@ def build_poster_pdf(output_path):
     doc.build(story)
     print(f"[SUCCESS] Built Project Poster PDF: {output_path}")
 
-def build_review_paper_pdf(output_path):
+def build_review_paper_pdf(output_path, force=False):
+    if not force and os.path.exists(output_path) and os.path.getsize(output_path) > 10000:
+        print(f"[PRESERVED] Existing custom PDF found ({os.path.getsize(output_path):,} bytes) at: {output_path}. Skipping overwrite.")
+        return output_path
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     doc = SimpleDocTemplate(
         output_path,
@@ -419,7 +425,10 @@ def build_review_paper_pdf(output_path):
                     onLaterPages=lambda c, d: add_header_footer(c, d, "Neuromorphic BMS Review Paper", "REVIEW ARTICLE PREPRINT"))
     print(f"[SUCCESS] Built Review Paper PDF: {output_path}")
 
-def build_research_paper_pdf(output_path):
+def build_research_paper_pdf(output_path, force=False):
+    if not force and os.path.exists(output_path) and os.path.getsize(output_path) > 10000:
+        print(f"[PRESERVED] Existing custom PDF found ({os.path.getsize(output_path):,} bytes) at: {output_path}. Skipping overwrite.")
+        return output_path
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     doc = SimpleDocTemplate(
         output_path,
@@ -591,6 +600,8 @@ def build_research_paper_pdf(output_path):
     print(f"[SUCCESS] Built Research Paper PDF: {output_path}")
 
 if __name__ == "__main__":
+    import sys
+    force = "--force" in sys.argv
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     poster_pdf = os.path.join(base_dir, "docs", "Poster", "Project_Poster.pdf")
@@ -601,16 +612,12 @@ if __name__ == "__main__":
     ref_review_pdf = os.path.join(base_dir, "reference", "Review_Paper.pdf")
     ref_research_pdf = os.path.join(base_dir, "reference", "Research_Paper.pdf")
 
-    print("Building Project Poster PDF...")
-    build_poster_pdf(poster_pdf)
+    print(f"Checking / Building Project Deliverable PDFs (force={force})...")
+    build_poster_pdf(poster_pdf, force=force)
+    build_review_paper_pdf(review_pdf, force=force)
+    build_review_paper_pdf(ref_review_pdf, force=force)
+    build_research_paper_pdf(research_pdf, force=force)
+    build_research_paper_pdf(ref_research_pdf, force=force)
     
-    print("Building Review Paper PDF...")
-    build_review_paper_pdf(review_pdf)
-    build_review_paper_pdf(ref_review_pdf)
-    
-    print("Building Research Paper PDF...")
-    build_research_paper_pdf(research_pdf)
-    build_research_paper_pdf(ref_research_pdf)
-    
-    print("All 3 project PDF deliverables generated successfully!")
+    print("Project PDF deliverables checked/generated successfully!")
 

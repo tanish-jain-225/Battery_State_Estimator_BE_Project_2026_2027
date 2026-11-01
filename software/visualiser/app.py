@@ -335,8 +335,26 @@ def check_simulator_port(force=False):
     if force or (now - _last_sim_port_check_time >= check_interval):
         _last_sim_port_check_time = now
         was_online = _simulator_port_online
+
+        # 1. Primary decoupled check via MongoDB Atlas sim_state (zero HTTP overhead)
+        if check_db_connected():
+            try:
+                doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
+                if doc:
+                    last_active = doc.get('last_real_time') or 0
+                    # If updated within 10 seconds or simulator marked running, simulator is actively publishing
+                    if (now - last_active < 10.0) or doc.get('sim_running', False):
+                        _simulator_port_online = True
+                        _simulator_port_data = doc
+                        if not was_online:
+                            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+                        return True, doc
+            except Exception:
+                pass
+
+        # 2. Local fallback check via HTTP only if DB is offline
         try:
-            with make_simulator_request("/api/status", timeout=0.8) as response:
+            with make_simulator_request("/api/status", timeout=0.1) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
                     _simulator_port_online = True
@@ -346,6 +364,7 @@ def check_simulator_port(force=False):
                     return True, data
         except Exception:
             pass
+
         _simulator_port_online = False
         _simulator_port_data = None
         if was_online:
@@ -539,7 +558,7 @@ def sync_simulation_locally():
 # ── Asynchronous Status Checker & Simulation Threads (Standalone mode) ──
 
 def status_checker_loop():
-    global _simulator_port_online, _simulator_port_data, _mongodb_connected, mongodb_connected, db_client, db
+    global _mongodb_connected, mongodb_connected, db_client, db
     print("Visualizer background status checker thread active.")
     
     # Try initial mongo connection
@@ -560,19 +579,8 @@ def status_checker_loop():
         db = None
 
     while True:
-        # 1. Asynchronously check Simulator Port
-        try:
-            with make_simulator_request("/api/status", timeout=1.0) as response:
-                if response.status == 200:
-                    data = json.loads(response.read().decode())
-                    _simulator_port_online = True
-                    _simulator_port_data = data
-                else:
-                    _simulator_port_online = False
-                    _simulator_port_data = None
-        except Exception:
-            _simulator_port_online = False
-            _simulator_port_data = None
+        # 1. Asynchronously check Simulator Status (via shared MongoDB or local probe)
+        check_simulator_port()
 
         # 2. Asynchronously check MongoDB Connection
         if not _mongodb_connected or db_client is None:
@@ -611,6 +619,12 @@ def local_generator_loop():
     
     while True:
         try:
+            # If MongoDB is connected, the standalone Simulator process generates and posts telemetry.
+            # Visualiser acts purely as a consumer and state estimator to prevent duplicate DB writes.
+            if check_db_connected():
+                time.sleep(1.0)
+                continue
+
             # If the simulator server port is online, let it generate the data
             port_online, _ = check_simulator_port()
             if port_online:
@@ -1113,10 +1127,10 @@ def get_status():
         if not model_loaded:
             load_ml_model()
             
-        port_online, port_data = check_simulator_port(force=True)
+        port_online, port_data = check_simulator_port()
         
-        # If the simulator service is offline, step the simulation inside the visualizer process
-        if not port_online:
+        # If both simulator and database are offline, step the simulation locally in visualizer memory
+        if not port_online and not check_db_connected():
             sync_simulation_locally()
 
         state = load_sim_state()
@@ -1304,8 +1318,8 @@ def control_simulation():
         # Invalidate telemetry cache whenever control state or command changes to ensure immediate UI sync
         _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         
-        # Forward control payload to Config.SIMULATOR_URL if online (force live check)
-        port_online, _ = check_simulator_port(force=True)
+        # Forward control payload to Config.SIMULATOR_URL if locally reachable (fast non-blocking notification)
+        port_online, _ = check_simulator_port()
         if port_online:
             try:
                 sim_data = data.copy()
@@ -1314,26 +1328,10 @@ def control_simulation():
                 if 'active_cycle' in sim_data:
                     sim_data['cycle_type'] = sim_data.pop('active_cycle')
                 
-                # Increased timeout to 1.5s to prevent false timeouts on Render
-                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=1.5) as response:
-                    if response.status == 200:
-                        sim_resp = json.loads(response.read().decode())
-                        # Update cache with the simulator's updated status values
-                        global _simulator_port_online, _simulator_port_data
-                        _simulator_port_online = True
-                        _simulator_port_data = {
-                            'sim_running': sim_resp.get('sim_running', False),
-                            'chemistry': sim_resp.get('chemistry', 'li_ion'),
-                            'active_cycle': sim_resp.get('active_cycle', 'udds'),
-                            'accelerated_aging': sim_resp.get('accelerated_aging', False),
-                            'T_ambient': sim_resp.get('T_ambient', 25.0),
-                            'fault_thermal': sim_resp.get('fault_thermal', False),
-                            'fault_dropout': sim_resp.get('fault_dropout', False),
-                            'fault_short': sim_resp.get('fault_short', False),
-                            'time': sim_resp.get('time', 0.0)
-                        }
-            except Exception as forward_err:
-                print(f"Failed to forward control to simulator: {forward_err}")
+                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=0.2) as response:
+                    pass
+            except Exception:
+                pass
                 
         # Invalidate visualizer status cache check time so next status poll triggers a fresh live query
         global _last_sim_check_time
@@ -1503,11 +1501,11 @@ def get_telemetry():
                     prev_time = None
                 
                 if prev_time is not None:
-                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1)
+                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
                     new_readings = list(cursor)
                 else:
-                    # Cap initial fetch to the most recent 500 records to prevent CPU/memory starvation on first load
-                    limit_val = 500
+                    # Cap initial fetch to the most recent window (60 records) for instantaneous UI load
+                    limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
                     new_readings = list(cursor)
                     new_readings.reverse() # Restore chronological order

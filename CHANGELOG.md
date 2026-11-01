@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.2.0] - 2026-11-01 (Autonomous Pub/Sub Decoupling & Document Safeguards Release)
+
+### 🚀 Highlights (v2.2.0)
+- **Autonomous Microservice Decoupling**: Completely decoupled Physics Simulator and Visualiser via MongoDB Atlas singleton state and telemetry pub/sub. The Simulator writes telemetry at 1.0s cadence and auto-prunes records older than the latest 1,000 samples ($O(1)$ indexed scans). The Visualiser independently polls for new readings every 1.0s without HTTP ping coupling or duplicate physics generators.
+- **Document Builder Safety Protection**: Implemented non-destructive guards across all ReportLab PDF generators in [`scripts/build_project_documents.py`](scripts/build_project_documents.py), ensuring existing custom PDFs (>10 KB) are strictly preserved while still supporting clean builds and opt-in `--force` regeneration.
+- **Expanded Pytest Regression Suite**: Expanded automated suite to **107 passing tests** across 14 test modules (100% pass rate in ~77s) with 94% coverage on `software/shared`, including regression tests for PDF preservation and zero-load database access.
+
+---
+
 ## [v2.1.0] - 2026-11-01 (Publications, Poster & Academic Architecture Release)
 
 ### 🚀 Highlights (v2.1.0)

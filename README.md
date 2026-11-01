@@ -55,7 +55,7 @@
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 104-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 107-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Active Deliverable** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Manuscript](reference/review_paper.md) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
@@ -526,6 +526,8 @@ Start Web Visualiser (Port 5000):
 python software/visualiser/app.py
 ```
 
+> **Decoupled Architecture Note**: Simulator and Visualiser operate completely independently via MongoDB Atlas pub/sub. The Simulator posts live physics telemetry every 1.0s and auto-prunes historical records to a rolling 1,000-document buffer. The Visualiser independently polls for new readings every 1.0s via indexed timestamp scans (<0.2ms latency) with zero database locking or port coupling.
+
 Run Embedded C99 Verification:
 ```bash
 hardware/STM_Verifier/run_c_simulator.bat
@@ -551,7 +553,7 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
 | 4 | Embedded C99 CSR Inference | CSR sparse SpMV execution speedup | 6.7× speedup verified | Pass |
 | 5 | FPGA RTL Golden Model Test | 100-neuron Verilog datapath vs Python model | 200/200 bit-exact matches | Pass |
-| 6 | Automated Pytest Suite | 104 test cases execution across all modules (software, hardware, APIs, docs) | 100% test pass rate | Pass |
+| 6 | Automated Pytest Suite | 107 test cases execution across all modules (software, hardware, APIs, docs) | 100% test pass rate | Pass |
 
 ---
 

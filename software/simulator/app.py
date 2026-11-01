@@ -71,7 +71,7 @@ DEFAULT_STATE = {
     'V2': 0.0,
     'temperature': 25.0,
     'internal_resistance_growth': 1.0,
-    'sim_running': False,
+    'sim_running': True,
     'active_cycle': 'udds',
     'accelerated_aging': False,
     'T_ambient': 25.0,
@@ -100,29 +100,26 @@ _last_state_load_time = 0.0
 
 def _ensure_db():
     global mongodb_connected, _mongodb_connected, db_client, db
-    if IS_SERVERLESS:
-        if _mongodb_connected and db is not None:
-            return True
-        try:
-            timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
+    if _mongodb_connected and db is not None:
+        return True
+    try:
+        timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
+        if db_client is None:
             db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=timeout_ms)
-            db_client.server_info()
-            db = db_client[Config.MONGODB_DB_NAME]
-            _mongodb_connected = True
-            mongodb_connected = True
-            try:
-                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
-            except Exception:
-                pass
-            print("Battery State Estimator — Physics Engine connected to MongoDB Atlas.")
-            return True
-        except Exception as e:
-            _mongodb_connected = False
-            mongodb_connected = False
-            print(f"Battery State Estimator — MongoDB connection attempt failed: {e}")
-            return False
-            
-    return _mongodb_connected and db is not None
+        db_client.server_info()
+        db = db_client[Config.MONGODB_DB_NAME]
+        _mongodb_connected = True
+        mongodb_connected = True
+        try:
+            db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+            db[Config.MONGODB_STATE_COLLECTION].delete_many({'_id': {'$ne': 'singleton'}})
+        except Exception:
+            pass
+        return True
+    except Exception as e:
+        _mongodb_connected = False
+        mongodb_connected = False
+        return False
 
 def load_sim_state(force_db_read=False):
     global _last_state_load_time
@@ -177,7 +174,7 @@ def generator_loop():
     while True:
         try:
             state = load_sim_state()
-            sim_running = state.get('sim_running', False)
+            sim_running = state.get('sim_running', True)
             chemistry_name = state.get('chemistry', 'li_ion')
             active_cycle = state.get('active_cycle', 'udds')
             accelerated_aging = state.get('accelerated_aging', False)
@@ -267,14 +264,24 @@ def generator_loop():
                 
                 # Push record to readings collection
                 if _ensure_db():
-                    db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+                    try:
+                        db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+                        # Zero DB Load: prune older records periodically so DB stays small, fast, and light
+                        if int(simulator.time) % 30 == 0:
+                            oldest_cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'time': 1, '_id': 0}).sort('time', -1).skip(1000).limit(1)
+                            oldest_list = list(oldest_cursor)
+                            if oldest_list:
+                                cutoff_time = oldest_list[0]['time']
+                                db[Config.MONGODB_READINGS_COLLECTION].delete_many({'time': {'$lt': cutoff_time}})
+                    except Exception as ins_err:
+                        print(f"Error inserting reading into MongoDB: {ins_err}")
                 else:
                     local_telemetry_buffer.append(record)
                     limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
                     if len(local_telemetry_buffer) > limit:
                         local_telemetry_buffer.pop(0)
                     
-                # Update configuration document
+                # Update configuration document with live heartbeat
                 update_sim_progress({
                     'time': simulator.time,
                     'soc': simulator.soc,
@@ -285,7 +292,8 @@ def generator_loop():
                     'internal_resistance_growth': simulator.internal_resistance_growth,
                     'last_real_time': time.time(),
                     'prev_voltage': V_meas,
-                    'prev_current': -I_meas
+                    'prev_current': -I_meas,
+                    'sim_running': True
                 })
                 
                 # Sleep interval
@@ -505,9 +513,12 @@ def get_health():
     try:
         db_ready = _ensure_db()
         if db_ready:
-            points_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
+            points_count = db[Config.MONGODB_READINGS_COLLECTION].estimated_document_count()
+        else:
+            points_count = len(local_telemetry_buffer)
     except Exception:
         db_ready = False
+        points_count = len(local_telemetry_buffer)
 
     return jsonify({
         'service': 'battery-simulator',
@@ -518,7 +529,7 @@ def get_health():
             'readings_count': points_count
         },
         'status': {
-            'sim_running': state.get('sim_running', False),
+            'sim_running': state.get('sim_running', True),
             'chemistry': state.get('chemistry', 'li_ion'),
             'active_cycle': state.get('active_cycle', 'udds'),
             'accelerated_aging': state.get('accelerated_aging', False),
@@ -542,12 +553,14 @@ def get_status():
     points_count = 0
     if _ensure_db():
         try:
-            points_count = db[Config.MONGODB_READINGS_COLLECTION].count_documents({})
+            points_count = db[Config.MONGODB_READINGS_COLLECTION].estimated_document_count()
         except Exception:
             pass
+    else:
+        points_count = len(local_telemetry_buffer)
             
     return jsonify({
-        'sim_running': state.get('sim_running', False),
+        'sim_running': state.get('sim_running', True),
         'chemistry': state.get('chemistry', 'li_ion'),
         'active_cycle': state.get('active_cycle', 'udds'),
         'accelerated_aging': state.get('accelerated_aging', False),
