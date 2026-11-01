@@ -64,5 +64,5 @@ echo Please install GCC (MinGW), Clang, or MSVC and try again.
 exit /b 1
 
 :end
-if not defined VALIDATION_PIPELINE pause
+if not defined VALIDATION_PIPELINE if not defined NON_INTERACTIVE pause
 

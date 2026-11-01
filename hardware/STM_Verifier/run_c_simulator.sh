@@ -15,7 +15,7 @@ if command -v gcc &> /dev/null; then
         echo "[SUCCESS] Compilation complete. Running simulator..."
         echo "----------------------------------------------"
         ./esn_simulator
-        rm esn_simulator
+        rm -f esn_simulator esn_simulator.exe
     else
         echo "[ERROR] Compilation failed."
         exit 1
@@ -28,7 +28,7 @@ elif command -v clang &> /dev/null; then
         echo "[SUCCESS] Compilation complete. Running simulator..."
         echo "----------------------------------------------"
         ./esn_simulator
-        rm esn_simulator
+        rm -f esn_simulator esn_simulator.exe
     else
         echo "[ERROR] Compilation failed."
         exit 1
@@ -38,4 +38,3 @@ else
     echo "Please install a C compiler and try again."
     exit 1
 fi
-
