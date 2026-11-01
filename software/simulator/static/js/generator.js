@@ -207,9 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize Status
-    updateStatus();
-
     // Start status polling recursive loop (prevents overlapping fetch stacking)
     async function pollLoop() {
         await updateStatus();

@@ -104,7 +104,8 @@ def _ensure_db():
         if _mongodb_connected and db is not None:
             return True
         try:
-            db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
+            timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
+            db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=timeout_ms)
             db_client.server_info()
             db = db_client[Config.MONGODB_DB_NAME]
             _mongodb_connected = True
@@ -825,7 +826,7 @@ if __name__ == '__main__':
             pass
 
     print("\nBattery Physics-Based Simulator")
-    print(f"Physics-Based Telemetry Generator • http://localhost:{Config.PORT}\n")
+    print(f"Physics-Based Telemetry Generator - http://localhost:{Config.PORT}\n")
     sim_status = "Running" if local_state.get('sim_running') else "Idle"
     print(f"Simulator: {sim_status}")
     if _mongodb_connected:
@@ -833,7 +834,7 @@ if __name__ == '__main__':
     else:
         print("MongoDB: Connection Failed")
         if _mongodb_error:
-            print(f"  └─ Connection Error: {_mongodb_error}")
-        print("  └─ Note: Check internet connection, credentials in .env, or MongoDB Atlas IP Access List whitelist.\n")
+            print(f"  [-] Connection Error: {_mongodb_error}")
+        print("  [-] Note: Check internet connection, credentials in .env, or MongoDB Atlas IP Access List whitelist.\n")
 
     app.run(host='0.0.0.0', port=Config.PORT, debug=Config.FLASK_DEBUG)

@@ -92,6 +92,8 @@ def make_simulator_request(path, method='GET', data=None, timeout=1.0):
         headers=headers,
         method=method
     )
+    if app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+        timeout = min(timeout, 0.05)
     return urllib.request.urlopen(req, timeout=timeout)
 
 import atexit
@@ -114,11 +116,12 @@ _last_db_ping_time = 0.0
 
 def check_db_connected():
     global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time
+    timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
     if IS_SERVERLESS:
         if _mongodb_connected and db is not None:
             return True
         try:
-            db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
+            db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
             _mongodb_connected = True
@@ -143,7 +146,7 @@ def check_db_connected():
         _last_db_ping_time = now
         try:
             if db_client is None:
-                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
+                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
             _mongodb_connected = True

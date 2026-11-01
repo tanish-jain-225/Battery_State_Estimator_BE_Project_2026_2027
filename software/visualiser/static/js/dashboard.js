@@ -1109,8 +1109,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Run Initialization
     initCharts();
-    refreshStatus();
-    refreshTelemetry();
     pollTrainingStatus();
 
     // Start Polling loops using recursive setTimeout to prevent request stacking (1-second sync interval)
