@@ -808,7 +808,7 @@ _checker_thread_started = False
 
 def _start_background_threads():
     global _local_threads_started, _checker_thread_started
-    if IS_SERVERLESS:
+    if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         return
         
     # Start status checker thread unconditionally for every process/worker
@@ -832,6 +832,8 @@ _lazy_lock = threading.Lock()
 @app.before_request
 def _lazy_init():
     global _lazy_initialized
+    if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+        return
     if not _lazy_initialized:
         with _lazy_lock:
             if not _lazy_initialized:

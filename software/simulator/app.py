@@ -776,7 +776,7 @@ _db_thread_started = False
 
 def _start_sim_thread():
     global _sim_thread_started, _db_thread_started
-    if IS_SERVERLESS:
+    if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         return
     
     # Start DB checker thread for this process if not already started
@@ -799,6 +799,8 @@ _lazy_lock = threading.Lock()
 @app.before_request
 def _lazy_init():
     global _lazy_initialized
+    if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+        return
     if not _lazy_initialized:
         with _lazy_lock:
             if not _lazy_initialized:

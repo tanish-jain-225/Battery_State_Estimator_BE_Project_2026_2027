@@ -16,6 +16,9 @@ for sub in [
     if sub not in sys.path:
         sys.path.append(sub)
 
+# Enable testing mode flag for Flask apps and background workers
+os.environ["TESTING"] = "1"
+
 # Set non-blocking testing default for MongoDB so offline/sandboxed test suites execute instantly
 if "MONGODB_URI" not in os.environ:
     os.environ["MONGODB_URI"] = "mongodb://localhost:27017/?serverSelectionTimeoutMS=20"

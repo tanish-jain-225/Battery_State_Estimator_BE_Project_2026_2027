@@ -411,6 +411,9 @@ def test_simulator_visualiser_mongodb_1s_sync():
         import software.simulator.app as sim_app
         import software.visualiser.app as vis_app
 
+        sim_app.app.config['TESTING'] = True
+        vis_app.app.config['TESTING'] = True
+
         sim_app.db = shared_db
         sim_app.db_client = MockMongoClient()
         sim_app._mongodb_connected = True
@@ -443,7 +446,7 @@ def test_simulator_visualiser_mongodb_1s_sync():
 
         # 4. Simulator loads updated state on 1-second sync interval
         sim_app._last_state_load_time = 0.0
-        s_state = sim_app.load_sim_state()
+        s_state = sim_app.load_sim_state(force_db_read=True)
         assert s_state['sim_running'] is True
         assert s_state['chemistry'] == 'lfp'
 
