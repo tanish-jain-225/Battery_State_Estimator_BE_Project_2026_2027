@@ -7,11 +7,11 @@ This document provides a technical overview of the software architecture, direct
 ---
 
 ## 📑 Table of Contents
-1. [Software Directory Structure](#-software-directory-structure)
-2. [Software Data Flow](#-software-data-flow)
-3. [Main Modules & Python Classes Reference](#️-main-modules--python-classes-reference)
-4. [Running the Software Services Locally](#-running-the-software-services-locally)
-5. [Verification and Testing](#-verification-and-testing)
+1. [Software Directory Structure](#software-directory-structure)
+2. [Software Data Flow](#software-data-flow)
+3. [Main Modules & Python Classes Reference](#main-modules-python-classes-reference)
+4. [Running the Software Services Locally](#running-the-software-services-locally)
+5. [Verification and Testing](#verification-and-testing)
 
 ---
 
@@ -44,13 +44,20 @@ software/
 │   ├── templates/                   # HTML view layouts
 │   └── training/                    # ESN training scripts
 │       └── train_rc.py              # Script to build software weights
-└── [Root tests/](../tests/)          # Unified pytest test suite (62 tests)
+└── [Root tests/](../tests/)          # Unified pytest test suite (104 tests)
+    ├── conftest.py                  # Pytest fixtures and mock MongoDB configuration
     ├── test_battery_chemistry.py    # Chemistry loading & OCV curve monotonicity
     ├── test_battery_simulator.py    # 2-RC transient solver, thermal, aging & faults
+    ├── test_build_documents.py      # Automated PDF generation verification
     ├── test_esn_model.py            # ESN inference, spectral radius & echo state property
     ├── test_estimator_pipeline.py   # State serialization & joint observer pipeline
+    ├── test_estimator_pipeline_advanced.py # Multi-chemistry, sensor faults & RLS tracking
     ├── test_flask_api.py            # Microservice API authentication & endpoints
+    ├── test_flask_api_comprehensive.py # Comprehensive endpoint parameter verification
     ├── test_fpga_verifier.py        # RTL parity, signed hex, LUT, and sequence tests
+    ├── test_fpga_verifier_extended.py # Extended COE parser and CLI outcomes verifier
+    ├── test_hardware_training_and_export.py # Embedded CSR export & quantization simulation
+    ├── test_integration.py          # End-to-end multi-timestep integration loop
     ├── test_online_training.py      # ESN online adaptation & RLS weight updates
     └── test_traditional_estimator.py# EKF, UKF convergence, covariance guards & VFF-RLS
 ```
@@ -137,7 +144,7 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 ## 🧪 Verification and Testing
 
-### 1. Unified Automated Test Suite (62 Tests)
+### 1. Unified Automated Test Suite (104 Tests)
 Run the complete automated pytest verification suite covering physics solvers, EKF, UKF, ESN online RLS adaptation, pipeline state serialization, and FPGA RTL bit-exact parity:
 ```bash
 pytest tests/ -v

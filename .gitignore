@@ -15,6 +15,7 @@ htmlcov/
 
 # Serialized model files (rebuild via training scripts)
 *.pkl
+!software/visualiser/model_rc.pkl
 
 # C / C++ build outputs
 *.o

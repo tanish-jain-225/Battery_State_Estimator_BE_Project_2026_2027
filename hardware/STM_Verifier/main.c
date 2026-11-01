@@ -110,8 +110,7 @@ void init_fixed_point_weights(void) {
 // Safe against integer overflow and out-of-bounds lookups.
 int16_t q15_tanh(int16_t x_q12) {
     if (x_q12 == -32768) x_q12 = -32767;
-    int16_t abs_x = x_q12 < 0 ? -x_q12 : x_q12;
-    if (abs_x > 32767) abs_x = 32767; // safety clamp
+    int16_t abs_x = (x_q12 < 0) ? (int16_t)(-x_q12) : x_q12;
     
     int idx = abs_x >> 10; // 0 to 31 (since 32767 >> 10 is 31)
     if (idx > 31) idx = 31; // defensive array bounds guard

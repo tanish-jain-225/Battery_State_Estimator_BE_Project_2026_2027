@@ -1,14 +1,16 @@
 import sys
 import os
 import numpy as np
-import pandas as pd
 
 # Allow importing Config whether run from project root or from training/ subdirectory
 _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _base_dir not in sys.path:
     sys.path.insert(0, _base_dir)
 
-from config import Config
+try:
+    from software.visualiser.config import Config
+except ImportError:
+    from config import Config
 
 def extract_features_df(df, rolling_window=None):
     """
@@ -51,12 +53,10 @@ def extract_features_step(V_current, I_current, T_current, history, rolling_wind
 
     if len(history) == 0:
         V_prev = V_current
-        V_history = [V_current]
         I_history = [I_current]
         T_history = [T_current]
     else:
         V_prev = history[-1]['voltage']
-        V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
         I_history = [r['current'] for r in history[-lookback:]] + [I_current]
         T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
 

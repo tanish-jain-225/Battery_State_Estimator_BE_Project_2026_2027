@@ -7,17 +7,17 @@ An end-to-end Python, Machine Learning and Flask-based Battery State Estimator c
 ---
 
 ## 📖 Table of Contents
-1. [Motivation & Background](#-motivation--background)
-2. [Visualiser Directory Structure](#-visualiser-directory-structure)
-3. [Battery State Estimator Architecture & Data Flow](#-battery-state-estimator-architecture--data-flow)
-4. [Deep Dive: Battery Physics Simulator](#-deep-dive-battery-physics-simulator)
-5. [Deep Dive: Traditional Estimators (EKF & SOH)](#-deep-dive-traditional-estimators-ekf--soh)
-6. [Deep Dive: Echo State Networks (Reservoir ML)](#-deep-dive-echo-state-networks-reservoir-ml)
-7. [Feature Engineering & Datasets](#-feature-engineering--datasets)
-8. [API Documentation](#-api-documentation)
-9. [Configuration & Tuning Parameters](#-configuration--tuning-parameters)
-10. [UI/UX Interface & Interactive Elements](#-uiux-interface--interactive-elements)
-11. [Setup & Running Instructions](#-setup--running-instructions)
+1. [Motivation & Background](#motivation-background)
+2. [Visualiser Directory Structure](#visualiser-directory-structure)
+3. [Battery State Estimator Architecture & Data Flow](#battery-state-estimator-architecture-data-flow)
+4. [Deep Dive: Battery Physics Simulator](#deep-dive-battery-physics-simulator)
+5. [Deep Dive: Traditional Estimators (EKF & SOH)](#deep-dive-traditional-estimators-ekf-soh)
+6. [Deep Dive: Echo State Networks (Reservoir ML)](#deep-dive-echo-state-networks-reservoir-ml)
+7. [Feature Engineering & Datasets](#feature-engineering-datasets)
+8. [API Documentation](#api-documentation)
+9. [Configuration & Tuning Parameters](#configuration-tuning-parameters)
+10. [UI/UX Interface & Interactive Elements](#uiux-interface-interactive-elements)
+11. [Setup & Running Instructions](#setup-running-instructions)
 12. [Serverless Compliance](#serverless-compliance)
 
 ---
@@ -54,7 +54,7 @@ The visualizer's code and assets are organized as follows:
 | **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[../../tests/](../../tests/)** | Comprehensive 49-test automated test suite validating physics, EKF, UKF, RLS online adaptation, and FPGA bit-exact parity. |
+| **[../../tests/](../../tests/)** | Comprehensive 104-test automated test suite validating physics, EKF, UKF, RLS online adaptation, Flask APIs, and FPGA bit-exact parity. |
 
 ---
 

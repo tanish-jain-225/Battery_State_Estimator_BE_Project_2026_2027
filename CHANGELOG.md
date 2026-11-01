@@ -7,9 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.1.0] - 2026-11-01 (Publications, Poster & Academic Architecture Release)
+
+### 🚀 Highlights (v2.1.0)
+- **Comprehensive Test Suite Expansion**: Expanded automated pytest regression suite from 62 to **104 passing tests** across 14 test modules (100% pass rate) covering document compilation, advanced estimator pipeline priming/hybrid observers, comprehensive Flask REST APIs, FPGA COE parser/extended CLI, and hardware CSR/quantization edge training.
+- **Strict Warning-Free C99 Compilation**: Resolved GCC `-Wtype-limits` and `-Wunused-parameter` warnings under `-Wall -Wextra -pedantic -std=c99` with full MISRA-C compliance.
+- **Pipeline Safe Self-Sufficiency**: Added `create_with_model()`, `load_saved_model()` and `PipelineSafeUnpickler` to `EstimatorPipeline` enabling zero-configuration model loading and robust NumPy 1.x / 2.x interoperability.
+- **Microservice Isolation**: Enforced fully-qualified package namespaces across `software.visualiser`, `software.shared`, and `hardware.STM_Verifier` preventing configuration cross-shadowing.
+- **Academic Publication Architecture**: Restructured the repository to host dedicated publication, poster, and verification directories (`docs/Poster/`, `docs/Publications/`, `docs/Paper_Proof/`).
+- **Capstone Presentation Poster**: Generated official high-resolution vector exhibition poster ([`Project_Poster.pdf`](docs/Poster/Project_Poster.pdf)) adhering to A1 exhibition board standards.
+- **Preprint Paper Deliverables**: Built publication-grade preprint PDFs for both the Comprehensive Review Paper ([`Review_Paper.pdf`](docs/Publications/Review_Paper.pdf)) and the Original Experimental Research Paper ([`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf)).
+- **Automated Document Generator**: Added [`scripts/build_project_documents.py`](scripts/build_project_documents.py) utilizing ReportLab to programmatically generate vector IEEE and poster assets.
+- **Evaluation Proofs Registry**: Scaffolded [`docs/Paper_Proof/README.md`](docs/Paper_Proof/README.md) establishing the 20 Marks evaluation tracking protocol (10 Marks submission proof + 10 Marks acceptance letter).
+- **Open-Source & Academic Governance Suite**: Added official open-source [`LICENSE`](LICENSE) (MIT License with academic attribution clause), [`AUTHORS.md`](AUTHORS.md) (comprehensive team, guide, coordinator, and VESIT institutional credits), [`CITATION.cff`](CITATION.cff) (GitHub-native BibTeX and APA citation metadata), [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), and [`SECURITY.md`](SECURITY.md) (vulnerability disclosure and secrets policy).
+
+---
+
 ## [v2.0.0] - 2026-10-10 (Review 2 Milestone Deliverable)
 
-### 🚀 Highlights
+### 🚀 Highlights (v2.0.0)
 - **Online ESN Adaptation**: Integrated Recursive Least Squares (RLS) adaptive readout filter reducing dynamic SOC tracking error to $<0.8\%$ under battery aging.
 - **UKF Non-Linear Benchmark**: Added Unscented Kalman Filter with Merwe scaled transform as a rigorous non-linear baseline.
 - **Embedded C99 CSR SpMV Acceleration**: MISRA-C compliant dual-mode firmware (Float32 vs Fixed-Point Q15) delivering a **6.7× inference speedup** and saving 82.4% RAM.
@@ -46,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v1.0.0] - 2026-09-21 (Review 1 Baseline Deliverable)
 
-### 🚀 Highlights
+### 🚀 Highlights (v1.0.0)
 - **2-RC Electro-Thermal Simulator**: Baseline simulation engine supporting UDDS driving profiles, OCV lookups, and thermal dynamics.
 - **Baseline Observers**: Initial implementation of Extended Kalman Filter (EKF), Coulomb Counting, and Resistance SOH observer.
 - **Proof-of-Concept ESN**: 50-neuron offline-trained Echo State Network for SOC estimation.

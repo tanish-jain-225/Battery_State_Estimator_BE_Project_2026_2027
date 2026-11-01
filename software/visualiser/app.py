@@ -229,11 +229,8 @@ class SafeUnpickler(pickle.Unpickler):
             module = module.replace("numpy._core", "numpy.core")
         # Remap numpy.core -> numpy._core (handles loading older pickles on environments where numpy.core is missing)
         elif module.startswith("numpy.core"):
-            try:
-                import numpy._core
+            if hasattr(np, '_core'):
                 module = module.replace("numpy.core", "numpy._core")
-            except ImportError:
-                pass
         return super().find_class(module, name)
 
 def safe_pickle_loads(data):
@@ -1387,7 +1384,7 @@ def post_register_chemistry():
         port_online, _ = check_simulator_port()
         if port_online:
             try:
-                with make_simulator_request("/api/chemistry/register", method='POST', data=data, timeout=1.0) as response:
+                with make_simulator_request("/api/chemistry/register", method='POST', data=data, timeout=1.0):
                     pass
             except Exception as e:
                 print(f"Warning: Failed to forward registered chemistry to simulator: {e}")

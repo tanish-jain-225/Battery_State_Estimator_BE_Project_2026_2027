@@ -9,10 +9,10 @@ This document defines the interfaces, state flow, runtime modes, API payloads an
 ## 📑 Table of Contents
 1. [System Goal](#system-goal)
 2. [Runtime Components](#runtime-components)
-3. [Data Flow & Architecture](#data-flow--architecture)
+3. [Data Flow & Architecture](#data-flow-architecture)
 4. [Telemetry Schema](#telemetry-schema)
 5. [Detailed API Endpoints Spec](#detailed-api-endpoints-spec)
-6. [Security & Authentication](#security--authentication)
+6. [Security & Authentication](#security-authentication)
 7. [Estimator Pipeline Architecture](#estimator-pipeline-architecture)
 8. [Edge Classifier Specification](#edge-classifier-specification)
 9. [Validation Scope](#validation-scope)
@@ -106,7 +106,7 @@ The database document schema for each telemetry frame is detailed below:
 
 ### 1. Simulator Service (`software/simulator`)
 
-#### `GET /api/status`
+#### Simulator `GET /api/status`
 Retrieves the simulator state, running configurations, active fault indicators and latest metrics.
 * **Response Payload (JSON):**
   ```json
@@ -197,7 +197,7 @@ Registers a new OCV curve and chemical characteristics parameter file.
 
 ### 2. Visualiser Service (`software/visualiser`)
 
-#### `GET /api/status`
+#### Visualiser `GET /api/status`
 Retrieves backend execution indicators, connection targets, active ESN model state, dynamic noise parameters and safety fault magnitudes.
 * **Response Payload (JSON):**
   ```json
@@ -309,7 +309,7 @@ Robustness and estimation accuracy limits are verified using automated unit suit
 
 Run the test suite locally using:
 ```bash
-# Automated 49-test regression suite
+# Automated 104-test regression suite
 pytest tests/ -v
 
 # Master one-click end-to-end validation (Windows)

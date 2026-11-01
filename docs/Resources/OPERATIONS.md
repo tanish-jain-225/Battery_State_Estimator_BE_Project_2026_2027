@@ -185,7 +185,7 @@ python hardware/FPGA_Verifier/compare_results.py
 
 ### Step 3: Run Automated FPGA Verifier Unit Tests
 ```bash
-pytest tests/test_fpga_verifier.py -v
+pytest tests/test_fpga_verifier.py tests/test_fpga_verifier_extended.py -v
 ```
 
 ---

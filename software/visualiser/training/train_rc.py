@@ -8,12 +8,25 @@ import pickle
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(base_dir)
 
-from config import Config
+try:
+    from software.visualiser.config import Config
+except ImportError:
+    from config import Config
 
 try:
     from feature_engineering import extract_features_df
 except ImportError:
     from training.feature_engineering import extract_features_df
+
+def simulate_quantization(val, bits_limit):
+    """Helper function to quantize arrays to simulate fixed-point precision."""
+    if val is None:
+        return None
+    v_max = max(1e-4, np.max(np.abs(val)))
+    scale = (2**(bits_limit - 1) - 1) / v_max
+    val_q = np.round(val * scale)
+    val_q = np.clip(val_q, -(2**(bits_limit - 1)), 2**(bits_limit - 1) - 1)
+    return val_q / scale
 
 class EchoStateNetwork:
     def __init__(self, n_inputs, n_reservoir, n_outputs, spectral_radius=0.95, leak_rate=0.3, input_scaling=1.0, ridge_param=1e-4, sparsity=0.85):

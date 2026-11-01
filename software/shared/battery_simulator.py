@@ -1,7 +1,5 @@
 import numpy as np
 import random
-import os
-import sys
 
 # Support relative or package import
 try:

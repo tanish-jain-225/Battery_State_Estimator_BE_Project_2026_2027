@@ -31,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from golden_model import GoldenESN, generate_reservoir_weights, load_tanh_mem
+from golden_model import GoldenESN, generate_reservoir_weights
 
 
 def generate_nasa_battery_dataset():

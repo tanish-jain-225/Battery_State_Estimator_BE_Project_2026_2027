@@ -8,10 +8,18 @@ try:
     train_rc_dir = os.path.join(root_dir, "software", "visualiser", "training")
     if train_rc_dir not in sys.path:
         sys.path.insert(0, train_rc_dir)
-    from train_rc import EchoStateNetwork as CanonicalEchoStateNetwork
+    from train_rc import EchoStateNetwork as CanonicalEchoStateNetwork, simulate_quantization
     _CANONICAL_ESN_AVAILABLE = True
 except Exception:
     _CANONICAL_ESN_AVAILABLE = False
+    def simulate_quantization(val, bits_limit):
+        if val is None:
+            return None
+        v_max = max(1e-4, np.max(np.abs(val)))
+        scale = (2**(bits_limit - 1) - 1) / v_max
+        val_q = np.round(val * scale)
+        val_q = np.clip(val_q, -(2**(bits_limit - 1)), 2**(bits_limit - 1) - 1)
+        return val_q / scale
 
 if _CANONICAL_ESN_AVAILABLE:
     class EchoStateNetwork(CanonicalEchoStateNetwork):

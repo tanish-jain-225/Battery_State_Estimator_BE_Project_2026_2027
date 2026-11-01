@@ -1,0 +1,41 @@
+MIT License
+
+Copyright (c) 2026 Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
+Vivekanand Education Society's Institute of Technology (VESIT), Mumbai, India.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+### Academic Attribution & Citation Notice
+
+This software, embedded firmware, and FPGA RTL repository was designed and engineered as part of a Bachelor of Engineering (B.E.) Capstone Project and peer-reviewed research initiative:
+
+* **Project Title:** Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting
+* **Student Authors:** 
+  - Sanjna Patankar (2023.sanjna.patankar@ves.ac.in)
+  - Akshay Nambiar (2023.akshay.nambiar@ves.ac.in)
+  - Satvik Verma (2023.satvik.verma@ves.ac.in)
+  - Tanish Sanghvi (2023.tanish.sanghvi@ves.ac.in)
+* **Project Guide:** Dr. Kadambari Sharma
+* **Project Coordinator:** Prof. Gopalakrishnan Narayanan
+* **Department:** Department of Automation and Robotics / Instrumentation
+* **Institution:** Vivekanand Education Society's Institute of Technology (VESIT), Chembur, Mumbai - 400074
+
+If you utilize, modify, or reference this codebase, dataset, embedded C99 firmware, or Verilog HDL models in academic research, educational courses, or commercial evaluations, please cite the project repository and its authored manuscripts (refer to `CITATION.cff` for BibTeX and APA entries).

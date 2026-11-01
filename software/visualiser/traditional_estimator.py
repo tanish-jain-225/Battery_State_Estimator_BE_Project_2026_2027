@@ -81,8 +81,6 @@ class ExtendedKalmanFilter:
         R2 = self.R2_nom * temp_effect
         C2 = self.C2_nom / temp_effect
 
-        x = np.array([[soc], [v1], [v2]])
-
         # 1. State Transition Matrices for 2RC
         tau1 = R1 * C1
         tau2 = R2 * C2

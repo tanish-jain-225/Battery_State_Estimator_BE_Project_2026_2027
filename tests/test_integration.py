@@ -30,7 +30,6 @@ from software.simulator.battery_simulator import BatterySimulator, DriveCycles
 from software.visualiser.estimator_pipeline import EstimatorPipeline
 from hardware.FPGA_Verifier.golden_model import (
     generate_reservoir_weights,
-    export_coe,
     parse_coe_file
 )
 

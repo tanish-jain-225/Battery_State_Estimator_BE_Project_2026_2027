@@ -16,7 +16,6 @@ Supports both:
 """
 
 import os
-import sys
 import csv
 import argparse
 import numpy as np

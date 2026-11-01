@@ -7,13 +7,13 @@ A high-fidelity real-time Python battery physics engine and simulation server. T
 ---
 
 ## 📖 Table of Contents
-1. [Simulator Directory Structure](#-simulator-directory-structure)
-2. [Simulation Architecture & Execution Loop](#-simulation-architecture--execution-loop)
-3. [Electro-Thermal & Degradation Physics](#-electro-thermal--degradation-physics)
-4. [Drive Cycles & Injected Faults](#-drive-cycles--injected-faults)
-5. [API Documentation](#-api-documentation)
-6. [Configuration & Tuning Parameters](#-configuration--tuning-parameters)
-7. [Setup & Running Instructions](#-setup--running-instructions)
+1. [Simulator Directory Structure](#simulator-directory-structure)
+2. [Simulation Architecture & Execution Loop](#simulation-architecture-execution-loop)
+3. [Electro-Thermal & Degradation Physics](#electro-thermal-degradation-physics)
+4. [Drive Cycles & Injected Faults](#drive-cycles-injected-faults)
+5. [API Documentation](#api-documentation)
+6. [Configuration & Tuning Parameters](#configuration-tuning-parameters)
+7. [Setup & Running Instructions](#setup-running-instructions)
 
 ---
 

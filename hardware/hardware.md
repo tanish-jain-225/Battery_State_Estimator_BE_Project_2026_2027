@@ -10,15 +10,15 @@ This document provides a single, consolidated technical guide to the hardware su
 ---
 
 ## 📑 Table of Contents
-1. [Hardware Subsystem Overview](#hardware-subsystem-overview)
-2. [Hardware Folder Structure](#-hardware-folder-structure)
-3. [FPGA Verilog ESN Verifier (ARTIX A7100T Target)](#-fpga-verilog-esn-verifier-artix-a7100t-target)
-4. [ESN Classifier Interface Specifications](#-esn-classifier-interface-specifications)
-5. [Embedded Optimizations (C99 Firmware)](#-embedded-optimizations)
-6. [Offline Model Export Pipeline](#️-offline-model-export-pipeline)
-7. [Hardware Wiring & Pinout Reference](#-hardware-wiring--pinout-reference)
-8. [Running the Desktop Verification Simulator](#-running-the-desktop-verification-simulator)
-9. [Running the FPGA RTL Hardware Verifier](#-running-the-fpga-rtl-hardware-verifier)
+1. [Hardware Subsystem Overview](#hardware-subsystem)
+2. [Hardware Folder Structure](#hardware-folder-structure)
+3. [FPGA Verilog ESN Verifier (ARTIX A7100T Target)](#fpga-verilog-esn-verifier-artix-a7100t-target)
+4. [ESN Classifier Interface Specifications](#esn-classifier-interface-specifications)
+5. [Embedded Optimizations (C99 Firmware)](#embedded-optimizations)
+6. [Offline Model Export Pipeline](#offline-model-export-pipeline)
+7. [Hardware Wiring & Pinout Reference](#hardware-wiring-pinout-reference)
+8. [Running the Desktop Verification Simulator](#running-the-desktop-verification-simulator)
+9. [Running the FPGA RTL Hardware Verifier](#running-the-fpga-rtl-hardware-verifier)
 
 ---
 
@@ -282,7 +282,7 @@ To test the Verilog HDL FPGA RTL models against the Python golden reference:
    ```
 
 3. **Master End-to-End Validation**:
-   To execute C99 simulation, FPGA verification, and all 62 test cases simultaneously:
+   To execute C99 simulation, FPGA verification, and all 104 test cases simultaneously:
    ```bash
    .\run_all_validation.bat
    ```

@@ -152,16 +152,18 @@ typedef struct {
 // Mock Function APIs
 static inline void HAL_Init(void) {}
 static inline void HAL_MPU_Disable(void) {}
-static inline void HAL_MPU_ConfigRegion(MPU_Region_InitTypeDef* init) {}
-static inline void HAL_MPU_Enable(uint32_t priv) {}
-static inline void HAL_PWREx_ConfigSupply(uint32_t supply) {}
-static inline void __HAL_PWR_VOLTAGESCALING_CONFIG(uint32_t scale) {}
-static inline uint32_t __HAL_PWR_GET_FLAG(uint32_t flag) { return 1; }
-static inline HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef* init) { return HAL_OK; }
-static inline HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef* init, uint32_t latency) { return HAL_OK; }
+static inline void HAL_MPU_ConfigRegion(MPU_Region_InitTypeDef* init) { (void)init; }
+static inline void HAL_MPU_Enable(uint32_t priv) { (void)priv; }
+static inline void HAL_PWREx_ConfigSupply(uint32_t supply) { (void)supply; }
+static inline void __HAL_PWR_VOLTAGESCALING_CONFIG(uint32_t scale) { (void)scale; }
+static inline uint32_t __HAL_PWR_GET_FLAG(uint32_t flag) { (void)flag; return 1; }
+static inline HAL_StatusTypeDef HAL_RCC_OscConfig(RCC_OscInitTypeDef* init) { (void)init; return HAL_OK; }
+static inline HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef* init, uint32_t latency) { (void)init; (void)latency; return HAL_OK; }
 
-static inline void HAL_GPIO_Init(void* GPIOx, GPIO_InitTypeDef* init) {}
+static inline void HAL_GPIO_Init(void* GPIOx, GPIO_InitTypeDef* init) { (void)GPIOx; (void)init; }
 static inline void HAL_GPIO_WritePin(void* GPIOx, uint16_t Pin, int PinState) {
+    (void)GPIOx;
+    (void)Pin;
     // Print LED state to stdout for verification
     if (PinState == GPIO_PIN_SET) {
         printf(" [LED: RED/ON]\n");
@@ -170,21 +172,26 @@ static inline void HAL_GPIO_WritePin(void* GPIOx, uint16_t Pin, int PinState) {
     }
 }
 static inline void HAL_GPIO_TogglePin(void* GPIOx, uint16_t Pin) {
+    (void)GPIOx;
+    (void)Pin;
     static bool state = false;
     state = !state;
     printf(" [LED: TOGGLED to %s]\n", state ? "ON" : "OFF");
 }
 
 static inline void HAL_Delay(uint32_t Delay) {
+    (void)Delay;
     // Bypass delay in host simulation to run instantly
 }
 
-static inline HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef* huart) { return HAL_OK; }
-static inline HAL_StatusTypeDef HAL_UARTEx_SetTxFifoThreshold(UART_HandleTypeDef* huart, uint32_t threshold) { return HAL_OK; }
-static inline HAL_StatusTypeDef HAL_UARTEx_SetRxFifoThreshold(UART_HandleTypeDef* huart, uint32_t threshold) { return HAL_OK; }
-static inline HAL_StatusTypeDef HAL_UARTEx_DisableFifoMode(UART_HandleTypeDef* huart) { return HAL_OK; }
+static inline HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef* huart) { (void)huart; return HAL_OK; }
+static inline HAL_StatusTypeDef HAL_UARTEx_SetTxFifoThreshold(UART_HandleTypeDef* huart, uint32_t threshold) { (void)huart; (void)threshold; return HAL_OK; }
+static inline HAL_StatusTypeDef HAL_UARTEx_SetRxFifoThreshold(UART_HandleTypeDef* huart, uint32_t threshold) { (void)huart; (void)threshold; return HAL_OK; }
+static inline HAL_StatusTypeDef HAL_UARTEx_DisableFifoMode(UART_HandleTypeDef* huart) { (void)huart; return HAL_OK; }
 
 static inline HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef* huart, const uint8_t* pData, uint16_t Size, uint32_t Timeout) {
+    (void)huart;
+    (void)Timeout;
     for (uint16_t i = 0; i < Size; i++) {
         putchar(pData[i]);
     }

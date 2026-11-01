@@ -51,7 +51,6 @@ def load_csv(path, default_key_pass='pass', key_neuron='neuron'):
         neuron = int(row[key_neuron])
         # Detect sequential wrap-around if passbuf rolled over (e.g., 0, 1, 0, 1)
         if key_pass == 'passbuf':
-            raw_pass = int(row['passbuf'])
             if idx > 0 and neuron == 0 and last_neuron > 0:
                 current_pass += 1
             pass_val = current_pass

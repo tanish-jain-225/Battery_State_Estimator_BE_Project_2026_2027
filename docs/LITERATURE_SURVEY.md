@@ -9,13 +9,13 @@ This document synthesizes the academic literature, theoretical foundations, and 
 ---
 
 ## 📑 Table of Contents
-1. [BMS Estimation Tasks & Shared Operational Challenges](#1-bms-estimation-tasks--shared-operational-challenges)
-2. [Conventional Estimation Methods (Classical & Observers)](#2-conventional-estimation-methods-classical--observers)
-3. [Deep Learning Approaches & The Edge-Deployment Limit](#3-deep-learning-approaches--the-edge-deployment-limit)
+1. [BMS Estimation Tasks & Shared Operational Challenges](#1-bms-estimation-tasks-shared-operational-challenges)
+2. [Conventional Estimation Methods (Classical & Observers)](#2-conventional-estimation-methods-classical-observers)
+3. [Deep Learning Approaches & The Edge-Deployment Limit](#3-deep-learning-approaches-the-edge-deployment-limit)
 4. [Spiking Neural Networks (SNNs) for BMS](#4-spiking-neural-networks-snns-for-bms)
-5. [Reservoir Computing (RC) & Liquid State Machines (LSMs)](#5-reservoir-computing-rc--liquid-state-machines-lsms)
-6. [Neuromorphic Hardware Platforms & Event-Driven Sensing](#6-neuromorphic-hardware-platforms--event-driven-sensing)
-7. [Multi-Dimensional Benchmarking & Research Roadmap](#7-multi-dimensional-benchmarking--research-roadmap)
+5. [Reservoir Computing (RC) & Liquid State Machines (LSMs)](#5-reservoir-computing-rc-liquid-state-machines-lsms)
+6. [Neuromorphic Hardware Platforms & Event-Driven Sensing](#6-neuromorphic-hardware-platforms-event-driven-sensing)
+7. [Multi-Dimensional Benchmarking & Research Roadmap](#7-multi-dimensional-benchmarking-research-roadmap)
 
 ---
 

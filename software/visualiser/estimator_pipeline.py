@@ -2,12 +2,39 @@ import time
 import numpy as np
 import sys
 import os
+import pickle
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
-from config import Config
+training_dir = os.path.join(base_dir, 'training')
+if training_dir not in sys.path:
+    sys.path.insert(0, training_dir)
+
+try:
+    from training.train_rc import EchoStateNetwork
+except ImportError:
+    try:
+        from train_rc import EchoStateNetwork
+    except ImportError:
+        EchoStateNetwork = None
+
+class PipelineSafeUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if name == "EchoStateNetwork" and EchoStateNetwork is not None:
+            return EchoStateNetwork
+        if module.startswith("numpy._core"):
+            module = module.replace("numpy._core", "numpy.core")
+        elif module.startswith("numpy.core"):
+            if hasattr(np, '_core'):
+                module = module.replace("numpy.core", "numpy._core")
+        return super().find_class(module, name)
+
+try:
+    from software.visualiser.config import Config
+except ImportError:
+    from config import Config
 from traditional_estimator import ExtendedKalmanFilter, UnscentedKalmanFilter, ResistanceSOH, RecursiveLeastSquares
 from battery_chemistry import get_chemistry
 
@@ -18,12 +45,10 @@ except ImportError:
         lookback = rolling_window - 1
         if len(history) == 0:
             V_prev = V_current
-            V_history = [V_current]
             I_history = [I_current]
             T_history = [T_current]
         else:
             V_prev = history[-1]['voltage']
-            V_history = [r['voltage'] for r in history[-lookback:]] + [V_current]
             I_history = [r['current'] for r in history[-lookback:]] + [I_current]
             T_history = [r['temperature'] for r in history[-lookback:]] + [T_current]
         V_grad = V_current - V_prev
@@ -117,6 +142,37 @@ class EstimatorPipeline:
                 self.esn_soh_state = [0.0] * self.esn_soh.n_reservoir
         else:
             self.esn_soh_state = None
+
+    def load_saved_model(self, path=None):
+        """Loads ESN model weights from local pickle file."""
+        if path is None:
+            path = getattr(Config, 'MODEL_PATH', os.path.join(base_dir, 'model_rc.pkl'))
+        if not os.path.isabs(path):
+            candidate = os.path.join(base_dir, path)
+            if os.path.exists(candidate):
+                path = candidate
+        if not os.path.exists(path):
+            return False
+        try:
+            with open(path, 'rb') as f:
+                pkg = PipelineSafeUnpickler(f).load()
+            self.load_model(
+                esn_soc=pkg.get('esn_soc'),
+                esn_soh=pkg.get('esn_soh'),
+                input_means=pkg.get('input_means'),
+                input_stds=pkg.get('input_stds')
+            )
+            return True
+        except Exception as e:
+            print(f"Warning: Failed to load saved model from {path}: {e}")
+            return False
+
+    @classmethod
+    def create_with_model(cls, chemistry_name="li_ion", mismatch=1.0, path=None):
+        """Factory constructor that initializes the pipeline and loads the trained ESN model."""
+        pipeline = cls(chemistry_name=chemistry_name, mismatch=mismatch)
+        pipeline.load_saved_model(path=path)
+        return pipeline
 
     def update_ekf_noise(self, q_soc, q_v1, q_v2, r_meas):
         """Pass noise params directly to the EKF object."""

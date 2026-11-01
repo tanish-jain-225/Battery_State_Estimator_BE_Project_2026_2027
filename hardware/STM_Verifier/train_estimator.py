@@ -2,7 +2,6 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-import pickle
 import argparse
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,8 +15,6 @@ def generate_full_range_dataset():
     Generates a high-fidelity synthetic battery dataset covering the full range
     of SOC (0% to 100%) and SOH (80% to 100%) with continuous degradation profiles.
     """
-    import sys
-    import os
     from pathlib import Path
     root_dir = Path(__file__).resolve().parent.parent.parent
     shared_path = str(root_dir / 'software' / 'shared')
@@ -114,7 +111,10 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"Training dataset not found at {csv_path}. Please place training_ev_battery_dataset_multiclass.csv in the directory.")
 
-    from config import Config as HWConfig
+    try:
+        from hardware.STM_Verifier.config import Config as HWConfig
+    except ImportError:
+        from config import Config as HWConfig
     if header_path is None:
         header_path = HWConfig.ESTIMATOR_WEIGHTS_HEADER
 
@@ -237,7 +237,10 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     # ── ESN Estimator Hyperparameters — read from hardware/STM_Verifier/config.py ──────────
     # These values MUST mirror software/visualiser/config.py → ESN_SOC_*/ESN_SOH_*.
     # Do NOT hardcode them here — change config.py to affect both hardware and software.
-    from config import Config as HWConfig
+    try:
+        from hardware.STM_Verifier.config import Config as HWConfig
+    except ImportError:
+        from config import Config as HWConfig
     SOC_N_RESERVOIR     = HWConfig.ESN_SOC_RESERVOIR
     SOC_SPECTRAL_RADIUS = HWConfig.ESN_SOC_SPECTRAL_RADIUS
     SOC_LEAK_RATE       = HWConfig.ESN_SOC_LEAK_RATE

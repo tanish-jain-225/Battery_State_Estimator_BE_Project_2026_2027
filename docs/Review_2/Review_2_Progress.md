@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [← Back to Review 1](../Review_1/Review_1_Progress.md) · [Review 2 Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes Report (PDF)](Resources/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
+[← Back to README](../../README.md) · [← Back to Review 1](../Review_1/Review_1_Progress.md) · [Review 2 Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes Report (PDF)](Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
 
 # ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
 ## Phase 2 Comprehensive Progress Report (Review 2 Deliverable)
@@ -13,12 +13,12 @@
 - Tanish Sanghvi  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (62 / 62 Automated Tests, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 104 Tests in v2.1.0, 200 / 200 FPGA Parity Stages)**
 
 ---
 
 ## 📑 Table of Contents
-1. [Executive Summary & Review 2 Scope](#1-executive-summary--review-2-scope)
+1. [Executive Summary & Review 2 Scope](#1-executive-summary-review-2-scope)
 2. [Review 1 Baseline vs. Review 2 Achievements](#2-review-1-baseline-vs-review-2-achievements)
 3. [Online ESN Adaptation with RLS Readout Weight Tracking](#3-online-esn-adaptation-with-rls-readout-weight-tracking)
 4. [Multi-Model Comparative Estimation Benchmark (ESN vs. UKF vs. EKF vs. CC)](#4-multi-model-comparative-estimation-benchmark)
@@ -26,7 +26,7 @@
 6. [Verilog HDL FPGA Hardware Verifier on Artix A7100T](#6-verilog-hdl-fpga-hardware-verifier-on-artix-a7100t)
 7. [Automated Verification Test Suite (62 Tests, 100% Pass)](#7-automated-verification-test-suite-62-tests-100-pass)
 8. [Master End-to-End One-Click Validation Pipeline](#8-master-end-to-end-one-click-validation-pipeline)
-9. [Review 2 Demonstration Script & Talking Points](#9-review-2-demonstration-script--talking-points)
+9. [Review 2 Demonstration Script & Talking Points](#9-review-2-demonstration-script-talking-points)
 10. [Phase 3 Roadmap Towards Final Defense](#10-phase-3-roadmap-towards-final-defense)
 
 ---
@@ -179,6 +179,9 @@ u(t) ────►│ Win MAC ──► (+) ──► Bias ──► Saturatio
 ---
 
 ## 7. Automated Verification Test Suite (62 Tests, 100% Pass)
+
+> [!NOTE]
+> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current v2.1.0 release, this test suite has expanded to **104 tests** across 14 modules, verifying automated PDF document compilation, advanced priming, multi-chemistry tracking, and hardware CSR quantization.
 
 The repository includes a comprehensive, automated test suite in the [`tests/`](../../tests/) directory. All tests run via `pytest`:
 
