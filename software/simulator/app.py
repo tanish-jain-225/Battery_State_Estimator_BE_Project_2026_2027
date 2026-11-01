@@ -125,8 +125,8 @@ def load_sim_state(force_db_read=False):
     global _last_state_load_time
     now = time.time()
     sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
-    # Cache state locally and query remote DB Atlas once every 1 second unless forced
-    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and _ensure_db():
+    # Cache state locally and query remote DB Atlas once every 2 seconds unless forced to minimize network roundtrips
+    if (force_db_read or (now - _last_state_load_time >= max(2.0, sync_interval))) and _ensure_db():
         try:
             doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
             _last_state_load_time = now
@@ -169,10 +169,14 @@ current_chemistry = None
 def generator_loop():
     global current_chemistry
     print("Simulator background thread active.")
-    last_loop_time = time.time()
+    target_tick = time.monotonic()
+    last_db_heartbeat = 0.0
     
     while True:
         try:
+            step_delay = Config.SIMULATION_STEP_DELAY
+            target_tick += step_delay
+
             state = load_sim_state()
             sim_running = state.get('sim_running', True)
             chemistry_name = state.get('chemistry', 'li_ion')
@@ -182,7 +186,6 @@ def generator_loop():
             fault_thermal = state.get('fault_thermal', False)
             fault_dropout = state.get('fault_dropout', False)
             fault_short = state.get('fault_short', False)
-            step_delay = Config.SIMULATION_STEP_DELAY
             
             # Sync chemistry
             if chemistry_name != current_chemistry:
@@ -194,14 +197,11 @@ def generator_loop():
                 print(f"Battery Physics profile loaded: {chemistry_name.upper()}")
                 
             if sim_running:
-                # Sync physical parameters
-                simulator.time = state.get('time', 0.0)
-                simulator.soc = state.get('soc', 1.0)
-                simulator.soh = state.get('soh', 1.0)
-                simulator.V1 = state.get('V1', 0.0)
-                simulator.V2 = state.get('V2', 0.0)
-                simulator.temperature = state.get('temperature', 25.0)
-                simulator.internal_resistance_growth = state.get('internal_resistance_growth', 1.0)
+                # Handle reset command if requested by user
+                if state.get('time', 0.0) == 0.0 and simulator.time > 1.0:
+                    simulator.reset(chemistry_name)
+                    print("Simulator baseline states reset.")
+
                 simulator.T_ambient = T_ambient
                 
                 # Retrieve cycle current excitation (I)
@@ -281,8 +281,9 @@ def generator_loop():
                     if len(local_telemetry_buffer) > limit:
                         local_telemetry_buffer.pop(0)
                     
-                # Update configuration document with live heartbeat
-                update_sim_progress({
+                # Update configuration document with live heartbeat every 3 seconds to eliminate redundant network roundtrips
+                now_wall = time.time()
+                local_state.update({
                     'time': simulator.time,
                     'soc': simulator.soc,
                     'soh': simulator.soh,
@@ -290,28 +291,44 @@ def generator_loop():
                     'V2': simulator.V2,
                     'temperature': simulator.temperature,
                     'internal_resistance_growth': simulator.internal_resistance_growth,
-                    'last_real_time': time.time(),
+                    'last_real_time': now_wall,
                     'prev_voltage': V_meas,
                     'prev_current': -I_meas,
                     'sim_running': True
                 })
+                if (now_wall - last_db_heartbeat >= 3.0) or (int(simulator.time) <= 1):
+                    last_db_heartbeat = now_wall
+                    update_sim_progress({
+                        'time': simulator.time,
+                        'soc': simulator.soc,
+                        'soh': simulator.soh,
+                        'V1': simulator.V1,
+                        'V2': simulator.V2,
+                        'temperature': simulator.temperature,
+                        'internal_resistance_growth': simulator.internal_resistance_growth,
+                        'last_real_time': now_wall,
+                        'prev_voltage': V_meas,
+                        'prev_current': -I_meas,
+                        'sim_running': True
+                    })
                 
-                # Sleep interval
-                now = time.time()
-                elapsed = now - last_loop_time
-                sleep_time = max(0.02, step_delay - elapsed)
+                # Drift-free monotonic sleep interval
+                now_mono = time.monotonic()
+                sleep_time = max(0.01, target_tick - now_mono)
+                if target_tick < now_mono - 2.0:
+                    target_tick = now_mono
                 time.sleep(sleep_time)
-                last_loop_time = time.time()
             else:
                 # Idle reset check
                 if state.get('time', 0.0) == 0.0 and simulator.time != 0.0:
                     simulator.reset(chemistry_name)
                     print("Simulator baseline states reset.")
                 time.sleep(0.5)
-                last_loop_time = time.time()
+                target_tick = time.monotonic()
         except Exception as e:
             print(f"Simulator thread exception: {e}")
             time.sleep(1.0)
+            target_tick = time.monotonic()
 
 def sync_simulation_on_demand():
     global current_chemistry

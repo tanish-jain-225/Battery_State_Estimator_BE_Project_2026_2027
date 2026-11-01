@@ -1111,17 +1111,20 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     pollTrainingStatus();
 
-    // Start Polling loops using recursive setTimeout to prevent request stacking (1-second sync interval)
-    async function statusPoll() {
-        await refreshStatus();
-        setTimeout(statusPoll, 1000);
-    }
-
+    // Start Polling loops using recursive setTimeout to prevent request stacking
+    // Telemetry polling: 500ms for instantaneous, zero-lag dynamic streaming
     async function telemetryPoll() {
         await refreshTelemetry();
-        setTimeout(telemetryPoll, 1000);
+        setTimeout(telemetryPoll, 500);
     }
 
-    statusPoll();
+    // Status polling: 2500ms since system configuration changes infrequently,
+    // eliminating request queueing on single-worker production WSGI servers (Gunicorn)
+    async function statusPoll() {
+        await refreshStatus();
+        setTimeout(statusPoll, 2500);
+    }
+
     telemetryPoll();
+    setTimeout(statusPoll, 200); // Stagger initial call to avoid concurrent startup contention
 });

@@ -384,7 +384,8 @@ def load_sim_state(force_db_read=False):
     global _last_state_load_time
     now = time.time()
     sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
-    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and check_db_connected():
+    # Cache state locally and query remote DB Atlas once every 2 seconds unless forced to minimize network roundtrips
+    if (force_db_read or (now - _last_state_load_time >= max(2.0, sync_interval))) and check_db_connected():
         try:
             state = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
             _last_state_load_time = now
@@ -1488,21 +1489,22 @@ def get_telemetry():
 
         if check_db_connected():
             try:
-                # Fast indexed lookup for database purge or reset detection (takes < 0.001s)
-                latest_record = db[Config.MONGODB_READINGS_COLLECTION].find_one(sort=[('time', -1)])
-                if latest_record is None or (prev_time is not None and latest_record['time'] < prev_time):
-                    cache.update({
-                        'key':       None,
-                        'pipeline':  None,
-                        'processed': [],
-                        'n_cached':  0
-                    })
-                    already_cached = 0
-                    prev_time = None
-                
                 if prev_time is not None:
+                    # Single fast indexed query: time > prev_time
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
                     new_readings = list(cursor)
+                    # If empty, check if database was purged or reset
+                    if not new_readings and already_cached > 0:
+                        latest_record = db[Config.MONGODB_READINGS_COLLECTION].find_one(sort=[('time', -1)])
+                        if latest_record is None or latest_record['time'] < prev_time:
+                            cache.update({
+                                'key':       None,
+                                'pipeline':  None,
+                                'processed': [],
+                                'n_cached':  0
+                            })
+                            already_cached = 0
+                            prev_time = None
                 else:
                     # Cap initial fetch to the most recent window (60 records) for instantaneous UI load
                     limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
