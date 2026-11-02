@@ -1,0 +1,11 @@
+; Auto-generated ESN weight file -- Q6.10 signed fixed point
+; See generate_weights.py for seed / distribution parameters
+memory_initialization_radix=10;
+memory_initialization_vector=
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0;
