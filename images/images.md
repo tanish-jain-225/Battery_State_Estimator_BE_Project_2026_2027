@@ -22,6 +22,13 @@ Second-order Equivalent Circuit Model schematic showing bulk OCV, ohmic resistan
 
 ---
 
+### Echo State Network (ESN) Reservoir Architecture
+Schematic of the recurrent dynamical reservoir topology, input projection weights $W^{\text{in}}$, sparse internal connections $W$, and trained linear readout matrix $W^{\text{out}}$.
+
+![Echo State Network Architecture](esn_architecture.png)
+
+---
+
 ### System Flowchart
 Execution algorithm and decision flowchart for telemetry generation, observer estimation, and CPS fault detection.
 

@@ -153,6 +153,12 @@ The proposed system uses an **Echo State Network (ESN)** based Reservoir Computi
 - **FPGA Verifier:** 100-neuron Verilog RTL, BRAM state storage, Python golden model verifier.
 - **Web Visualiser:** Flask REST backend, Chart.js frontend dashboard.
 
+### Echo State Network (ESN) Reservoir Architecture
+
+![Echo State Network Architecture](images/esn_architecture.png)
+
+The Echo State Network (ESN) projects input telemetry $\mathbf{u}_t \in \mathbb{R}^H$ (battery terminal voltage, current, temperature, and derived feature gradients) through a fixed, randomized input weight matrix $\mathbf{W}^{\text{in}}$ into a high-dimensional dynamical reservoir of $N$ recurrent neurons with internal weight matrix $\mathbf{W}$. Only the linear readout weight matrix $\mathbf{W}^{\text{out}}$ is trained via single-shot regularized Ridge Regression, completely bypassing backpropagation through time (BPTT) and enabling low-latency, memory-efficient edge execution on microcontrollers and FPGAs.
+
 ---
 
 ## System Architecture
@@ -269,6 +275,7 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 | Hardware Specs | [Hardware Overview](hardware/hardware.md) | Enclosure and hardware target specifications |
 | Circuit Diagram | [Circuit Diagram](images/circuit_diagram.png) | 2-RC ECM Equivalent Electrical Schematic |
 | System Architecture | [System Architecture Diagram](images/system_architecture.png) | End-to-end telemetry & hardware verifier architecture |
+| ESN Architecture | [ESN Reservoir Architecture](images/esn_architecture.png) | Echo State Network (ESN) dynamical reservoir structure |
 | Flowchart | [System Flowchart](images/flowchart.png) | Flowchart for simulator and estimator execution |
 | RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn_top.v) | Top-level 100-neuron Verilog RTL module with multi-timestep support |
 | RTL Schematic | [FPGA RTL Schematic](images/assets/screenshot_fpga_schematic.png) | Vivado synthesized ESN top datapath schematic |
