@@ -30,7 +30,7 @@
 
 ---
 
-## Team Details
+## Team Details 
 
 | Sr. No. | Name of Student | Roll No. | Branch | Email ID |
 | :---: | :--- | :--- | :--- | :--- |
