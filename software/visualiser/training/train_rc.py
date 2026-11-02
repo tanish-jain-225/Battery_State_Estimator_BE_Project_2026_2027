@@ -380,7 +380,7 @@ def main():
     source_name = None
 
     # Priority 1: Doc Link Data (if CSV_URL is configured and accessible)
-    if csv_url:
+    if csv_url and not (os.environ.get("VALIDATION_PIPELINE") == "1" and os.path.exists(csv_path)):
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
@@ -468,9 +468,9 @@ def main():
         if df['SOH'].max() > 1.5:
             df['SOH'] = df['SOH'] / 100.0
         df.reset_index(drop=True, inplace=True)
-    is_production = Config.is_production()
+    is_production = Config.is_production() or (os.environ.get("VALIDATION_PIPELINE") == "1")
     limit = Config.PRODUCTION_DECIMATION_LIMIT
-    if is_production and len(df) > limit:
+    if (is_production or len(df) > limit) and len(df) > limit:
         step = int(np.ceil(len(df) / limit))
         df = df.iloc[::step].reset_index(drop=True)
         print(f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.")

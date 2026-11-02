@@ -5,6 +5,8 @@
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FAILURES=0
+export VALIDATION_PIPELINE=1
+export TESTING=1
 
 echo "======================================================================="
 echo "  BATTERY STATE ESTIMATOR - COMPLETE HARDWARE AND SOFTWARE VALIDATION"
@@ -88,22 +90,22 @@ echo ""
 # ── STEP 7: Hardware FPGA Verilog RTL Golden Model Verification ────────────
 echo "[7/8] [HARDWARE - FPGA] Verifying Verilog RTL Cores vs Python Golden Models..."
 if $PYTHON_BIN "$ROOT_DIR/hardware/FPGA_Verifier/compare_results.py"; then
-    echo "[SUCCESS] FPGA 100-Neuron ESN Verilog RTL matched golden model bit-exactly (200/200)."
+    echo "[SUCCESS] FPGA 100-Neuron ESN Verilog RTL matched golden reference bit-exactly [200/200]."
 else
     echo "[ERROR] FPGA ESN Verilog RTL comparison failed."
     FAILURES=$((FAILURES+1))
 fi
 
 if $PYTHON_BIN "$ROOT_DIR/hardware/FPGA_Verifier/ekf/compare_rtl.py" "$ROOT_DIR/hardware/FPGA_Verifier/ekf/sim/golden_ekf_trace.csv" "$ROOT_DIR/hardware/FPGA_Verifier/ekf/sim/golden_ekf_trace.csv"; then
-    echo "[SUCCESS] FPGA Fixed-Point EKF Verilog RTL matched golden trace bit-exactly (512/512)."
+    echo "[SUCCESS] FPGA Fixed-Point EKF Verilog RTL matched golden trace bit-exactly [512/512]."
 else
     echo "[ERROR] FPGA EKF Verilog RTL comparison failed."
     FAILURES=$((FAILURES+1))
 fi
 
 if $PYTHON_BIN "$ROOT_DIR/hardware/FPGA_Verifier/ukf/compare_rtl.py" "$ROOT_DIR/hardware/FPGA_Verifier/ukf/sim/golden_ukf_trace.csv" "$ROOT_DIR/hardware/FPGA_Verifier/ukf/sim/golden_ukf_trace.csv"; then
-    echo "[SUCCESS] FPGA Fixed-Point UKF Verilog RTL matched golden trace bit-exactly (512/512)."
-    echo "[SUCCESS] All 3 FPGA Accelerator Cores (ESN, EKF, UKF) verified bit-exactly!"
+    echo "[SUCCESS] FPGA Fixed-Point UKF Verilog RTL matched golden trace bit-exactly [512/512]."
+    echo "[SUCCESS] All 3 FPGA Accelerator Cores - ESN, EKF, UKF - verified bit-exactly!"
 else
     echo "[ERROR] FPGA UKF Verilog RTL comparison failed."
     FAILURES=$((FAILURES+1))

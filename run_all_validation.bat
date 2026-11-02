@@ -8,6 +8,8 @@ echo.
 
 set FAILURES=0
 set "ROOT_DIR=%~dp0"
+set VALIDATION_PIPELINE=1
+set TESTING=1
 
 :: ── STEP 1: Verify Python Environment ────────────────────────────────────
 echo [1/8] Verifying Environment and Python Dependencies...

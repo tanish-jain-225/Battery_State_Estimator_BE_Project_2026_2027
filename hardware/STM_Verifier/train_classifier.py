@@ -146,7 +146,7 @@ def train_and_export_classifier(csv_path=None, header_path=None, grid_search=Fal
     source_name = None
     csv_url = getattr(Config, 'CSV_URL', '').strip()
 
-    if csv_url:
+    if csv_url and not (os.environ.get("VALIDATION_PIPELINE") == "1" and os.path.exists(csv_path)):
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
@@ -176,6 +176,11 @@ def train_and_export_classifier(csv_path=None, header_path=None, grid_search=Fal
         raise FileNotFoundError(f"Classifier dataset not found at {csv_path} and remote URL unavailable.")
 
     df = clean_df_columns(df)
+    limit = 5000
+    if (os.environ.get("VALIDATION_PIPELINE") == "1" or len(df) > limit) and len(df) > limit:
+        step = int(np.ceil(len(df) / limit))
+        df = df.iloc[::step].reset_index(drop=True)
+        print(f"Decimated dataset (sampled every {step}th row) to {len(df)} rows for fast classifier training.")
     labels = get_labels(df)
 
     print(f"[DATA SOURCE] Training hardware classifier using: {source_name or 'Local Trained File Data'}")

@@ -116,13 +116,21 @@ db = None
 mongodb_connected = False
 
 _last_db_ping_time = 0.0
+_last_db_failure_time = 0.0
 
 def check_db_connected():
-    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time
-    timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
+    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time, _last_db_failure_time
+    # Fast non-blocking check when already connected
+    if _mongodb_connected and db is not None:
+        return True
+
+    now = time.time()
+    failure_cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2.0
+    if now - _last_db_failure_time < failure_cooldown:
+        return False
+
+    timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2000
     if IS_SERVERLESS:
-        if _mongodb_connected and db is not None:
-            return True
         try:
             db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
             db_client.admin.command('ping')
@@ -131,17 +139,13 @@ def check_db_connected():
             mongodb_connected = True
             return True
         except Exception as e:
+            _last_db_failure_time = now
             print(f"Visualiser Database connection failed: {e}")
             _mongodb_connected = False
             mongodb_connected = False
             db_client = None
             db = None
             return False
-
-    now = time.time()
-    # Fast non-blocking check when already connected
-    if _mongodb_connected and db is not None:
-        return True
 
     # Reconnect check paced by MONGODB_SYNC_INTERVAL (1.0 second)
     sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
@@ -156,6 +160,7 @@ def check_db_connected():
             mongodb_connected = True
             return True
         except Exception as e:
+            _last_db_failure_time = now
             print(f"Visualiser Database connection failed: {e}")
             _mongodb_connected = False
             mongodb_connected = False
@@ -891,7 +896,9 @@ def run_training_async():
             rem = timeout_limit - (time.time() - start_time)
             if rem <= 0:
                 raise TimeoutError(f"Online training exceeded time limit of {timeout_limit:.2f} seconds.")
-            req_timeout = min(10.0, max(0.1, rem))
+            is_test_env = app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1'
+            max_req_timeout = 0.2 if is_test_env else 10.0
+            req_timeout = min(max_req_timeout, max(0.05, rem))
             training_status['logs'] += f"Checking doc link accessibility ({csv_url}, timeout: {req_timeout:.1f}s)...\n"
             try:
                 import io

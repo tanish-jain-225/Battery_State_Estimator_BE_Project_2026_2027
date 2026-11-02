@@ -175,77 +175,58 @@ class GoldenESN:
         self.W = np.array(W, dtype=np.int64).reshape(n_res, n_res)
         self.bias = np.array(bias, dtype=np.int64).reshape(n_res)
         self.lut = lut if lut is not None else load_tanh_mem()
+        self.lut_arr = np.array(self.lut, dtype=np.int64)
         self.x = np.zeros(n_res, dtype=np.int64)
 
     def reset(self):
         self.x = np.zeros(self.n_res, dtype=np.int64)
 
-    def step(self, u_vec, pass_idx):
+    def step(self, u_vec, pass_idx, record_details=True):
         """
         Executes one timestep of the ESN matching RTL stage by stage.
-        Returns a list of dicts for each neuron.
+        Returns a list of dicts for each neuron when record_details=True.
         """
         u_arr = np.array(u_vec, dtype=np.int64)
         x_old = self.x.copy()
-        x_next = np.zeros(self.n_res, dtype=np.int64)
+
+        # Vectorized Q6.10 matrix-vector operations
+        acc = (self.Win @ u_arr) + (self.W @ x_old)
+        rounded = (acc + (1 << 9)) >> 10
+        mac_result = np.clip(rounded, -32768, 32767)
+        neuron_sum = mac_result + self.bias
+        tanh_input = np.clip(neuron_sum, -5120, 5120)
+
+        abs_addr = np.abs(tanh_input)
+        rom_val = self.lut_arr[abs_addr]
+        rom_signed = np.where(rom_val >= 32768, rom_val - 65536, rom_val)
+        tanh_output = np.where(tanh_input < 0, -rom_signed, rom_signed)
+        x_next = np.clip(tanh_output, -32768, 32767)
+        self.x = x_next
+
+        if not record_details:
+            return None
+
         records = []
-
         for i in range(self.n_res):
-            # Accumulator in RTL is 40-bit signed
-            acc = 0
-
-            # Win.u products
-            for k in range(self.n_in):
-                acc += int(self.Win[i, k]) * int(u_arr[k])
-
-            # W.x products
-            for j in range(self.n_res):
-                acc += int(self.W[i, j]) * int(x_old[j])
-
-            # Round-half-up: (acc + 512) >>> 10
-            rounded = (acc + (1 << 9)) >> 10
-            # 16-bit saturation
-            mac_result = max(-32768, min(32767, rounded))
-
-            # Bias addition: 18-bit signed
+            m_res = int(mac_result[i])
             b_val = int(self.bias[i])
-            neuron_sum = mac_result + b_val
-
-            # Clipping to [-5120, +5120] ([-5.0, +5.0] in Q6.10)
-            tanh_input = max(-5120, min(5120, neuron_sum))
-
-            # Hardware tanh LUT
-            sign = 1 if tanh_input < 0 else 0
-            abs_addr = -tanh_input if sign else tanh_input
-            rom_val = self.lut[abs_addr]
-
-            # Interpret rom_val as signed 16-bit
-            if rom_val >= 32768:
-                rom_signed = rom_val - 65536
-            else:
-                rom_signed = rom_val
-
-            tanh_output = -rom_signed if sign else rom_signed
-            # Ensure within 16-bit signed
-            tanh_output = max(-32768, min(32767, tanh_output))
-            x_next[i] = tanh_output
-
+            n_sum = int(neuron_sum[i])
+            t_in = int(tanh_input[i])
+            t_out = int(x_next[i])
             records.append({
                 'pass': pass_idx,
                 'neuron': i,
-                'mac': to_hex_signed(mac_result, 16),
+                'mac': to_hex_signed(m_res, 16),
                 'bias': to_hex_signed(b_val, 16),
-                'sum': to_hex_signed(neuron_sum, 18),
-                'tanh_in': to_hex_signed(tanh_input, 16),
-                'tanh_out': to_hex_signed(tanh_output, 16),
-                'mac_dec': mac_result,
+                'sum': to_hex_signed(n_sum, 18),
+                'tanh_in': to_hex_signed(t_in, 16),
+                'tanh_out': to_hex_signed(t_out, 16),
+                'mac_dec': m_res,
                 'bias_dec': b_val,
-                'sum_dec': neuron_sum,
-                'out_dec': tanh_output,
-                'out_real': tanh_output / 1024.0
+                'sum_dec': n_sum,
+                'out_dec': t_out,
+                'out_real': t_out / 1024.0
             })
-
-        self.x = x_next
         return records
 
 

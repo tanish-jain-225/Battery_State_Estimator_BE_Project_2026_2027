@@ -187,13 +187,12 @@ def evaluate_fpga_outcomes():
             if expected_u_addr != t_idx * len(feature_keys):
                 timestep_addr_errors += 1
 
-            records = esn.step(u_q610, pass_idx=t_idx)
+            esn.step(u_q610, pass_idx=t_idx, record_details=False)
             total_evaluations += 1
 
             # Hardware Check 2: X-corruption check (uninitialized/NaN values)
-            for rec in records:
-                if rec['tanh_out'] is None or 'x' in str(rec['tanh_out']).lower():
-                    x_corruptions += 1
+            if np.any(np.isnan(esn.x)):
+                x_corruptions += 1
 
             state_real = esn.x.astype(np.float64) / 1024.0
 

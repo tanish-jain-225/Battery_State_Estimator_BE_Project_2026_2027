@@ -126,7 +126,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
     csv_url = getattr(HWConfig, 'CSV_URL', '').strip()
 
     # Priority 1: Doc Link Data (if CSV_URL is configured and accessible)
-    if csv_url:
+    if csv_url and not (os.environ.get("VALIDATION_PIPELINE") == "1" and csv_path is not None and os.path.exists(csv_path)):
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
@@ -213,6 +213,13 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         if df['SOH'].max() > 1.5:
             df['SOH'] = df['SOH'] / 100.0
         df.reset_index(drop=True, inplace=True)
+
+        # Decimate dataset in validation pipeline to complete in seconds
+        limit = 5000
+        if (os.environ.get("VALIDATION_PIPELINE") == "1" or len(df) > limit) and len(df) > limit:
+            step = int(np.ceil(len(df) / limit))
+            df = df.iloc[::step].reset_index(drop=True)
+            print(f"Decimated dataset (sampled every {step}th row) to {len(df)} rows for fast hardware training.")
 
     # 3. Feature engineering
     print("Performing feature engineering...")

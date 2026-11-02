@@ -98,11 +98,17 @@ db = None
 _mongodb_connected = False
 _mongodb_error = None
 _last_state_load_time = 0.0
+_last_db_connect_attempt = 0.0
 
 def _ensure_db():
-    global mongodb_connected, _mongodb_connected, db_client, db
+    global mongodb_connected, _mongodb_connected, db_client, db, _last_db_connect_attempt
     if _mongodb_connected and db is not None:
         return True
+    now = time.time()
+    cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2.0
+    if now - _last_db_connect_attempt < cooldown:
+        return False
+    _last_db_connect_attempt = now
     try:
         timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
         if db_client is None:
