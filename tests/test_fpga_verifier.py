@@ -9,12 +9,8 @@ fpga_dir = os.path.join(root_dir, "hardware", "FPGA_Verifier")
 if fpga_dir not in sys.path:
     sys.path.insert(0, fpga_dir)
 
-from hardware.FPGA_Verifier.golden_model import (
-    load_tanh_mem,
-    run_tiny,
-    to_hex_signed
-)
 from hardware.FPGA_Verifier.compare_results import load_csv
+from hardware.FPGA_Verifier.golden_model import load_tanh_mem, run_tiny, to_hex_signed
 
 
 def test_tanh_lut_loading():

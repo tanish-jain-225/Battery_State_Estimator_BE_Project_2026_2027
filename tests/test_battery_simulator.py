@@ -1,5 +1,6 @@
 from software.shared.battery_simulator import BatterySimulator, DriveCycles
 
+
 def test_simulator_initialization():
     sim = BatterySimulator("li_ion")
     assert sim.soc == 1.0
@@ -11,7 +12,7 @@ def test_simulator_step_discharge():
     sim = BatterySimulator("li_ion")
     initial_soc = sim.soc
     out = sim.step(current=2.0, dt=1.0)
-    
+
     assert out['time'] == 1.0
     assert out['voltage'] > 0.0
     assert out['true_soc'] < initial_soc
@@ -33,7 +34,7 @@ def test_drive_cycles():
     for c in cycles:
         current = DriveCycles.get_current(c, t=10.0)
         assert isinstance(current, float)
-        
+
     assert isinstance(DriveCycles.udds(10.0), float)
     assert isinstance(DriveCycles.hwfet(10.0), float)
     assert isinstance(DriveCycles.us06(10.0), float)
@@ -53,7 +54,7 @@ def test_fault_modes():
     sim = BatterySimulator("li_ion")
     out_short = sim.step(current=2.0, dt=1.0, fault_short=True)
     assert out_short['voltage'] > 0.0
-    
+
     out_thermal = sim.step(current=2.0, dt=1.0, fault_thermal=True)
     assert out_thermal['temperature'] >= 25.0
 
@@ -67,7 +68,7 @@ def test_cccv_charge_cycle():
     """Validates the CCCV charge profile transitions from CC to CV mode at SOC > 0.8."""
     cc_current = DriveCycles.cccv_charge(0, soc=0.5)
     assert cc_current == -3.0, "CC phase should deliver -3.0 A"
-    
+
     cv_current = DriveCycles.cccv_charge(0, soc=0.9)
     assert cv_current == -1.0, "CV phase should taper to -1.0 A"
 

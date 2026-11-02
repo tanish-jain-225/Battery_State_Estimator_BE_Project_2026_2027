@@ -35,11 +35,12 @@ jobs:
           pip install -r software/visualiser/requirements.txt
           pip install -r software/simulator/requirements.txt
           pip install -r hardware/STM_Verifier/requirements.txt
-          pip install pytest flake8 pytest-cov
+          pip install pytest flake8 pytest-cov ruff
 
       - name: Code Quality & Syntax Linting
         run: |
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          ruff check .
 
       - name: Run Pytest Suite with Coverage
         run: |

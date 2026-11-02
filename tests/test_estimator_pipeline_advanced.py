@@ -1,17 +1,14 @@
-import sys
 import os
+import sys
+
 import numpy as np
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-from software.visualiser.estimator_pipeline import (
-    EstimatorPipeline,
-    _trapezoidal_integration,
-    extract_features_step
-)
 from software.visualiser.config import Config
+from software.visualiser.estimator_pipeline import EstimatorPipeline, _trapezoidal_integration, extract_features_step
 
 
 def test_pipeline_load_saved_model():
@@ -37,7 +34,7 @@ def test_pipeline_full_esn_step():
     """Verify that with model loaded, step() performs reservoir updates and predictions."""
     ep = EstimatorPipeline.create_with_model()
     res = ep.step(V_meas=3.7, I_meas_discharge=2.0, T_meas=25.0, dt=1.0)
-    
+
     assert 'esn_soc' in res
     assert 'esn_soh' in res
     assert 0.0 <= res['esn_soc'] <= 1.0
@@ -93,15 +90,15 @@ def test_pipeline_adaptive_rls_online():
 def test_pipeline_sensor_fault_handling():
     """Verify pipeline detects sensor short and dropout faults gracefully."""
     ep = EstimatorPipeline.create_with_model()
-    
+
     # Normal step
     res_norm = ep.step(V_meas=3.7, I_meas_discharge=2.0, T_meas=25.0)
     assert len(res_norm['faults']) == 0
-    
+
     # Voltage zero dropout
     res_zero = ep.step(V_meas=0.0, I_meas_discharge=0.0, T_meas=25.0)
     assert 'sensor_dropout' in res_zero['faults']
-    
+
     # Explicit short fault
     res_short = ep.step(V_meas=3.7, I_meas_discharge=2.0, T_meas=25.0, fault_short=True)
     assert 'internal_short' in res_short['faults']
@@ -132,7 +129,7 @@ def test_extract_features_step_empty_and_populated():
     assert f_empty[1] == 2.0
     assert f_empty[2] == 25.0
     assert f_empty[3] == 0.0  # V_grad = 0
-    
+
     history = [
         {'voltage': 3.75, 'current': 2.0, 'temperature': 25.0},
         {'voltage': 3.72, 'current': 2.1, 'temperature': 25.1},

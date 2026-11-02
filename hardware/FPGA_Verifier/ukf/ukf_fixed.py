@@ -27,6 +27,7 @@ The second Cholesky column has no SOC component, so sigma points 0, 2, 4 share
 one SOC and need only one OCV lookup (3 lookups instead of 5).
 """
 import math
+
 import numpy as np
 
 F30, F28 = 30, 28

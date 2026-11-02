@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import pytest
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -129,7 +130,7 @@ def test_visualiser_control_commands(vis_client):
     # Test Start
     res_start = vis_client.post('/api/control', json={'command': 'start'})
     assert res_start.status_code in (200, 401)
-    
+
     # Test Set Parameters
     res_params = vis_client.post('/api/control', json={
         'chemistry': 'lfp',

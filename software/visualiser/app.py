@@ -1,11 +1,12 @@
-import sys
+import json
 import os
+import pickle
+import sys
+import threading
 import time
 import urllib.request
-import json
-import pickle
-import threading
 from datetime import datetime
+
 import numpy as np
 import pandas as pd
 
@@ -17,18 +18,20 @@ training_dir = os.path.join(base_dir, 'training')
 if training_dir not in sys.path:
     sys.path.append(training_dir)
 
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
+
 try:
     from software.visualiser.config import Config
 except ImportError:
     from config import Config
 from train_rc import EchoStateNetwork
+
 sys.modules['__main__'].EchoStateNetwork = EchoStateNetwork
 
 # Dynamic imports from local modules
-from battery_simulator import BatterySimulator, DriveCycles
 from battery_chemistry import get_chemistry, register_chemistry
+from battery_simulator import BatterySimulator, DriveCycles
 from estimator_pipeline import EstimatorPipeline
 
 # System resource monitor fallback
@@ -54,38 +57,38 @@ def verify_request_auth():
     remote = request.remote_addr
     if remote in ('127.0.0.1', '::1', 'localhost'):
         return True
-        
+
     secret = get_shared_secret()
     if not secret:
         is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
         return not is_prod
-    
+
     # Check header
     header_key = request.headers.get("X-API-Key")
     if header_key == secret:
         return True
-        
+
     # Check query param as fallback
     query_key = request.args.get("api_key")
     if query_key == secret:
         return True
-        
+
     return False
 
 
 def make_simulator_request(path, method='GET', data=None, timeout=1.0):
     url = f"{Config.SIMULATOR_URL}{path}"
     headers = {}
-    
+
     secret = get_shared_secret()
     if secret:
         headers["X-API-Key"] = secret
-        
+
     encoded_data = None
     if data is not None:
         encoded_data = json.dumps(data).encode('utf-8')
         headers["Content-Type"] = "application/json"
-        
+
     req = urllib.request.Request(
         url,
         data=encoded_data,
@@ -269,7 +272,7 @@ def load_ml_model():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse
 
     candidates = []
-    
+
     # First: Try to load from MongoDB Registry (supports serverless read-only filesystem)
     if check_db_connected():
         try:
@@ -370,7 +373,7 @@ def check_simulator_port(force=False):
         if was_online:
             _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         return False, None
-        
+
     return _simulator_port_online, _simulator_port_data
 
 # Shared state memory
@@ -425,7 +428,7 @@ def sync_simulation_locally():
     global current_chemistry
     if not IS_SERVERLESS:
         return
-        
+
     state = load_sim_state()
     sim_running = state.get('sim_running', False)
     if not sim_running:
@@ -561,7 +564,7 @@ def sync_simulation_locally():
 def status_checker_loop():
     global _mongodb_connected, mongodb_connected, db_client, db
     print("Visualizer background status checker thread active.")
-    
+
     # Try initial mongo connection
     try:
         db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
@@ -617,7 +620,7 @@ def local_generator_loop():
     global current_chemistry
     print("Visualizer local simulator background thread active.")
     last_loop_time = time.time()
-    
+
     while True:
         try:
             # If MongoDB is connected, the standalone Simulator process generates and posts telemetry.
@@ -632,7 +635,7 @@ def local_generator_loop():
                 time.sleep(1.0)
                 last_loop_time = time.time()
                 continue
-                
+
             state = load_sim_state()
             sim_running = state.get('sim_running', False)
             chemistry_name = state.get('chemistry', 'li_ion')
@@ -643,7 +646,7 @@ def local_generator_loop():
             fault_dropout = state.get('fault_dropout', False)
             fault_short = state.get('fault_short', False)
             step_delay = Config.SIMULATION_STEP_DELAY
-            
+
             # Sync chemistry
             if chemistry_name != current_chemistry:
                 if state.get('time', 0.0) == 0.0:
@@ -652,7 +655,7 @@ def local_generator_loop():
                     visualiser_simulator.change_chemistry(chemistry_name)
                 current_chemistry = chemistry_name
                 print(f"Local simulator chemistry loaded: {chemistry_name.upper()}")
-                
+
             if sim_running:
                 # Sync physical parameters
                 visualiser_simulator.time = state.get('time', 0.0)
@@ -663,7 +666,7 @@ def local_generator_loop():
                 visualiser_simulator.temperature = state.get('temperature', 25.0)
                 visualiser_simulator.internal_resistance_growth = state.get('internal_resistance_growth', 1.0)
                 visualiser_simulator.T_ambient = T_ambient
-                
+
                 # Retrieve cycle current excitation (I)
                 t = visualiser_simulator.time
                 if active_cycle == "udds":
@@ -678,16 +681,16 @@ def local_generator_loop():
                     I = DriveCycles.cccv_charge(t, visualiser_simulator.soc)
                 else:
                     I = 0.0
-                    
+
                 # Step physics
                 out = visualiser_simulator.step(
-                    I, step_delay, 
+                    I, step_delay,
                     accelerated_aging=accelerated_aging,
                     fault_thermal=fault_thermal,
                     fault_dropout=fault_dropout,
                     fault_short=fault_short
                 )
-                
+
                 # Apply nominal noise bounds
                 noisy = visualiser_simulator.add_sensor_noise(
                     out,
@@ -696,11 +699,11 @@ def local_generator_loop():
                     t_noise=Config.DEFAULT_NOISE_TEMPERATURE,
                     fault_dropout=fault_dropout
                 )
-                
+
                 V_meas = noisy['voltage']
                 I_meas = noisy['current']
                 T_meas = noisy['temperature']
-                
+
                 record = {
                     'time': out['time'],
                     'voltage': V_meas,
@@ -710,7 +713,7 @@ def local_generator_loop():
                     'fault_short': fault_short,
                     'fault_thermal': fault_thermal,
                     'fault_dropout': fault_dropout,
-                    
+
                     # True ground truth reference properties
                     'true_soc': out['true_soc'],
                     'true_soh': out['true_soh'],
@@ -721,7 +724,7 @@ def local_generator_loop():
                     'true_voltage': out['voltage'],
                     'true_current': -out['current']
                 }
-                
+
                 # Push record to readings collection
                 if check_db_connected():
                     db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
@@ -729,7 +732,7 @@ def local_generator_loop():
                     local_telemetry_buffer.append(record)
                     if len(local_telemetry_buffer) > Config.TELEMETRY_FALLBACK_LIMIT:
                         local_telemetry_buffer.pop(0)
-                    
+
                 # Update configuration document
                 update_sim_progress({
                     'time': visualiser_simulator.time,
@@ -743,7 +746,7 @@ def local_generator_loop():
                     'prev_voltage': V_meas,
                     'prev_current': -I_meas
                 })
-                
+
                 # Sleep interval
                 now = time.time()
                 elapsed = now - last_loop_time
@@ -828,13 +831,13 @@ def _start_background_threads():
     global _local_threads_started, _checker_thread_started
     if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         return
-        
+
     # Start status checker thread unconditionally for every process/worker
     if not _checker_thread_started:
         _checker_thread_started = True
         checker = threading.Thread(target=status_checker_loop, daemon=True)
         checker.start()
-        
+
     # Start local generator fallback simulator ONLY if we acquire the lock
     if not _local_threads_started:
         if _acquire_lock():
@@ -864,7 +867,7 @@ def run_training_async():
     global esn_soc, esn_soh, input_means, input_stds, model_loaded, loaded_soc_rmse, loaded_soh_rmse, _last_fetched_df
     training_status['status'] = 'running'
     training_status['logs'] = 'Checking training dataset paths...\n'
-    
+
     start_time = time.time()
     timeout_limit = getattr(Config, 'ONLINE_TRAINING_TIMEOUT', 300.0)
 
@@ -874,9 +877,9 @@ def run_training_async():
 
     try:
         check_timeout()
-        from train_rc import EchoStateNetwork, generate_full_range_dataset
         from feature_engineering import extract_features_df
-        
+        from train_rc import EchoStateNetwork, generate_full_range_dataset
+
         csv_path = Config.CSV_PATH
         csv_url  = Config.CSV_URL
 
@@ -892,6 +895,7 @@ def run_training_async():
             training_status['logs'] += f"Checking doc link accessibility ({csv_url}, timeout: {req_timeout:.1f}s)...\n"
             try:
                 import io
+
                 import requests
                 response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=req_timeout)
                 if response.status_code == 200:
@@ -957,7 +961,7 @@ def run_training_async():
                 if split_data.shape[1] == len(new_cols):
                     split_data.columns = new_cols
                     df = split_data.apply(pd.to_numeric, errors='coerce')
-                    
+
             df.columns = [str(col).strip() for col in df.columns]
             rename_dict = {}
             for col in df.columns:
@@ -999,17 +1003,17 @@ def run_training_async():
             step = int(np.ceil(len(df) / limit))
             df = df.iloc[::step].reset_index(drop=True)
             training_status['logs'] += f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.\n"
-            
+
         training_status['logs'] += "Extracting features & scaling rolling MA features...\n"
         U_raw = extract_features_df(df)
         selected_indices = Config.ESN_SELECTED_FEATURE_INDICES
         U_raw = U_raw[:, selected_indices]
         n_features = len(selected_indices)
-        
+
         input_means = U_raw.mean(axis=0)
         input_stds = U_raw.std(axis=0)
         input_stds[input_stds == 0.0] = 1.0
-        
+
         U_scaled = (U_raw - input_means) / input_stds
         Y_soc = df[['SOC']].values
         Y_soh = df[['SOH']].values
@@ -1089,7 +1093,7 @@ def run_training_async():
         training_status['soh_rmse'] = soh_rmse
         training_status['timestamp'] = datetime.utcnow().isoformat()
         training_status['logs'] += "Echo State Network retraining finished successfully.\n"
-        
+
         # Hydrate active ESN components in global scope
         esn_soc = local_esn_soc
         esn_soh = local_esn_soh
@@ -1097,7 +1101,7 @@ def run_training_async():
         loaded_soc_rmse = soc_rmse
         loaded_soh_rmse = soh_rmse
         model_loaded = True
-        
+
         # Invalidate telemetry cache to apply the newly trained ESN weights retroactively
         _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
 
@@ -1127,27 +1131,27 @@ def get_status():
     try:
         if not model_loaded:
             load_ml_model()
-            
+
         port_online, port_data = check_simulator_port()
-        
+
         # If both simulator and database are offline, step the simulation locally in visualizer memory
         if not port_online and not check_db_connected():
             sync_simulation_locally()
 
         state = load_sim_state()
-        
+
         # Check simulator state fields
         sim_running = state.get('sim_running', False)
         active_cycle = state.get('active_cycle', 'udds')
         accelerated_aging = state.get('accelerated_aging', False)
         chemistry = state.get('chemistry', 'li_ion')
-        
+
         # Default environment / fault status
         T_ambient = state.get('T_ambient', 25.0)
         fault_thermal = state.get('fault_thermal', False)
         fault_dropout = state.get('fault_dropout', False)
         fault_short = state.get('fault_short', False)
-        
+
         # Override with live port state if online (always when simulator is online)
         if port_online and port_data:
             sim_running = port_data.get('sim_running', sim_running)
@@ -1158,7 +1162,7 @@ def get_status():
             fault_thermal = port_data.get('fault_thermal', fault_thermal)
             fault_dropout = port_data.get('fault_dropout', fault_dropout)
             fault_short = port_data.get('fault_short', fault_short)
-            
+
             # Sync back to local/database state ONLY if we are not connected to a shared MongoDB.
             # If MongoDB is connected, the DB is the single source of truth and the simulator
             # already writes its status directly to it. Overwriting it here causes race conditions
@@ -1170,7 +1174,7 @@ def get_status():
                     if val is not None and state.get(key) != val:
                         state[key] = val
                         config_changed = True
-                
+
                 prog_changed = False
                 prog_mappings = {
                     'time': 'time',
@@ -1185,7 +1189,7 @@ def get_status():
                     if val is not None and state.get(state_key) != val:
                         state[state_key] = val
                         prog_changed = True
-                        
+
                 if config_changed or prog_changed:
                     save_sim_state(state)
             if config_changed:
@@ -1242,10 +1246,10 @@ def control_simulation():
     try:
         data = request.json or {}
         state = load_sim_state()
-        
+
         # Save local parameter modifications (ignored under standard approach)
         pass
-            
+
         # Store other config inputs
         for key in ['chemistry', 'active_cycle', 'accelerated_aging', 'T_ambient', 'fault_thermal', 'fault_dropout', 'fault_short']:
             if key in data:
@@ -1280,32 +1284,32 @@ def control_simulation():
             state['fault_thermal'] = False
             state['fault_dropout'] = False
             state['fault_short'] = False
-            
+
             state['time'] = 0.0
-            
+
             # Detect if ESN is loaded with narrow range CSV dataset
             is_narrow_dataset = False
             if model_loaded and input_means is not None:
                 if len(input_means) > 0 and input_means[0] < 10.2:
                     is_narrow_dataset = True
-                    
+
             if is_narrow_dataset:
                 state['soc'] = 0.1156
                 state['soh'] = 0.90
             else:
                 state['soc'] = 1.0
                 state['soh'] = 1.0
-                
+
             state['V1'] = 0.0
             state['V2'] = 0.0
             state['temperature'] = 25.0
             state['internal_resistance_growth'] = 1.0
             state['last_real_time'] = None
-            
+
             chem_obj = get_chemistry(state['chemistry'])
             state['prev_voltage'] = chem_obj.lookup_ocv(state['soc'])
             state['prev_current'] = 0.0
-            
+
             # Clear local buffer
             local_telemetry_buffer.clear()
             if check_db_connected():
@@ -1313,12 +1317,12 @@ def control_simulation():
                     db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
                 except Exception as db_err:
                     print(f"Error purging database in visualizer: {db_err}")
-            
+
         save_sim_state(state)
 
         # Invalidate telemetry cache whenever control state or command changes to ensure immediate UI sync
         _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
-        
+
         # Forward control payload to Config.SIMULATOR_URL if locally reachable (fast non-blocking notification)
         port_online, _ = check_simulator_port()
         if port_online:
@@ -1328,16 +1332,16 @@ def control_simulation():
                 sim_data['soh'] = state['soh']
                 if 'active_cycle' in sim_data:
                     sim_data['cycle_type'] = sim_data.pop('active_cycle')
-                
-                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=0.2) as response:
+
+                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=0.2):
                     pass
             except Exception:
                 pass
-                
+
         # Invalidate visualizer status cache check time so next status poll triggers a fresh live query
         global _last_sim_check_time
         _last_sim_check_time = 0.0
-                
+
         return jsonify({
             'status': 'ok',
             'ekf_mismatch': state.get('ekf_mismatch', 1.0),
@@ -1371,7 +1375,7 @@ def trigger_training():
     if is_sync:
         run_training_async()
         return jsonify(training_status)
-        
+
     thread = threading.Thread(target=run_training_async, daemon=True)
     thread.start()
     return jsonify({'status': 'started', 'message': 'ESN Training thread launched.'})
@@ -1395,10 +1399,10 @@ def post_register_chemistry():
         cooling_coefficient = data.get('cooling_coefficient')
         ocv_table = data.get('ocv_table')
         n_cells = data.get('n_cells', 1)
-        
+
         if not name or not nominal_capacity or not ocv_table:
             return jsonify({'status': 'error', 'message': 'Missing required fields (name, nominal_capacity, ocv_table)'}), 400
-            
+
         chem = register_chemistry(
             name=name,
             nominal_capacity=nominal_capacity,
@@ -1412,7 +1416,7 @@ def post_register_chemistry():
             ocv_table=ocv_table,
             n_cells=n_cells
         )
-        
+
         # Forward to simulator port if online
         port_online, _ = check_simulator_port()
         if port_online:
@@ -1421,7 +1425,7 @@ def post_register_chemistry():
                     pass
             except Exception as e:
                 print(f"Warning: Failed to forward registered chemistry to simulator: {e}")
-                
+
         return jsonify({
             'status': 'ok',
             'message': f"Chemistry '{chem.name}' registered successfully.",
@@ -1444,7 +1448,7 @@ def get_telemetry():
         chemistry_name = state.get('chemistry', 'li_ion')
         ekf_mismatch   = 1.0
         quantize_mode  = 'float32'
-        
+
         # Override with live port state if simulator is online
         port_online, port_data = check_simulator_port()
         if port_online and port_data:
@@ -1473,15 +1477,15 @@ def get_telemetry():
 
         pipeline         = cache['pipeline']
         pipeline.load_model(esn_soc, esn_soh, input_means, input_stds)
-        
+
         ekf_q_soc = 1e-7
         ekf_q_v1  = 1e-6
         ekf_q_v2  = 1e-6
         ekf_r_meas = 0.01
         pipeline.update_ekf_noise(ekf_q_soc, ekf_q_v1, ekf_q_v2, ekf_r_meas)
-        
+
         already_cached   = cache['n_cached']
-        
+
         new_readings = []
         prev_time = None
         if already_cached > 0 and len(cache['processed']) > 0:
@@ -1512,7 +1516,7 @@ def get_telemetry():
                     new_readings = list(cursor)
                     new_readings.reverse() # Restore chronological order
                     already_cached = 0
-                    
+
                 cache['n_cached'] = already_cached + len(new_readings)
             except Exception as db_err:
                 print(f"Error querying database in get_telemetry: {db_err}")
@@ -1530,7 +1534,7 @@ def get_telemetry():
                     print(f"Error fetching readings from simulator: {e}")
             else:
                 raw_readings = list(local_telemetry_buffer)
-            
+
             # Invalidate cache if local buffer was cleared / truncated
             if len(raw_readings) < already_cached:
                 cache.update({
@@ -1540,7 +1544,7 @@ def get_telemetry():
                     'n_cached':  0
                 })
                 already_cached = 0
-            
+
             new_readings = raw_readings[already_cached:]
             cache['n_cached'] = len(raw_readings)
 

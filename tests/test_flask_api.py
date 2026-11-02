@@ -1,6 +1,7 @@
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root_dir not in sys.path:
@@ -14,6 +15,7 @@ if simulator_dir not in sys.path:
 
 from software.simulator.app import app as simulator_app
 from software.visualiser.app import app as visualiser_app
+
 
 @pytest.fixture
 def simulator_client():

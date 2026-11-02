@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -24,7 +25,7 @@ def test_csr_matrix_compression():
         [3.0, 4.0, 0.0]
     ])
     val, col, row_ptr = tc.to_csr(matrix)
-    
+
     assert list(val) == [1.0, 2.0, 3.0, 4.0]
     assert list(col) == [0, 2, 0, 1]
     assert list(row_ptr) == [0, 2, 2, 4]
@@ -72,7 +73,7 @@ def test_esn_instantiation_and_quantized_predict():
     esn = EchoStateNetwork(n_inputs=3, n_reservoir=20, n_outputs=1, spectral_radius=0.9, leak_rate=0.3)
     U = np.random.randn(30, 3)
     Y = np.random.rand(30, 1)
-    
+
     esn.train(U, Y, washout=5)
     pred_step = esn.predict_step(U[0], quantize_mode='q15')
     assert len(pred_step) == 1
@@ -96,10 +97,10 @@ def test_exported_c_headers_existence():
     """Verify generated C header files exist and contain necessary STM32 definitions."""
     cls_h = os.path.join(stm_dir, "esn_classifier_weights.h")
     est_h = os.path.join(stm_dir, "esn_estimator_weights.h")
-    
+
     assert os.path.exists(cls_h), f"Missing {cls_h}"
     assert os.path.exists(est_h), f"Missing {est_h}"
-    
+
     with open(cls_h, "r") as f:
         content_cls = f.read()
     assert "#define ESN_N_INPUTS" in content_cls

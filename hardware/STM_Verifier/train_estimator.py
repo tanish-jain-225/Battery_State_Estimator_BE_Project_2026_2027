@@ -1,14 +1,16 @@
+import argparse
 import os
 import sys
-import pandas as pd
+
 import numpy as np
-import argparse
+import pandas as pd
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
 from train import EchoStateNetwork
+
 
 def generate_full_range_dataset():
     """
@@ -25,14 +27,14 @@ def generate_full_range_dataset():
     except ImportError:
         print("Battery simulator not found.")
         sys.exit(1)
-        
+
     import pandas as pd
-    
+
     records = []
     soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
     dt = 1.0
     global_time = 0.0
-    
+
     for idx, soh_target in enumerate(soh_levels):
         next_soh = soh_levels[idx + 1] if idx + 1 < len(soh_levels) else soh_target - 0.05
         # 1. Discharging Cycle (Constant + Pulsed)
@@ -41,7 +43,7 @@ def generate_full_range_dataset():
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
         sim.temperature = 25.0
-        
+
         t = 0.0
         total_steps = 1500
         step_count = 0
@@ -55,7 +57,7 @@ def generate_full_range_dataset():
                 I = 4.5
             elif int(t) % 200 >= 180:
                 I = -1.0
-                
+
             out = sim.step(I, dt, accelerated_aging=False)
             records.append({
                 'Time': global_time,
@@ -67,7 +69,7 @@ def generate_full_range_dataset():
             })
             t += dt
             global_time += dt
-            
+
         # 2. Charging Cycle (CCCV Charge)
         sim = BatterySimulator()
         sim.reset("li_ion")
@@ -75,7 +77,7 @@ def generate_full_range_dataset():
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
         sim.soc = 0.01
         sim.temperature = 25.0
-        
+
         t = 0.0
         step_count = 0
         last_cell_v = 3.5
@@ -86,7 +88,7 @@ def generate_full_range_dataset():
             I_charge = 2.0
             if last_cell_v > 4.15:
                 I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
-                
+
             out = sim.step(-I_charge, dt, accelerated_aging=False)
             last_cell_v = out['voltage'] / float(sim.n_cells)
             records.append({
@@ -99,12 +101,12 @@ def generate_full_range_dataset():
             })
             t += dt
             global_time += dt
-            
+
     return pd.DataFrame(records)
 
 def train_and_export_estimator(csv_path=None, header_path=None, grid_search=False):
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    
+
     # 1. Resolve paths
     if csv_path is None:
         csv_path = os.path.join(base_dir, "training_ev_battery_dataset_multiclass.csv")
@@ -128,6 +130,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
+
             import requests
             response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
             if response.status_code == 200:
@@ -176,7 +179,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             if split_data.shape[1] == len(new_cols):
                 split_data.columns = new_cols
                 df = split_data.apply(pd.to_numeric, errors='coerce')
-                
+
         df.columns = [str(col).strip() for col in df.columns]
         rename_dict = {}
         for col in df.columns:
@@ -400,18 +403,18 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         f.write("#define ESN_ESTIMATOR_WEIGHTS_H\n\n")
         f.write("// Auto-generated weights file for STM32 ESN estimators\n\n")
         f.write("#include <stdint.h>\n\n")
-        
-        f.write(f"#define ESN_ESTIMATOR_N_INPUTS 4\n")
+
+        f.write("#define ESN_ESTIMATOR_N_INPUTS 4\n")
         f.write(f"#define ESN_SOC_N_RESERVOIR {SOC_N_RESERVOIR}\n")
         f.write(f"#define ESN_SOH_N_RESERVOIR {SOH_N_RESERVOIR}\n")
         f.write(f"#define ESN_SOC_LEAK_RATE {SOC_LEAK_RATE:.6f}f\n")
         f.write(f"#define ESN_SOH_LEAK_RATE {SOH_LEAK_RATE:.6f}f\n")
         f.write(f"#define ESN_SOC_WASHOUT_STEPS {SOC_WASHOUT}\n")
         f.write(f"#define ESN_SOH_WASHOUT_STEPS {SOH_WASHOUT}\n\n")
-        
+
         write_array_1d(f, "esn_estimator_input_means", input_means)
         write_array_1d(f, "esn_estimator_input_stds", input_stds)
-        
+
         f.write("// SOC Weights\n")
         write_array_2d(f, "esn_soc_W_in", esn_soc.W_in)
         write_array_2d(f, "esn_soc_W_out", esn_soc.W_out)
@@ -420,7 +423,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         write_array_1d(f, "esn_soc_W_res_val", soc_val)
         write_array_1d_int(f, "esn_soc_W_res_col", soc_col)
         write_array_1d_int(f, "esn_soc_W_res_row_ptr", soc_row_ptr)
-        
+
         f.write("// SOH Weights\n")
         write_array_2d(f, "esn_soh_W_in", esn_soh.W_in)
         write_array_2d(f, "esn_soh_W_out", esn_soh.W_out)
@@ -429,11 +432,11 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
         write_array_1d(f, "esn_soh_W_res_val", soh_val)
         write_array_1d_int(f, "esn_soh_W_res_col", soh_col)
         write_array_1d_int(f, "esn_soh_W_res_row_ptr", soh_row_ptr)
-        
+
         # Write 500-sample test data subset: Voltage, Current, Temperature, SOC, SOH
         n_test_samples = min(500, len(df))
         f.write(f"#define ESTIMATOR_TEST_N {n_test_samples}\n")
-        f.write(f"#if STATIC_VERIFICATION_MODE\n")
+        f.write("#if STATIC_VERIFICATION_MODE\n")
         f.write(f"const float estimator_test_data[{n_test_samples}][5] = {{\n")
         for i in range(n_test_samples):
             v_val = df['Voltage'].iloc[i]
@@ -447,7 +450,7 @@ def train_and_export_estimator(csv_path=None, header_path=None, grid_search=Fals
             else:
                 f.write("\n")
         f.write("};\n")
-        f.write(f"#endif // STATIC_VERIFICATION_MODE\n\n")
+        f.write("#endif // STATIC_VERIFICATION_MODE\n\n")
 
         f.write("#endif // ESN_ESTIMATOR_WEIGHTS_H\n")
 

@@ -81,6 +81,15 @@
 //                 no new logic, no change to any existing datapath.
 // Additional Comments:
 // 
+// Revision 0.12 - Made the datapath observable for synthesis. Before this,
+//                 `done` was the only output, and `done` depends only on
+//                 control timing, never on data. Vivado was therefore free
+//                 to remove the multiplier, accumulator, tanh table and
+//                 related registers as logic with no observable effect,
+//                 so the utilization/power/timing reports described a
+//                 control-only design. x_out / x_valid / ovf_out expose
+//                 each new reservoir state as it is written back. No
+//                 change to any existing datapath or FSM.
 //////////////////////////////////////////////////////////////////////////////////
 // ESN Top Module
 //////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +106,12 @@ module esn_top
     input  wire rst_n,
     input  wire start,
 
-    output wire done
+    output wire done,
+
+    // Rev 0.12: observable datapath outputs (prevent synthesis trimming)
+    output wire signed [DW-1:0] x_out,    // x_i(t+1), valid when x_valid = 1
+    output wire                 x_valid,  // high on the cycle the state is written back
+    output wire                 ovf_out   // MAC saturation flag for the current neuron
 );
 
 ////////////////////////////////////////////////////////////
@@ -439,5 +453,12 @@ u_neuron
 
     .overflow(overflow)
 );
+
+////////////////////////////////////////////////////////////
+// Rev 0.12: observable outputs
+////////////////////////////////////////////////////////////
+assign x_out   = x_next;
+assign x_valid = store_en;
+assign ovf_out = overflow;
 
 endmodule

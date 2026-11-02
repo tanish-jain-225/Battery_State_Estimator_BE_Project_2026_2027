@@ -14,10 +14,10 @@ Verifies bit-exact matches across all 5 datapath stages:
   5. Tanh_out (Q6.10 16-bit post-LUT activation / state update)
 """
 
+import argparse
 import csv
 import os
 import sys
-import argparse
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

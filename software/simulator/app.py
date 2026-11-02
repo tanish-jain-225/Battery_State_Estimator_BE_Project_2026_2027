@@ -1,19 +1,20 @@
-import sys
-import os
-import time
-import threading
 import logging
+import os
+import sys
+import threading
+import time
 from datetime import datetime
+
+from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
-from flask import Flask, jsonify, request, render_template
 
 # Add local directory to path to allow clean imports
 base_dir = os.path.dirname(os.path.abspath(__file__))
 if base_dir not in sys.path:
     sys.path.append(base_dir)
 
-from battery_simulator import BatterySimulator, DriveCycles
 from battery_chemistry import get_chemistry, register_chemistry
+from battery_simulator import BatterySimulator, DriveCycles
 from config import Config
 
 # Suppress Flask startup banner and logs
@@ -35,22 +36,22 @@ def verify_request_auth():
     remote = request.remote_addr
     if remote in ('127.0.0.1', '::1', 'localhost'):
         return True
-        
+
     secret = get_shared_secret()
     if not secret:
         is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
         return not is_prod
-    
+
     # Check header
     header_key = request.headers.get("X-API-Key")
     if header_key == secret:
         return True
-        
+
     # Check query param as fallback
     query_key = request.args.get("api_key")
     if query_key == secret:
         return True
-        
+
     return False
 
 @app.before_request
@@ -116,7 +117,7 @@ def _ensure_db():
         except Exception:
             pass
         return True
-    except Exception as e:
+    except Exception:
         _mongodb_connected = False
         mongodb_connected = False
         return False
@@ -171,7 +172,7 @@ def generator_loop():
     print("Simulator background thread active.")
     target_tick = time.monotonic()
     last_db_heartbeat = 0.0
-    
+
     while True:
         try:
             step_delay = Config.SIMULATION_STEP_DELAY
@@ -186,7 +187,7 @@ def generator_loop():
             fault_thermal = state.get('fault_thermal', False)
             fault_dropout = state.get('fault_dropout', False)
             fault_short = state.get('fault_short', False)
-            
+
             # Sync chemistry
             if chemistry_name != current_chemistry:
                 if state.get('time', 0.0) == 0.0:
@@ -195,7 +196,7 @@ def generator_loop():
                     simulator.change_chemistry(chemistry_name)
                 current_chemistry = chemistry_name
                 print(f"Battery Physics profile loaded: {chemistry_name.upper()}")
-                
+
             if sim_running:
                 # Handle reset command if requested by user
                 if state.get('time', 0.0) == 0.0 and simulator.time > 1.0:
@@ -203,7 +204,7 @@ def generator_loop():
                     print("Simulator baseline states reset.")
 
                 simulator.T_ambient = T_ambient
-                
+
                 # Retrieve cycle current excitation (I)
                 t = simulator.time
                 if active_cycle == "udds":
@@ -218,16 +219,16 @@ def generator_loop():
                     I = DriveCycles.cccv_charge(t, simulator.soc)
                 else:
                     I = 0.0
-                    
+
                 # Step physics
                 out = simulator.step(
-                    I, step_delay, 
+                    I, step_delay,
                     accelerated_aging=accelerated_aging,
                     fault_thermal=fault_thermal,
                     fault_dropout=fault_dropout,
                     fault_short=fault_short
                 )
-                
+
                 # Apply nominal noise bounds
                 noisy = simulator.add_sensor_noise(
                     out,
@@ -236,11 +237,11 @@ def generator_loop():
                     t_noise=Config.DEFAULT_NOISE_TEMPERATURE,
                     fault_dropout=fault_dropout
                 )
-                
+
                 V_meas = noisy['voltage']
                 I_meas = noisy['current']
                 T_meas = noisy['temperature']
-                
+
                 record = {
                     'time': out['time'],
                     'voltage': V_meas,
@@ -250,7 +251,7 @@ def generator_loop():
                     'fault_short': fault_short,
                     'fault_thermal': fault_thermal,
                     'fault_dropout': fault_dropout,
-                    
+
                     # True ground truth reference properties
                     'true_soc': out['true_soc'],
                     'true_soh': out['true_soh'],
@@ -261,7 +262,7 @@ def generator_loop():
                     'true_voltage': out['voltage'],
                     'true_current': -out['current']
                 }
-                
+
                 # Push record to readings collection
                 if _ensure_db():
                     try:
@@ -280,7 +281,7 @@ def generator_loop():
                     limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
                     if len(local_telemetry_buffer) > limit:
                         local_telemetry_buffer.pop(0)
-                    
+
                 # Update configuration document with live heartbeat every 3 seconds to eliminate redundant network roundtrips
                 now_wall = time.time()
                 local_state.update({
@@ -311,7 +312,7 @@ def generator_loop():
                         'prev_current': -I_meas,
                         'sim_running': True
                     })
-                
+
                 # Drift-free monotonic sleep interval
                 now_mono = time.monotonic()
                 sleep_time = max(0.01, target_tick - now_mono)
@@ -334,7 +335,7 @@ def sync_simulation_on_demand():
     global current_chemistry
     if not IS_SERVERLESS:
         return
-        
+
     state = load_sim_state()
     sim_running = state.get('sim_running', False)
     if not sim_running:
@@ -353,7 +354,7 @@ def sync_simulation_on_demand():
     step_delay = Config.SIMULATION_STEP_DELAY
     elapsed = now - last_real_time
     steps = int(elapsed / step_delay)
-    
+
     if steps <= 0:
         return
 
@@ -492,10 +493,10 @@ def post_register_chemistry():
         cooling_coefficient = data.get('cooling_coefficient')
         ocv_table = data.get('ocv_table')
         n_cells = data.get('n_cells', 1)
-        
+
         if not name or not nominal_capacity or not ocv_table:
             return jsonify({'status': 'error', 'message': 'Missing required fields (name, nominal_capacity, ocv_table)'}), 400
-            
+
         chem = register_chemistry(
             name=name,
             nominal_capacity=nominal_capacity,
@@ -575,7 +576,7 @@ def get_status():
             pass
     else:
         points_count = len(local_telemetry_buffer)
-            
+
     return jsonify({
         'sim_running': state.get('sim_running', True),
         'chemistry': state.get('chemistry', 'li_ion'),
@@ -608,12 +609,12 @@ def post_control():
         fault_thermal = data.get('fault_thermal')
         fault_dropout = data.get('fault_dropout')
         fault_short = data.get('fault_short')
-        
+
         state = load_sim_state()
-        
+
         if chemistry is not None:
             state['chemistry'] = chemistry
-            
+
         if command == 'start':
             state['sim_running'] = True
             state['last_real_time'] = time.time()
@@ -629,7 +630,7 @@ def post_control():
             state['fault_thermal'] = False
             state['fault_dropout'] = False
             state['fault_short'] = False
-            
+
             state['time'] = 0.0
             state['soc'] = float(data.get('soc', 1.0))
             state['soh'] = float(data.get('soh', 1.0))
@@ -638,11 +639,11 @@ def post_control():
             state['temperature'] = 25.0
             state['internal_resistance_growth'] = 1.0
             state['last_real_time'] = None
-            
+
             chem_obj = get_chemistry(state['chemistry'])
             state['prev_voltage'] = chem_obj.lookup_ocv(state['soc'])
             state['prev_current'] = 0.0
-            
+
             local_telemetry_buffer.clear()
             # Clear Battery State Estimator readings collection
             if _ensure_db():
@@ -650,10 +651,10 @@ def post_control():
                     db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
                 except Exception as db_err:
                     print(f"Battery State Estimator — Error purging readings: {db_err}")
-                    
+
         if cycle_type is not None:
             state['active_cycle'] = cycle_type
-            
+
         if accelerated_aging is not None:
             state['accelerated_aging'] = bool(accelerated_aging)
 
@@ -682,7 +683,7 @@ def post_control():
             val = float(data['fault_thermal_runaway_mult'])
             state['fault_thermal_runaway_mult'] = val
             Config.FAULT_THERMAL_RUNAWAY_MULT = val
-            
+
         save_sim_state(state)
         return jsonify({
             'status': 'ok',
@@ -809,13 +810,13 @@ def _start_sim_thread():
     global _sim_thread_started, _db_thread_started
     if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         return
-    
+
     # Start DB checker thread for this process if not already started
     if not _db_thread_started:
         _db_thread_started = True
         db_checker = threading.Thread(target=db_checker_loop, daemon=True)
         db_checker.start()
-        
+
     # Start generator thread if lock is acquired and generator not already running in this process
     if not _sim_thread_started:
         if _acquire_lock():

@@ -1,4 +1,5 @@
 import os
+
 try:
     from dotenv import load_dotenv
 except ImportError:

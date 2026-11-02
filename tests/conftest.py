@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 # Ensure root directory is at the front of sys.path for fully-qualified imports
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

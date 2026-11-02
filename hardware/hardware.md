@@ -12,7 +12,11 @@ This document provides a single, consolidated technical guide to the hardware su
 ## 📑 Table of Contents
 1. [Hardware Subsystem Overview](#hardware-subsystem)
 2. [Hardware Folder Structure](#hardware-folder-structure)
-3. [FPGA Verilog ESN Verifier (ARTIX A7100T Target)](#fpga-verilog-esn-verifier-artix-a7100t-target)
+3. [FPGA Verilog Accelerators & Verifiers (ARTIX A7100T Target)](#-fpga-verilog-accelerators--verifiers-artix-a7100t-target)
+   - [3.1 100-Neuron Echo State Network Core](#31-100-neuron-echo-state-network-esn-core)
+   - [3.2 Fixed-Point Extended Kalman Filter Core](#32-fixed-point-extended-kalman-filter-ekf-core)
+   - [3.3 Fixed-Point Unscented Kalman Filter Core](#33-fixed-point-unscented-kalman-filter-ukf-core)
+   - [3.4 Comparative FPGA Accelerator Matrix](#34-comparative-fpga-accelerator-matrix)
 4. [ESN Classifier Interface Specifications](#esn-classifier-interface-specifications)
 5. [Embedded Optimizations (C99 Firmware)](#embedded-optimizations)
 6. [Offline Model Export Pipeline](#offline-model-export-pipeline)
@@ -64,18 +68,54 @@ hardware/
 
 ---
 
-## ⚡ FPGA Verilog ESN Verifier (ARTIX A7100T Target)
+## ⚡ FPGA Verilog Accelerators & Verifiers (ARTIX A7100T Target)
 
-The hardware subsystem includes a fully verified Verilog HDL Echo State Network targeting the **ARTIX A7100T FPGA** platform (`xc7a100tcsg324-1`):
+The hardware subsystem provides three fully verified Verilog HDL accelerator cores targeting the **Xilinx ARTIX A7100T FPGA** (`xc7a100tcsg324-1`). Complete documentation, build scripts, and memory models are organized in [`hardware/FPGA_Verifier/`](FPGA_Verifier/README.md).
 
-### RTL Design Specifications
+### 3.1 100-Neuron Echo State Network (ESN) Core
+- **Module & Location**: [`hardware/FPGA_Verifier/esn/rtl/esn_top.v`](FPGA_Verifier/esn/rtl/esn_top.v)
 - **Reservoir Size**: 100 neurons ($N=100$) for full model / 2 neurons for sequence model
 - **Input Dimension**: 4 features ($M=4$: `voltage_measured`, `current_measured`, `temperature_measured`, `current_load`)
-- **Fixed-Point Data Format**: Q6.10 signed fixed point (6 integer bits, 10 fractional bits)
-- **Reservoir Seed**: `seed=42` ($W_{in} \sim U(-0.5, 0.5)$ dense; $W$ 10% density, spectral radius = 0.9, zero bias)
+- **Fixed-Point Format**: Q6.10 signed fixed point (6 integer bits, 10 fractional bits)
+- **Reservoir Seed**: `seed=42` ($W_{in} \sim U(-0.5, 0.5)$ dense; $W$ 10% density, spectral radius $\rho=0.900$, zero bias)
 - **Pipeline Stages**: $\text{Win}\cdot u + W\cdot x \text{ MAC} \rightarrow \text{bias addition} \rightarrow \text{saturation clipping} \rightarrow \text{tanh LUT}$
-- **Memory Architecture**: BRAM-based weight and state storage with double-buffered (ping-pong) recurrent reservoir state memory.
-- **Activation Function**: Hardware odd-symmetry $\tanh$ lookup table (5,121 entries in Q6.10).
+- **Memory Architecture**: Double-buffered (ping-pong) BRAM state memory preventing read-after-write hazards.
+- **Activation Function**: 5,121-entry hardware odd-symmetry $\tanh$ lookup table (`tanh.mem`).
+- **Bit-Exact Parity**: **200/200 exact stage matches** vs Vivado XSim.
+- **Synthesis Utilization**: 77 LUTs (0.12%), 66 Registers (0.05%), 7.5 BRAM tiles, **0 DSP48 slices (0.00%)**.
+- **Power & Latency**: 0.099 W total power @ 100 MHz, 428.1 $\mu$s per update (**23$\times$ headroom** at 100 Hz BMS sampling).
+
+### 3.2 Fixed-Point Extended Kalman Filter (EKF) Core
+- **Module & Location**: [`hardware/FPGA_Verifier/ekf/rtl/ekf_core.v`](FPGA_Verifier/ekf/rtl/ekf_core.v)
+- **Model Physics**: Discrete-time 1-RC Thevenin battery equivalent circuit model.
+- **Arithmetic Datapath**: Single 32$\times$32 signed MAC with barrel shifter, rounding, and radix-2 non-restoring divider.
+- **ROM Lookups**: Dual 1,024-entry LUT ROMs for $V_{\text{ocv}}(SOC)$ and $\frac{\partial V_{\text{ocv}}}{\partial SOC}$ slope.
+- **Clock & Latency**: 80 MHz clock, ~320 cycles/step (4.0 $\mu$s latency $\rightarrow$ **2,500$\times$ headroom** at 100 Hz).
+- **Bit-Exact Parity**: **512/512 exact matches** across all 22 stage registers.
+- **Estimation Metrics**: Test SOC MAE: 0.0847, RMSE: 0.1013, $R^2 = 0.8975$.
+
+### 3.3 Fixed-Point Unscented Kalman Filter (UKF) Core
+- **Module & Location**: [`hardware/FPGA_Verifier/ukf/rtl/ukf_core.v`](FPGA_Verifier/ukf/rtl/ukf_core.v)
+- **Transform**: Julier scaled unscented transform ($\kappa = 3 - n = 1$, $\gamma = \sqrt{3}$).
+- **Microcode Engine**: 73 micro-ops in `rtl/ukf_ucode.vh` executing 4 primitive operations (`MAC`, `LUT` with linear interpolation, `DIV`, `SQRT`).
+- **Clock & Latency**: 80 MHz clock, ~590 cycles/step (7.4 $\mu$s latency $\rightarrow$ **1,350$\times$ headroom** at 100 Hz).
+- **Bit-Exact Parity**: **512/512 exact matches** across all 25 stage registers.
+- **Estimation Metrics**: Test SOC MAE: 0.0846, RMSE: 0.1012, $R^2 = 0.8977$.
+
+### 3.4 Comparative FPGA Accelerator Matrix
+
+| Parameter | 100-Neuron ESN Core | Fixed-Point EKF Core | Fixed-Point UKF Core |
+| :--- | :---: | :---: | :---: |
+| **Primary Module** | `esn_top.v` | `ekf_core.v` | `ukf_core.v` |
+| **Arithmetic Format** | Q6.10 Fixed-Point (16-bit) | Q4.28 / Q2.30 Fixed-Point | Q4.28 / Q2.30 Fixed-Point |
+| **Target Clock** | 100 MHz (Demonstrated) / 250 MHz | 80 MHz | 80 MHz |
+| **Cycles per Update** | ~42,810 cycles (100 neurons) | ~320 cycles | ~590 cycles |
+| **Execution Latency** | 428.1 $\mu$s @ 100 MHz | 4.0 $\mu$s @ 80 MHz | 7.4 $\mu$s @ 80 MHz |
+| **BMS Headroom** | **23$\times$ Headroom** @ 100 Hz | **2,500$\times$ Headroom** @ 100 Hz | **1,350$\times$ Headroom** @ 100 Hz |
+| **Slice LUTs** | 77 / 63,400 (0.12%) | 620 / 63,400 (0.98%) | 890 / 63,400 (1.40%) |
+| **DSP48 Slices** | **0 / 240 (0.00% - Pure LUT)** | 3 / 240 (1.25%) | 4 / 240 (1.67%) |
+| **Total On-Chip Power** | **0.099 W** | **0.104 W** | **0.108 W** |
+| **Bit-Exact Matches** | **200/200 Exact Matches** | **512/512 Exact Matches** | **512/512 Exact Matches** |
 
 ### Verification Audit & Estimation Outcomes Summary
 Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FPGA_Verifier/eval_fpga_outcomes.py) across **32 NASA battery cycles (2,048 labeled timesteps)**:
@@ -94,14 +134,6 @@ Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FP
 3. **Baseline Comparison (1RC EKF vs FPGA ESN Readout)**:
    - **EKF (1RC Baseline)**: Test MAE 0.0311, Test RMSE 0.0387, Test $R^2 = 0.7818$
    - **FPGA ESN Readout**: Test MAE 0.0220, Test RMSE 0.0289, Test $R^2 = 0.8783$ (*FPGA ESN outperforms EKF baseline on all metrics*).
-
-4. **Post-Implementation Synthesis Utilization & Power**:
-   - **Slice LUTs**: 77 / 63,400 (0.12%)
-   - **Slice Registers**: 66 / 126,800 (0.05%)
-   - **Block RAM Tiles**: 7.5 / 135 (5.56%)
-   - **DSP48 Slices**: 0 / 240 (**0.00%** — entire datapath synthesizes into LUT fabric)
-   - **On-Chip Power**: 0.099 W @ 100 MHz (0.001 W dynamic, 0.097 W static leakage)
-   - **Latency & Headroom**: 428.1 $\mu$s per update @ 100 MHz (**23$\times$ headroom** at 100 Hz BMS sampling).
 
 ### FPGA RTL Datapath Schematic & Simulation Waveforms
 

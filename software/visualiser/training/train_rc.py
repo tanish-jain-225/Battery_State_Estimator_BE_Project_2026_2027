@@ -1,8 +1,9 @@
-import sys
 import os
-import pandas as pd
-import numpy as np
 import pickle
+import sys
+
+import numpy as np
+import pandas as pd
 
 # Add base directory to path to support config imports
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,19 +39,19 @@ class EchoStateNetwork:
         self.input_scaling = input_scaling
         self.ridge_param = ridge_param
         self.sparsity = sparsity
-        
+
         # Initialize input weights
         np.random.seed(42)  # For reproducible weights
         self.W_in = (np.random.rand(n_reservoir, 1 + n_inputs) - 0.5) * 2.0 * input_scaling
-        
+
         # Initialize reservoir weights
         W = np.random.randn(n_reservoir, n_reservoir)
-        
+
         # Apply sparsity (zero out random elements)
         if sparsity > 0.0:
             mask = np.random.rand(*W.shape) < sparsity
             W[mask] = 0.0
-            
+
         # Scale reservoir weights to have desired spectral radius
         eigenvalues = np.linalg.eigvals(W)
         max_eigenval = np.max(np.abs(eigenvalues))
@@ -58,10 +59,10 @@ class EchoStateNetwork:
             self.W_res = W * (spectral_radius / max_eigenval)
         else:
             self.W_res = W
-            
+
         # Readout weights
         self.W_out = None
-        
+
         # Reservoir state vector
         self.x = np.zeros((n_reservoir, 1))
 
@@ -94,51 +95,51 @@ class EchoStateNetwork:
         """
         n_samples = U.shape[0]
         self.reset_state()
-        
+
         # Pre-compute input projections: U_biased shape (n_samples, 1 + n_inputs)
         U_biased = np.hstack((np.ones((n_samples, 1)), U))
         W_in_U = np.dot(U_biased, self.W_in.T) # shape (n_samples, n_reservoir)
-        
+
         # Cache variables locally using 1D vector representation for fast operations
         x_vec = self.x.ravel().copy()
         W_res = self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
-        
+
         n_effective = max(0, n_samples - washout)
         state_dim = 1 + self.n_inputs + self.n_reservoir
         X = np.empty((n_effective, state_dim))
-        
+
         for t in range(n_samples):
             if t % 2000 == 0 and timeout_check is not None:
                 timeout_check()
-            
+
             # Fast 1D vector recurrence update (avoids allocations & reshapes)
             x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
-            
+
             # Skip the washout phase
             if t >= washout:
                 idx = t - washout
                 X[idx, 0] = 1.0
                 X[idx, 1:1+self.n_inputs] = U[t]
                 X[idx, 1+self.n_inputs:] = x_vec
-                
+
         self.x = x_vec.reshape(-1, 1) # Save final state back
-        
+
         if timeout_check is not None:
             timeout_check()
 
         # Design matrix transpose X_T: shape (state_dim, n_effective)
         X_T = X.T
-        
+
         # Target matrix Y_target: (n_outputs, n_effective)
         Y_target = Y[washout:].reshape(-1, self.n_outputs).T
-        
+
         # Ridge Regression: W_out = Y_target * X * (X^T * X + lambda * I)^-1
         X_XT = np.dot(X_T, X)
         reg_matrix = self.ridge_param * np.eye(state_dim)
         self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
-        
+
         y_pred_washout = np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
         return y_pred_washout
 
@@ -152,16 +153,16 @@ class EchoStateNetwork:
         """
         if self.W_out is None:
             return
-        
+
         u_t = np.array(u).reshape(-1, 1)
         state_vec = np.vstack(([1.0], u_t, self.x)) # shape (1 + n_inputs + n_reservoir, 1)
-        
+
         if self.W_out.shape[1] != state_vec.shape[0]:
             return
 
         y_pred = np.dot(self.W_out, state_vec).item()
         error = y_target - y_pred
-        
+
         if mode == 'nlms':
             # Normalized LMS update:
             vec_norm_sq = np.sum(state_vec ** 2)
@@ -174,16 +175,16 @@ class EchoStateNetwork:
             # Recursive Least Squares online update:
             if not hasattr(self, 'P_adapt') or self.P_adapt is None or self.P_adapt.shape[0] != state_vec.shape[0]:
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
-            
+
             lmbda = 0.9995  # Forgetting factor
-            
+
             P_s = np.dot(self.P_adapt, state_vec)
             denom = lmbda + np.dot(state_vec.T, P_s).item()
             K = P_s / max(denom, 1e-6)
-            
+
             new_W_out = self.W_out + error * K.T
             new_P_adapt = (self.P_adapt - np.dot(K, np.dot(state_vec.T, self.P_adapt))) / lmbda
-            
+
             if not np.any(np.isnan(new_W_out)) and not np.any(np.isinf(new_W_out)):
                 self.W_out = new_W_out
             if np.any(np.isnan(new_P_adapt)) or np.any(np.isinf(new_P_adapt)):
@@ -198,10 +199,10 @@ class EchoStateNetwork:
         :param quantize_mode: 'float32', 'int16', or 'int8'
         """
         u_t = np.array(u).reshape(-1, 1)
-        
+
         if quantize_mode in ('int8', 'int16'):
             bits = 8 if quantize_mode == 'int8' else 16
-            
+
             # Helper function to quantize arrays to simulate fixed-point precision
             def simulate_quantization(val, bits_limit):
                 if val is None:
@@ -217,20 +218,20 @@ class EchoStateNetwork:
             W_in_q = simulate_quantization(self.W_in, bits)
             W_res_q = simulate_quantization(self.W_res, bits)
             x_q = simulate_quantization(self.x, bits)
-            
+
             u_biased = np.vstack(([1.0], u_t_q))
             arg = np.dot(W_in_q, u_biased) + np.dot(W_res_q, x_q)
             arg_q = simulate_quantization(arg, bits)
-            
+
             # Perform state update in quantized space
             self.x = (1.0 - self.leak_rate) * x_q + self.leak_rate * np.tanh(arg_q)
             self.x = simulate_quantization(self.x, bits)
-            
+
             # Compute output in quantized space
             W_out_q = simulate_quantization(self.W_out, bits)
             state_vec = np.vstack(([1.0], u_t_q, self.x))
             state_vec_q = simulate_quantization(state_vec, bits)
-            
+
             y_pred = np.dot(W_out_q, state_vec_q)
             return np.clip(y_pred, 0.0, 1.0).flatten()
         else:
@@ -247,27 +248,27 @@ class EchoStateNetwork:
         """
         n_samples = U.shape[0]
         self.reset_state()
-        
+
         U_biased = np.hstack((np.ones((n_samples, 1)), U))
         W_in_U = np.dot(U_biased, self.W_in.T)
-        
+
         x_vec = self.x.ravel().copy()
         W_res = self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
-        
+
         state_dim = 1 + self.n_inputs + self.n_reservoir
         state_matrix = np.empty((n_samples, state_dim))
-        
+
         for t in range(n_samples):
             if t % 2000 == 0 and timeout_check is not None:
                 timeout_check()
             x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
-            
+
             state_matrix[t, 0] = 1.0
             state_matrix[t, 1:1+self.n_inputs] = U[t]
             state_matrix[t, 1+self.n_inputs:] = x_vec
-            
+
         self.x = x_vec.reshape(-1, 1)
         predictions = np.clip(np.dot(state_matrix, self.W_out.T), 0.0, 1.0)
         return predictions
@@ -283,18 +284,18 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
         try:
             from software.shared.battery_simulator import BatterySimulator
         except ImportError:
-            import sys
             import os
+            import sys
             sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             from battery_simulator import BatterySimulator
-        
+
     import pandas as pd
-    
+
     records = []
     is_prod = getattr(Config, 'is_production', lambda: False)()
     soh_levels = [1.0, 0.90, 0.80] if is_prod else [1.0, 0.95, 0.90, 0.85, 0.80]
     dt = 2.0 if is_prod else 1.0
-    
+
     step_counter = 0
     for soh_target in soh_levels:
         if timeout_check is not None:
@@ -305,7 +306,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
         sim.temperature = 25.0
-        
+
         t = 0.0
         while sim.soc > 0.01:
             step_counter += 1
@@ -316,7 +317,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
                 I = 4.5
             elif int(t) % 200 >= 180:
                 I = -1.0
-                
+
             out = sim.step(I, dt, accelerated_aging=False)
             records.append({
                 'Time': t,
@@ -329,7 +330,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
             t += dt
             if max_rows and len(records) >= max_rows:
                 break
-                
+
         if max_rows and len(records) >= max_rows:
             break
 
@@ -340,7 +341,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
         sim.soc = 0.01
         sim.temperature = 25.0
-        
+
         t = 0.0
         last_cell_v = 3.5
         while sim.soc < 0.99:
@@ -350,7 +351,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
             I_charge = 2.0
             if last_cell_v > 4.15:
                 I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
-                
+
             out = sim.step(-I_charge, dt, accelerated_aging=False)
             last_cell_v = out['voltage'] / float(sim.n_cells)
             records.append({
@@ -364,10 +365,10 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
             t += dt
             if max_rows and len(records) >= max_rows:
                 break
-                
+
         if max_rows and len(records) >= max_rows:
             break
-            
+
     return pd.DataFrame(records)
 
 def main():
@@ -383,6 +384,7 @@ def main():
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
+
             import requests
             response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
             if response.status_code == 200:
@@ -432,7 +434,7 @@ def main():
                 split_data.columns = new_cols
                 df = split_data.apply(pd.to_numeric, errors='coerce')
                 print(f"DEBUG: Recovered single-column CSV into {len(new_cols)} columns.")
-                
+
         df.columns = [str(col).strip() for col in df.columns]
         rename_dict = {}
         for col in df.columns:
@@ -450,7 +452,7 @@ def main():
             elif col_lower == 'time':
                 rename_dict[col] = 'Time'
         df.rename(columns=rename_dict, inplace=True)
-        
+
         # Coerce numeric columns, drop NaNs, and normalize percentage values
         req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
         for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
@@ -459,7 +461,7 @@ def main():
         df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
         if 'SOH' not in df.columns:
             df['SOH'] = 1.0
-        
+
         # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
         if df['SOC'].max() > 1.5:
             df['SOC'] = df['SOC'] / 100.0
@@ -472,13 +474,13 @@ def main():
         step = int(np.ceil(len(df) / limit))
         df = df.iloc[::step].reset_index(drop=True)
         print(f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.")
-        
+
     # 1. Feature Engineering
     print("Performing feature engineering...")
     U_raw = extract_features_df(df)
     n_features = U_raw.shape[1]
     print(f"Engineered {n_features} features: Voltage, Current, Temperature, Voltage_grad, Current_ma, Temp_ma")
-    
+
     # Target values
     Y_soc = df[['SOC']].values
     Y_soh = df[['SOH']].values
@@ -487,17 +489,17 @@ def main():
     selected_indices = Config.ESN_SELECTED_FEATURE_INDICES  # e.g. [0,1,3,4] = Voltage, Current, Voltage_grad, Current_ma
     U_raw = U_raw[:, selected_indices]
     n_features = len(selected_indices)
-    
+
     print("Normalizing input features...")
     input_means = U_raw.mean(axis=0)
     input_stds = U_raw.std(axis=0)
     input_stds[input_stds == 0.0] = 1.0
-    
+
     all_names = ['Voltage', 'Current', 'Temperature', 'Voltage_grad', 'Current_ma', 'Temp_ma']
     feature_names = [all_names[i] for i in selected_indices]
     for idx, name in enumerate(feature_names):
         print(f"  Feature '{name}': mean={input_means[idx]:.4f}, std={input_stds[idx]:.4f}")
-        
+
     U_scaled = (U_raw - input_means) / input_stds
 
     # 3. Instantiate and Train SOC ESN
@@ -513,7 +515,7 @@ def main():
         sparsity=Config.ESN_SOC_SPARSITY
     )
     esn_soc.train(U_scaled, Y_soc, washout=Config.ESN_WASHOUT_STEPS)
-    
+
     # Evaluate SOC ESN
     pred_soc = esn_soc.predict(U_scaled)
     soc_rmse = np.sqrt(np.mean((Y_soc[Config.ESN_WASHOUT_STEPS:] - pred_soc[Config.ESN_WASHOUT_STEPS:]) ** 2))
@@ -535,7 +537,7 @@ def main():
         sparsity=Config.ESN_SOH_SPARSITY
     )
     esn_soh.train(U_scaled, Y_soh, washout=Config.ESN_WASHOUT_STEPS)
-    
+
     # Evaluate SOH ESN
     pred_soh = esn_soh.predict(U_scaled)
     soh_rmse = np.sqrt(np.mean((Y_soh[Config.ESN_WASHOUT_STEPS:] - pred_soh[Config.ESN_WASHOUT_STEPS:]) ** 2))
@@ -553,7 +555,7 @@ def main():
         'soc_rmse': float(soc_rmse),
         'soh_rmse': float(soh_rmse)
     }
-    
+
     print(f"Saving trained ESN models locally to {model_save_path}...")
     try:
         with open(model_save_path, 'wb') as f:
@@ -564,13 +566,14 @@ def main():
 
     # 6. Upload package to MongoDB model registry (if connection is configured)
     try:
-        from pymongo import MongoClient
         from datetime import datetime
+
+        from pymongo import MongoClient
         print("Checking MongoDB Model Registry connection...")
         client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
         client.server_info()  # trigger connection check
         db = client[Config.MONGODB_DB_NAME]
-        
+
         print("Uploading package to MongoDB registry cluster...")
         db['model_weights'].replace_one(
             {'_id': 'esn_package'},

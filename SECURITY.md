@@ -10,7 +10,7 @@ Only the latest active major releases receive security updates and bug fixes:
 
 | Version | Supported | Release Date | Notes |
 | :---: | :---: | :--- | :--- |
-| **v2.2.x** | :white_check_mark: | 2026-11-01 | Current release (107 tests, pub/sub decoupled microservices, PDF safeguards). |
+| **v2.2.x** | :white_check_mark: | 2026-11-01 | Current release (114 tests, pub/sub decoupled microservices, FPGA EKF/UKF verification, PDF safeguards). |
 | **v2.1.x** | :white_check_mark: | 2026-11-01 | Academic publications, poster and governance release. |
 | **v2.0.x** | :white_check_mark: | 2026-10-10 | Review 2 Milestone baseline (62 tests, FPGA RTL parity). |
 | **v1.0.x** | :x: | 2026-09-21 | Review 1 Prototype (Deprecated). |

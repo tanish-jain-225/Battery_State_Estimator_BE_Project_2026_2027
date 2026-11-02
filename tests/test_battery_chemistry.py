@@ -1,10 +1,11 @@
 from software.shared.battery_chemistry import get_chemistry, register_chemistry
 
+
 def test_get_chemistry():
     chem = get_chemistry("nmc")
     assert chem.name == "NMC"
     assert chem.nominal_capacity == 2.5
-    
+
     # Test fallback
     fallback = get_chemistry("non_existent_chemistry")
     assert fallback.name == "Li-ion"
@@ -13,7 +14,7 @@ def test_ocv_lookup():
     chem = get_chemistry("nmc")
     ocv_full = chem.lookup_ocv(1.0)
     ocv_empty = chem.lookup_ocv(0.0)
-    
+
     assert ocv_full == 4.20
     assert ocv_empty == 3.00
     assert ocv_full > ocv_empty

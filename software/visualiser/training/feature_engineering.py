@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import numpy as np
 
 # Allow importing Config whether run from project root or from training/ subdirectory

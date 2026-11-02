@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class BatteryChemistry:
     def __init__(self, name, nominal_capacity, R0_nom, R1_nom, C1_nom, R2_nom, C2_nom, thermal_capacitance, cooling_coefficient, ocv_table, n_cells):
         self.name = name
@@ -13,7 +14,7 @@ class BatteryChemistry:
         self.cooling_coefficient = cooling_coefficient  # W/K
         self.ocv_table = ocv_table                      # List of (SOC, OCV)
         self.n_cells = n_cells
-        
+
         # Precompute numpy arrays to prevent slow list comprehensions in high-frequency lookup_ocv
         self.socs = np.array([x[0] for x in ocv_table])
         self.ocvs = np.array([x[1] for x in ocv_table])
@@ -142,16 +143,16 @@ def register_chemistry(name, nominal_capacity, R0_nom, R1_nom, C1_nom, R2_nom, C
     Registers a new battery chemistry profile dynamically at runtime.
     """
     clean_name = str(name).lower().replace(" ", "_").replace("-", "_")
-    
+
     # Validate and structure ocv_table as list of (soc, ocv) tuples
     formatted_ocv_table = []
     for pair in ocv_table:
         if isinstance(pair, (list, tuple)) and len(pair) == 2:
             formatted_ocv_table.append((float(pair[0]), float(pair[1])))
-    
+
     # Sort OCV table by SOC to ensure monotonic lookup behavior
     formatted_ocv_table.sort(key=lambda x: x[0])
-    
+
     chem = BatteryChemistry(
         name=name,
         nominal_capacity=float(nominal_capacity),
@@ -165,6 +166,6 @@ def register_chemistry(name, nominal_capacity, R0_nom, R1_nom, C1_nom, R2_nom, C
         ocv_table=formatted_ocv_table,
         n_cells=int(n_cells)
     )
-    
+
     CHEMISTRIES[clean_name] = chem
     return chem

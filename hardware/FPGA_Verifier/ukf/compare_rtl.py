@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Word-by-word comparison of RTL trace (XSim) vs golden trace.
 usage: python3 compare_rtl.py golden.csv rtl.csv"""
-import sys, csv
+import csv
+import sys
+
 g = list(csv.DictReader(open(sys.argv[1])))
 r = list(csv.DictReader(open(sys.argv[2])))
 cols = [c for c in g[0] if c not in ("step", "t")]

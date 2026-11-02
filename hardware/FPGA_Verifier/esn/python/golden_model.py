@@ -15,14 +15,39 @@ Supports both:
   2. --full : 4-input, 100-neuron, multi-timestep test using active .coe files
 """
 
-import os
-import sys
-import csv
 import argparse
+import csv
+import os
+
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TANH_MEM_PATH = os.path.join(BASE_DIR, "tanh.mem")
+
+
+def _resolve_resource_path(filepath, default_name=None):
+    if filepath and os.path.exists(filepath):
+        return os.path.abspath(filepath)
+    target = filepath if filepath else default_name
+    if not target:
+        return None
+    name = os.path.basename(target)
+    candidates = [
+        target,
+        os.path.join(BASE_DIR, name),
+        os.path.join(BASE_DIR, "mem", name),
+        os.path.join(BASE_DIR, "..", "mem", name),
+        os.path.join(BASE_DIR, "esn", "mem", name),
+        os.path.join(BASE_DIR, "..", name),
+        os.path.join(BASE_DIR, "..", "..", name),
+        os.path.join(BASE_DIR, "..", "..", "esn", "mem", name),
+    ]
+    for c in candidates:
+        if c and os.path.exists(c):
+            return os.path.abspath(c)
+    return filepath
+
+
+TANH_MEM_PATH = _resolve_resource_path(os.path.join(BASE_DIR, "tanh.mem"), "tanh.mem")
 
 
 def to_hex_signed(val, nbits):
@@ -32,11 +57,12 @@ def to_hex_signed(val, nbits):
     return format(int(val) & mask, 'x').zfill(ndigits)
 
 
-def load_tanh_mem(filepath=TANH_MEM_PATH):
+def load_tanh_mem(filepath=None):
     """Loads 5121-entry tanh.mem lookup table."""
-    if not os.path.exists(filepath):
-        raise FileNotFoundError(f"LUT file not found: {filepath}")
-    with open(filepath, 'r') as f:
+    resolved = _resolve_resource_path(filepath, "tanh.mem")
+    if not resolved or not os.path.exists(resolved):
+        raise FileNotFoundError(f"LUT file not found: {filepath or 'tanh.mem'}")
+    with open(resolved, 'r', encoding='utf-8') as f:
         lines = [line.strip() for line in f if line.strip()]
     lut = [int(x, 16) for x in lines]
     if len(lut) < 5121:
@@ -46,12 +72,13 @@ def load_tanh_mem(filepath=TANH_MEM_PATH):
 
 def parse_coe_file(filepath):
     """Parses Xilinx .coe memory initialization file (radix 10 or 16)."""
-    if not os.path.exists(filepath):
+    resolved = _resolve_resource_path(filepath)
+    if not resolved or not os.path.exists(resolved):
         raise FileNotFoundError(f"COE file not found: {filepath}")
     radix = 10
     values = []
     in_vector = False
-    with open(filepath, 'r') as f:
+    with open(resolved, 'r', encoding='utf-8') as f:
         for line in f:
             clean = line.strip()
             if not clean or clean.startswith(';'):

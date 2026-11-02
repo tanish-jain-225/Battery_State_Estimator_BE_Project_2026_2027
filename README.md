@@ -5,8 +5,8 @@
 **Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting**
 
 <p align="left">
-  <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.1.0" target="_blank">
-    <img src="https://img.shields.io/badge/Release-v2.1.0-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.1.0" />
+  <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.2.0" target="_blank">
+    <img src="https://img.shields.io/badge/Release-v2.2.0-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.1.0" />
   </a>
   <a href="docs/Poster/Project_Poster.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Poster-Exhibition%20PDF-0D9488?style=for-the-badge&logo=adobeacrobatreader" alt="Project Poster PDF" />
@@ -30,14 +30,14 @@
 
 ---
 
-## Team Details 
+## Team Details & Project Contributors
 
-| Sr. No. | Name of Student | Roll No. | Branch | Email ID |
-| :---: | :--- | :--- | :--- | :--- |
-| 1 | Sanjna Patankar | 2023.sanjna.patankar | Automation and Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) |
-| 2 | Akshay Nambiar | 2023.akshay.nambiar | Automation and Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) |
-| 3 | Satvik Verma | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) |
-| 4 | Tanish Sanghvi | 2023.tanish.sanghvi | Automation and Robotics | [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in) |
+| Sr. No. | Name of Student | Roll No. | Branch | Institutional Email | GitHub Profile |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| 1 | **Sanjna Patankar** | 2023.sanjna.patankar | Automation and Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-Clothflow13-181717?style=flat-square&logo=github)](https://github.com/Clothflow13) |
+| 2 | **Akshay Nambiar** | 2023.akshay.nambiar | Automation and Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-RoyalMaddy08-181717?style=flat-square&logo=github)](https://github.com/RoyalMaddy08) |
+| 3 | **Satvik Verma** | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-satvikverma14-181717?style=flat-square&logo=github)](https://github.com/satvikverma14) |
+| 4 | **Tanish Sanghvi** | 2023.tanish.sanghvi | Automation and Robotics | [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-tanish--jain--225-181717?style=flat-square&logo=github)](https://github.com/tanish-jain-225) |
 
 ---
 
@@ -55,13 +55,13 @@
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 107-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 114-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Active Deliverable** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Manuscript](reference/review_paper.md) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
 | **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Registry Active** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Master Index** |
-| **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.1.0 Active** |
+| **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.2.0 Active** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
@@ -394,29 +394,33 @@ BE-Capstone-Project/
 │   │   └── run_c_simulator.sh
 │   │
 │   └── FPGA_Verifier/
-│       ├── eval_fpga_outcomes.py
-│       ├── esn_top.v
-│       ├── esn_neuron.v
-│       ├── reservoir_controller.v
-│       ├── address_generator.v
-│       ├── mac_accum_q6_10.v
-│       ├── mult_q6_10.v
-│       ├── tanh_lut.v
-│       ├── tb_esn_top.v
-│       ├── tb_esn_top_tiny.v
-│       ├── tiny_bram_models.v
-│       ├── golden_model.py
-│       ├── compare_results.py
-│       ├── golden_results.csv
-│       ├── golden.csv
-│       ├── golden_tiny.csv
-│       ├── vivado_esn_results.csv
-│       ├── tanh.mem
-│       ├── input_bram.coe
-│       ├── win_bram.coe
-│       ├── w_bram.coe
-│       ├── bias_bram.coe
-│       └── state_bram.coe
+│       ├── README.md                      # Master FPGA Accelerators Guide
+│       ├── compare_results.py             # ESN Bit-Exact Parity Comparator
+│       ├── golden_model.py                # Fixed-Point ESN Golden Reference
+│       ├── eval_fpga_outcomes.py          # 32-Cycle NASA Dataset & RTL Outcomes Evaluator
+│       │
+│       ├── esn/                           # 100-Neuron ESN Hardware Subsystem
+│       │   ├── README.md                  # ESN Core Architecture & BRAM Specs
+│       │   ├── build_esn_project.tcl      # Vivado Project & Synthesis Script
+│       │   ├── rtl/                       # Verilog RTL (esn_top, esn_neuron, etc.)
+│       │   ├── mem/                       # Memory Initialization (COE & MEM)
+│       │   ├── tb/                        # Testbenches (tb_esn_top, tb_esn_top_tiny)
+│       │   ├── xdc/                       # Timing Constraints (100 MHz clock)
+│       │   └── python/                    # Evaluation & Golden Models
+│       │
+│       ├── ekf/                           # Fixed-Point EKF Hardware Subsystem
+│       │   ├── README.md                  # EKF Core Specifications
+│       │   ├── build_ekf_project.tcl      # Vivado Synthesis Script
+│       │   ├── rtl/                       # Verilog RTL (ekf_core, tb_ekf_core)
+│       │   ├── sim/                       # Simulation ROMs (ocv_lut, slope_lut, stim)
+│       │   └── compare_ekf.py             # 4-Fold Nested-LOCO Benchmark
+│       │
+│       └── ukf/                           # Fixed-Point UKF Hardware Subsystem
+│           ├── README.md                  # UKF Core Specifications & Microcode
+│           ├── build_ukf_project.tcl      # Vivado Synthesis Script
+│           ├── rtl/                       # Verilog RTL (ukf_core, tb_ukf_core)
+│           ├── sim/                       # Simulation ROMs (ukf_ocv, ukf_slope, stim)
+│           └── compare_ukf.py             # Float vs Fixed vs EKF Benchmark
 │
 ├── software/
 │   ├── software.md
@@ -480,6 +484,7 @@ BE-Capstone-Project/
 │   ├── test_estimator_pipeline_advanced.py
 │   ├── test_flask_api.py
 │   ├── test_flask_api_comprehensive.py
+│   ├── test_fpga_ekf_ukf.py
 │   ├── test_fpga_verifier.py
 │   ├── test_fpga_verifier_extended.py
 │   ├── test_hardware_training_and_export.py
@@ -553,7 +558,7 @@ Open `http://localhost:5000` in your web browser to observe real-time dynamic ba
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
 | 4 | Embedded C99 CSR Inference | CSR sparse SpMV execution speedup | 6.7× speedup verified | Pass |
 | 5 | FPGA RTL Golden Model Test | 100-neuron Verilog datapath vs Python model | 200/200 bit-exact matches | Pass |
-| 6 | Automated Pytest Suite | 107 test cases execution across all modules (software, hardware, APIs, docs) | 100% test pass rate | Pass |
+| 6 | Automated Pytest Suite | 114 test cases execution across all modules (software, hardware, APIs, docs) | 100% test pass rate | Pass |
 
 ---
 

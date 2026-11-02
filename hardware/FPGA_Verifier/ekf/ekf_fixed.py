@@ -24,6 +24,7 @@ OCV(SOC) and dOCV/dSOC are 1024-entry ROMs indexed by the top 10 fraction
 bits of SOC (entry k holds the value at SOC = (k + 0.5)/1024).
 """
 import math
+
 import numpy as np
 
 F30, F28 = 30, 28

@@ -1,5 +1,6 @@
 import os
 import sys
+
 import numpy as np
 
 # Try importing the canonical EchoStateNetwork class from software module for single-source-of-truth logic
@@ -8,7 +9,8 @@ try:
     train_rc_dir = os.path.join(root_dir, "software", "visualiser", "training")
     if train_rc_dir not in sys.path:
         sys.path.insert(0, train_rc_dir)
-    from train_rc import EchoStateNetwork as CanonicalEchoStateNetwork, simulate_quantization
+    from train_rc import EchoStateNetwork as CanonicalEchoStateNetwork
+    from train_rc import simulate_quantization
     _CANONICAL_ESN_AVAILABLE = True
 except Exception:
     _CANONICAL_ESN_AVAILABLE = False
@@ -39,19 +41,19 @@ else:
             self.input_scaling = input_scaling
             self.ridge_param = ridge_param
             self.sparsity = sparsity
-            
+
             # Initialize input weights
             np.random.seed(42)  # For reproducible weights
             self.W_in = (np.random.rand(n_reservoir, 1 + n_inputs) - 0.5) * 2.0 * input_scaling
-            
+
             # Initialize reservoir weights
             W = np.random.randn(n_reservoir, n_reservoir)
-            
+
             # Apply sparsity (zero out random elements)
             if sparsity > 0.0:
                 mask = np.random.rand(*W.shape) < sparsity
                 W[mask] = 0.0
-                
+
             # Scale reservoir weights to have desired spectral radius
             eigenvalues = np.linalg.eigvals(W)
             max_eigenval = np.max(np.abs(eigenvalues))
@@ -59,10 +61,10 @@ else:
                 self.W_res = W * (spectral_radius / max_eigenval)
             else:
                 self.W_res = W
-                
+
             # Readout weights
             self.W_out = None
-            
+
             # Reservoir state vector
             self.x = np.zeros((n_reservoir, 1))
 
@@ -84,19 +86,19 @@ else:
         def train(self, U, Y, washout=50, timeout_check=None):
             n_samples = U.shape[0]
             self.reset_state()
-            
+
             U_biased = np.hstack((np.ones((n_samples, 1)), U))
             W_in_U = np.dot(U_biased, self.W_in.T)
-            
+
             x_vec = self.x.ravel().copy()
             W_res = self.W_res
             leak = self.leak_rate
             one_minus_leak = 1.0 - leak
-            
+
             n_effective = max(0, n_samples - washout)
             state_dim = 1 + self.n_inputs + self.n_reservoir
             X = np.empty((n_effective, state_dim))
-            
+
             for t in range(n_samples):
                 if t % 2000 == 0 and timeout_check is not None:
                     timeout_check()
@@ -106,7 +108,7 @@ else:
                     X[idx, 0] = 1.0
                     X[idx, 1:1+self.n_inputs] = U[t]
                     X[idx, 1+self.n_inputs:] = x_vec
-                    
+
             self.x = x_vec.reshape(-1, 1)
             if timeout_check is not None:
                 timeout_check()
@@ -116,9 +118,9 @@ else:
             X_XT = np.dot(X_T, X)
             reg_matrix = self.ridge_param * np.eye(state_dim)
             self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
-            
+
             return np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
-        
+
     def adapt_online(self, u, y_target, learning_rate=0.01, mode='rls'):
         """
         Adapt the readout weights W_out online based on target feedback.
@@ -129,13 +131,13 @@ else:
         """
         if self.W_out is None:
             return
-        
+
         u_t = np.array(u).reshape(-1, 1)
         state_vec = np.vstack(([1.0], u_t, self.x)) # shape (1 + n_inputs + n_reservoir, 1)
-        
+
         y_pred = np.dot(self.W_out, state_vec).item()
         error = y_target - y_pred
-        
+
         if mode == 'nlms':
             # Normalized LMS update:
             vec_norm_sq = np.sum(state_vec ** 2)
@@ -146,16 +148,16 @@ else:
             # Recursive Least Squares online update:
             if not hasattr(self, 'P_adapt') or self.P_adapt is None:
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
-            
+
             lmbda = 0.9995  # Forgetting factor
-            
+
             P_s = np.dot(self.P_adapt, state_vec)
             denom = lmbda + np.dot(state_vec.T, P_s).item()
             K = P_s / max(denom, 1e-6)
-            
+
             self.W_out += error * K.T
             self.P_adapt = (self.P_adapt - np.dot(K, np.dot(state_vec.T, self.P_adapt))) / lmbda
-            
+
             if np.any(np.isnan(self.P_adapt)) or np.any(np.isinf(self.P_adapt)):
                 self.P_adapt = np.eye(state_vec.shape[0]) * 10.0
 
@@ -169,10 +171,10 @@ else:
         :param quantize_mode: 'float32', 'int16', or 'int8'
         """
         u_t = np.array(u).reshape(-1, 1)
-        
+
         if quantize_mode in ('int8', 'int16'):
             bits = 8 if quantize_mode == 'int8' else 16
-            
+
             # Helper function to quantize arrays to simulate fixed-point precision
             def simulate_quantization(val, bits_limit):
                 if val is None:
@@ -188,20 +190,20 @@ else:
             W_in_q = simulate_quantization(self.W_in, bits)
             W_res_q = simulate_quantization(self.W_res, bits)
             x_q = simulate_quantization(self.x, bits)
-            
+
             u_biased = np.vstack(([1.0], u_t_q))
             arg = np.dot(W_in_q, u_biased) + np.dot(W_res_q, x_q)
             arg_q = simulate_quantization(arg, bits)
-            
+
             # Perform state update in quantized space
             self.x = (1.0 - self.leak_rate) * x_q + self.leak_rate * np.tanh(arg_q)
             self.x = simulate_quantization(self.x, bits)
-            
+
             # Compute output in quantized space
             W_out_q = simulate_quantization(self.W_out, bits)
             state_vec = np.vstack(([1.0], u_t_q, self.x))
             state_vec_q = simulate_quantization(state_vec, bits)
-            
+
             y_pred = np.dot(W_out_q, state_vec_q)
             return self._clip_output(y_pred).flatten()
         else:
@@ -225,7 +227,9 @@ else:
 
 
 if __name__ == '__main__':
-    import subprocess, sys, os
+    import os
+    import subprocess
+    import sys
 
     print("=" * 52)
     print("  Battery State Estimator — Hardware ESN Trainer")

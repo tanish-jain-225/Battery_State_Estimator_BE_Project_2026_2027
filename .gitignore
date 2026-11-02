@@ -1,33 +1,107 @@
-# Environment variables and secrets
+# ==============================================================================
+# Master .gitignore for Battery State Estimator Project
+# ==============================================================================
+
+# ── Secrets and Environment Configurations ────────────────────────────────────
 .env
 *.env
 !.env.example
 
-# Python cache & bytecode
+# ── Python Caches & Bytecode ──────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
+coverage.xml
 htmlcov/
-*.egg-info/
+*.cover
 .hypothesis/
 
-# Serialized model files (rebuild via training scripts)
+# ── Virtual Environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ── Serialized Model Exceptions ───────────────────────────────────────────────
 *.pkl
 !software/visualiser/model_rc.pkl
 
-# C / C++ build outputs
+# ── C / C++ Compiler Outputs & Executables ────────────────────────────────────
+build/
+dist/
+*.egg-info/
 *.o
 *.obj
 *.exe
 *.out
-*.so
-*.dylib
+*.elf
+*.map
+*.bin
+*.d
 *.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.gch
+*.pch
 
-# IDEs & System files
-.vscode/
+# ── Xilinx Vivado & XSim FPGA Build / Simulation Artifacts ────────────────────
+.Xil/
+xsim.dir/
+*.jou
+*.pb
+*.str
+*.wdb
+*.vcd
+*.bak
+xsim.log
+vivado.log
+
+# ── Local Database & Runtime Telemetry Logs ───────────────────────────────────
+*.log
+*.db
+*.sqlite
+*.sqlite3
+mongo_data/
+data/db/
+
+# ── Temporary & Scratch Files ─────────────────────────────────────────────────
+tmp/
+temp/
+scratch/
+*.tmp
+
+# ── IDEs, Code Editors & OS Files ──────────────────────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
+.vs/
+*.swp
+*~
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Explicitly Tracked Model & Dataset Rules ──────────────────────────────────
+!hardware/STM_Verifier/esn_classifier_weights.h
+!hardware/STM_Verifier/esn_estimator_weights.h
+!hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv
+!hardware/STM_Verifier/training_ev_battery_dataset_multiclass.csv
+!hardware/FPGA_Verifier/*.csv
+!hardware/FPGA_Verifier/*.coe
+!hardware/FPGA_Verifier/*.mem
+!hardware/FPGA_Verifier/**/*.csv
+!hardware/FPGA_Verifier/**/*.coe
+!hardware/FPGA_Verifier/**/*.mem
+!hardware/FPGA_Verifier/**/*.json

@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 import pytest
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -10,12 +11,8 @@ fpga_dir = os.path.join(root_dir, "hardware", "FPGA_Verifier")
 if fpga_dir not in sys.path:
     sys.path.insert(0, fpga_dir)
 
-from hardware.FPGA_Verifier.golden_model import (
-    parse_coe_file,
-    run_full,
-    to_hex_signed
-)
 from hardware.FPGA_Verifier.compare_results import load_csv
+from hardware.FPGA_Verifier.golden_model import parse_coe_file, run_full, to_hex_signed
 
 
 def test_parse_coe_radix10_and_16():
@@ -75,13 +72,13 @@ def test_compare_golden_and_vivado_data():
     """Verify golden_results.csv and vivado_esn_results.csv load and match neuron count."""
     golden_path = os.path.join(fpga_dir, "golden_results.csv")
     vivado_path = os.path.join(fpga_dir, "vivado_esn_results.csv")
-    
+
     g_map, g_rows = load_csv(golden_path, default_key_pass='pass')
     v_map, v_rows = load_csv(vivado_path, default_key_pass='passbuf')
-    
+
     assert len(g_map) == 200
     assert len(v_map) == 200
-    
+
     # Check that pass 0, neuron 0 matches exactly in tanh_out
     assert g_map[(0, 0)]['tanh_out'].strip().lower() == v_map[(0, 0)]['tanh_out'].strip().lower()
 

@@ -1,6 +1,7 @@
-import numpy as np
-import sys
 import os
+import sys
+
+import numpy as np
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root_dir not in sys.path:
@@ -11,10 +12,11 @@ if visualiser_dir not in sys.path:
 
 from software.visualiser.traditional_estimator import (
     ExtendedKalmanFilter,
-    UnscentedKalmanFilter,
+    RecursiveLeastSquares,
     ResistanceSOH,
-    RecursiveLeastSquares
+    UnscentedKalmanFilter,
 )
+
 
 def test_ekf_initialization():
     ekf = ExtendedKalmanFilter("li_ion")
@@ -67,17 +69,17 @@ def test_ukf_step_discharge():
 def test_ukf_vs_ekf_convergence():
     ekf = ExtendedKalmanFilter("li_ion")
     ukf = UnscentedKalmanFilter("li_ion")
-    
+
     P_ekf = np.eye(3) * 0.01
     P_ukf = np.eye(3) * 0.01
-    
+
     soc_ekf, v1_e, v2_e = 0.9, 0.0, 0.0
     soc_ukf, v1_u, v2_u = 0.9, 0.0, 0.0
-    
+
     for t in range(10):
         soc_ekf, v1_e, v2_e, P_ekf = ekf.step(soc_ekf, v1_e, v2_e, P_ekf, -2.0, 3.65, 1.0)
         soc_ukf, v1_u, v2_u, P_ukf = ukf.step(soc_ukf, v1_u, v2_u, P_ukf, -2.0, 3.65, 1.0)
-        
+
     assert abs(soc_ekf - soc_ukf) < 0.05
 
 def test_resistance_soh_step():
@@ -93,10 +95,10 @@ def test_rls_initialization_and_step():
     rls = RecursiveLeastSquares(dt=1.0)
     assert rls.r0 == 0.025 or rls.r0 > 0
     assert not rls.converged
-    
+
     for i in range(60):
         r0, r1, c1, conv = rls.step(3.7 - 0.005*i, -2.0, 3.8)
-        
+
     assert rls.steps >= 50
 
 

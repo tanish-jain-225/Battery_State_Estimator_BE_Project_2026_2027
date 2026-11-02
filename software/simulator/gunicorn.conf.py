@@ -16,6 +16,7 @@ keepalive = 5
 # ── Binding ───────────────────────────────────────────────────────────────────
 # Render sets the PORT environment variable automatically
 import os
+
 bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
 
 # ── Logging ───────────────────────────────────────────────────────────────────

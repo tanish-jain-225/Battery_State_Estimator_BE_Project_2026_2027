@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import tempfile
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -10,11 +10,7 @@ scripts_dir = os.path.join(root_dir, "scripts")
 if scripts_dir not in sys.path:
     sys.path.insert(0, scripts_dir)
 
-from build_project_documents import (
-    build_poster_pdf,
-    build_review_paper_pdf,
-    build_research_paper_pdf
-)
+from build_project_documents import build_poster_pdf, build_research_paper_pdf, build_review_paper_pdf
 
 
 def test_build_poster_pdf_generation():

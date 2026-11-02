@@ -6,12 +6,12 @@ PDF Generator for Project Deliverables:
 """
 
 import os
-from reportlab.lib.pagesizes import A4, landscape
+
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
-)
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
 
 def add_header_footer(canvas_obj, doc, title_text, doc_type="MANUSCRIPT PREPRINT"):
     canvas_obj.saveState()
@@ -19,12 +19,12 @@ def add_header_footer(canvas_obj, doc, title_text, doc_type="MANUSCRIPT PREPRINT
     canvas_obj.setFillColor(colors.HexColor("#4B5563"))
     canvas_obj.drawString(54, doc.pagesize[1] - 36, f"VESIT AUTOMATION & ROBOTICS / INSTRUMENTATION | {doc_type}")
     canvas_obj.drawRightString(doc.pagesize[0] - 54, doc.pagesize[1] - 36, "BE CAPSTONE 2026-2027")
-    
+
     canvas_obj.setStrokeColor(colors.HexColor("#D1D5DB"))
     canvas_obj.setLineWidth(0.5)
     canvas_obj.line(54, doc.pagesize[1] - 42, doc.pagesize[0] - 54, doc.pagesize[1] - 42)
     canvas_obj.line(54, 45, doc.pagesize[0] - 54, 45)
-    
+
     canvas_obj.setFont("Helvetica", 8)
     canvas_obj.drawString(54, 32, f"Target: IEEE / Scopus-Indexed Journal - {title_text[:60]}...")
     canvas_obj.drawRightString(doc.pagesize[0] - 54, 32, f"Page {canvas_obj._pageNumber}")
@@ -44,9 +44,9 @@ def build_poster_pdf(output_path, force=False):
         topMargin=25,
         bottomMargin=25
     )
-    
+
     styles = getSampleStyleSheet()
-    
+
     title_style = ParagraphStyle(
         'PosterTitle',
         parent=styles['Normal'],
@@ -56,7 +56,7 @@ def build_poster_pdf(output_path, force=False):
         textColor=colors.HexColor("#1E3A8A"),
         alignment=1
     )
-    
+
     sub_title_style = ParagraphStyle(
         'PosterSubTitle',
         parent=styles['Normal'],
@@ -94,7 +94,7 @@ def build_poster_pdf(output_path, force=False):
         leading=9.5,
         textColor=colors.HexColor("#1F2937")
     )
-    
+
     story = []
 
     # Title Banner Block
@@ -172,7 +172,7 @@ def build_poster_pdf(output_path, force=False):
         Paragraph("<b>6. Comprehensive Test Suite</b>", box_title_style),
         Spacer(1, 3),
         Paragraph(
-            "&bull; <b>62 Pytest Tests:</b> 100% pass across simulator, chemistry, ESN model, estimator pipeline, and Verilog RTL.<br/>"
+            "&bull; <b>114 Pytest Tests:</b> 100% pass across simulator, chemistry, ESN model, estimator pipeline, and Verilog RTL.<br/>"
             "&bull; <b>Regression Runner:</b> Automated 8-step verification on Windows (`.bat`) and Linux/macOS (`.sh`).",
             box_body_style
         )
@@ -207,7 +207,7 @@ def build_poster_pdf(output_path, force=False):
     col_w = (doc.pagesize[0] - 56 - 24) / 4.0
 
     table_data = [[col1_content, col2_content, col3_content, col4_content]]
-    
+
     col_table = Table(table_data, colWidths=[col_w, col_w, col_w, col_w])
     col_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#F9FAFB")),
@@ -220,7 +220,7 @@ def build_poster_pdf(output_path, force=False):
     ]))
     story.append(col_table)
     story.append(Spacer(1, 8))
-    
+
     # Bottom Summary Notice
     banner_text = (
         "<b>VESIT Department of Automation & Robotics / Instrumentation &bull; Capstone Project 2026-2027 &bull; "
@@ -558,7 +558,7 @@ def build_research_paper_pdf(output_path, force=False):
         ["Thermal Safety Diagnostic Accuracy", "99.80% (Float32)", "98.40% (Q15 Fixed-Point)", "1.4% drop with 0 FPU dependency"],
         ["SOC Observer RMSE (Drive Cycles)", "EKF Baseline: 1.42%", "Decoupled ESN Observer: 0.80%", "43% Error Reduction"],
         ["Xilinx Artix-7 FPGA RTL Verification", "Python Golden Model", "5-Stage Pipelined Verilog RTL", "200/200 Bit-Exact States (0 Deviation)"],
-        ["Automated Pytest Regression Suite", "N/A", "62 End-to-End Tests", "100% Pass Rate across all modules"]
+        ["Automated Pytest Regression Suite", "N/A", "114 End-to-End Tests", "100% Pass Rate across all modules"]
     ]
     t = Table(exp_data, colWidths=[140, 125, 125, 145])
     t.setStyle(TableStyle([
@@ -603,11 +603,11 @@ if __name__ == "__main__":
     import sys
     force = "--force" in sys.argv
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
+
     poster_pdf = os.path.join(base_dir, "docs", "Poster", "Project_Poster.pdf")
     review_pdf = os.path.join(base_dir, "docs", "Publications", "Review_Paper.pdf")
     research_pdf = os.path.join(base_dir, "docs", "Publications", "Research_Paper.pdf")
-    
+
     # Also place copies in reference/ so navigation from either directory works seamlessly
     ref_review_pdf = os.path.join(base_dir, "reference", "Review_Paper.pdf")
     ref_research_pdf = os.path.join(base_dir, "reference", "Research_Paper.pdf")
@@ -618,6 +618,6 @@ if __name__ == "__main__":
     build_review_paper_pdf(ref_review_pdf, force=force)
     build_research_paper_pdf(research_pdf, force=force)
     build_research_paper_pdf(ref_research_pdf, force=force)
-    
+
     print("Project PDF deliverables checked/generated successfully!")
 

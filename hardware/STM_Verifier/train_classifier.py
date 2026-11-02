@@ -1,14 +1,16 @@
-import pandas as pd
-import numpy as np
+import argparse
 import os
 import sys
-import argparse
+
+import numpy as np
+import pandas as pd
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 if base_dir not in sys.path:
     sys.path.insert(0, base_dir)
 
 from train import EchoStateNetwork
+
 try:
     from hardware.STM_Verifier.config import Config
 except ImportError:
@@ -24,7 +26,7 @@ def clean_df_columns(df_in):
             if split_data.shape[1] == len(new_cols):
                 split_data.columns = new_cols
                 df_in = split_data.apply(pd.to_numeric, errors='coerce')
-                
+
         df_in.columns = [str(col).strip() for col in df_in.columns]
         rename_dict = {}
         for col in df_in.columns:
@@ -42,7 +44,7 @@ def clean_df_columns(df_in):
             elif col_lower == 'time':
                 rename_dict[col] = 'Time'
         df_in.rename(columns=rename_dict, inplace=True)
-        
+
         # Coerce numeric columns and drop NaNs
         req_cols = ['Voltage', 'Current', 'Temperature']
         for col in req_cols:
@@ -148,6 +150,7 @@ def train_and_export_classifier(csv_path=None, header_path=None, grid_search=Fal
         print(f"Checking doc link accessibility ({csv_url})...")
         try:
             import io
+
             import requests
             response = requests.get(csv_url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=10.0)
             if response.status_code == 200:
@@ -267,28 +270,28 @@ def train_and_export_classifier(csv_path=None, header_path=None, grid_search=Fal
         f.write("#define ESN_CLASSIFIER_WEIGHTS_H\n\n")
         f.write("// Auto-generated weights file for STM32 ESN classifier\n\n")
         f.write("#include <stdint.h>\n\n")
-        
+
         f.write(f"#define ESN_N_INPUTS {n_inputs}\n")
         f.write(f"#define ESN_N_RESERVOIR {n_reservoir}\n")
         f.write(f"#define ESN_N_OUTPUTS {n_outputs}\n")
         f.write(f"#define ESN_LEAK_RATE {Config.ESN_LEAK_RATE:.6f}f\n")
         f.write(f"#define ESN_SPECTRAL_RADIUS {Config.ESN_SPECTRAL_RADIUS:.6f}f\n")
         f.write(f"#define ESN_WASHOUT_STEPS {washout}\n\n")
-        
+
         write_array_1d(f, "esn_input_means", input_means)
         write_array_1d(f, "esn_input_stds", input_stds)
-        
+
         f.write("// ESN Input & Readout Weights (Dense)\n")
         write_array_2d(f, "esn_W_in", esn.W_in)
         write_array_2d(f, "esn_W_out", esn.W_out)
-        
+
         f.write("// ESN Reservoir Weights (Compressed Sparse Row CSR Optimization)\n")
         val, col, row_ptr = to_csr(esn.W_res)
         f.write(f"#define ESN_W_RES_NNZ {len(val)}\n\n")
         write_array_1d(f, "esn_W_res_val", val)
         write_array_1d_int(f, "esn_W_res_col", col)
         write_array_1d_int(f, "esn_W_res_row_ptr", row_ptr)
-        
+
         f.write("#endif // ESN_CLASSIFIER_WEIGHTS_H\n")
 
     print(f"Successfully generated {header_path}!")
