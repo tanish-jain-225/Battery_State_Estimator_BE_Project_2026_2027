@@ -10,7 +10,7 @@ This project is conceived, developed, and maintained as an undergraduate Bachelo
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
 | 1 | **Sanjna Patankar** | 2023.sanjna.patankar | Automation & Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) | [@Clothflow13](https://github.com/Clothflow13) | 2-RC ECM electro-thermal physics modeling, Arrhenius parameter scaling, dynamic drive cycles, and comprehensive literature survey. |
 | 2 | **Akshay Nambiar** | 2023.akshay.nambiar | Automation & Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) | [@RoyalMaddy08](https://github.com/RoyalMaddy08) | Traditional state observers (EKF, UKF, Coulomb Counting, VFF-RLS), state space innovation, and telemetry API services. |
-| 3 | **Satvik Verma** | 2023.satvik.verma | Automation & Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) | [@satvikverma14](https://github.com/satvikverma14) | Embedded C99 firmware, Compressed Sparse Row (CSR) SpMV acceleration, Q15 fixed-point math, and microcontroller HAL simulation. |
+| 3 | **Satvik Verma** | 2023.satvik.verma | Automation & Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) | [@ABKmaster](https://github.com/ABKmaster) | Embedded C99 firmware, Compressed Sparse Row (CSR) SpMV acceleration, Q15 fixed-point math, and microcontroller HAL simulation. |
 | 4 | **Tanish Sanghvi** | 2023.tanish.sanghvi | Automation & Robotics | [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in) | [@tanish-jain-225](https://github.com/tanish-jain-225) | Echo State Network (ESN) reservoir architecture, FPGA Verilog RTL pipeline, bit-exact golden verification, and full-stack integration. |
 
 ---

@@ -36,7 +36,7 @@
 | :---: | :--- | :--- | :--- | :--- | :--- |
 | 1 | **Sanjna Patankar** | 2023.sanjna.patankar | Automation and Robotics | [2023.sanjna.patankar@ves.ac.in](mailto:2023.sanjna.patankar@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-Clothflow13-181717?style=flat-square&logo=github)](https://github.com/Clothflow13) |
 | 2 | **Akshay Nambiar** | 2023.akshay.nambiar | Automation and Robotics | [2023.akshay.nambiar@ves.ac.in](mailto:2023.akshay.nambiar@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-RoyalMaddy08-181717?style=flat-square&logo=github)](https://github.com/RoyalMaddy08) |
-| 3 | **Satvik Verma** | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-satvikverma14-181717?style=flat-square&logo=github)](https://github.com/satvikverma14) |
+| 3 | **Satvik Verma** | 2023.satvik.verma | Automation and Robotics | [2023.satvik.verma@ves.ac.in](mailto:2023.satvik.verma@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-ABKmaster-181717?style=flat-square&logo=github)](https://github.com/ABKmaster) |
 | 4 | **Tanish Sanghvi** | 2023.tanish.sanghvi | Automation and Robotics | [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in) | [![GitHub](https://img.shields.io/badge/GitHub-tanish--jain--225-181717?style=flat-square&logo=github)](https://github.com/tanish-jain-225) |
 
 ---
