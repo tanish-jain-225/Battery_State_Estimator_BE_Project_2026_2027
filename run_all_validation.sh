@@ -38,9 +38,9 @@ fi
 echo ""
 
 # ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
-echo "[2/8] Running Complete Pytest Suite (114 Unit/Integration Tests)..."
+echo "[2/8] Running Complete Pytest Suite (115 Unit/Integration Tests)..."
 if $PYTHON_BIN -m pytest "$ROOT_DIR/tests"; then
-    echo "[SUCCESS] Full Pytest suite executed and all 114 tests passed."
+    echo "[SUCCESS] Full Pytest suite executed and all 115 tests passed."
 else
     echo "[ERROR] Pytest suite execution failed."
     FAILURES=$((FAILURES+1))
@@ -108,6 +108,13 @@ if $PYTHON_BIN "$ROOT_DIR/hardware/FPGA_Verifier/ukf/compare_rtl.py" "$ROOT_DIR/
     echo "[SUCCESS] All 3 FPGA Accelerator Cores - ESN, EKF, UKF - verified bit-exactly!"
 else
     echo "[ERROR] FPGA UKF Verilog RTL comparison failed."
+    FAILURES=$((FAILURES+1))
+fi
+
+if $PYTHON_BIN -c "import sys; sys.path.insert(0, 'hardware/IP_Block'); from esn_host import Pack; p = Pack('hardware/IP_Block'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack verified end-to-end.')"; then
+    :
+else
+    echo "[ERROR] FPGA ESN IP Block verification failed."
     FAILURES=$((FAILURES+1))
 fi
 echo ""

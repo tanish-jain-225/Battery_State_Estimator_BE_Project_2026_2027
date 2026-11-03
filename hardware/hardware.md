@@ -33,6 +33,20 @@ The layout below maps out the key modules within the hardware directory:
 ```text
 hardware/
 ├── hardware.md                                  # Consolidated hardware documentation
+├── IP_Block/                                    # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform
+│   ├── README.md                                # Master IP-XACT Catalog, AXI4-Lite/Stream & Platform Guide
+│   ├── component.xml                            # IEEE 1685 IP-XACT packaging specification (VESIT UserIP)
+│   ├── register_map.md                          # AXI4-Lite memory-mapped register space specification
+│   ├── uart_protocol.md                         # 115200-baud real-time multi-observer UART protocol
+│   ├── esn_axi_ip.v                             # Reusable AXI4-Lite + AXI4-Stream ESN IP top module
+│   ├── esn_platform_top.v                       # Tri-observer FPGA top module (ESN + EKF + UKF in parallel)
+│   ├── esn_platform_top.bit                     # Pre-compiled ready-to-program bitstream (Arty A7-100T)
+│   ├── package_esn_ip.tcl                       # Vivado IP-XACT packaging automation script
+│   ├── build_platform.tcl                       # Vivado project generation and bitstream synthesis script
+│   ├── esn_ip.h                                 # C driver header for MicroBlaze / Zynq ARM Cortex-A
+│   ├── esn_ip_example.c                         # C driver example application
+│   ├── esn_host.py                              # Real-time UART host communication and evaluation CLI
+│   └── esn_platform_top_*.rpt                   # Synthesis, timing summary and power reports
 ├── STM_Verifier/                                # C99 embedded firmware and training scripts
 │   ├── main.c                                   # C99 classifier runtime & test simulation
 │   ├── main.h                                   # Host-side HAL shims & microcontroller config
@@ -142,6 +156,25 @@ Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FP
 
 #### Vivado XSim RTL Simulation Waveform (`tb_esn_top.v`)
 ![FPGA Vivado Simulation Waveform](../images/assets/screenshot_fpga_waveform.png)
+
+---
+
+### 3.5 Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform (`hardware/IP_Block/`)
+
+The [`hardware/IP_Block/`](IP_Block/README.md) directory delivers our complete **commercial-grade, plug-and-play FPGA IP Block and Multi-Observer Hardware Platform** targeting the Xilinx Artix-7 FPGA (Digilent Arty A7-100T):
+
+1. **Reusable AXI4 IP Block (`esn_axi_ip`)**:
+   - **Bus Protocols:** AXI4-Lite slave interface for memory-mapped parameter configuration and control; AXI4-Stream slave/master interfaces for streaming battery telemetry vectors and receiving predictions.
+   - **IP-XACT Packaging:** Packaged compliant with IEEE 1685 standard in [`component.xml`](IP_Block/component.xml) under taxonomy `/UserIP` (`vesit.ac.in:user:esn_axi_ip:1.0`), enabling drag-and-drop integration in Vivado IP Integrator / Block Designs.
+   - **Runtime Reconfigurability:** All ESN reservoir weights ($W_{\text{in}}, W$, bias) and linear readout weights ($W_{\text{out}}^{\text{SOC}}, W_{\text{out}}^{\text{SOH}}$) are loaded at runtime over AXI4-Lite, allowing one bitstream to service any trained ESN model or cell chemistry.
+   - **Embedded Software Driver:** Complete C driver API ([`esn_ip.h`](IP_Block/esn_ip.h), [`esn_ip_example.c`](IP_Block/esn_ip_example.c)) for MicroBlaze, Zynq ARM Cortex-A9/A53, or host microcontrollers.
+
+2. **Tri-Observer FPGA Platform (`esn_platform_top`)**:
+   - **Concurrent Hardware Observers:** Executes the 100-neuron ESN, 512-point Fixed-Point EKF, and 512-point Fixed-Point UKF **simultaneously in parallel** on the FPGA fabric upon receiving each battery telemetry frame.
+   - **Hardware UART Interface:** Real-time 115200-baud UART protocol ([`uart_protocol.md`](IP_Block/uart_protocol.md)) streaming telemetry frames from host laptops and returning concurrent predictions and measured execution cycle counts.
+   - **Cycle Latencies (at 80 MHz):** ESN: 42,905 cycles (536 µs); EKF: 226 cycles (2.8 µs); UKF: 597 cycles (7.5 µs).
+   - **Total Device Power:** 0.124 W on Digilent Arty A7-100T (`xc7a100tcsg324-1`).
+   - **Pre-Compiled Ready-to-Flash Bitstream:** Included as [`esn_platform_top.bit`](IP_Block/esn_platform_top.bit) (3.7 MB), enabling instant FPGA flashing and validation without waiting for full synthesis.
 
 ---
 

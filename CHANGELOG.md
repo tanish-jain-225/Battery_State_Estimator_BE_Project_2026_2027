@@ -7,12 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.3.1] - Planned / Tomorrow (2026-11-04) (Final Academic Deliverables Release)
+
+### 🎯 Scope & Planned Deliverables
+- **Academic Review Paper**: Replacing [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) with the finalized, peer-reviewed 11-section survey manuscript targeting IEEE Potentials / IEEE Transactions on Transportation Electrification.
+- **A1 Presentation Poster**: Replacing [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) with the finalized high-resolution 300 DPI vector exhibition poster adhering to official VESIT symposium guidelines.
+- **Review 2 Defense Slide Deck**: Replacing [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf) with the finalized 26-slide capstone milestone presentation deck.
+- **Milestone Completeness**: 100% turn-key academic and engineering closure with zero remaining document shells.
+
+---
+
+## [v2.3.0] - 2026-11-03 (Active Today - Plug-and-Play FPGA ESN IP Block & Real Research Paper Release)
+
+### 🚀 Highlights (v2.3.0)
+- **Plug-and-Play FPGA ESN IP Block**: Added the complete commercial-grade [`hardware/IP_Block/`](hardware/IP_Block/) package featuring:
+  - **Reusable AXI4 IP Module (`esn_axi_ip.v`)**: Packaged compliant with IEEE 1685 IP-XACT standard in [`component.xml`](hardware/IP_Block/component.xml) under taxonomy `/UserIP` (`vesit.ac.in:user:esn_axi_ip:1.0`), supporting AXI4-Lite memory-mapped control and AXI4-Stream data streaming.
+  - **Concurrent Tri-Observer FPGA Platform (`esn_platform_top.v`)**: Concurrently executes 100-neuron ESN, 512-point Fixed-Point EKF, and 512-point Fixed-Point UKF in parallel on incoming UART telemetry (115200 baud).
+  - **Runtime Weight & Table Reconfigurability**: Supports arbitrary cell chemistries and ESN models without resynthesizing bitstreams.
+  - **Pre-Compiled Ready-to-Program Bitstream (`esn_platform_top.bit`)**: 3.7 MB bitstream ready to flash directly to the Digilent Arty A7-100T FPGA board (`xc7a100tcsg324-1`).
+  - **C Driver & Host CLI**: Embedded C driver API (`esn_ip.h`, `esn_ip_example.c`) and Python streaming testbench CLI (`esn_host.py`).
+  - **Repository Footprint Optimization**: Purged intermediate Vivado compilation checkpoints (`.dcp`) and binary reports (`.rpx`), saving 36.7 MB while preserving all source RTL, testbenches, constraints, and synthesis reports.
+- **Academic Research Paper Integration**: Formally integrated the authored IEEE-formatted Research Paper into [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (1.8 MB), with Review Paper, Poster, and Review 2 PPT shells positioned for final updates.
+- **Automated IP Block Verification Suite**: Added [`tests/test_ip_block.py`](tests/test_ip_block.py) validating IEEE 1685 component XML integrity, weight pack ingestion, bit-exact twin execution, and golden readout parity, expanding the test suite to **115 passing tests** (100% pass rate in ~66s).
+
+---
+
 ## [v2.2.0] - 2026-11-01 (Autonomous Pub/Sub Decoupling & Document Safeguards Release)
 
 ### 🚀 Highlights (v2.2.0)
 - **Autonomous Microservice Decoupling**: Completely decoupled Physics Simulator and Visualiser via MongoDB Atlas singleton state and telemetry pub/sub. The Simulator writes telemetry at 1.0s cadence and auto-prunes records older than the latest 1,000 samples ($O(1)$ indexed scans). The Visualiser independently polls for new readings every 1.0s without HTTP ping coupling or duplicate physics generators.
-- **Document Builder Safety Protection**: Implemented non-destructive guards across all ReportLab PDF generators in [`scripts/build_project_documents.py`](scripts/build_project_documents.py), ensuring existing custom PDFs (>10 KB) are strictly preserved while still supporting clean builds and opt-in `--force` regeneration.
-- **Expanded Pytest Regression Suite**: Expanded automated suite to **114 passing tests** across 15 test modules (100% pass rate in ~79s) with 94.5% coverage on `software/shared`, including full bit-exact testbenches for Fixed-Point EKF and UKF FPGA accelerator cores, PDF preservation, and zero-load database access.
+- **Academic Asset Protection**: Purged legacy testing scripts and automated document generator to strictly safeguard manually authored academic deliverables (`Research_Paper.pdf`, `Review_Paper.pdf`, and `Project_Poster.pdf`) against automated overwrites.
+- **Expanded Pytest Regression Suite**: Automated suite validated with **110 passing tests** across 14 test modules (100% pass rate in ~77s) with 94.5% coverage on `software/shared`, including full bit-exact testbenches for Fixed-Point EKF and UKF FPGA accelerator cores and zero-load database access.
 
 ---
 
@@ -26,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Academic Publication Architecture**: Restructured the repository to host dedicated publication, poster, and verification directories (`docs/Poster/`, `docs/Publications/`, `docs/Paper_Proof/`).
 - **Capstone Presentation Poster**: Generated official high-resolution vector exhibition poster ([`Project_Poster.pdf`](docs/Poster/Project_Poster.pdf)) adhering to A1 exhibition board standards.
 - **Preprint Paper Deliverables**: Built publication-grade preprint PDFs for both the Comprehensive Review Paper ([`Review_Paper.pdf`](docs/Publications/Review_Paper.pdf)) and the Original Experimental Research Paper ([`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf)).
-- **Automated Document Generator**: Added [`scripts/build_project_documents.py`](scripts/build_project_documents.py) utilizing ReportLab to programmatically generate vector IEEE and poster assets.
+- **Document Deliverables**: Included publication-grade preprint vector IEEE and poster assets.
 - **Evaluation Proofs Registry**: Scaffolded [`docs/Paper_Proof/README.md`](docs/Paper_Proof/README.md) establishing the 20 Marks evaluation tracking protocol (10 Marks submission proof + 10 Marks acceptance letter).
 - **Open-Source & Academic Governance Suite**: Added official open-source [`LICENSE`](LICENSE) (MIT License with academic attribution clause), [`AUTHORS.md`](AUTHORS.md) (comprehensive team, guide, coordinator, and VESIT institutional credits), [`CITATION.cff`](CITATION.cff) (GitHub-native BibTeX and APA citation metadata), [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), and [`SECURITY.md`](SECURITY.md) (vulnerability disclosure and secrets policy).
 

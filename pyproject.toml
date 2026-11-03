@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "battery-state-estimator"
-version = "2.2.0"
+version = "2.3.0"
 description = "ESN-Based Battery State Estimator: An Alternative to EKF and Coulomb Counting"
 readme = "README.md"
 license = {text = "MIT"}
@@ -56,7 +56,7 @@ exclude = [".git", "__pycache__", ".pytest_cache", "*.egg-info"]
 [tool.ruff]
 line-length = 120
 target-version = "py310"
-exclude = [".git", "__pycache__", ".pytest_cache", "*.egg-info"]
+exclude = [".git", "__pycache__", ".pytest_cache", "*.egg-info", "hardware/IP_Block"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]

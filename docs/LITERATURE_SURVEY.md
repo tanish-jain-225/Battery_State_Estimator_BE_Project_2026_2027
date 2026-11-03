@@ -1,10 +1,10 @@
-[← Back to README](../README.md) · [Web Research & Industrial Audit](Resources/WEB_RESEARCH.md) · [IEEE / Q3 Review Paper Manuscript](../reference/review_paper.md)
+[← Back to README](../README.md) · [Web Research & Industrial Audit](Resources/WEB_RESEARCH.md) · [IEEE / Q3 Review Paper](Publications/Review_Paper.pdf)
 
 # Literature Survey: Neuromorphic Computing, Spiking Networks, and Reservoir Computing for Intelligent Battery Management Systems
 
 This document synthesizes the academic literature, theoretical foundations, and state-of-the-art estimation paradigms for Battery Management Systems (BMS). It traces the field from conventional control-theoretic observers and deep learning architectures to neuromorphic computing, Spiking Neural Networks (SNNs), Reservoir Computing (RC), Liquid State Machines (LSMs), event-driven sensing, and hardware acceleration platforms.
 
-> **Full Manuscript Reference:** [`reference/review_paper.md`](../reference/review_paper.md) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Edition).
+> **Full Manuscript Reference:** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Edition).
 
 ---
 
@@ -36,7 +36,7 @@ Real-world estimation faces electrochemical nonlinearity (steep OCV knees, LFP p
 
 * **Coulomb Counting & OCV Mapping**: Coulomb counting integrates net current ($O(1)$ complexity) but drifts $5–10\%$ over a 2-hour drive cycle due to sensor bias. OCV mapping requires extended rest (3–4 hours) and fails during active drive cycles or on flat LFP OCV plateaus.
 * **Equivalent Circuit Models (ECM)**: Lumped 1-RC and 2-RC networks balance physical accuracy against real-time execution. Extended Kalman Filters (EKF) linearize non-linear voltage equations via Taylor Jacobians ($\mathbf{H}_k$).
-* **Multi-Timescale Decoupling (*Li et al., 2020*)**: Decouples fast intra-cycle SOC tracking ($1\text{ s}$) from slow inter-cycle SOH capacity degradation ($100–1000\text{ s}$), preventing covariance blowup and computational redundancy.
+* **Multi-Timescale Decoupling ([*Li et al., 2020*](../reference/paper_ekf_soc_soh.pdf))**: Decouples fast intra-cycle SOC tracking ($1\text{ s}$) from slow inter-cycle SOH capacity degradation ($100–1000\text{ s}$), preventing covariance blowup and computational redundancy. See primary reference [`reference/paper_ekf_soc_soh.pdf`](../reference/paper_ekf_soc_soh.pdf).
 * **Unscented Kalman Filter (UKF)**: Propagates $2n+1$ deterministic sigma points through non-linear voltage curves via Merwe transform, eliminating Jacobians but increasing compute by $2.5\times–3\times$.
 
 ---
@@ -67,7 +67,7 @@ Reservoir Computing projects inputs into a high-dimensional recurrent reservoir 
 $$\mathbf{W}_{\text{out}} = \mathbf{Y}_{\text{target}} \mathbf{X}^T (\mathbf{X} \mathbf{X}^T + \lambda \mathbf{I})^{-1}$$
 
 * **ESNs vs Spiking Reservoirs (RSNNs / LSMs)**: ESNs use continuous (tanh/sigmoid) synchronous neurons, ideal for near-term MCU/FPGA deployment. RSNNs/LSMs use spiking LIF neurons, natively suited for neuromorphic hardware.
-* **BMS Application (*Kamarudin et al., 2026*)**: RSNNs reached SOH RMSE of 0.029 with $12–26\text{ ms}$ latency. Our fixed-point Q6.10 Echo State Network (100 neurons, 4 inputs, seed=42) achieves $R^2 = 0.8783$ test SOC estimation with zero DSP usage on FPGA fabric.
+* **BMS Application ([*Rigutini / Kamarudin et al., 2020/2026*](../reference/paper_rc_soc_soh.pdf))**: Recurrent reservoir architectures reached SOH RMSE of 0.029 with $12–26\text{ ms}$ latency on microcontroller targets. Our fixed-point Q6.10 Echo State Network (100 neurons, 4 inputs, seed=42) achieves $R^2 = 0.8783$ test SOC estimation with zero DSP slice usage on FPGA fabric. See primary reference [`reference/paper_rc_soc_soh.pdf`](../reference/paper_rc_soc_soh.pdf).
 
 ---
 

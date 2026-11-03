@@ -10,7 +10,7 @@ All contributors are expected to uphold rigorous scientific integrity, clean cod
 
 ### Core Architecture Guidelines
 * **Physics Simulation:** Strictly preserve the 2-RC Equivalent Circuit Model (ECM) physics and Arrhenius equations defined in [`software/shared/battery_simulator.py`](software/shared/battery_simulator.py).
-* **Observer Pipelines:** Any modification to Kalman filters (EKF/UKF) or Echo State Networks (ESN) must preserve parameter decoupling and run against the 114-test regression suite.
+* **Observer Pipelines:** Any modification to Kalman filters (EKF/UKF) or Echo State Networks (ESN) must preserve parameter decoupling and run against the 115-test regression suite.
 * **Embedded C Firmware:** Maintain C99 compatibility, Q15 fixed-point arithmetic, and Compressed Sparse Row (CSR) memory bounds in [`hardware/STM_Verifier/`](hardware/STM_Verifier/).
 * **Verilog RTL:** Keep the 5-stage pipeline in [`hardware/FPGA_Verifier/`](hardware/FPGA_Verifier/) bit-exact with [`golden_model.py`](hardware/FPGA_Verifier/golden_model.py).
 
@@ -41,7 +41,7 @@ Before committing any changes, run the master end-to-end validation runner:
   ./run_all_validation.sh
   ```
 
-All 114 tests across pytest, model training, C99 compilation, and FPGA RTL bit-exact matching must pass with **0 errors**.
+All 115 tests across pytest, model training, C99 compilation, and FPGA RTL bit-exact matching must pass with **0 errors**.
 
 ---
 
@@ -49,11 +49,8 @@ All 114 tests across pytest, model training, C99 compilation, and FPGA RTL bit-e
 
 1. **Authored Manuscripts:**
    * Text source for the Research Paper: [`reference/paper.md`](reference/paper.md)
-   * Text source for the Review Paper: [`reference/review_paper.md`](reference/review_paper.md)
-   * When modifying manuscript text, update both the markdown document and rebuild the vector preprint PDFs using:
-     ```bash
-     python scripts/build_project_documents.py
-     ```
+   * Comprehensive Review Paper Deliverable: [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf)
+   * When modifying manuscript text, update the markdown document and place the compiled camera-ready PDF deliverables in [`docs/Publications/`](docs/Publications/README.md).
 2. **Publications Directory:**
    * Canonical PDF deliverables are located in [`docs/Publications/`](docs/Publications/README.md).
 3. **Capstone Poster:**

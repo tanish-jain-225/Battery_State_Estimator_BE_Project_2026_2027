@@ -1,0 +1,42 @@
+{
+ "name": "NASA-18650 fold B0018",
+ "trained_on": [
+  "B0005",
+  "B0006",
+  "B0007"
+ ],
+ "features": [
+  "voltage_measured",
+  "current_measured",
+  "temperature_measured",
+  "current_load"
+ ],
+ "scaler_min": {
+  "voltage_measured": 1.8132694309760007,
+  "current_measured": -2.0166947158636264,
+  "temperature_measured": 23.320483522668614,
+  "current_load": -2.0
+ },
+ "scaler_max": {
+  "voltage_measured": 4.205067189469255,
+  "current_measured": 0.002996454667232304,
+  "temperature_measured": 41.430855994635635,
+  "current_load": 2.0
+ },
+ "input_scale": 1024,
+ "ocv_poly": [
+  -4.235203087962226,
+  14.036010101395927,
+  -14.763851822879621,
+  5.924039866425004,
+  -0.1559383274459251,
+  3.2119625620003114
+ ],
+ "r0": 0.010619409748206186,
+ "r1": 0.01,
+ "c1": 3000.0,
+ "cap_nominal": 1.8550045207910817,
+ "n_in": 4,
+ "n_res": 100,
+ "t_steps": 64
+}

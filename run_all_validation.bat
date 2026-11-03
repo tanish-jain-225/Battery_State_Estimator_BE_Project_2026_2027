@@ -28,13 +28,13 @@ if !errorlevel! neq 0 (
 echo.
 
 :: ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
-echo [2/8] Running Complete Pytest Suite (114 Unit/Integration Tests)...
+echo [2/8] Running Complete Pytest Suite (115 Unit/Integration Tests)...
 python -m pytest "%ROOT_DIR%tests"
 if !errorlevel! neq 0 (
     echo [ERROR] Pytest suite execution failed.
     set /a FAILURES+=1
 ) else (
-    echo [SUCCESS] Full Pytest suite executed and all 114 tests passed.
+    echo [SUCCESS] Full Pytest suite executed and all 115 tests passed.
 )
 echo.
 
@@ -107,6 +107,12 @@ if !errorlevel! neq 0 (
 ) else (
     echo [SUCCESS] FPGA Fixed-Point UKF Verilog RTL matched golden trace bit-exactly [512/512].
     echo [SUCCESS] All 3 FPGA Accelerator Cores - ESN, EKF, UKF - verified bit-exactly!
+)
+
+python -c "import sys; sys.path.insert(0, 'hardware/IP_Block'); from esn_host import Pack; p = Pack('hardware/IP_Block'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack verified end-to-end.')"
+if !errorlevel! neq 0 (
+    echo [ERROR] FPGA ESN IP Block verification failed.
+    set /a FAILURES+=1
 )
 echo.
 

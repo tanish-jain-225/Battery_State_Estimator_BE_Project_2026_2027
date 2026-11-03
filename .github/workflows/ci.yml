@@ -46,10 +46,6 @@ jobs:
         run: |
           pytest tests/ --cov=software/shared --cov-report=term --cov-report=xml --cov-fail-under=85
 
-      - name: Build Project PDF Deliverables
-        run: |
-          python scripts/build_project_documents.py
-
       - name: Run End-to-End Validation Script (POSIX bash)
         if: runner.os != 'Windows'
         run: |

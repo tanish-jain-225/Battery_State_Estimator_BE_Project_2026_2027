@@ -13,7 +13,7 @@
 - Tanish Sanghvi  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 114 Tests in v2.2.0, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 115 Tests in v2.3.0, 200 / 200 FPGA Parity Stages)**
 
 ---
 
@@ -24,7 +24,7 @@
 4. [Multi-Model Comparative Estimation Benchmark (ESN vs. UKF vs. EKF vs. CC)](#4-multi-model-comparative-estimation-benchmark)
 5. [C99 Embedded Firmware Validation (Float32 vs. Fixed-Point Q15 & CSR SpMV)](#5-c99-embedded-firmware-validation)
 6. [Verilog HDL FPGA Hardware Verifier on Artix A7100T](#6-verilog-hdl-fpga-hardware-verifier-on-artix-a7100t)
-7. [Automated Verification Test Suite (62 Tests, 100% Pass)](#7-automated-verification-test-suite-62-tests-100-pass)
+7. [Automated Verification Test Suite (115 Tests, 100% Pass)](#7-automated-verification-test-suite-115-tests-100-pass)
 8. [Master End-to-End One-Click Validation Pipeline](#8-master-end-to-end-one-click-validation-pipeline)
 9. [Review 2 Demonstration Script & Talking Points](#9-review-2-demonstration-script-talking-points)
 10. [Phase 3 Roadmap Towards Final Defense](#10-phase-3-roadmap-towards-final-defense)
@@ -59,6 +59,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 | **Online ESN Adaptation** | In Progress (Target) | **Fully Verified RLS Readout Tracking** | Model updates dynamically to capacity fade without full matrix recomputation. |
 | **C99 Embedded Firmware** | Conceptual CSR code | **Fully Benchmarked Dual C99 Engine** | Float32 (99.80%) vs Q15 (98.40%), 0.0031 RMSE, 6.7× CSR SpMV speedup. |
 | **FPGA RTL Verification** | Single-pass 100-neuron test | **200/200 Stages Parity + Multi-Step Sequence** | Bit-exact matching in Vivado XSim and temporal sequence input indexing (`tb_esn_top_tiny.v`). |
+| **FPGA IP Block & Platform** | Conceptual / In Progress | **Plug-and-Play AXI4 IP (`esn_axi_ip`) + Arty A7 Platform** | IEEE 1685 IP-XACT catalog module with concurrent tri-observer execution (ESN + EKF + UKF in parallel). |
 | **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
 | **One-Click Validation** | Separate build scripts | **Unified 8-Step Runner (`.bat` / `.sh`)** | Zero-configuration validation across hardware and software in under 45 seconds. |
 
@@ -178,10 +179,10 @@ u(t) ────►│ Win MAC ──► (+) ──► Bias ──► Saturatio
 
 ---
 
-## 7. Automated Verification Test Suite (62 Tests, 100% Pass)
+## 7. Automated Verification Test Suite (115 Tests, 100% Pass)
 
 > [!NOTE]
-> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current v2.2.0 release, this test suite has expanded to **114 tests** across 15 modules, verifying automated PDF document compilation, advanced priming, multi-chemistry tracking, hardware CSR quantization, FPGA EKF/UKF golden trace parity, and custom PDF preservation.
+> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current v2.3.0 release, this test suite has expanded to **115 tests** across 15 modules, verifying plug-and-play FPGA IP block integration, IP-XACT component XML, advanced priming, multi-chemistry tracking, hardware CSR quantization, and FPGA EKF/UKF golden trace parity.
 
 The repository includes a comprehensive, automated test suite in the [`tests/`](../../tests/) directory. All tests run via `pytest`:
 
@@ -237,7 +238,7 @@ To guarantee 100% reproducibility for examiners and evaluators, the repository f
            -> Bias Stage:     200/200 bit-exact matches (100%)
            -> Sum Stage:      200/200 bit-exact matches (100%)
            -> Tanh In/Out:    200/200 bit-exact matches (100%)
-[STEP 7/8] Running Complete Automated Test Suite (62 Tests via Pytest)... [OK]
+[STEP 7/8] Running Complete Automated Test Suite (115 Tests via Pytest)... [OK]
 [STEP 8/8] Performing Final Integrity Check... [OK]
 
 ========================================================================
@@ -286,5 +287,5 @@ With all Phase 2 / Review 2 goals 100% completed and verified, our final phase f
 
 1. **Physical Artix A7100T Synthesis & Flashing**: Generate final bitstream (`.bit`) with Vivado 2024.x, record on-chip utilization (LUTs, BRAMs, DSP slices) and dynamic power consumption.
 2. **Hardware-in-the-Loop (HIL) UART Bridge**: Connect PC-based real-time simulator via USB-UART (FTDI / CH340) directly to FPGA Pmod pins to perform hardware-in-the-loop state estimation.
-3. **Publication Milestones (20 Marks)**: Submit both official manuscripts to peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**: (1) Comprehensive Review Paper ([`reference/review_paper.md`](../../reference/review_paper.md)), and (2) Original Experimental Research Paper ([`reference/paper.md`](../../reference/paper.md)).
+3. **Publication Milestones (20 Marks)**: Submit both official manuscripts to peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**: (1) Comprehensive Review Paper ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)), and (2) Original Experimental Research Paper ([`reference/paper.md`](../../reference/paper.md)).
 4. **Final Thesis Submission**: Complete comprehensive B.E. dissertation defense documentation.

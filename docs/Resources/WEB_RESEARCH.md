@@ -31,7 +31,7 @@ This document synthesizes the comprehensive engineering audit, web research, aut
 The primary goals accomplished during this session:
 1. Conducted an end-to-end audit across all software, firmware, RTL hardware, test suites, and documentation.
 2. Resolved all detected defects (FPGA golden reference clobbering, COE signed hex parsing, Windows UTF-8 BOM compatibility, UKF pipeline state serialization).
-3. Expanded automated regression testing to **114 passing tests (100% pass rate in ~79s)** and verified the master 8-step validation runner (`run_all_validation.bat` / `.sh`) with zero errors.
+3. Expanded automated regression testing to **115 passing tests (100% pass rate in ~66s)** and verified the master 8-step validation runner (`run_all_validation.bat` / `.sh`) with zero errors.
 4. Synchronized all 19 Markdown documents across the repository and authored the formal [Review 2 Progress Report](../Review_2/Review_2_Progress.md).
 5. Conducted an extensive industrial benchmark of Coulomb Counting, EKF, and UKF against global automotive standards (ISO 26262, AUTOSAR, AEC-Q100).
 6. Confirmed mathematical and computational synchronization across Python, Embedded C99, and Verilog FPGA RTL.
@@ -46,7 +46,7 @@ The primary goals accomplished during this session:
 | **COE Radix-16 Signed Hex Bug** | In `parse_coe_file`, hex strings like `FE6A` were parsed as positive integers (`65130`) instead of signed 16-bit negative values (`-406`). | Added two's complement sign conversion: `if val >= 32768: val -= 65536`. | Fixed negative weight and bias arithmetic parity in golden reference model. |
 | **Windows UTF-8 BOM Encoding Issue** | PowerShell file piping introduced UTF-8 BOM headers (`\ufeffSTAGE`), breaking standard Python CSV reader lookups. | Standardized `encoding="utf-8-sig"` in `load_csv()` across [compare_results.py](../../hardware/FPGA_Verifier/compare_results.py) and [golden_model.py](../../hardware/FPGA_Verifier/golden_model.py). | Platform-agnostic CSV loading on Windows, Linux, and macOS. |
 | **UKF State Serialization Gap** | `EstimatorPipeline.get_state()` and `set_state()` did not extract or restore UKF states (`ukf_soc`, `ukf_v1`, `ukf_v2`, `ukf_p`), resetting the filter during catch-up cycles. | Added UKF state extraction to `get_state()` and restored them alongside `UnscentedKalmanFilter` in `set_state()`. | Validated via `test_estimator_pipeline_state_serialization`. |
-| **Test Suite Hygiene & Expansion** | Test suite expanded to cover document generation, advanced estimator priming, multi-chemistry, comprehensive APIs, hardware CSR quantization, and FPGA EKF/UKF golden trace parity. | Cleaned up imports and added advanced test suites across all components. | Suite grew to **114 tests (100% pass rate)**. |
+| **Test Suite Hygiene & Expansion** | Test suite expanded to cover document generation, advanced estimator priming, multi-chemistry, comprehensive APIs, hardware CSR quantization, FPGA EKF/UKF golden trace parity, and plug-and-play IP block. | Cleaned up imports and added advanced test suites across all components. | Suite grew to **115 tests (100% pass rate)**. |
 | **Documentation Discrepancies** | Relative links in `docs/Resources/` used `../software` instead of `../../software`; file trees omitted `software/shared/`; Review 2 progress was unrecorded. | Corrected all relative paths, updated trees across all 19 `.md` files, and created [Review_2_Progress.md](../Review_2/Review_2_Progress.md). | Zero broken links or outdated references across entire repository. |
 
 ---
@@ -117,7 +117,7 @@ Evaluated against the ACM/IEEE Artifact Evaluation Guidelines:
 * **Artifact Functional (★★★★★):** 107 automated unit/integration tests passing with 100% pass rate in ~77 seconds; zero syntax errors under `flake8`.
 * **Results Replicated (★★★★★):** Single-click master runner (`run_all_validation.bat` / `.sh`) reproduces all claimed physics, firmware, FPGA parity, and benchmark figures in under 45 seconds with 0 errors.
 * **Artifact Reusable (★★★★★):** Complete modular separation between 2-RC physics, observers, C99 firmware, and Verilog RTL.
-* **Manuscripts Aligned (★★★★★):** Complete camera-ready IEEE / Q3 Scopus manuscripts drafted in [`reference/paper.md`](../../reference/paper.md) (Original Experimental Research) and [`reference/review_paper.md`](../../reference/review_paper.md) (Comprehensive Review/Survey) matching the codebase numbers exactly.
+* **Manuscripts Aligned (★★★★★):** Complete camera-ready IEEE / Q3 Scopus manuscripts aligned across [`reference/paper.md`](../../reference/paper.md) (Original Experimental Research) and [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (Comprehensive Review/Survey) matching the codebase numbers exactly.
 
 ---
 
@@ -197,7 +197,7 @@ Your project delivers **6 concrete deliverables** across the software, firmware,
 
 ### 📦 Deliverable 6: The Research Paper Manuscripts & Capstone Documentation
 * **Target Paper 1 (Original Research):** [`reference/paper.md`](../../reference/paper.md) — *Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems* (IEEE / Q3 Scopus Target)
-* **Target Paper 2 (Comprehensive Review):** [`reference/review_paper.md`](../../reference/review_paper.md) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Restructured Edition, IEEE / Q3 Scopus Target, [`Compiled 29-Page PDF Draft`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf))
+* **Target Paper 2 (Comprehensive Review):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Restructured Edition, IEEE / Q3 Scopus Target, [`Compiled 29-Page PDF Draft`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf))
 * **Review 2 Defense Report:** [`docs/Review_2/Review_2_Progress.md`](../Review_2/Review_2_Progress.md)
 * **Review 2 Presentation Deck:** [`docs/Review_2/Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf)
 * **System Specification:** [`docs/Resources/SYSTEM_SPECIFICATION.md`](SYSTEM_SPECIFICATION.md)

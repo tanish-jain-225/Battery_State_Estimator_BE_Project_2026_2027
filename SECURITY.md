@@ -10,7 +10,9 @@ Only the latest active major releases receive security updates and bug fixes:
 
 | Version | Supported | Release Date | Notes |
 | :---: | :---: | :--- | :--- |
-| **v2.2.x** | :white_check_mark: | 2026-11-01 | Current release (114 tests, pub/sub decoupled microservices, FPGA EKF/UKF verification, PDF safeguards). |
+| **v2.3.1** | :white_check_mark: | 2026-11-04 (Tomorrow) | Planned release: Final Academic Deliverables (Review Paper, Poster, Review 2 PPT). |
+| **v2.3.0** | :white_check_mark: | 2026-11-03 (Today) | Current active release (115 tests, plug-and-play FPGA ESN IP block, IEEE research paper, footprint optimization). |
+| **v2.2.x** | :white_check_mark: | 2026-11-01 | Previous release (pub/sub decoupled microservices, FPGA EKF/UKF verification). |
 | **v2.1.x** | :white_check_mark: | 2026-11-01 | Academic publications, poster and governance release. |
 | **v2.0.x** | :white_check_mark: | 2026-10-10 | Review 2 Milestone baseline (62 tests, FPGA RTL parity). |
 | **v1.0.x** | :x: | 2026-09-21 | Review 1 Prototype (Deprecated). |

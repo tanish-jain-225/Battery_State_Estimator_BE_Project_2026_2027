@@ -1,0 +1,473 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2023.1 (win64) Build 3865809 Sun May  7 15:05:29 MDT 2023
+| Date         : Fri Oct 30 23:31:43 2026
+| Host         : ImmortalWealth running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file esn_platform_top_control_sets_placed.rpt
+| Design       : esn_platform_top
+| Device       : xc7a100t
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Total control sets                                       |   395 |
+|    Minimum number of control sets                        |   395 |
+|    Addition due to synthesis replication                 |     0 |
+|    Addition due to physical synthesis replication        |     0 |
+| Unused register locations in slices containing registers |  1415 |
++----------------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |   395 |
+| >= 0 to < 4        |     3 |
+| >= 4 to < 6        |     9 |
+| >= 6 to < 8        |    13 |
+| >= 8 to < 10       |    28 |
+| >= 10 to < 12      |     1 |
+| >= 12 to < 14      |     2 |
+| >= 14 to < 16      |     0 |
+| >= 16              |   339 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |             120 |           29 |
+| No           | No                    | Yes                    |             151 |           63 |
+| No           | Yes                   | No                     |               0 |            0 |
+| Yes          | No                    | No                     |            3923 |         1445 |
+| Yes          | No                    | Yes                    |            5064 |         3260 |
+| Yes          | Yes                   | No                     |               7 |            3 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++--------------+----------------------------------------------------------+------------------------------+------------------+----------------+--------------+
+| Clock Signal |                       Enable Signal                      |       Set/Reset Signal       | Slice Load Count | Bel Load Count | Bels / Slice |
++--------------+----------------------------------------------------------+------------------------------+------------------+----------------+--------------+
+|  clk80       | u_plat/u_tx/tx_i_1_n_0                                   | u_plat/u_ukf/rst_sync_reg[2] |                1 |              1 |         1.00 |
+|  clk80       | u_plat/u_esn/u_neuron/FSM_onehot_state_reg_n_0_[1]       | u_plat/u_ukf/rst_sync_reg[2] |                1 |              2 |         2.00 |
+|  clk80       |                                                          | rst_sync[2]_i_1_n_0          |                1 |              3 |         3.00 |
+|  clk80       | u_plat/u_esn/u_controller/xst_reg[0][0]                  | u_plat/u_ukf/rst_sync_reg[2] |                2 |              4 |         2.00 |
+|  clk80       | u_plat/u_rx/x_tx_reg_0[0]                                |                              |                1 |              4 |         4.00 |
+|  clk80       | u_plat/u_rx/x_tx_reg_1[0]                                | u_plat/u_ukf/rst_sync_reg[2] |                1 |              4 |         4.00 |
+|  clk80       | u_plat/u_rx/cmd_reg[0][0]                                | u_plat/u_ukf/rst_sync_reg[2] |                1 |              4 |         4.00 |
+|  clk80       | u_plat/u_tx/bit_idx                                      | u_plat/u_ukf/rst_sync_reg[2] |                2 |              4 |         2.00 |
+|  clk80       | u_plat/u_rx/x_kf_we_reg[0]                               | u_plat/u_ukf/rst_sync_reg[2] |                1 |              5 |         5.00 |
+|  clk80       | u_plat/xk[4]_i_1_n_0                                     | u_plat/u_ukf/rst_sync_reg[2] |                3 |              5 |         1.67 |
+|  clk80       | u_plat/u_ekf/pc[4]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |                1 |              5 |         5.00 |
+|  clk80       | u_plat/u_tx/tx_st_reg[0]_1[0]                            | u_plat/u_ukf/rst_sync_reg[2] |                3 |              5 |         1.67 |
+|  clk80       | u_plat/u_rx/x_kf_we_reg_1[0]                             | u_plat/u_ukf/rst_sync_reg[2] |                3 |              6 |         2.00 |
+|  clk80       | u_plat/u_ro/step3[5]_i_1_n_0                             | u_plat/u_ukf/rst_sync_reg[2] |                1 |              6 |         6.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[0][1]                               | u_plat/u_ukf/rst_sync_reg[2] |                3 |              6 |         2.00 |
+|  clk80       | u_plat/u_ukf/rd_r[5]_i_1_n_0                             | u_plat/u_ukf/rst_sync_reg[2] |                4 |              6 |         1.50 |
+|  clk80       | u_plat/u_esn/u_controller/FSM_onehot_state[5]_i_1__0_n_0 | u_plat/u_ukf/rst_sync_reg[2] |                1 |              6 |         6.00 |
+|  clk80       | u_plat/u_ro/step[5]_i_1_n_0                              | u_plat/u_ukf/rst_sync_reg[2] |                2 |              6 |         3.00 |
+|  clk80       | u_plat/u_esn/u_controller/esn_done_q_reg_1[0]            | u_plat/u_ukf/rst_sync_reg[2] |                2 |              7 |         3.50 |
+|  clk80       | u_plat/u_esn/u_controller/neuron_idx[6]_i_1_n_0          | u_plat/u_ukf/rst_sync_reg[2] |                2 |              7 |         3.50 |
+|  clk80       | u_plat/u_esn/u_neuron/FSM_onehot_state[5]_i_1_n_0        | u_plat/u_ukf/rst_sync_reg[2] |                2 |              7 |         3.50 |
+|  clk80       | u_plat/u_ukf/pc[6]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |                2 |              7 |         3.50 |
+|  clk80       | u_plat/u_rx/x_tx_reg_0[0]                                | u_plat/u_rx/x_tx_reg         |                3 |              7 |         2.33 |
+|  clk80       | u_plat/u_esn/u_neuron/FSM_onehot_state_reg_n_0_[5]       | u_plat/u_ukf/rst_sync_reg[2] |                3 |              7 |         2.33 |
+|  clk80       | u_plat/u_esn/u_controller/E[0]                           | u_plat/u_ukf/rst_sync_reg[2] |                2 |              7 |         3.50 |
+|  clk80       | u_plat/u_rx/E[0]                                         |                              |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[0]_1[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pst_reg[2]_1[0]                              | u_plat/u_ukf/rst_sync_reg[2] |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/pst_reg[0]_0[0]                              | u_plat/u_ukf/rst_sync_reg[2] |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2]_4[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pst_reg[2]_0[0]                              | u_plat/u_ukf/rst_sync_reg[2] |                4 |              8 |         2.00 |
+|  clk80       | u_plat/u_rx/pst_reg[2]_1[1]                              | u_plat/u_ukf/rst_sync_reg[2] |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2]_3[0]                             |                              |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1]_2[0]                             |                              |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2]_1[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2]_2[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/cmd_reg[2][0]                                | u_plat/u_ukf/rst_sync_reg[2] |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1]_0[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[0][0]                               | u_plat/u_ukf/rst_sync_reg[2] |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1]_4[0]                             |                              |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[4][0]                               |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[0]_0[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2][0]                               |                              |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/valid_i_1_n_0                                | u_plat/u_ukf/rst_sync_reg[2] |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/sh                                           | u_plat/u_ukf/rst_sync_reg[2] |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_tx/E[0]                                         | u_plat/u_ukf/rst_sync_reg[2] |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1][0]                               |                              |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1]_3[0]                             |                              |                1 |              8 |         8.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[1]_1[0]                             |                              |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_tx/tx_go_reg[0]                                 | u_plat/u_ukf/rst_sync_reg[2] |                2 |              8 |         4.00 |
+|  clk80       | u_plat/u_rx/pcnt_reg[2]_0[0]                             |                              |                3 |              8 |         2.67 |
+|  clk80       | u_plat/u_ro/E[0]                                         | u_plat/u_ukf/rst_sync_reg[2] |                3 |              9 |         3.00 |
+|  clk80       | u_plat/u_tx/active                                       | u_plat/u_ukf/rst_sync_reg[2] |                3 |              9 |         3.00 |
+|  clk80       | u_plat/u_ekf/rd_r[4]_i_1_n_0                             | u_plat/u_ukf/rst_sync_reg[2] |                3 |             11 |         3.67 |
+|  clk80       | u_plat/u_esn/u_neuron/u_tanh/E[0]                        | u_plat/u_ukf/rst_sync_reg[2] |                3 |             13 |         4.33 |
+|  clk80       | u_plat/x_txn                                             | u_plat/u_ukf/rst_sync_reg[2] |                3 |             13 |         4.33 |
+|  clk80       | u_plat/cyc_ukf[15]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |                5 |             16 |         3.20 |
+|  clk80       | u_plat/u_rx/pst_reg[2][0]                                | u_plat/u_ukf/rst_sync_reg[2] |                5 |             16 |         3.20 |
+|  clk80       | u_plat/u_rx/cnt                                          | u_plat/u_ukf/rst_sync_reg[2] |                7 |             16 |         2.29 |
+|  clk80       | u_plat/u_ro/soh_valid_reg_0[0]                           | u_plat/u_ukf/rst_sync_reg[2] |                3 |             16 |         5.33 |
+|  clk80       | u_plat/cyc_ekf[15]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |                5 |             16 |         3.20 |
+|  clk80       | u_plat/u_tx/cnt[15]_i_1__0_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |                4 |             16 |         4.00 |
+|  clk80       | u_plat/u_esn/u_neuron/u_mac/E[0]                         | u_plat/u_ukf/rst_sync_reg[2] |                2 |             16 |         8.00 |
+|  clk80       | u_plat/u_ro/soh[15]_i_1_n_0                              | u_plat/u_ukf/rst_sync_reg[2] |                2 |             16 |         8.00 |
+|  clk80       | u_plat/u_esn/u_neuron/u_tanh/FSM_onehot_state_reg[11][0] | u_plat/u_ukf/rst_sync_reg[2] |                2 |             16 |         8.00 |
+|  clk80       | u_plat/u_esn/u_neuron/u_mac/last_d                       | u_plat/u_ukf/rst_sync_reg[2] |                4 |             17 |         4.25 |
+|  clk80       | u_plat/u_ro/rom_soh[1][17]_i_1_n_0                       |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[21][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[10][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soh[11][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[16][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[100][17]_i_1_n_0                     |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[14][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[12][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[17][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[19][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[0][17]_i_1_n_0                       |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[13][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[15][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[18][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[20][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[70][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[29][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[61][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[77][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[30][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soh[57][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[51][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[78][17]_i_1_n_0                      |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soh[55][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[7][17]_i_1_n_0                       |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[22][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[27][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[31][17]_i_1_n_0                      |                              |               12 |             18 |         1.50 |
+|  clk80       | u_plat/u_ro/rom_soh[28][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[47][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soh[34][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[44][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[38][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[52][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[58][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[56][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[36][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[46][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soh[50][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[64][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[72][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[73][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soh[74][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[25][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[79][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soh[2][17]_i_1_n_0                       |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[35][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[43][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[67][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[71][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[32][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[76][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soh[37][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[45][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[24][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soh[26][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[41][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[42][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[48][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[4][17]_i_1_n_0                       |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[5][17]_i_1_n_0                       |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[60][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[62][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[66][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[3][17]_i_1_n_0                       |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[49][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[63][17]_i_1_n_0                      |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soh[65][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[39][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[33][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[23][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[75][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[40][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[54][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[6][17]_i_1_n_0                       |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[69][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[59][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[53][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soh[94][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[8][17]_i_1_n_0                       |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soh[81][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[82][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[95][17]_i_1_n_0                      |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soh[87][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[84][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soh[89][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[9][17]_i_1_n_0                       |                              |               12 |             18 |         1.50 |
+|  clk80       | u_plat/u_ro/rom_soh[92][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[85][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soh[91][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[99][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[86][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[88][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soh[93][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[83][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soh[98][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[96][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[80][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[97][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soh[90][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[11][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[12][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[13][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[100][17]_i_1_n_0                     |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[10][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[0][17]_i_1_n_0                       |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[60][17]_i_1_n_0                      |                              |               12 |             18 |         1.50 |
+|  clk80       | u_plat/u_ro/rom_soc[61][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[49][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[62][17]_i_1_n_0                      |                              |               13 |             18 |         1.38 |
+|  clk80       | u_plat/u_ro/rom_soc[63][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soc[64][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soc[29][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[30][17]_i_1_n_0                      |                              |               12 |             18 |         1.50 |
+|  clk80       | u_plat/u_ro/rom_soc[21][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[28][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[32][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[39][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[16][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[38][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[17][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[52][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[59][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[65][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[5][17]_i_1_n_0                       |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soc[66][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[1][17]_i_1_n_0                       |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[24][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soc[27][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[15][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[35][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soh[68][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[22][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[37][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[45][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[3][17]_i_1_n_0                       |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[14][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[4][17]_i_1_n_0                       |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[51][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[41][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[44][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[46][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[18][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[19][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[31][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soc[23][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[2][17]_i_1_n_0                       |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[40][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[47][17]_i_1_n_0                      |                              |               17 |             18 |         1.06 |
+|  clk80       | u_plat/u_ro/rom_soc[26][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[33][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[53][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[56][17]_i_1_n_0                      |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soc[50][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[57][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[58][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[43][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soc[20][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[34][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[48][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[55][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[42][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soc[54][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[25][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[99][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[90][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[77][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[87][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[81][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[79][17]_i_1_n_0                      |                              |               13 |             18 |         1.38 |
+|  clk80       | u_plat/u_ro/rom_soc[68][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[83][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[70][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[84][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[88][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[89][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[8][17]_i_1_n_0                       |                              |               13 |             18 |         1.38 |
+|  clk80       | u_plat/u_ro/rom_soc[91][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[82][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soc[92][17]_i_1_n_0                      |                              |                9 |             18 |         2.00 |
+|  clk80       | u_plat/u_ro/rom_soc[71][17]_i_1_n_0                      |                              |                7 |             18 |         2.57 |
+|  clk80       | u_plat/u_ro/rom_soc[74][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[97][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[7][17]_i_1_n_0                       |                              |               12 |             18 |         1.50 |
+|  clk80       | u_plat/u_ro/rom_soc[85][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[6][17]_i_1_n_0                       |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soc[72][17]_i_1_n_0                      |                              |                5 |             18 |         3.60 |
+|  clk80       | u_plat/u_ro/rom_soc[73][17]_i_1_n_0                      |                              |               11 |             18 |         1.64 |
+|  clk80       | u_plat/u_ro/rom_soc[76][17]_i_1_n_0                      |                              |               10 |             18 |         1.80 |
+|  clk80       | u_plat/u_ro/rom_soc[78][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[86][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[93][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soc[75][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[98][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ro/rom_soc[69][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[80][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[95][17]_i_1_n_0                      |                              |               14 |             18 |         1.29 |
+|  clk80       | u_plat/u_ro/rom_soc[9][17]_i_1_n_0                       |                              |               13 |             18 |         1.38 |
+|  clk80       | u_plat/u_ro/rom_soc[94][17]_i_1_n_0                      |                              |                8 |             18 |         2.25 |
+|  clk80       | u_plat/u_ro/rom_soc[67][17]_i_1_n_0                      |                              |                6 |             18 |         3.00 |
+|  clk80       | u_plat/u_ro/rom_soc[96][17]_i_1_n_0                      |                              |                3 |             18 |         6.00 |
+|  clk80       | u_plat/u_ro/rom_soc[36][17]_i_1_n_0                      |                              |                4 |             18 |         4.50 |
+|  clk80       | u_plat/u_ekf/state[3]_i_1_n_0                            | u_plat/u_ukf/rst_sync_reg[2] |                7 |             19 |         2.71 |
+|  clk80       | u_plat/u_ro/soc_valid_reg_0[0]                           | u_plat/u_ukf/rst_sync_reg[2] |                4 |             22 |         5.50 |
+|  clk80       | u_plat/u_ro/soc[15]_i_1_n_0                              | u_plat/u_ukf/rst_sync_reg[2] |                4 |             22 |         5.50 |
+|  clk80       | u_plat/frame_ok_r_reg_0                                  | u_plat/u_ukf/rst_sync_reg[2] |                6 |             22 |         3.67 |
+|  clk80       | u_plat/cyc_esn[23]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |                7 |             24 |         3.43 |
+|  clk80       | u_plat/x_ld_addr                                         | u_plat/u_ukf/rst_sync_reg[2] |               13 |             25 |         1.92 |
+|  clk80       | u_plat/u_esn/u_controller/esn_clear_reg                  | u_plat/u_ukf/rst_sync_reg[2] |                9 |             26 |         2.89 |
+|  clk80       | u_plat/u_ekf/rf[3][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ukf/rf[56][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[57][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[58][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ekf/rf[9][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ekf/rf[8][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ekf/rf[7][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf[6][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ekf/rf[5][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[59][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[5][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[61][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[34][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ekf/rf[31][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ekf/rf[2][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               25 |             32 |         1.28 |
+|  clk80       | u_plat/u_ekf/rf[28][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ekf/rf[27][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ekf/rf[26][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf[25][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ekf/rf[24][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ekf/rf[23][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ekf/rf[22][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ekf/rf[21][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf[20][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ekf/rf[19][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ekf/rf[18][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ekf/rf[4][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               22 |             32 |         1.45 |
+|  clk80       | u_plat/u_ukf/rf[6][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ekf/E[0]                                        | u_plat/u_ukf/rst_sync_reg[2] |                8 |             32 |         4.00 |
+|  clk80       | u_plat/u_ukf/rf[7][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ekf/rf[14][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf[13][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ukf/rf[9][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               22 |             32 |         1.45 |
+|  clk80       | u_plat/u_ekf/rf[12][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ekf/rf[11][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[33][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               25 |             32 |         1.28 |
+|  clk80       | u_plat/u_rx/x_esn_ld_reg[0]                              | u_plat/u_ukf/rst_sync_reg[2] |                8 |             32 |         4.00 |
+|  clk80       | u_plat/u_ekf/rf[10][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf[0][31]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ekf/rf                                          | u_plat/u_ukf/rst_sync_reg[2] |               23 |             32 |         1.39 |
+|  clk80       | u_plat/u_ekf/rf[17][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               24 |             32 |         1.33 |
+|  clk80       | u_plat/u_ekf/rf[16][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               23 |             32 |         1.39 |
+|  clk80       | u_plat/u_ukf/div_den[31]_i_1__0_n_0                      | u_plat/u_ukf/rst_sync_reg[2] |                8 |             32 |         4.00 |
+|  clk80       | u_plat/u_ukf/done                                        | u_plat/u_ukf/rst_sync_reg[2] |               12 |             32 |         2.67 |
+|  clk80       | u_plat/u_ukf/lut_src_r[31]_i_1_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               22 |             32 |         1.45 |
+|  clk80       | u_plat/u_ukf/rf[1][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[20][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               21 |             32 |         1.52 |
+|  clk80       | u_plat/u_ekf/rf[15][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ukf/rf[0][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[10][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[11][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ukf/rf[12][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ukf/rf[13][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[15][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               18 |             32 |         1.78 |
+|  clk80       | u_plat/u_ukf/rf[16][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               24 |             32 |         1.33 |
+|  clk80       | u_plat/u_ukf/rf[17][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[8][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ukf/rf[21][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[22][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               24 |             32 |         1.33 |
+|  clk80       | u_plat/u_ukf/rf[23][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[24][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ukf/rf[25][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ukf/rf[26][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[27][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               18 |             32 |         1.78 |
+|  clk80       | u_plat/u_ukf/rf[28][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               23 |             32 |         1.39 |
+|  clk80       | u_plat/u_ukf/rf[29][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               19 |             32 |         1.68 |
+|  clk80       | u_plat/u_ukf/rf[2][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[30][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[31][31]_i_1__0_n_0                       | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[32][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ro/fin_soc3_i_1_n_0                             | u_plat/u_ukf/rst_sync_reg[2] |                8 |             32 |         4.00 |
+|  clk80       | u_plat/u_ukf/rf[49][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[35][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ukf/rf[36][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               22 |             32 |         1.45 |
+|  clk80       | u_plat/u_ukf/rf[37][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[38][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[39][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[3][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[40][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               28 |             32 |         1.14 |
+|  clk80       | u_plat/u_ukf/rf[41][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[42][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[43][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ukf/rf[44][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ukf/rf[45][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               26 |             32 |         1.23 |
+|  clk80       | u_plat/u_ukf/rf[46][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               27 |             32 |         1.19 |
+|  clk80       | u_plat/u_ukf/rf[47][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               29 |             32 |         1.10 |
+|  clk80       | u_plat/u_ukf/rf[48][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[60][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[4][31]_i_1__0_n_0                        | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[50][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[51][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[52][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               30 |             32 |         1.07 |
+|  clk80       | u_plat/u_ukf/rf[53][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[54][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               31 |             32 |         1.03 |
+|  clk80       | u_plat/u_ukf/rf[55][31]_i_1_n_0                          | u_plat/u_ukf/rst_sync_reg[2] |               32 |             32 |         1.00 |
+|  clk80       | u_plat/u_ekf/div_den[31]_i_1_n_0                         | u_plat/u_ukf/rst_sync_reg[2] |                9 |             33 |         3.67 |
+|  clk80       | u_plat/u_ro/fin_soh3_i_1_n_0                             | u_plat/u_ukf/rst_sync_reg[2] |                9 |             34 |         3.78 |
+|  clk80       | u_plat/u_rx/pst_reg[0][0]                                | u_plat/u_ukf/rst_sync_reg[2] |               16 |             35 |         2.19 |
+|  clk80       | u_plat/x_kf_addr                                         | u_plat/u_ukf/rst_sync_reg[2] |                9 |             37 |         4.11 |
+|  clk80       | u_plat/u_ekf/rnd_r[63]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               13 |             39 |         3.00 |
+|  clk80       | u_plat/u_ukf/rnd_r[64]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               10 |             39 |         3.90 |
+|  clk80       | u_plat/u_esn/u_neuron/u_mac/acc[39]_i_1_n_0              | u_plat/u_ukf/rst_sync_reg[2] |               11 |             40 |         3.64 |
+|  clk80       | u_plat/u_ekf/sum_r[64]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               10 |             40 |         4.00 |
+|  clk80       | u_plat/u_ukf/sum_r[65]_i_1_n_0                           | u_plat/u_ukf/rst_sync_reg[2] |               10 |             40 |         4.00 |
+|  clk80       | u_plat/u_rx/wr_target_reg[1][0]                          | u_plat/u_ukf/rst_sync_reg[2] |               10 |             42 |         4.20 |
+|  clk80       | u_plat/x_tb                                              | u_plat/u_ukf/rst_sync_reg[2] |               12 |             51 |         4.25 |
+|  clk80       | u_plat/u_ukf/state[3]_i_1__0_n_0                         | u_plat/u_ukf/rst_sync_reg[2] |               27 |             57 |         2.11 |
+|  clk80       | u_plat/u_esn/u_controller/store_en_reg_1                 | u_plat/u_ukf/rst_sync_reg[2] |               32 |             60 |         1.88 |
+|  clk80       | u_plat/u_rx/wr_target_reg[3]_1                           | u_plat/u_ukf/rst_sync_reg[2] |               22 |             61 |         2.77 |
+|  clk80       | u_plat/u_ro/acc_soh                                      | u_plat/u_ukf/rst_sync_reg[2] |               15 |             88 |         5.87 |
+|  clk80       | u_plat/u_rx/x_kf_we_reg_0                                | u_plat/u_ukf/rst_sync_reg[2] |               27 |             89 |         3.30 |
+|  clk80       | u_plat/u_ukf/c_r                                         | u_plat/u_ukf/rst_sync_reg[2] |               48 |             96 |         2.00 |
+|  clk80       | u_plat/u_ekf/clamp_r                                     | u_plat/u_ukf/rst_sync_reg[2] |               42 |            100 |         2.38 |
+|  clk80       | u_plat/u_ukf/sq_cnt                                      | u_plat/u_ukf/rst_sync_reg[2] |               47 |            102 |         2.17 |
+|  clk80       | u_plat/x_tb[11][7]_i_1_n_0                               | u_plat/u_ukf/rst_sync_reg[2] |               37 |            104 |         2.81 |
+|  clk80       |                                                          |                              |               29 |            120 |         4.14 |
+|  clk80       | u_plat/u_ekf/div_cnt                                     | u_plat/u_ukf/rst_sync_reg[2] |               36 |            130 |         3.61 |
+|  clk80       | u_plat/u_ukf/div_cnt                                     | u_plat/u_ukf/rst_sync_reg[2] |               46 |            134 |         2.91 |
+|  clk80       |                                                          | u_plat/u_ukf/rst_sync_reg[2] |               62 |            148 |         2.39 |
+|  clk80       | u_plat/tb[4][4]_i_1_n_0                                  |                              |               42 |            155 |         3.69 |
++--------------+----------------------------------------------------------+------------------------------+------------------+----------------+--------------+
+
+

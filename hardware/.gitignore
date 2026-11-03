@@ -56,6 +56,19 @@ xsim.dir/
 *.wdb
 *.vcd
 *.bak
+*.dcp
+*.rpx
+*.sdb
+*.dmp
+*.rst
+*.vdi
+*.vds
+*.wdf
+*.wpc
+*.rlx
+*.rtti
+*.svtype
+*.xdbg
 xsim.log
 vivado.log
 

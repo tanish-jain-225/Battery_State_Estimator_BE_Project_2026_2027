@@ -18,7 +18,7 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 | Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Marks |
 | :--- | :--- | :---: | :---: | :--- | :---: |
-| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`reference/review_paper.md`](../../reference/review_paper.md) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) |
+| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) |
 | **Paper 2: Original Experimental Research** | Edge-optimized CSR SpMV ESN, 2-RC cyber-physical simulator, Q15 fixed-point LUT, 200/200 FPGA Verilog RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) |
 
 ---
@@ -35,7 +35,6 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
   * Formulates a multi-dimensional benchmarking taxonomy across inference energy, latency, parameter complexity, and cross-chemistry robustness.
 * **Deliverable Files:**
   * Formatted Preprint PDF: [`Review_Paper.pdf`](Review_Paper.pdf)
-  * Markdown Manuscript: [`reference/review_paper.md`](../../reference/review_paper.md)
   * Milestone Outcome PDF: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)
 
 ---
@@ -60,13 +59,7 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 ## 🔁 Updating or Replacing Deliverables
 
-To rebuild the vector PDF placeholders:
-```bash
-python scripts/build_project_documents.py
-```
-
 When camera-ready PDFs are compiled from LaTeX (Overleaf) or IEEE Word templates:
 1. Replace [`Review_Paper.pdf`](Review_Paper.pdf) and [`Research_Paper.pdf`](Research_Paper.pdf) with your compiled IEEE PDFs.
-2. Mirror the PDFs in [`reference/`](../../reference/) if necessary for external cross-linking.
-3. Log official submission acknowledgement emails or tracking letters in [`docs/Paper_Proof/`](../Paper_Proof/README.md).
+2. Log official submission acknowledgement emails or tracking letters in [`docs/Paper_Proof/`](../Paper_Proof/README.md).
 

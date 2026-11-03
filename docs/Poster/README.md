@@ -38,16 +38,9 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 
 ---
 
-## 🔁 How to Update or Rebuild
+## 🔁 How to Update Deliverables
 
-To regenerate the vector PDF poster placeholder from source:
-
-```bash
-# From repository root:
-python scripts/build_project_documents.py
-```
-
-To replace with the final camera-ready poster from Figma/Illustrator/Canva:
+To update or replace with the camera-ready exhibition poster from Figma/Illustrator/Canva:
 1. Export your design as a high-resolution PDF (PDF/X-1a or standard PDF 1.7).
 2. Save or overwrite [`docs/Poster/Project_Poster.pdf`](Project_Poster.pdf).
 3. Commit the updated asset to Git.
