@@ -1,4 +1,4 @@
-[← Back to README](../../README.md)
+[← Back to Main Repository](../../README.md) · [Presentation Speaker Notes](PRESENTATION.md) · [Review 2 Progress](../Review_2/Review_2_Progress.md) · [Documentation Hub](../README.md)
 
 # Demo Checklist
 

@@ -1,4 +1,4 @@
-[← Back to README](../../README.md)
+[← Back to Main Repository](../../README.md) · [Literature Survey](../literature_survey.md) · [Next: Review 1 Progress →](../Review_1/Review_1_Progress.md)
 
 # BE Project Proposal (Academic Year 2026-2027)
 
@@ -72,3 +72,7 @@ Existing Battery Management Systems face two main challenges:
 * Verilog RTL 100-neuron reservoir datapath verified bit-exactly (200/200 matches).
 * Two peer-reviewed manuscripts submitted to IEEE / Q3 Scopus-indexed journals (Review Paper & Research Paper).
 * Comprehensive GitHub repository & GitHub Log Book.
+
+---
+
+[← Return to Literature Survey](../literature_survey.md) · [Proceed to Review 1 Milestone →](../Review_1/Review_1_Progress.md)

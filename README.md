@@ -8,6 +8,15 @@
   <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0" target="_blank">
     <img src="https://img.shields.io/badge/Release-v2.3.0-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.3.0" />
   </a>
+  <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/actions/workflows/ci.yml" target="_blank">
+    <img src="https://img.shields.io/badge/CI%20Pipeline-Passing-2ea44f?style=for-the-badge&logo=githubactions" alt="CI Pipeline Passing" />
+  </a>
+  <a href="#testing-and-results">
+    <img src="https://img.shields.io/badge/Tests-115%20Passing-brightgreen?style=for-the-badge&logo=pytest" alt="115 Pytest Passing" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
+  </a>
   <a href="docs/Poster/Project_Poster.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Poster-Exhibition%20PDF-0D9488?style=for-the-badge&logo=adobeacrobatreader" alt="Project Poster PDF" />
   </a>
@@ -50,21 +59,119 @@
 
 ---
 
+## 🌊 Project Narrative & Development Flow
+
+This repository tells a complete, end-to-end engineering and scientific story: **bridging electrochemical battery physics, reservoir computing machine learning, and dual-target edge silicon realization**.
+
+### 1. The Story Arc: From Electrochemistry to Silicon (5 Acts)
+
+```
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│  Act I: The Challenge     │      │  Act II: Digital Twin     │      │  Act III: Neuromorphic    │
+│  • Li-ion non-linearity   │ ───► │  • 2-RC Equivalent Circuit│ ───► │  • 100-Neuron Recurrent   │
+│  • Coulomb Counting drift │      │  • Arrhenius temperature  │      │  • Leaky-integrator ESN   │
+│  • EKF compute bottleneck │      │  • Drive cycles (UDDS/US06│      │  • Single-shot Ridge read │
+│  • Model recalibration    │      │  • NASA PCoE battery data │      │  • Online RLS adaptation  │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+                                                                                    │
+                                                                                    ▼
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│  Act V: Culmination       │      │  Act IV-B: FPGA IP Block  │      │  Act IV-A: MCU Firmware   │
+│  • Final B.E. Thesis      │ ◄─── │  • Artix-7 100-neuron RTL │ ◄─── │  • C99 Cortex-M firmware  │
+│  • IEEE Research Paper    │      │  • IEEE 1685 IP-XACT AXI4 │      │  • CSR SpMV (6.7× speed)  │
+│  • 29-Page Review Survey  │      │  • Bitstream (3.7 MB Bit) │      │  • Q12/Q15 Fixed-Point    │
+│  • A1 Exhibition Poster   │      │  • 200/200 Bit-Exact Twin │      │  • 82.4% RAM savings      │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+```
+
+1. **Act I — The Electrochemical Dilemma & Problem Formulation**: Lithium-ion cells exhibit complex internal degradation, temperature sensitivity, and steep Open Circuit Voltage (OCV) characteristics. Open-loop Coulomb Counting accumulates drift from current sensor biases, while the Extended Kalman Filter (EKF) requires heavy online matrix inversions and continuous electrochemical parameter recalibration as the cell ages.
+2. **Act II — The Cyber-Physical Digital Twin**: To develop algorithms before physical hardware assembly, we engineered a high-fidelity 2-RC Equivalent Circuit Model (ECM) coupled with Arrhenius thermal equations. It simulates dynamic EV driving cycles (UDDS, HWFET, US06), multiple chemistries (NMC, LFP, Lead-Acid), active fault injection (thermal runaway, sensor dropout), and is validated against NASA Ames battery aging datasets.
+3. **Act III — Reservoir Computing & Dynamic Adaptation**: We deployed an Echo State Network (ESN) with 100 recurrent leaky-integrator neurons ($\rho = 0.90–0.95$). By fixing randomized internal reservoir weights and solving only the output layer via single-shot Ridge regression, backpropagation through time is completely avoided. To track battery aging, an online Recursive Least Squares (RLS) adaptive readout was formulated, maintaining sub-1.0% SOC error across 32 battery aging cycles.
+4. **Act IV — Dual Silicon Realization (Hardware-Software Co-Design)**:
+   * **Microcontroller Tier (STM32 / ARM Cortex-M)**: Standalone C99 firmware utilizing Compressed Sparse Row (CSR) matrix representation, integer-only Q12/Q15 arithmetic, and a hardware $\tanh$ LUT, achieving a **6.7× speedup** and **82.4% RAM reduction**.
+   * **FPGA Accelerator Tier (Xilinx Artix-7 `xc7a100tcsg324-1`)**: 100-neuron Verilog RTL datapath with BRAM state arrays, verified **200/200 bit-exactly** against a Python golden model. Packaged into a commercial-grade **IEEE 1685 IP-XACT AXI4 IP Block** (`component.xml`) and pre-compiled 3.7 MB bitstream (`esn_platform_top.bit`) with a real-time 115200-baud UART HIL interface running ESN, EKF, and UKF in parallel with a **23× real-time BMS execution margin**.
+5. **Act V — Academic Dissemination & Capstone Culmination**: The verified algorithms and silicon designs culminated in an IEEE-targeted original research paper, a 29-page comprehensive review survey, an A1 exhibition defense poster, and the official University of Mumbai / VESIT Bachelor of Engineering dissertation thesis.
+
+---
+
+### 2. The Developmental Evolution Flow (Chronological Milestones)
+
+```mermaid
+flowchart LR
+    M0["<b>Phase 0: Inception</b><br/>• Problem Scoping<br/>• Literature Survey<br/>• Proposal Submission<br/><i>(Aug 2026)</i>"] --> M1["<b>Phase 1: Baseline</b><br/>• Review 1 Defense<br/>• 2-RC ECM Engine<br/>• EKF & CC Baselines<br/>• C99 CSR Logic<br/><i>(Sep 2026)</i>"]
+    M1 --> M2["<b>Phase 2: Maturity</b><br/>• Review 2 Defense<br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/>• 16:9 Deck & Report<br/><i>(Nov 2026)</i>"]
+    M2 --> M3["<b>Phase 3: Silicon IP</b><br/>• Release v2.3.0<br/>• IEEE 1685 IP-XACT<br/>• Artix-7 Bitstream<br/>• IEEE Research Paper<br/>• 115 Passing Tests<br/><i>(Active Today)</i>"]
+    M3 --> M4["<b>Phase 4: Culmination</b><br/>• Release v2.3.1<br/>• Final B.E. Thesis<br/>• IEEE Review Paper<br/>• Exhibition Poster<br/>• Degree Defense<br/><i>(Active Target)</i>"]
+```
+
+---
+
+### 3. End-to-End System Architecture Flow
+
+The complete data pipeline moves seamlessly from dynamic drive schedules to dual-target hardware execution and web monitoring:
+
+```mermaid
+flowchart TD
+    subgraph P1["1. Physics Engine (Cyber-Physical Twin)"]
+        DC["Dynamic Drive Cycles<br/>(UDDS, US06, WLTP, Constant)"] --> ECM["2-RC ECM + Arrhenius<br/>Thermal Balance Solver"]
+        ECM --> FLT["Fault Injection Engine<br/>(Thermal Runaway, Sensor Dropout)"]
+    end
+
+    subgraph P2["2. Cloud Pub/Sub & Decoupling"]
+        FLT --> DB[("MongoDB Atlas / In-Memory Buffer<br/>(Rolling 1,000 Records @ 1 Hz)")]
+    end
+
+    subgraph P3["3. Multi-Observer Benchmark Suite"]
+        DB --> CC["Coulomb Counting<br/>(Open-Loop Baseline)"]
+        DB --> EKF["Extended Kalman Filter<br/>(Linearized ECM Baseline)"]
+        DB --> UKF["Unscented Kalman Filter<br/>(Non-Linear Baseline)"]
+        DB --> ESN["Echo State Network<br/>(100 Neurons, Leaky Integrator)"]
+        ESN --> RLS["Online RLS Adaptation<br/>(Dynamic Aging & Capacity Fade)"]
+    end
+
+    subgraph P4["4. Dual-Target Silicon Acceleration"]
+        ESN --> MCU["STM32 C99 Firmware<br/>CSR SpMV (6.7× Speedup)<br/>Q12/Q15 Fixed-Point Arithmetic"]
+        ESN --> FPGA["Xilinx Artix-7 FPGA IP Block<br/>IEEE 1685 IP-XACT (component.xml)<br/>Pre-Compiled Bitstream (3.7 MB)"]
+    end
+
+    subgraph P5["5. Dashboard Telemetry & Academic Outputs"]
+        RLS --> DASH["Flask Web Visualiser Dashboard<br/>(Real-Time Chart.js Multi-Observer UI)"]
+        FPGA --> PUB["Academic Publications & Thesis Hub<br/>(Research Paper, Review, Poster, Thesis)"]
+    end
+```
+
+---
+
+### 4. Reading Order & Navigation Guide
+
+Navigate the repository according to your area of interest:
+
+| Persona / Interest | Recommended Reading Path | Primary Goal |
+| :--- | :--- | :--- |
+| **Project Evaluators & Guides** | [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md) ──► [`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md) ──► [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) ──► [`docs/Thesis/README.md`](docs/Thesis/README.md) | Verify milestone progress, FPGA bit-exact parity, and capstone dissertation structure. |
+| **Embedded & Silicon Engineers** | [`docs/Resources/SYSTEM_SPECIFICATION.md`](docs/Resources/SYSTEM_SPECIFICATION.md) ──► [`hardware/hardware.md`](hardware/hardware.md) ──► [`hardware/STM_Verifier/README.md`](hardware/STM_Verifier/README.md) ──► [`hardware/IP_Block/register_map.md`](hardware/IP_Block/register_map.md) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) | Examine C99 CSR SpMV algorithms, Verilog RTL datapath, AXI4 memory maps, and Artix-7 bitstream. |
+| **ML & Software Developers** | [`software/software.md`](software/software.md) ──► [`software/simulator/simulator.md`](software/simulator/simulator.md) ──► [`software/visualiser/visualiser.md`](software/visualiser/visualiser.md) ──► [`tests/`](tests/) | Explore 2-RC physics, ESN reservoir dynamics, online RLS filter, and 115 passing tests. |
+| **Academic Researchers** | [`docs/literature_survey.md`](docs/literature_survey.md) ──► [`docs/Publications/README.md`](docs/Publications/README.md) ──► [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) ──► [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) ──► [`docs/Paper_Proof/README.md`](docs/Paper_Proof/README.md) | Review scientific methodology, IEEE manuscript drafts, benchmarking data, and evaluation marks. |
+
+---
+
 ## 📑 Project Milestones & Review Reports
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
-| **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) | 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | Completed |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.0.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.0.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 115-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
-| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Active Deliverable** |
-| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
-| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Drafted / 10/10 Ready** |
-| **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Registry Active** |
-| **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Master Index** |
+| **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / 10/10 Ready** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 115-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
+| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/register_map.md) | IEEE 1685 IP-XACT component, concurrent Tri-Observer FPGA platform, 3.7 MB bitstream, UART HIL | **Completed / 10/10 Ready** |
+| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Shell (Active Deliverable)** |
+| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Shell (Active Deliverable)** |
+| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Pending Shell (Active Deliverable)** |
+| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Shell (Active Deliverable)** |
+| **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **10/10 Ready (Registry Active)** |
+| **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **10/10 Ready (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.3.0 Active Today (v2.3.1 Tomorrow)** |
-| **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | Reference |
-| **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | Reference |
-| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | Reference |
+| **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **10/10 Ready (Reference)** |
+| **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **10/10 Ready (Reference)** |
+| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | **10/10 Ready (Reference)** |
 
 ---
 
@@ -329,58 +436,77 @@ As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Depa
 BE-Capstone-Project/
 │
 ├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── README.md
-├── pyproject.toml
-├── pytest.ini
-├── requirements.txt
-├── LICENSE
-├── CONTRIBUTING.md
-├── AUTHORS.md
-├── CITATION.cff
-├── SECURITY.md
-├── CODE_OF_CONDUCT.md
-├── run_all_validation.bat
-├── run_all_validation.sh
+│   ├── workflows/
+│   │   └── ci.yml                         # Automated multi-OS CI pipeline (lint, pytest, E2E)
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.yml                 # Structured YAML bug report form
+│   │   ├── feature_request.yml            # Structured YAML feature proposal form
+│   │   └── config.yml                     # Documentation links and contact channels
+│   ├── pull_request_template.md           # Mandatory PR quality and verification checklist
+│   ├── dependabot.yml                     # Automated security dependency scanner
+│   └── CODEOWNERS                         # Subsystem maintainer assignment registry
+│
+├── .editorconfig                          # Cross-IDE indentation & formatting standards
+├── .env.example                           # Unified environment variable template
+├── README.md                              # Main repository documentation & narrative flow
+├── pyproject.toml                         # Project build and tool metadata
+├── pytest.ini                             # Pytest configuration and execution settings
+├── requirements.txt                       # Central Python dependency manifest
+├── start_system.py                        # Unified 1-click launcher (Simulator + Visualiser)
+├── start_system.bat                       # 1-click Windows desktop startup harness
+├── start_system.sh                        # 1-click Linux / macOS startup harness
+├── run_all_validation.bat                 # Master 8-step Windows hardware/software validator
+├── run_all_validation.sh                  # Master 8-step POSIX hardware/software validator
+├── LICENSE                                # MIT License with academic attribution clause
+├── CONTRIBUTING.md                        # Developer contribution guidelines
+├── AUTHORS.md                             # Comprehensive author & institutional credits
+├── CITATION.cff                           # Machine-readable BibTeX / APA citation metadata
+├── SECURITY.md                            # Security policy & vulnerability reporting
+├── CODE_OF_CONDUCT.md                     # Contributor Covenant scientific code of conduct
 │
 ├── docs/
-│   ├── README.md
-│   ├── LITERATURE_SURVEY.md
+│   ├── README.md                          # Master documentation hub & 4-stream guide
+│   ├── literature_survey.md               # 29-page survey on SNNs, ESNs & Neuromorphic BMS
 │   │
-│   ├── Poster/
-│   │   ├── Project_Poster.pdf
-│   │   └── README.md
+│   ├── Thesis/                            # B.E. Capstone Final Dissertation
+│   │   ├── Final_Thesis.pdf               # Camera-ready dissertation PDF shell (A4)
+│   │   └── README.md                      # University of Mumbai dissertation specifications
 │   │
-│   ├── Publications/
-│   │   ├── Research_Paper.pdf
-│   │   ├── Review_Paper.pdf
-│   │   └── README.md
+│   ├── Poster/                            # Academic Exhibition & Defense Poster
+│   │   ├── Project_Poster.pdf             # Formatted presentation poster PDF (A1)
+│   │   └── README.md                      # Print specs, high-res layout & cloud links
 │   │
-│   ├── Paper_Proof/
-│   │   └── README.md
+│   ├── Publications/                      # Official Academic Paper Deliverables
+│   │   ├── Research_Paper.pdf             # Original Experimental Research Paper (IEEE Target)
+│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (29 Pages, 11 Sections)
+│   │   └── README.md                      # Publication abstracts, authorship, and scopes
 │   │
-│   ├── Resources/
-│   │   ├── PROJECT_PROPOSAL.md
-│   │   ├── SYSTEM_SPECIFICATION.md
-│   │   ├── OPERATIONS.md
-│   │   ├── DEPLOY_RENDER.md
-│   │   ├── DEMO_CHECKLIST.md
-│   │   ├── ARTIFACTS.md
-│   │   ├── PRESENTATION.md
-│   │   └── WEB_RESEARCH.md
-│   ├── Review_1/
-│   │   ├── Review_1_Progress.md
-│   │   └── Review_1_PPT.pdf
-│   └── Review_2/
-│       ├── Review_2_Progress.md
-│       ├── Review_2_PPT.pdf
-│       └── Outcomes/
-│           ├── FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf
-│           └── Neuromorphic-BMS-Review-Paper-Draft.pdf
+│   ├── Paper_Proof/                       # 20 Marks Evaluation Submission/Acceptance Records
+│   │   └── README.md                      # Proof logging registry & mark criteria checklist
+│   │
+│   ├── Review_1/                          # Review 1 Milestone Documentation
+│   │   ├── Review_1_Progress.md           # Phase 1 baseline progress report
+│   │   └── Review_1_PPT.pdf               # Phase 1 presentation slide deck
+│   │
+│   ├── Review_2/                          # Review 2 Milestone Documentation
+│   │   ├── Review_2_Progress.md           # Phase 2 comprehensive progress report
+│   │   ├── Review_2_PPT.pdf               # Official 16:9 widescreen presentation slide deck
+│   │   └── Outcomes/                      # Milestone outcome evaluation reports
+│   │       ├── FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf
+│   │       └── Neuromorphic-BMS-Review-Paper-Draft.pdf
+│   │
+│   └── Resources/                         # Engineering Guides & Technical References
+│       ├── PROJECT_PROPOSAL.md            # Official BE proposal document (Aug 2026)
+│       ├── SYSTEM_SPECIFICATION.md        # Comprehensive mathematical equations & noise models
+│       ├── OPERATIONS.md                  # Local execution runbook & port configurations
+│       ├── DEPLOY_RENDER.md               # Cloud deployment runbook for Render.com
+│       ├── DEMO_CHECKLIST.md              # 10-minute presentation & viva defense checklist
+│       ├── ARTIFACTS.md                   # Model parameters and dataset versioning policy
+│       ├── PRESENTATION.md                # Slide-by-slide defense talking points & script
+│       └── WEB_RESEARCH.md                # Automotive BMS landscape & ISO 26262 audit
 │
 ├── hardware/
-│   ├── hardware.md
+│   ├── hardware.md                        # Consolidated hardware subsystem guide
 │   │
 │   ├── IP_Block/                          # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform
 │   │   ├── README.md                      # IP-XACT Catalog, AXI4-Lite/Stream & Arty A7 Guide
@@ -397,25 +523,26 @@ BE-Capstone-Project/
 │   │   ├── esn_host.py                    # Multi-Cycle UART Host Communication & Live Replay CLI
 │   │   └── esn_platform_top_*.rpt         # Timing, Power (0.124 W) & Resource Utilization Reports
 │   │
-│   ├── STM_Verifier/
-│   │   ├── main.c
-│   │   ├── main.h
-│   │   ├── Makefile.arm
-│   │   ├── config.py
-│   │   ├── train.py
-│   │   ├── train_classifier.py
-│   │   ├── train_estimator.py
-│   │   ├── esn_classifier_weights.h
-│   │   ├── esn_estimator_weights.h
-│   │   ├── requirements.txt
+│   ├── STM_Verifier/                      # C99 Embedded Firmware & Microcontroller Verifier
+│   │   ├── README.md                      # STM32 C99 CSR SpMV & Fixed-Point Guide
+│   │   ├── main.c                         # Dual-mode (Float32 / Q15) C99 firmware
+│   │   ├── main.h                         # CSR structures, function prototypes, and fixed-point macros
+│   │   ├── Makefile.arm                   # ARM Cortex-M cross-compilation Makefile
+│   │   ├── config.py                      # Environment and hyperparameter configuration
+│   │   ├── train.py                       # Unified ESN training script
+│   │   ├── train_classifier.py            # Safety classification ESN trainer & header exporter
+│   │   ├── train_estimator.py             # Continuous estimator ESN trainer & header exporter
+│   │   ├── esn_classifier_weights.h       # Quantized CSR sparse classification weights
+│   │   ├── esn_estimator_weights.h        # Quantized CSR sparse estimation weights
+│   │   ├── requirements.txt               # Embedded training dependencies
 │   │   ├── original_ev_battery_dataset_multiclass.csv
 │   │   ├── training_ev_battery_dataset_multiclass.csv
-│   │   ├── run_c_simulator.bat
-│   │   └── run_c_simulator.sh
+│   │   ├── run_c_simulator.bat            # 1-click Windows C99 compilation & execution test
+│   │   └── run_c_simulator.sh             # 1-click POSIX C99 compilation & execution test
 │   │
 │   └── FPGA_Verifier/
 │       ├── README.md                      # Master FPGA Accelerators Guide
-│       ├── compare_results.py             # ESN Bit-Exact Parity Comparator
+│       ├── compare_results.py             # ESN Bit-Exact Parity Comparator (200/200 Matches)
 │       ├── golden_model.py                # Fixed-Point ESN Golden Reference
 │       ├── eval_fpga_outcomes.py          # 32-Cycle NASA Dataset & RTL Outcomes Evaluator
 │       │
@@ -433,60 +560,61 @@ BE-Capstone-Project/
 │       │   ├── build_ekf_project.tcl      # Vivado Synthesis Script
 │       │   ├── rtl/                       # Verilog RTL (ekf_core, tb_ekf_core)
 │       │   ├── sim/                       # Simulation ROMs (ocv_lut, slope_lut, stim)
-│       │   └── compare_ekf.py             # 4-Fold Nested-LOCO Benchmark
+│       │   └── compare_ekf.py             # 4-Fold Nested-LOCO Benchmark (512/512 Matches)
 │       │
 │       └── ukf/                           # Fixed-Point UKF Hardware Subsystem
 │           ├── README.md                  # UKF Core Specifications & Microcode
 │           ├── build_ukf_project.tcl      # Vivado Synthesis Script
 │           ├── rtl/                       # Verilog RTL (ukf_core, tb_ukf_core)
 │           ├── sim/                       # Simulation ROMs (ukf_ocv, ukf_slope, stim)
-│           └── compare_ukf.py             # Float vs Fixed vs EKF Benchmark
+│           └── compare_ukf.py             # Float vs Fixed vs EKF Benchmark (512/512 Matches)
 │
 ├── software/
-│   ├── software.md
+│   ├── software.md                        # Master Software Subsystem Guide
 │   │
-│   ├── shared/
-│   │   ├── __init__.py
-│   │   ├── battery_chemistry.py
-│   │   └── battery_simulator.py
+│   ├── shared/                            # Shared Multi-Service Physics & Chemistry Package
+│   │   ├── __init__.py                    # Python package declaration
+│   │   ├── battery_chemistry.py           # Chemistry parameters & OCV lookup tables
+│   │   └── battery_simulator.py           # 2-RC transient equations solver
 │   │
-│   ├── simulator/
-│   │   ├── simulator.md
-│   │   ├── app.py
-│   │   ├── config.py
-│   │   ├── battery_chemistry.py
-│   │   ├── battery_simulator.py
-│   │   ├── gunicorn.conf.py
-│   │   ├── requirements.txt
-│   │   ├── templates/
-│   │   └── static/
+│   ├── simulator/                         # Physics Engine Service (Port 8000)
+│   │   ├── simulator.md                   # Simulator architecture & API reference
+│   │   ├── app.py                         # Flask application & simulation loop
+│   │   ├── config.py                      # Environment settings & fault thresholds
+│   │   ├── battery_chemistry.py           # Multi-chemistry parameter definitions
+│   │   ├── battery_simulator.py           # 2-RC transient equations solvers
+│   │   ├── gunicorn.conf.py               # Production WSGI server configuration
+│   │   ├── requirements.txt               # Simulator Python dependencies
+│   │   ├── templates/                     # Status web dashboard templates
+│   │   └── static/                        # CSS and JavaScript assets
 │   │
-│   └── visualiser/
-│       ├── visualiser.md
-│       ├── app.py
-│       ├── config.py
-│       ├── estimator_pipeline.py
-│       ├── traditional_estimator.py
-│       ├── battery_chemistry.py
-│       ├── battery_simulator.py
-│       ├── gunicorn.conf.py
-│       ├── requirements.txt
-│       ├── model_rc.pkl
-│       ├── datasets/
+│   └── visualiser/                        # Visualisation & Observer Service (Port 5000)
+│       ├── visualiser.md                  # Visualiser architecture & API reference
+│       ├── app.py                         # Flask application & telemetry consumer
+│       ├── config.py                      # Environment settings & model paths
+│       ├── estimator_pipeline.py          # Joint observer & CPS diagnostics manager
+│       ├── traditional_estimator.py       # EKF, UKF, Coulomb Counting, and RLS classes
+│       ├── battery_chemistry.py           # Chemistry loading & OCV lookup tables
+│       ├── battery_simulator.py           # 2-RC physics classes for visualizer
+│       ├── gunicorn.conf.py               # Production WSGI server configuration
+│       ├── requirements.txt               # Visualiser Python dependencies
+│       ├── model_rc.pkl                   # Trained software ESN model binary
+│       ├── datasets/                      # EV dynamic driving telemetry datasets
 │       │   ├── original_ev_battery_dataset_multiclass.csv
 │       │   └── training_ev_battery_dataset_multiclass.csv
-│       ├── templates/
-│       ├── static/
-│       └── training/
-│           ├── train_rc.py
-│           └── feature_engineering.py
+│       ├── templates/                     # Interactive HTML dashboard templates
+│       ├── static/                        # Chart.js, styles, and dashboard logic
+│       └── training/                      # Training & feature engineering scripts
+│           ├── train_rc.py                # Software ESN training pipeline
+│           └── feature_engineering.py     # Temporal feature extraction
 │
-├── images/
-│   ├── images.md
-│   ├── system_architecture.png
-│   ├── circuit_diagram.png
-│   ├── flowchart.png
-│   └── assets/
+├── images/                                # Diagrams, Schematics & Waveforms
+│   ├── images.md                          # Image inventory & asset attribution
+│   ├── system_architecture.png            # Complete cyber-physical architecture diagram
+│   ├── circuit_diagram.png                # 2-RC equivalent electrical circuit schematic
+│   ├── esn_architecture.png               # Echo State Network reservoir topology
+│   ├── flowchart.png                      # System execution and data flowchart
+│   └── assets/                            # Screen captures and waveforms
 │       ├── screenshot_simulator_aging.png
 │       ├── screenshot_simulator_dashboard.png
 │       ├── screenshot_visualiser_overview.png
@@ -494,74 +622,105 @@ BE-Capstone-Project/
 │       ├── screenshot_fpga_schematic.png
 │       └── screenshot_fpga_waveform.png
 │
-├── tests/
-│   ├── conftest.py
-│   ├── test_battery_chemistry.py
-│   ├── test_battery_simulator.py
-│   ├── test_esn_model.py
-│   ├── test_estimator_pipeline.py
-│   ├── test_estimator_pipeline_advanced.py
-│   ├── test_flask_api.py
-│   ├── test_flask_api_comprehensive.py
-│   ├── test_fpga_ekf_ukf.py
-│   ├── test_fpga_verifier.py
-│   ├── test_fpga_verifier_extended.py
-│   ├── test_hardware_training_and_export.py
-│   ├── test_integration.py
-│   ├── test_ip_block.py
-│   ├── test_online_training.py
-│   └── test_traditional_estimator.py
+├── tests/                                 # Unified Pytest Regression Suite (115 Tests)
+│   ├── README.md                          # Comprehensive test suite guide & coverage map
+│   ├── conftest.py                        # Test fixtures & mock database configuration
+│   ├── test_battery_chemistry.py          # Chemistry validation & OCV monotonicity (3 tests)
+│   ├── test_battery_simulator.py          # 2-RC solver, thermal & fault injection (10 tests)
+│   ├── test_esn_model.py                  # ESN inference & echo state property (5 tests)
+│   ├── test_estimator_pipeline.py         # Estimator pipeline & state serialization (9 tests)
+│   ├── test_estimator_pipeline_advanced.py# Multi-chemistry & sensor faults (11 tests)
+│   ├── test_flask_api.py                  # Simulator & visualiser API routes (5 tests)
+│   ├── test_flask_api_comprehensive.py    # Endpoint parameter verification (12 tests)
+│   ├── test_fpga_ekf_ukf.py               # FPGA fixed-point EKF/UKF bit-exact parity (7 tests)
+│   ├── test_fpga_verifier.py              # RTL parity, signed hex & LUT verification (7 tests)
+│   ├── test_fpga_verifier_extended.py     # Extended COE parser & CLI outcomes (9 tests)
+│   ├── test_hardware_training_and_export.py# Embedded CSR export & quantization (7 tests)
+│   ├── test_integration.py                # End-to-end multi-timestep integration (6 tests)
+│   ├── test_ip_block.py                   # IEEE 1685 IP-XACT & bitstream verification (5 tests)
+│   ├── test_online_training.py            # Online RLS dynamic weight adaptation (9 tests)
+│   └── test_traditional_estimator.py     # EKF, UKF, and Coulomb Counting math (10 tests)
 │
 └── reference/
-    ├── paper.md
-    ├── paper_ekf_soc_soh.pdf
-    └── paper_rc_soc_soh.pdf
+    ├── paper.md                           # Original Research Paper markdown manuscript
+    ├── paper_ekf_soc_soh.pdf              # Foundational multi-timescale EKF paper (Li et al.)
+    └── paper_rc_soc_soh.pdf               # Reservoir Computing for BMS paper (Rigutini et al.)
 ```
 
 ---
 
 ## How to Run the Project
 
-### Step 1: Clone the Repository
+### Prerequisites & Installation
 
+Clone the repository and install the standard dependencies:
 ```bash
 git clone https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027.git
 cd Battery_State_Estimator_BE_Project_2026_2027
-```
-
-### Step 2: Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-### Step 3: Run the Services
+> **Zero-Config In-Memory Mode**: The system functions completely out-of-the-box in local in-memory ring-buffer mode if MongoDB Atlas credentials are not supplied. No external database or network configuration is required!
 
-Start Battery Simulator (Port 8000):
-```bash
-python software/simulator/app.py
-```
+---
 
-Start Web Visualiser (Port 5000):
-```bash
-python software/visualiser/app.py
-```
+### Execution Modes
 
-> **Decoupled Architecture Note**: Simulator and Visualiser operate completely independently via MongoDB Atlas pub/sub. The Simulator posts live physics telemetry every 1.0s and auto-prunes historical records to a rolling 1,000-document buffer. The Visualiser independently polls for new readings every 1.0s via indexed timestamp scans (<0.2ms latency) with zero database locking or port coupling.
+#### ⚡ Option A: 1-Click Unified System Launcher (Recommended)
 
-Run Embedded C99 Verification:
-```bash
-hardware/STM_Verifier/run_c_simulator.bat
-```
+Runs both the 2-RC Physics Simulator and Web Visualiser concurrently, verifies service availability, opens the dashboard automatically in your default browser, and cleanly handles shutdown on `Ctrl+C`:
 
-Run FPGA Golden Model Verification:
-```bash
-python hardware/FPGA_Verifier/compare_results.py
-```
+* **Windows:** Double-click [`start_system.bat`](start_system.bat) or run:
+  ```cmd
+  python start_system.py
+  ```
+* **Linux / macOS:**
+  ```bash
+  chmod +x start_system.sh
+  ./start_system.sh
+  ```
 
-### Step 4: Observe the Output
+#### 💻 Option B: Manual Multi-Terminal Developer Run
 
-Open `http://localhost:5000` in your web browser to observe real-time dynamic battery telemetry, side-by-side estimator state tracking (ESN vs EKF vs Coulomb Counting), and safety diagnostic alerts.
+If you prefer inspecting individual service logs in separate terminal windows:
+
+* **Terminal 1 — Physics Simulator (Port 8000):**
+  ```bash
+  python software/simulator/app.py
+  ```
+* **Terminal 2 — Web Visualiser Dashboard (Port 5000):**
+  ```bash
+  python software/visualiser/app.py
+  ```
+
+Navigate to `http://localhost:5000` in your web browser to observe real-time dynamic battery telemetry, side-by-side estimator state tracking (ESN vs EKF vs UKF vs Coulomb Counting), and safety diagnostic alerts.
+
+#### 🔧 Option C: Embedded C99 & FPGA Hardware Verification
+
+Validate edge embedded execution and silicon RTL models:
+
+* **STM32 C99 CSR SpMV Microcontroller Test:**
+  ```bash
+  # Windows:
+  hardware\STM_Verifier\run_c_simulator.bat
+  # Linux / macOS:
+  bash hardware/STM_Verifier/run_c_simulator.sh
+  ```
+* **FPGA 100-Neuron ESN Bit-Exact Parity Check (200/200 Matches):**
+  ```bash
+  python hardware/FPGA_Verifier/compare_results.py
+  ```
+* **FPGA Concurrent Tri-Observer IP Block Simulation (ESN + EKF + UKF):**
+  ```bash
+  python hardware/IP_Block/esn_host.py run --pack pack_B0018 --data b18.csv --emit simdir
+  ```
+
+#### 🛡️ Option D: Master 8-Step Validation Suite
+
+Execute the complete end-to-end verification pipeline (Unit tests, ESN training, C99 compilation, and FPGA golden verification):
+
+* **Windows:** `run_all_validation.bat`
+* **Linux / macOS:** `bash run_all_validation.sh`
 
 ---
 

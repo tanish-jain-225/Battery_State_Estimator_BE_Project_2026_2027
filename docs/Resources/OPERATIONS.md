@@ -1,4 +1,6 @@
-[← Back to README](../../README.md)
+[← Back to Main Repository](../../README.md) · [Documentation Hub](../README.md) · [System Spec](SYSTEM_SPECIFICATION.md) · [Deploy Render](DEPLOY_RENDER.md) · [Demo Checklist](DEMO_CHECKLIST.md)
+
+---
 
 # Operations Guide
 
@@ -9,29 +11,32 @@ This guide describes local setup, environment configuration, training pipelines,
 ## 💻 1. System Setup & Configuration
 
 ### Prerequisites
-- **Python 3.8+**: Used for simulator, training scripts and visualiser.
-- **C99 Compiler**: (e.g., `gcc`, `clang`, or MSVC `cl.exe`) for running the desktop C diagnostic simulator.
+- **Python 3.8+**: Used for simulator, training scripts, visualiser, and test harnesses.
+- **C99 Compiler (Optional)**: (e.g., `gcc`, `clang`, or MSVC `cl.exe`) for running the desktop C diagnostic simulator.
 - **Database (Optional)**: A local MongoDB instance or a MongoDB Atlas cloud database. If unavailable, the system defaults to in-memory buffers automatically.
 
 ### Local Installation
 1. Clone the repository and navigate to the project root:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027.git
    cd Battery_State_Estimator_BE_Project_2026_2027
    ```
-2. Install the necessary Python packages:
+2. Install dependencies:
    ```bash
-   pip install -r software/simulator/requirements.txt
-   pip install -r software/visualiser/requirements.txt
-   pip install -r hardware/STM_Verifier/requirements.txt
+   pip install -r requirements.txt
    ```
 
-### ⚡ 1-Click Automated Validation Pipeline
+### ⚡ 1-Click Unified System Launcher
 
-Run the entire end-to-end training, testing and C simulator verification suite:
-```cmd
-run_all_validation.bat
-```
+To start both the Physics Simulator (Port 8000) and Web Visualiser (Port 5000) together with automatic browser launch:
+* **Windows:** Double-click [`start_system.bat`](../../start_system.bat) or run `python start_system.py`
+* **Linux / macOS:** Run `chmod +x start_system.sh && ./start_system.sh`
+
+### 🛡️ 1-Click Automated Validation Pipeline
+
+Run the complete 8-step end-to-end training, testing, C99 compilation, and FPGA golden verification suite:
+* **Windows:** `run_all_validation.bat`
+* **Linux / macOS:** `bash run_all_validation.sh`
 
 ### Local Environment Settings
 

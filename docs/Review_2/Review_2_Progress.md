@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [← Back to Review 1](../Review_1/Review_1_Progress.md) · [Review 2 Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes Report (PDF)](Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
+[← Back to README](../../README.md) · [← Review 1](../Review_1/Review_1_Progress.md) · [Review 2 (Current)] · [Next: FPGA IP Block →](../../hardware/IP_Block/README.md) · [Next: Capstone Thesis →](../Thesis/README.md) · [Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes Report (PDF)](Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
 
 # ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
 ## Phase 2 Comprehensive Progress Report (Review 2 Deliverable)
@@ -46,7 +46,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 2. **Unscented Kalman Filter (UKF)** implementation as a rigorous non-linear benchmark alongside EKF and Coulomb Counting.
 3. **Dual C99 Microcontroller Execution**: Floating-point (99.80% acc) and integer-only Q15 fixed-point (98.40% acc) with **6.7× CSR SpMV acceleration**.
 4. **Verilog HDL FPGA RTL Verification on Artix A7100T**: Bit-exact stage parity (200/200 stages verified) and multi-timestep temporal sequence processing.
-5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing with 100% pass rate.
+5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing at Review 2 milestone (expanded to 115 passing tests in v2.3.0).
 
 ---
 
@@ -60,7 +60,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 | **C99 Embedded Firmware** | Conceptual CSR code | **Fully Benchmarked Dual C99 Engine** | Float32 (99.80%) vs Q15 (98.40%), 0.0031 RMSE, 6.7× CSR SpMV speedup. |
 | **FPGA RTL Verification** | Single-pass 100-neuron test | **200/200 Stages Parity + Multi-Step Sequence** | Bit-exact matching in Vivado XSim and temporal sequence input indexing (`tb_esn_top_tiny.v`). |
 | **FPGA IP Block & Platform** | Conceptual / In Progress | **Plug-and-Play AXI4 IP (`esn_axi_ip`) + Arty A7 Platform** | IEEE 1685 IP-XACT catalog module with concurrent tri-observer execution (ESN + EKF + UKF in parallel). |
-| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
+| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass; 115 in v2.3.0)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
 | **One-Click Validation** | Separate build scripts | **Unified 8-Step Runner (`.bat` / `.sh`)** | Zero-configuration validation across hardware and software in under 45 seconds. |
 
 ---
@@ -273,19 +273,31 @@ python hardware/FPGA_Verifier/compare_results.py
 
 ---
 
-## 10. Phase 3 Roadmap Towards Final Defense
+## 10. Development Continuity: Phase 3 Silicon IP & Phase 4 Capstone Culmination
 
-With all Phase 2 / Review 2 goals 100% completed and verified, our final phase focuses on physical benchtop deployment:
+The developmental journey from Review 2 evolves directly into commercial silicon packaging and final academic degree defense:
 
 ```
-[Phase 1: Completed] ──► [Phase 2: Completed] ──► [Phase 3: Final Goal]
-- 2-RC Physics           - Online RLS ESN         - Artix A7100T Flashing
-- EKF & CC Baselines     - UKF Implementation     - UART HIL Testbench
-- C99 CSR & Q15          - 200/200 FPGA Parity    - Real Battery Pack Tests
-- Verilog RTL Core       - 62 Automated Tests     - Final B.E. Thesis
+[Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination]
+- 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis
+- EKF & CC Baselines    - UKF Implementation    - Artix-7 3.7 MB Bitstream- Comprehensive Review
+- C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL Platform (115k)- A1 Exhibition Poster
+- Verilog RTL Core      - 115 Automated Tests   - Authored Research Paper - Degree Viva Defense
+(Completed)             (Completed)             (Completed in v2.3.0)     (Active Target)
 ```
 
-1. **Physical Artix A7100T Synthesis & Flashing**: Generate final bitstream (`.bit`) with Vivado 2024.x, record on-chip utilization (LUTs, BRAMs, DSP slices) and dynamic power consumption.
-2. **Hardware-in-the-Loop (HIL) UART Bridge**: Connect PC-based real-time simulator via USB-UART (FTDI / CH340) directly to FPGA Pmod pins to perform hardware-in-the-loop state estimation.
-3. **Publication Milestones (20 Marks)**: Submit both official manuscripts to peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**: (1) Comprehensive Review Paper ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)), and (2) Original Experimental Research Paper ([`reference/paper.md`](../../reference/paper.md)).
-4. **Final Thesis Submission**: Complete comprehensive B.E. dissertation defense documentation.
+1. **Phase 3 — Hardware IP Block & Acceleration ([`hardware/IP_Block/README.md`](../../hardware/IP_Block/README.md))**:
+   * **IEEE 1685 IP-XACT Packaging**: Packaged the verified 100-neuron ESN RTL into an AXI4-Lite/Stream component descriptor ([`hardware/IP_Block/component.xml`](../../hardware/IP_Block/component.xml)) ready for the Vivado IP Catalog.
+   * **Concurrent Tri-Observer FPGA Platform**: Synthesized and implemented top-level RTL ([`hardware/IP_Block/esn_platform_top.v`](../../hardware/IP_Block/esn_platform_top.v)) running ESN, EKF, and UKF simultaneously.
+   * **Pre-Compiled FPGA Bitstream**: Generated flash-ready 3.7 MB bitstream ([`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit)) for Digilent Arty A7-100T (`xc7a100tcsg324-1`).
+   * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/esn_host.py`](../../hardware/IP_Block/esn_host.py)) delivering 23× real-time headroom over 115200-baud serial links.
+   * **Regression Suite**: Expanded to **115 passing tests** with 100% pass rate in ~32s.
+
+2. **Phase 4 — Capstone Dissertation & Academic Dissemination ([`docs/Thesis/README.md`](../Thesis/README.md))**:
+   * **B.E. Final Thesis**: Official 8-chapter dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
+   * **Peer-Reviewed Publications (20 Marks)**: Target manuscripts for IEEE / Q3 Scopus review journals ([`docs/Publications/README.md`](../Publications/README.md) and [`docs/Paper_Proof/README.md`](../Paper_Proof/README.md)).
+   * **A1 Symposium Exhibition Poster**: High-resolution vector defense poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).
+
+---
+
+[← Return to Review 1](../Review_1/Review_1_Progress.md) · [Proceed to FPGA IP Block Architecture →](../../hardware/IP_Block/README.md) · [Proceed to B.E. Final Thesis →](../Thesis/README.md)

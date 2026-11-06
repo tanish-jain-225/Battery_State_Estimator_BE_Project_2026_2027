@@ -1,6 +1,6 @@
 # Paper Publication Proofs & Evaluation Records
 
-[← Back to Main Repository](../../README.md) · [Publications](../Publications/README.md) · [Project Poster](../Poster/README.md)
+[← Back to Main Repository](../../README.md) · [← Capstone Thesis](../Thesis/README.md) · [Publications](../Publications/README.md) · [Project Poster](../Poster/README.md)
 
 ---
 

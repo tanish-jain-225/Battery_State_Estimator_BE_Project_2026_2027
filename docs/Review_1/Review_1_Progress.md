@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [Next: Review 2 Progress →](../Review_2/Review_2_Progress.md)
+[← Back to Main Repository](../../README.md) · [← Proposal](../Resources/PROJECT_PROPOSAL.md) · [Review 1 Baseline (Current)] · [Next: Review 2 Progress →](../Review_2/Review_2_Progress.md) · [Slide Deck (PDF)](Review_1_PPT.pdf)
 
 # ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation
 
@@ -71,3 +71,7 @@
 * **3rd Wk Oct**: **Review II**
 * **Oct 25**: Hardware HIL validation
 * **Nov 20**: Final thesis
+
+---
+
+[← Return to Proposal](../Resources/PROJECT_PROPOSAL.md) · [Proceed to Review 2 Comprehensive Progress Report →](../Review_2/Review_2_Progress.md)

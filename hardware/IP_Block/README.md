@@ -1,4 +1,12 @@
-# ESN accelerator IP + ESN/EKF/UKF estimation platform (Arty A7-100T)
+# ESN Accelerator IP Block & Tri-Observer FPGA Platform (Arty A7-100T)
+
+[← Back to Main Repository](../../README.md) · [← Hardware Overview](../hardware.md) · [← Review 2 Progress](../../docs/Review_2/Review_2_Progress.md) · [Register Map](register_map.md) · [UART Protocol](uart_protocol.md) · [Next: Capstone Thesis →](../../docs/Thesis/README.md)
+
+---
+
+## 📌 Development Flow & Silicon Role
+
+This package represents **Phase 3 (Silicon IP & Acceleration)** of the project development flow. It translates the verified 100-neuron ESN Python model and C99 firmware into a commercial-grade, plug-and-play hardware accelerator packaged to the **IEEE 1685 IP-XACT** standard.
 
 Two deliverables built on the verified Q6.10 ESN datapath (100 neurons, 4 inputs, 64-step window).
 The verified MAC / tanh / neuron / controller RTL is **unchanged** (`rtl/esn_neuron.v`, `mac_accum_q6_10.v`, `mult_q6_10.v`, `tanh_lut.v`, `reservoir_controller.v`, `address_generator.v`).
@@ -60,3 +68,7 @@ Copy those and `tanh.mem` into the simulation working directory, run `tb_esn_pla
 * EKF/UKF need an initial SOC from the host (default 1.0 = full); the ESN does not.
 * SOH is the mean over one 64-step window, so one window = one discharge cycle (resampled).
 * Throughput is limited by the 115200-baud UART (~4 ms per sample incl. frames), not by the 0.54 ms ESN compute.
+
+---
+
+[← Return to Review 2 Progress](../../docs/Review_2/Review_2_Progress.md) · [Proceed to B.E. Final Thesis →](../../docs/Thesis/README.md) · [Academic Publications →](../../docs/Publications/README.md)

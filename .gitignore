@@ -90,6 +90,8 @@ tmp/
 temp/
 scratch/
 *.tmp
+resp.txt
+simdir/
 
 # ── IDEs, Code Editors & OS Files ──────────────────────────────────────────────
 .vscode/*

@@ -1,6 +1,6 @@
 # Capstone Project Presentation Poster
 
-[← Back to Main Repository](../../README.md) · [View PDF Poster](Project_Poster.pdf) · [Publications](../Publications/README.md)
+[← Back to Main Repository](../../README.md) · [← Capstone Thesis](../Thesis/README.md) · [Publications](../Publications/README.md) · [View PDF Poster](Project_Poster.pdf)
 
 ---
 

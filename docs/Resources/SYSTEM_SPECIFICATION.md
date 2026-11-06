@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [Web Research & Industrial Audit](WEB_RESEARCH.md)
+[← Back to Main Repository](../../README.md) · [Documentation Hub](../README.md) · [Web Research](WEB_RESEARCH.md) · [Hardware Spec](../../hardware/hardware.md) · [Software Spec](../../software/software.md)
 
 # System Specification
 

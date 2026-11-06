@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation Hub
+    url: https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/tree/main/docs
+    about: Read our comprehensive technical specifications, literature survey, and guides.
+  - name: 💬 Discussion & Questions
+    url: https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/discussions
+    about: Ask questions and discuss features with the maintainers and contributors.
+

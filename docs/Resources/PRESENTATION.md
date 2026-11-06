@@ -1,4 +1,4 @@
-[← Back to README](../../README.md) · [Review 2 Slide Deck (PDF)](../Review_2/Review_2_PPT.pdf)
+[← Back to Main Repository](../../README.md) · [Demo Checklist](DEMO_CHECKLIST.md) · [Review 1 Slide Deck (PDF)](../Review_1/Review_1_PPT.pdf) · [Review 2 Slide Deck (PDF)](../Review_2/Review_2_PPT.pdf)
 
 # PowerPoint Presentation Plan: First Progress Review
 

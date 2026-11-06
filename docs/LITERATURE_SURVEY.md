@@ -1,4 +1,4 @@
-[← Back to README](../README.md) · [Web Research & Industrial Audit](Resources/WEB_RESEARCH.md) · [IEEE / Q3 Review Paper](Publications/Review_Paper.pdf)
+[← Back to Main Repository](../README.md) · [Project Proposal](Resources/PROJECT_PROPOSAL.md) · [Review Paper (PDF)](Publications/Review_Paper.pdf) · [Web Research](Resources/WEB_RESEARCH.md)
 
 # Literature Survey: Neuromorphic Computing, Spiking Networks, and Reservoir Computing for Intelligent Battery Management Systems
 

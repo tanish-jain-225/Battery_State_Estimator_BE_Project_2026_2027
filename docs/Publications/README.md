@@ -1,6 +1,6 @@
 # Academic Publications & Manuscripts
 
-[← Back to Main Repository](../../README.md) · [Submission Proofs](../Paper_Proof/README.md) · [Project Poster](../Poster/README.md)
+[← Back to Main Repository](../../README.md) · [← Capstone Thesis](../Thesis/README.md) · [Submission Proofs (20 Marks)](../Paper_Proof/README.md) · [Project Poster](../Poster/README.md)
 
 ---
 
@@ -41,8 +41,8 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 ## 📄 Target Paper 2: Original Experimental Research Paper
 
-* **Title:** *Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems*
-* **Authors:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi, and Kadambari Sharma
+* **Title:** *A Bit-Exact Fixed-Point FPGA Echo State Network Reservoir for Lithium-Ion Battery SOC and SOH Estimation*
+* **Authors:** Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, and Nilima Warke
 * **Affiliation:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai, India
 * **Scope & Highlights:**
   * Co-designed cyber-physical system integrating a 2-RC electro-thermal model, multi-timescale EKF, and continuous-time Leaky ESN.

@@ -59,7 +59,7 @@ echo ""
 
 # ── STEP 4: Software Estimator & Simulator Verification ───────────────────
 echo "[4/8] [SOFTWARE] Testing Physics Simulator and Estimator Pipeline..."
-if $PYTHON_BIN -c "import sys; sys.path.insert(0, '.'); sys.path.insert(0, '$ROOT_DIR/software/visualiser'); from software.shared.battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V | EKF SOC=', round(res['ekf_soc'],4), '| UKF SOC=', round(res['ukf_soc'],4))"; then
+if $PYTHON_BIN -c "import sys; sys.path.insert(0, '.'); sys.path.insert(0, '$ROOT_DIR/software/visualiser'); from software.shared.battery_simulator import BatterySimulator; sim = BatterySimulator(); st = sim.step(-2.0, 1.0); from estimator_pipeline import EstimatorPipeline; ep = EstimatorPipeline(); res = ep.step(V_meas=st['voltage'], I_meas_discharge=st['current'], T_meas=st['temperature']); print('[TEST PASSED] Physics step V=', round(st['voltage'],3), 'V - EKF SOC=', round(res['ekf_soc'],4), '- UKF SOC=', round(res['ukf_soc'],4))"; then
     echo "[SUCCESS] Software Physics Simulator and Estimator Pipeline verified."
 else
     echo "[ERROR] Software Estimator and Simulator verification failed."

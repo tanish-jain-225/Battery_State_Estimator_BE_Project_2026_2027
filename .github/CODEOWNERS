@@ -1,0 +1,30 @@
+# ==============================================================================
+# GitHub CODEOWNERS for Battery State Estimator Project
+# ==============================================================================
+# Defines maintainer and reviewer responsibilities for pull requests and audits.
+# Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default maintainers for the entire repository
+* @tanish-jain-225 @Clothflow13 @RoyalMaddy08 @ABKmaster
+
+# Software Subsystem (Simulator, Visualiser, Shared Physics)
+/software/simulator/ @Clothflow13 @RoyalMaddy08
+/software/visualiser/ @tanish-jain-225 @RoyalMaddy08
+/software/shared/ @Clothflow13 @tanish-jain-225
+
+# Hardware Subsystem (C99 Microcontroller Firmware & FPGA RTL)
+/hardware/STM_Verifier/ @ABKmaster @tanish-jain-225
+/hardware/FPGA_Verifier/ @tanish-jain-225 @ABKmaster
+/hardware/IP_Block/ @tanish-jain-225
+
+# Automated Regression Test Suite
+/tests/ @tanish-jain-225 @RoyalMaddy08 @Clothflow13 @ABKmaster
+
+# Documentation Hub & Academic Publications
+/docs/ @Clothflow13 @tanish-jain-225 @RoyalMaddy08 @ABKmaster
+/docs/Publications/ @tanish-jain-225 @Clothflow13
+/docs/Thesis/ @tanish-jain-225 @Clothflow13 @RoyalMaddy08 @ABKmaster
+
+# Continuous Integration & GitHub Automation Workflows
+/.github/ @tanish-jain-225
+

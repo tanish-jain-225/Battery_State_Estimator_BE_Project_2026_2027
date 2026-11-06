@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🎯 Scope & Planned Deliverables
 - **Academic Review Paper**: Replacing [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) with the finalized, peer-reviewed 11-section survey manuscript targeting IEEE Potentials / IEEE Transactions on Transportation Electrification.
 - **A1 Presentation Poster**: Replacing [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) with the finalized high-resolution 300 DPI vector exhibition poster adhering to official VESIT symposium guidelines.
-- **Review 2 Defense Slide Deck**: Replacing [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf) with the finalized 26-slide capstone milestone presentation deck.
+- **B.E. Capstone Final Thesis**: Replacing [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) with the complete, camera-ready B.E. Capstone Dissertation Report adhering to University of Mumbai and VESIT guidelines.
 - **Milestone Completeness**: 100% turn-key academic and engineering closure with zero remaining document shells.
 
 ---
@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Repository Footprint Optimization**: Purged intermediate Vivado compilation checkpoints (`.dcp`) and binary reports (`.rpx`), saving 36.7 MB while preserving all source RTL, testbenches, constraints, and synthesis reports.
 - **Academic Research Paper Integration**: Formally integrated the authored IEEE-formatted Research Paper into [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (1.8 MB), with Review Paper, Poster, and Review 2 PPT shells positioned for final updates.
 - **Automated IP Block Verification Suite**: Added [`tests/test_ip_block.py`](tests/test_ip_block.py) validating IEEE 1685 component XML integrity, weight pack ingestion, bit-exact twin execution, and golden readout parity, expanding the test suite to **115 passing tests** (100% pass rate in ~66s).
+- **Unified 1-Click System Launcher**: Added cross-platform `start_system.py`, `start_system.bat`, and `start_system.sh` enabling developers and common users to boot both Physics Simulator (Port 8000) and Web Visualiser (Port 5000) simultaneously with automatic browser launching and clean shutdown.
+- **Open-Source Repository Standards**: Integrated `.editorconfig`, `.env.example`, `.github/CODEOWNERS`, `.github/pull_request_template.md`, `.github/dependabot.yml`, and YAML issue forms (`bug_report.yml`, `feature_request.yml`).
+- **Comprehensive Subsystem Guides**: Added [`hardware/STM_Verifier/README.md`](hardware/STM_Verifier/README.md) for C99 CSR SpMV firmware and [`tests/README.md`](tests/README.md) for the 15-module automated test inventory.
+- **Narrative Flow & Developmental Continuity**: Formally unified root `README.md` and `docs/README.md` with a 5-Act story arc, chronological milestone diagrams, and bidirectional breadcrumb links across all 36+ Markdown documents.
 
 ---
 
