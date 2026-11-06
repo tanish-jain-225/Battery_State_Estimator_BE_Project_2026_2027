@@ -282,11 +282,12 @@ def generator_loop():
                                 db[Config.MONGODB_READINGS_COLLECTION].delete_many({'time': {'$lt': cutoff_time}})
                     except Exception as ins_err:
                         print(f"Error inserting reading into MongoDB: {ins_err}")
-                else:
-                    local_telemetry_buffer.append(record)
-                    limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
-                    if len(local_telemetry_buffer) > limit:
-                        local_telemetry_buffer.pop(0)
+
+                # Always maintain fast in-memory circular ring buffer for zero-latency direct HTTP streaming
+                local_telemetry_buffer.append(record)
+                limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
+                if len(local_telemetry_buffer) > limit:
+                    local_telemetry_buffer.pop(0)
 
                 # Update configuration document with live heartbeat every 3 seconds to eliminate redundant network roundtrips
                 now_wall = time.time()
@@ -474,6 +475,14 @@ def sync_simulation_on_demand():
         'prev_current': -I_meas
     })
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
+    response.headers['Connection'] = 'keep-alive'
+    return response
+
 # Endpoints
 @app.route('/')
 def home():
@@ -482,7 +491,25 @@ def home():
 @app.route('/api/readings', methods=['GET'])
 def get_readings():
     sync_simulation_on_demand()
-    return jsonify(local_telemetry_buffer)
+    since_arg = request.args.get('since')
+    limit_arg = request.args.get('limit')
+
+    readings = list(local_telemetry_buffer)
+    if since_arg is not None:
+        try:
+            since_val = float(since_arg)
+            readings = [r for r in readings if r.get('time', 0.0) > since_val]
+        except (ValueError, TypeError):
+            pass
+
+    if limit_arg is not None:
+        try:
+            limit_val = int(limit_arg)
+            readings = readings[-limit_val:]
+        except (ValueError, TypeError):
+            pass
+
+    return jsonify(readings)
 
 @app.route('/api/chemistry/register', methods=['POST'])
 def post_register_chemistry():

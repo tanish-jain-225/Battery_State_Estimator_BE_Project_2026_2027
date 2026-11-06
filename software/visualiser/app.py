@@ -4,11 +4,12 @@ import pickle
 import sys
 import threading
 import time
-import urllib.request
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
+import requests
+import requests.adapters
 
 # Add local directories to path for clean imports
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -76,6 +77,54 @@ def verify_request_auth():
     return False
 
 
+@app.after_request
+def add_cors_and_cache_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-API-Key, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
+    response.headers['Connection'] = 'keep-alive'
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    return response
+
+
+class _SimulatorResponseWrapper:
+    """Drop-in context manager wrapping a requests.Response for zero-latency HTTP Keep-Alive pooling."""
+    def __init__(self, resp):
+        self._resp = resp
+        self.status = resp.status_code
+        self.status_code = resp.status_code
+
+    def read(self):
+        return self._resp.content
+
+    def json(self):
+        return self._resp.json()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
+_sim_http_session = None
+
+
+def get_sim_http_session():
+    global _sim_http_session
+    if _sim_http_session is None:
+        _sim_http_session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=20,
+            max_retries=1
+        )
+        _sim_http_session.mount("http://", adapter)
+        _sim_http_session.mount("https://", adapter)
+    return _sim_http_session
+
+
 def make_simulator_request(path, method='GET', data=None, timeout=1.0):
     url = f"{Config.SIMULATOR_URL}{path}"
     headers = {}
@@ -84,20 +133,21 @@ def make_simulator_request(path, method='GET', data=None, timeout=1.0):
     if secret:
         headers["X-API-Key"] = secret
 
-    encoded_data = None
     if data is not None:
-        encoded_data = json.dumps(data).encode('utf-8')
         headers["Content-Type"] = "application/json"
 
-    req = urllib.request.Request(
-        url,
-        data=encoded_data,
-        headers=headers,
-        method=method
-    )
     if app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         timeout = min(timeout, 0.05)
-    return urllib.request.urlopen(req, timeout=timeout)
+
+    session = get_sim_http_session()
+    if method == 'GET':
+        resp = session.get(url, headers=headers, timeout=timeout)
+    elif method == 'POST':
+        resp = session.post(url, json=data, headers=headers, timeout=timeout)
+    else:
+        resp = session.request(method, url, json=data, headers=headers, timeout=timeout)
+
+    return _SimulatorResponseWrapper(resp)
 
 import atexit
 import tempfile
@@ -135,6 +185,10 @@ def check_db_connected():
             db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
+            try:
+                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+            except Exception:
+                pass
             _mongodb_connected = True
             mongodb_connected = True
             return True
@@ -156,6 +210,10 @@ def check_db_connected():
                 db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
+            try:
+                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+            except Exception:
+                pass
             _mongodb_connected = True
             mongodb_connected = True
             return True
@@ -1504,10 +1562,10 @@ def get_telemetry():
                     # Single fast indexed query: time > prev_time
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
                     new_readings = list(cursor)
-                    # If empty, check if database was purged or reset
+                    # If empty, check if simulation was reset (in-memory zero-latency check)
                     if not new_readings and already_cached > 0:
-                        latest_record = db[Config.MONGODB_READINGS_COLLECTION].find_one(sort=[('time', -1)])
-                        if latest_record is None or latest_record['time'] < prev_time:
+                        sim_time = state.get('time', 0.0)
+                        if sim_time < prev_time:
                             cache.update({
                                 'key':       None,
                                 'pipeline':  None,
@@ -1529,31 +1587,48 @@ def get_telemetry():
                 print(f"Error querying database in get_telemetry: {db_err}")
                 new_readings = []
         else:
-            # Fallback when database is offline
+            # Fallback when database is offline - query simulator via Keep-Alive session with delta stream
             port_online, _ = check_simulator_port(force=True)
-            raw_readings = []
             if port_online:
                 try:
-                    with make_simulator_request("/api/readings", timeout=1.5) as response:
+                    req_path = f"/api/readings?since={prev_time}&limit=60" if prev_time is not None else "/api/readings?limit=60"
+                    with make_simulator_request(req_path, timeout=1.0) as response:
                         if response.status == 200:
-                            raw_readings = json.loads(response.read().decode())
+                            new_readings = json.loads(response.read().decode())
                 except Exception as e:
                     print(f"Error fetching readings from simulator: {e}")
+                    new_readings = []
             else:
-                raw_readings = list(local_telemetry_buffer)
+                if prev_time is not None:
+                    new_readings = [r for r in local_telemetry_buffer if r.get('time', 0.0) > prev_time]
+                else:
+                    new_readings = list(local_telemetry_buffer[-60:])
 
-            # Invalidate cache if local buffer was cleared / truncated
-            if len(raw_readings) < already_cached:
-                cache.update({
-                    'key':       None,
-                    'pipeline':  None,
-                    'processed': [],
-                    'n_cached':  0
-                })
-                already_cached = 0
+            # Detect simulation reset in fallback mode
+            if not new_readings and already_cached > 0:
+                sim_time = state.get('time', 0.0)
+                if sim_time < prev_time:
+                    cache.update({
+                        'key':       None,
+                        'pipeline':  None,
+                        'processed': [],
+                        'n_cached':  0
+                    })
+                    already_cached = 0
+                    prev_time = None
+            elif new_readings and prev_time is not None:
+                # If first new reading has time < prev_time, reset occurred
+                if new_readings[0].get('time', 0.0) < prev_time:
+                    cache.update({
+                        'key':       None,
+                        'pipeline':  None,
+                        'processed': [],
+                        'n_cached':  0
+                    })
+                    already_cached = 0
+                    prev_time = None
 
-            new_readings = raw_readings[already_cached:]
-            cache['n_cached'] = len(raw_readings)
+            cache['n_cached'] = already_cached + len(new_readings)
 
         cpu_usage, mem_usage = get_system_metrics()
         prev_time = None
@@ -1614,6 +1689,10 @@ def get_telemetry():
                 'innovation':    est_output.get('innovation', 0.0)
             })
             cache['processed'].append(processed_record)
+
+        # Cap memory consumption during long multi-hour runs
+        if len(cache['processed']) > 300:
+            cache['processed'] = cache['processed'][-200:]
 
         # Update cache watermark is handled inside the fetch branches
 

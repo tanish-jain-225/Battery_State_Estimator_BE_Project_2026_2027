@@ -10,8 +10,8 @@ workers = 1
 # killing the process during long operations.
 timeout = 300
 
-# Keep-alive connections to Render's load balancer
-keepalive = 5
+# Keep-alive connections to upstream reverse-proxies and load balancers
+keepalive = 65
 
 # ── Binding ───────────────────────────────────────────────────────────────────
 # Render sets the PORT environment variable automatically

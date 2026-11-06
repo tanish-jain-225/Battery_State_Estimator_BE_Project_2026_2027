@@ -11,8 +11,8 @@ workers = 1
 # Default is 30 seconds — far too short for reservoir computing on a free-tier container.
 timeout = 300
 
-# Keep-alive connections to Render's load balancer
-keepalive = 5
+# Keep-alive connections to upstream reverse-proxies and load balancers
+keepalive = 65
 
 # ── Binding ───────────────────────────────────────────────────────────────────
 # Render sets the PORT environment variable automatically
