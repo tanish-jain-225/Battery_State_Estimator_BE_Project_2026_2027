@@ -124,18 +124,33 @@ Below is a breakdown of the key files and classes implementing the battery estim
 ## 🚀 Running the Software Services Locally
 
 > [!NOTE]
-> Both services must be running simultaneously for the full system to operate. The visualiser (Port 5000) fetches telemetry from the simulator (Port 8000).
+> Both services must be running simultaneously for the full comparative system to operate. The visualiser (Port 5000) fetches telemetry from the simulator (Port 8000). MongoDB is optional; if absent, both services automatically fall back to zero-configuration in-memory telemetry buffers.
 
+### Option A: One-Click Unified Launcher (Recommended)
+Launch both microservices, verify port availability, open the browser dashboard, and handle graceful shutdown in one command:
+
+```bash
+# Cross-platform Python launcher
+python start_system.py
+
+# Windows 1-Click batch script
+start_system.bat
+
+# Linux / macOS POSIX shell script
+chmod +x start_system.sh && ./start_system.sh
+```
+
+### Option B: Manual Two-Terminal Launch
 1. Install Python packages for each service:
    ```bash
    pip install -r software/simulator/requirements.txt
    pip install -r software/visualiser/requirements.txt
    ```
-2. Open terminal 1 and start the physics simulator:
+2. Terminal 1 — Start the physics simulator engine (Port 8000):
    ```bash
    python software/simulator/app.py
    ```
-3. Open terminal 2 and start the visualiser dashboard:
+3. Terminal 2 — Start the visualiser dashboard (Port 5000):
    ```bash
    python software/visualiser/app.py
    ```
@@ -145,7 +160,7 @@ Below is a breakdown of the key files and classes implementing the battery estim
 
 ## 🧪 Verification and Testing
 
-### 1. Unified Automated Test Suite (104 Tests)
+### 1. Unified Automated Test Suite (115 Tests)
 Run the complete automated pytest verification suite covering physics solvers, EKF, UKF, ESN online RLS adaptation, pipeline state serialization, and FPGA RTL bit-exact parity:
 ```bash
 pytest tests/ -v

@@ -213,6 +213,13 @@ Ensure a MongoDB service is active on Port 27017.
 
 ### Step 3: Run the Server
 Launch the Flask simulator server:
+
+**Option A — Unified 1-Click Launch (Runs Simulator & Visualiser together):**
+```bash
+python start_system.py
+```
+
+**Option B — Standalone Simulator Server:**
 ```bash
 python app.py
 ```

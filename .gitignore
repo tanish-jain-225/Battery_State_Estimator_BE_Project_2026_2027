@@ -2,45 +2,68 @@
 # Master .gitignore for Battery State Estimator Project
 # ==============================================================================
 
-# ── Secrets and Environment Configurations ────────────────────────────────────
+# ── Secrets, Credentials & Environment Configurations ─────────────────────────
 .env
+.env.*
 *.env
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*credentials*.json
+*client_secret*.json
 !.env.example
 
-# ── Python Caches & Bytecode ──────────────────────────────────────────────────
+# ── Python Caches, Bytecode & Profiling ───────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
+*.pyd
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.hypothesis/
 .coverage
+.coverage.*
 coverage.xml
+nosetests.xml
 htmlcov/
 *.cover
-.hypothesis/
 
 # ── Virtual Environments ──────────────────────────────────────────────────────
 .venv/
 venv/
 env/
 ENV/
+.env/
 env.bak/
 venv.bak/
+
+# ── Python Packaging & Distribution ───────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # ── Serialized Model Exceptions ───────────────────────────────────────────────
 *.pkl
 !software/visualiser/model_rc.pkl
 
-# ── C / C++ Compiler Outputs & Executables ────────────────────────────────────
-build/
-dist/
-*.egg-info/
+# ── C / C++ Compiler Outputs, Debuggers & Executables ─────────────────────────
 *.o
 *.obj
 *.exe
 *.out
 *.elf
+*.hex
+*.axf
 *.map
 *.bin
 *.d
@@ -51,10 +74,20 @@ dist/
 *.dylib
 *.gch
 *.pch
+*.idb
+*.pdb
+*.ilk
+Debug/
+Release/
 
-# ── Xilinx Vivado & XSim FPGA Build / Simulation Artifacts ────────────────────
+# ── Xilinx Vivado, XSim, Verilator & EDA FPGA Build Artifacts ─────────────────
 .Xil/
 xsim.dir/
+vivado_*/
+obj_dir/
+webtalk/
+webtalk*.log
+webtalk*.xml
 *.jou
 *.pb
 *.str
@@ -76,39 +109,48 @@ xsim.dir/
 *.xdbg
 xsim.log
 vivado.log
+simdir/
+resp.txt
+*.mem.bak
 
-# ── Local Database & Runtime Telemetry Logs ───────────────────────────────────
+# ── Local Databases & Runtime Telemetry Logs ──────────────────────────────────
 *.log
 *.db
 *.sqlite
 *.sqlite3
+dump.rdb
 mongo_data/
 data/db/
 
-# ── Temporary & Scratch Files ─────────────────────────────────────────────────
+# ── Temporary, Scratch & Editor Swap Files ────────────────────────────────────
 tmp/
 temp/
 scratch/
 *.tmp
-resp.txt
-simdir/
+*.swp
+*.swo
+*~
+.#*
 
-# ── IDEs, Code Editors & OS Files ──────────────────────────────────────────────
+# ── IDEs, Code Editors & OS Artifacts ─────────────────────────────────────────
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea/
+*.iml
 .vs/
-*.swp
-*~
+*.sublime-workspace
+*.sublime-project
 .DS_Store
 Thumbs.db
 desktop.ini
 ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
 
-# ── Explicitly Tracked Model & Dataset Rules ──────────────────────────────────
+# ── Explicitly Whitelisted Project Assets (Never Ignored) ─────────────────────
 !hardware/STM_Verifier/esn_classifier_weights.h
 !hardware/STM_Verifier/esn_estimator_weights.h
 !hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv
@@ -120,3 +162,11 @@ ehthumbs.db
 !hardware/FPGA_Verifier/**/*.coe
 !hardware/FPGA_Verifier/**/*.mem
 !hardware/FPGA_Verifier/**/*.json
+!hardware/IP_Block/esn_platform_top.bit
+!hardware/IP_Block/*.mem
+!hardware/IP_Block/*.csv
+!hardware/IP_Block/*.json
+!hardware/IP_Block/*.xml
+!hardware/IP_Block/*.rpt
+!hardware/IP_Block/xsim.ini
+!hardware/IP_Block/xsimSettings.ini

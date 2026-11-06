@@ -1,3 +1,7 @@
+[← Back to Main Repository](../../README.md) · [← Hardware Overview](../hardware.md) · [IP Block Platform](../IP_Block/README.md) · [STM32 C99 Verifier](../STM_Verifier/README.md)
+
+---
+
 # FPGA Hardware Accelerators & Verifier Suite
 
 This directory contains the complete **Verilog HDL RTL hardware accelerator cores**, testbenches, behavioral memory models, Xilinx Vivado Tcl automation scripts, and bit-exact golden reference verification pipelines targeting the **Xilinx Artix-7 FPGA** (`xc7a100tcsg324-1` / Digilent Arty A7-100T).
@@ -217,4 +221,8 @@ vivado -mode batch -source hardware/FPGA_Verifier/ekf/build_ekf_project.tcl
 # For UKF Core:
 vivado -mode batch -source hardware/FPGA_Verifier/ukf/build_ukf_project.tcl
 ```
+
+---
+
+[← Return to Hardware Overview](../hardware.md) · [Proceed to FPGA IP Block Platform →](../IP_Block/README.md) · [Proceed to Review 2 Report →](../../docs/Review_2/Review_2_Progress.md)
 

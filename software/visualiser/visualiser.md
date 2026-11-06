@@ -54,7 +54,7 @@ The visualizer's code and assets are organized as follows:
 | **[battery_chemistry.py](battery_chemistry.py)** | Chemistry definitions and lookup-table curves for NMC, LFP and Lead-Acid profiles. |
 | **[static/](static/)** | Client-side dashboard assets (glassmorphic styling, animation assets, JavaScript visual controllers). |
 | **[templates/](templates/)** | HTML structure for the Flask comparative evaluation interface. |
-| **[../../tests/](../../tests/)** | Comprehensive 107-test automated test suite validating physics, EKF, UKF, RLS online adaptation, Flask APIs, and FPGA bit-exact parity. |
+| **[../../tests/](../../tests/)** | Comprehensive 115-test automated test suite validating physics, EKF, UKF, RLS online adaptation, Flask APIs, and FPGA bit-exact parity. |
 
 ---
 
@@ -433,7 +433,14 @@ python software/visualiser/training/train_rc.py
 This trains the SOC and SOH ESNs on the `datasets/training_ev_battery_dataset_multiclass.csv` EV data and registers weights locally and to MongoDB.
 
 ### Step 5: Launch Web Visualizer
-Start the Flask web visualizer:
+You can launch the visualizer standalone, or run both the simulator and visualizer together:
+
+**Option A — Unified 1-Click Launch (Recommended for full pipeline):**
+```bash
+python start_system.py
+```
+
+**Option B — Standalone Visualizer (Self-contained / offline fallback):**
 ```bash
 python software/visualiser/app.py
 ```

@@ -1,4 +1,8 @@
-# Fixed-point EKF core (ekf_core) — step 1
+[← Back to FPGA Accelerators](../README.md) · [ESN Core Architecture](../esn/README.md) · [UKF Core Architecture](../ukf/README.md) · [IP Block Platform](../../IP_Block/README.md)
+
+---
+
+# Fixed-Point Extended Kalman Filter (EKF) Core (`ekf_core`)
 
 Separate module from the ESN. The verified ESN RTL is not touched.
 
