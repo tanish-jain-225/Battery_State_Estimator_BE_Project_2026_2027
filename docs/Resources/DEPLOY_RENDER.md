@@ -47,6 +47,7 @@ Set these variables in the Render environment settings for each service:
 | `MODEL_PATH` | Visualiser | No | `model_rc.pkl` | Path to the local reservoir weight fallback file. |
 | `TELEMETRY_RESPONSE_LIMIT` | Visualiser | No | `150` | Maximum points returned per visualizer API request. |
 | `GRAPH_SLICE_LIMIT` | Visualiser | No | `120` | Maximum points to display in front-end plots. |
+| `API_KEY` | Both | No | None (open) | Optional shared secret token. If configured on both services, cross-service requests are authenticated via `X-API-Key`. |
 
 ---
 

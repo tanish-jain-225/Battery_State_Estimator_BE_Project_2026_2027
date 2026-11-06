@@ -175,3 +175,64 @@ def test_visualiser_chemistry_register(vis_client):
     assert res.status_code in (200, 201)
     data = res.get_json()
     assert data.get('status') == 'ok' or 'success' in data or 'registered' in str(data).lower()
+
+
+def test_simulator_cors_options_and_keepalive(sim_client):
+    # Test OPTIONS preflight
+    res_opts = sim_client.open('/api/control', method='OPTIONS')
+    assert res_opts.status_code == 200
+    assert res_opts.headers.get('Access-Control-Allow-Origin') == '*'
+    assert 'POST' in res_opts.headers.get('Access-Control-Allow-Methods', '')
+    assert res_opts.headers.get('Connection') == 'keep-alive'
+
+    # Test GET status headers
+    res_get = sim_client.get('/api/status')
+    assert res_get.headers.get('Access-Control-Allow-Origin') == '*'
+    assert res_get.headers.get('Connection') == 'keep-alive'
+
+
+def test_visualiser_cors_options_and_keepalive(vis_client):
+    # Test OPTIONS preflight
+    res_opts = vis_client.open('/api/telemetry', method='OPTIONS')
+    assert res_opts.status_code == 200
+    assert res_opts.headers.get('Access-Control-Allow-Origin') == '*'
+    assert res_opts.headers.get('Connection') == 'keep-alive'
+
+    # Test GET telemetry headers
+    res_get = vis_client.get('/api/telemetry')
+    assert res_get.headers.get('Access-Control-Allow-Origin') == '*'
+    assert res_get.headers.get('Connection') == 'keep-alive'
+    assert 'no-store' in res_get.headers.get('Cache-Control', '')
+
+
+def test_simulator_delta_readings_streaming(sim_client):
+    # Retrieve readings with since and limit
+    res_delta = sim_client.get('/api/readings?since=0.0&limit=10')
+    assert res_delta.status_code == 200
+    data = res_delta.get_json()
+    assert isinstance(data, list)
+    assert len(data) <= 10
+
+
+def test_api_key_auth_enforcement_when_set(monkeypatch):
+    from software.simulator.app import app as auth_app
+    monkeypatch.setenv("API_KEY", "prod_secret_token_123")
+    auth_app.config['TESTING'] = True
+    with auth_app.test_client() as client:
+        # Non-loopback unauthorized request should be blocked
+        res_unauth = client.post(
+            '/api/control',
+            json={'command': 'start'},
+            environ_base={'REMOTE_ADDR': '198.51.100.1'}
+        )
+        assert res_unauth.status_code == 401
+
+        # Authorized request with X-API-Key should succeed
+        res_auth = client.post(
+            '/api/control',
+            json={'command': 'start'},
+            headers={'X-API-Key': 'prod_secret_token_123'},
+            environ_base={'REMOTE_ADDR': '198.51.100.1'}
+        )
+        assert res_auth.status_code == 200
+

@@ -6,8 +6,10 @@ except ImportError:
     def load_dotenv(*_args, **_kwargs):
         return False
 
-# Load environmental variables from .env file in the simulator directory
+# Load environmental variables from root .env and local .env
 base_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(base_dir))
+load_dotenv(os.path.join(root_dir, '.env'))
 load_dotenv(os.path.join(base_dir, '.env'))
 
 class Config:

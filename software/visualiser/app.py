@@ -47,11 +47,19 @@ except Exception:
 
 app = Flask(__name__)
 
+try:
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+except Exception:
+    pass
+
+
 def get_shared_secret():
     secret = os.environ.get("API_KEY", getattr(Config, "API_KEY", None))
     if secret and secret != "change_this_to_a_secure_random_key_in_production":
         return secret
     return None
+
 
 def verify_request_auth():
     # Loopback addresses (localhost) bypass auth checks in dev/local environments
@@ -61,8 +69,7 @@ def verify_request_auth():
 
     secret = get_shared_secret()
     if not secret:
-        is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
-        return not is_prod
+        return True
 
     # Check header
     header_key = request.headers.get("X-API-Key")
@@ -126,7 +133,9 @@ def get_sim_http_session():
 
 
 def make_simulator_request(path, method='GET', data=None, timeout=1.0):
-    url = f"{Config.SIMULATOR_URL}{path}"
+    clean_path = "/" + path.lstrip("/")
+    base_url = Config.SIMULATOR_URL.rstrip("/")
+    url = f"{base_url}{clean_path}"
     headers = {}
 
     secret = get_shared_secret()
@@ -420,7 +429,7 @@ def check_simulator_port(force=False):
 
         # 2. Local fallback check via HTTP only if DB is offline
         try:
-            with make_simulator_request("/api/status", timeout=0.1) as response:
+            with make_simulator_request("/api/status", timeout=1.0) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
                     _simulator_port_online = True
@@ -914,6 +923,12 @@ _lazy_initialized = False
 _lazy_lock = threading.Lock()
 
 @app.before_request
+def handle_options_preflight():
+    if request.method == 'OPTIONS':
+        return app.make_default_options_response()
+
+
+@app.before_request
 def _lazy_init():
     global _lazy_initialized
     if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
@@ -1398,7 +1413,7 @@ def control_simulation():
                 if 'active_cycle' in sim_data:
                     sim_data['cycle_type'] = sim_data.pop('active_cycle')
 
-                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=0.2):
+                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=1.0):
                     pass
             except Exception:
                 pass

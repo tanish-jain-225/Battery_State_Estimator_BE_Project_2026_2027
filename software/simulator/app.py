@@ -24,6 +24,12 @@ log.setLevel(logging.ERROR)
 app = Flask(__name__)
 app_start_time = time.time()
 
+try:
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+except Exception:
+    pass
+
 def get_shared_secret():
     # Use explicit API_KEY environment variable or fallback configuration
     secret = os.environ.get("API_KEY", getattr(Config, "API_KEY", None))
@@ -39,8 +45,7 @@ def verify_request_auth():
 
     secret = get_shared_secret()
     if not secret:
-        is_prod = os.environ.get('RENDER') == 'true' or os.environ.get('SERVERLESS') == '1'
-        return not is_prod
+        return True
 
     # Check header
     header_key = request.headers.get("X-API-Key")
@@ -54,8 +59,11 @@ def verify_request_auth():
 
     return False
 
+
 @app.before_request
-def enforce_api_key():
+def handle_options_and_enforce_auth():
+    if request.method == 'OPTIONS':
+        return app.make_default_options_response()
     if request.path.startswith('/api/') and request.method == 'POST':
         if not verify_request_auth():
             return jsonify({'status': 'error', 'message': 'Unauthorized: Invalid API Key.'}), 401
@@ -453,13 +461,13 @@ def sync_simulation_on_demand():
             exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
             if not exists:
                 db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
-        else:
-            # Make sure we don't duplicate locally either
-            if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
-                local_telemetry_buffer.append(record)
-                limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
-                if len(local_telemetry_buffer) > limit:
-                    local_telemetry_buffer.pop(0)
+
+        # Maintain fast in-memory circular buffer for zero-latency direct streaming
+        if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
+            local_telemetry_buffer.append(record)
+            limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
+            if len(local_telemetry_buffer) > limit:
+                local_telemetry_buffer.pop(0)
 
     # Save final simulator state back to state dict
     update_sim_progress({

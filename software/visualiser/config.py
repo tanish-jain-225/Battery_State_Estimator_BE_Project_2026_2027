@@ -6,8 +6,10 @@ except ImportError:
     def load_dotenv(*_args, **_kwargs):
         return False
 
-# Load environmental variables from .env file explicitly using absolute path
+# Load environmental variables from root .env and local .env explicitly
 base_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(base_dir))
+load_dotenv(os.path.join(root_dir, '.env'))
 load_dotenv(os.path.join(base_dir, '.env'))
 
 class Config:
@@ -26,7 +28,7 @@ class Config:
     # -------------------------------------------------------------------------
     PORT = int(os.environ.get("PORT", 5000))
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1", "t", "yes")
-    SIMULATOR_URL = os.environ.get("SIMULATOR_URL", "http://127.0.0.1:8000")
+    SIMULATOR_URL = os.environ.get("SIMULATOR_URL", "http://127.0.0.1:8000").rstrip("/")
 
     # -------------------------------------------------------------------------
     # File paths
@@ -34,10 +36,30 @@ class Config:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     model_env = os.environ.get("MODEL_PATH", "model_rc.pkl")
-    MODEL_PATH = model_env if os.path.isabs(model_env) else os.path.join(BASE_DIR, model_env)
+    if os.path.isabs(model_env):
+        MODEL_PATH = model_env
+    elif os.path.exists(os.path.join(BASE_DIR, model_env)):
+        MODEL_PATH = os.path.join(BASE_DIR, model_env)
+    elif os.path.exists(os.path.join(root_dir, model_env)):
+        MODEL_PATH = os.path.join(root_dir, model_env)
+    elif model_env.startswith("software/visualiser/") or model_env.startswith("software\\visualiser\\"):
+        rel_to_base = model_env.replace("software/visualiser/", "").replace("software\\visualiser\\", "")
+        MODEL_PATH = os.path.join(BASE_DIR, rel_to_base)
+    else:
+        MODEL_PATH = os.path.join(BASE_DIR, model_env)
 
     csv_env = os.environ.get("CSV_PATH", os.path.join("datasets", "training_ev_battery_dataset_multiclass.csv"))
-    CSV_PATH = csv_env if os.path.isabs(csv_env) else os.path.join(BASE_DIR, csv_env)
+    if os.path.isabs(csv_env):
+        CSV_PATH = csv_env
+    elif os.path.exists(os.path.join(BASE_DIR, csv_env)):
+        CSV_PATH = os.path.join(BASE_DIR, csv_env)
+    elif os.path.exists(os.path.join(root_dir, csv_env)):
+        CSV_PATH = os.path.join(root_dir, csv_env)
+    elif csv_env.startswith("software/visualiser/") or csv_env.startswith("software\\visualiser\\"):
+        rel_to_base = csv_env.replace("software/visualiser/", "").replace("software\\visualiser\\", "")
+        CSV_PATH = os.path.join(BASE_DIR, rel_to_base)
+    else:
+        CSV_PATH = os.path.join(BASE_DIR, csv_env)
 
     # Remote CSV source — set to a public Google Sheets export URL or any direct CSV URL.
     # Format for Google Sheets: https://docs.google.com/spreadsheets/d/{ID}/export?format=csv
