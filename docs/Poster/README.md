@@ -12,8 +12,8 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 **Department:** Automation and Robotics / Instrumentation, VESIT, Mumbai  
 **Academic Year:** 2026–2027  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
-**Project Guide:** Dr. Kadambari Sharma  
-**Coordinator:** Prof. Gopalakrishnan Narayanan  
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Prof. Gopalkrishnan Narayan  
 
 ---
 

@@ -34,13 +34,14 @@ This document serves as an end-to-end slide-by-slide blueprint for your first ca
     2. Akshay Nambiar
     3. Satvik Verma
     4. Tanish Sanghvi
-  * **Guide**: Dr. Kadambari Sharma
-  * **Department**: Automation and Robotics
+  * **Mentor**: Dr. Kadambari Sharma
+  * **Project Guide / Coordinator**: Mr. Gopalkrishnan Narayan
+  * **Department**: Automation and Robotics / Instrumentation
   * **Institute**: Vivekanand Education Society's Institute of Technology (VESIT), Mumbai
 * **Visual Layout & Aesthetics**:
   * Modern dark slate background with cyan and teal accent cards.
-  * Right panel highlighting Guide, Department, and Institute metadata.
-* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Sanjna Patankar, Akshay Nambiar, Satvik Verma, and Tanish Sanghvi from the Department of Automation and Robotics at VESIT. Our project is titled 'ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation', guided by Dr. Kadambari Sharma. Today we will present our first progress review."
+  * Right panel highlighting Mentor, Guide, Department, and Institute metadata.
+* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Sanjna Patankar, Akshay Nambiar, Satvik Verma, and Tanish Sanghvi from the Department of Automation and Robotics at VESIT. Our project is titled 'ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation', mentored by Dr. Kadambari Sharma and guided by Mr. Gopalkrishnan Narayan. Today we will present our progress review."
 
 ---
 

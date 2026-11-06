@@ -78,6 +78,12 @@ Cycle-accurate behavioral simulation waveform in Vivado XSim (`tb_esn_top.v`) de
 
 ---
 
+### Review 2 Defense Session Geotag Photo
+Official geotagged institutional defense session photograph of the project team and faculty at Vivekanand Education Society's Institute of Technology (VESIT, Chembur, Mumbai).
+
+![Review 2 Defense Geotag Photo](../docs/Review_2/Review_2_Geotag_Group_Photo.png)
+
+---
 
 ## Guidelines
 

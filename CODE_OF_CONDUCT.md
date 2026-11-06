@@ -46,9 +46,10 @@ This Code of Conduct applies within all project spaces (GitHub repositories, iss
 
 ## Enforcement & Reporting
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project team and guide:
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project team, mentor, and guide:
 * **Tanish Sanghvi:** [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in)
-* **Dr. Kadambari Sharma (Project Guide):** Department of Automation and Robotics / Instrumentation, VESIT
+* **Dr. Kadambari Sharma (Project Mentor):** Department of Automation and Robotics / Instrumentation, VESIT
+* **Mr. Gopalkrishnan Narayan (Project Guide / Coordinator):** Department of Instrumentation Engineering / Automation and Robotics, VESIT
 
 All complaints will be reviewed and investigated promptly and fairly. All maintainers are obligated to respect the privacy and security of the reporter of any incident.
 

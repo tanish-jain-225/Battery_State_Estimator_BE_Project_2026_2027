@@ -10,7 +10,8 @@
 **Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Chembur, Mumbai  
 **Affiliation:** University of Mumbai  
 **Academic Year:** 2026–2027  
-**Project Guide:** Dr. Kadambari Sharma  
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Reference:** [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md)  
 **Verification Date:** November 2026 (Review 2 Milestone & Commercial IP Release v2.3.0)

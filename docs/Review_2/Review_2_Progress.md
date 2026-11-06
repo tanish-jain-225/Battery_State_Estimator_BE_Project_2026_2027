@@ -5,12 +5,22 @@
 
 **Department:** Department of Automation and Robotics / Instrumentation  
 **Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Chembur, Mumbai  
-**Project Guide:** Dr. Kadambari Sharma  
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:**  
 - Sanjna Patankar  
 - Akshay Nambiar  
 - Satvik Verma  
 - Tanish Sanghvi  
+
+### 📸 Review 2 Project Defense Session (Geotagged)
+
+<p align="center">
+  <img src="Review_2_Geotag_Group_Photo.png" alt="Review 2 Project Defense Geotag Group Photo" width="85%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+
+> **Defense Milestone Verification (VESIT Chembur, 05/11/2026 & 06/11/2026):**  
+> Official institutional defense session conducted before Project Mentor Dr. Kadambari Sharma and Project Guide / Coordinator Mr. Gopalkrishnan Narayan at the Department of Automation & Robotics / Instrumentation. All Phase 2 deliverables—including the online RLS adaptive ESN, C99 embedded firmware, and 200/200 bit-exact FPGA RTL parity on Artix-7—were demonstrated live.  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
 **Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 115 Tests in v2.3.0, 200 / 200 FPGA Parity Stages)**

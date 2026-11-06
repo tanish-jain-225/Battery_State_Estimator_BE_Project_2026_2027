@@ -43,9 +43,10 @@ Only the latest active major releases receive security updates and bug fixes:
 If you discover a security vulnerability, memory safety defect, or credential exposure within this repository:
 
 1. **Do not create a public GitHub issue.**
-2. Send an email to the lead student maintainer and project guide:
+2. Send an email to the lead student maintainer, project mentor, and project guide:
    - **Tanish Sanghvi:** [2023.tanish.sanghvi@ves.ac.in](mailto:2023.tanish.sanghvi@ves.ac.in)
-   - **Dr. Kadambari Sharma:** Project Guide, VESIT ([VESIT Department Portal](https://vesit.ves.ac.in))
+   - **Dr. Kadambari Sharma:** Project Mentor, VESIT ([VESIT Department Portal](https://vesit.ves.ac.in))
+   - **Mr. Gopalkrishnan Narayan:** Project Guide / Coordinator, VESIT
 3. Include detailed steps to reproduce the issue, sample payload/telemetry, and affected operating system/hardware.
 4. The maintainers will respond within 48 hours to acknowledge receipt and coordinate a patch.
 

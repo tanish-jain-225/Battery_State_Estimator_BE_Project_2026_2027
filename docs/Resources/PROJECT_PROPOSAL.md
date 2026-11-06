@@ -12,7 +12,8 @@
 
 * **Project Title:** Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting
 * **Domain:** Cyber-Physical Systems, Embedded Systems, Machine Learning & Battery Management Systems (BMS)
-* **Project Guide:** Dr. Kadambari Sharma
+* **Project Mentor:** Dr. Kadambari Sharma  
+* **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan
 
 ---
 

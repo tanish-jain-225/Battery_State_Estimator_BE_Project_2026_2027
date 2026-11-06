@@ -50,12 +50,21 @@
 
 ---
 
-## Guide & Department Details
+## Mentor, Guide & Department Details
 
-**Project Guide:** Dr. Kadambari Sharma  
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan (Assistant Professor, Instrumentation Dept)  
 **Department:** Department of Automation and Robotics / Instrumentation  
 **Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Hashu Advani Memorial Complex, Chembur, Mumbai - 400074  
-**Project Coordinator / Department Notice:** Mr. Gopalakrishnan Narayanan (Assistant Professor, Instrumentation Dept)  
+
+### 📸 Review 2 Project Defense & Institutional Evaluation (Geotagged)
+
+<p align="center">
+  <img src="docs/Review_2/Review_2_Geotag_Group_Photo.png" alt="Review 2 Project Defense Geotag Group Photo" width="85%" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</p>
+
+> **Institutional Milestone Note (VESIT, Chembur, Mumbai):**  
+> Captured during the official **Review 2 Phase Evaluation** on **05/11/2026 & 06/11/2026** at the Department of Automation & Robotics / Instrumentation, Vivekanand Education Society's Institute of Technology. The presentation demonstrated the live cyber-physical 2-RC battery simulator, online RLS ESN adaptation, embedded C99 firmware execution, and 200/200 bit-exact FPGA parity verification on the Xilinx Artix-7 platform before Project Mentor **Dr. Kadambari Sharma** and Project Guide / Coordinator **Mr. Gopalkrishnan Narayan**.  
 
 ---
 
@@ -327,7 +336,7 @@ The system architecture feeds 2-RC battery telemetry into a multi-estimator pipe
 
 ## Department BE Project Timeline & Milestones
 
-As per department notice from Mr. Gopalakrishnan Narayanan (Instrumentation Department), the official timeline for BE Project 2026-2027 is:
+As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Department), the official timeline for BE Project 2026-2027 is:
 
 | Milestone / Review Event | Scheduled Date | Mode | Status |
 | :--- | :---: | :---: | :---: |

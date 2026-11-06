@@ -4,6 +4,12 @@
 
 ---
 
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Prof. Gopalkrishnan Narayan  
+**Department:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai  
+
+---
+
 ## 🎓 Overview & Evaluation Policy
 
 As part of the BE Capstone project evaluation criteria, **20 Marks** are strictly allocated to peer-reviewed publication deliverables:

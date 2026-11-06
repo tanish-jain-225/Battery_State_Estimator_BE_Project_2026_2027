@@ -4,7 +4,8 @@
 
 **Department:** Department of Automation and Robotics / Instrumentation  
 **Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Mumbai  
-**Guide:** Dr. Kadambari Sharma  
+**Project Mentor:** Dr. Kadambari Sharma  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Path:** [`docs/Review_1/Review_1_Progress.md`](Review_1_Progress.md)  
 

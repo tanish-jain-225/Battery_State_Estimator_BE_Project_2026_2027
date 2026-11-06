@@ -15,21 +15,21 @@ This project is conceived, developed, and maintained as an undergraduate Bachelo
 
 ---
 
-## 🎓 Project Guidance & Department Coordination
+## 🎓 Project Mentorship & Guidance
 
-### Project Guide
+### Project Mentor
 * **Dr. Kadambari Sharma**
-* **Designation:** Assistant Professor / Project Guide
+* **Designation:** Assistant Professor / Project Mentor
 * **Department:** Department of Automation and Robotics / Instrumentation Engineering
 * **Institution:** Vivekanand Education Society's Institute of Technology (VESIT)
 * **Role:** Academic mentorship, experimental validation review, thesis evaluation, and journal manuscript advising.
 
-### Project Coordinator / Department Notice
-* **Prof. Gopalakrishnan Narayanan**
-* **Designation:** Assistant Professor & BE Project Coordinator
-* **Department:** Department of Instrumentation Engineering
+### Project Guide / Coordinator
+* **Prof. Gopalkrishnan Narayan**
+* **Designation:** Assistant Professor, Project Guide & BE Project Coordinator
+* **Department:** Department of Instrumentation Engineering / Automation and Robotics
 * **Institution:** Vivekanand Education Society's Institute of Technology (VESIT)
-* **Role:** Milestone review coordination, academic defense evaluation, and departmental compliance.
+* **Role:** Project guidance, departmental coordination, milestone review governance, and academic compliance.
 
 ---
 

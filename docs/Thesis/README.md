@@ -14,8 +14,8 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 * **Affiliation:** University of Mumbai
 * **Academic Year:** 2026–2027
 * **Investigators:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
-* **Project Guide:** Dr. Kadambari Sharma
-* **Project Coordinator:** Prof. Gopalakrishnan Narayanan
+* **Project Mentor:** Dr. Kadambari Sharma
+* **Project Guide / Coordinator:** Prof. Gopalkrishnan Narayan
 
 ---
 
