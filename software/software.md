@@ -44,7 +44,7 @@ software/
 │   ├── templates/                   # HTML view layouts
 │   └── training/                    # ESN training scripts
 │       └── train_rc.py              # Script to build software weights
-└── [Root tests/](../tests/)          # Unified pytest test suite (115 tests)
+└── [Root tests/](../tests/)          # Unified pytest test suite (119 tests)
     ├── conftest.py                  # Pytest fixtures and mock MongoDB configuration
     ├── test_battery_chemistry.py    # Chemistry loading & OCV curve monotonicity
     ├── test_battery_simulator.py    # 2-RC transient solver, thermal, aging & faults
@@ -160,7 +160,7 @@ chmod +x start_system.sh && ./start_system.sh
 
 ## 🧪 Verification and Testing
 
-### 1. Unified Automated Test Suite (115 Tests)
+### 1. Unified Automated Test Suite (119 Tests)
 Run the complete automated pytest verification suite covering physics solvers, EKF, UKF, ESN online RLS adaptation, pipeline state serialization, and FPGA RTL bit-exact parity:
 ```bash
 pytest tests/ -v

@@ -10,7 +10,7 @@ All contributors are expected to uphold rigorous scientific integrity, clean cod
 
 ### Core Architecture Guidelines
 * **Physics Simulation:** Strictly preserve the 2-RC Equivalent Circuit Model (ECM) physics and Arrhenius equations defined in [`software/shared/battery_simulator.py`](software/shared/battery_simulator.py).
-* **Observer Pipelines:** Any modification to Kalman filters (EKF/UKF) or Echo State Networks (ESN) must preserve parameter decoupling and run against the 115-test regression suite.
+* **Observer Pipelines:** Any modification to Kalman filters (EKF/UKF) or Echo State Networks (ESN) must preserve parameter decoupling and run against the 119-test regression suite.
 * **Embedded C Firmware:** Maintain C99 compatibility, Q15 fixed-point arithmetic, and Compressed Sparse Row (CSR) memory bounds in [`hardware/STM_Verifier/`](hardware/STM_Verifier/).
 * **Verilog RTL:** Keep the 5-stage pipeline in [`hardware/FPGA_Verifier/`](hardware/FPGA_Verifier/) bit-exact with [`golden_model.py`](hardware/FPGA_Verifier/golden_model.py).
 
@@ -41,7 +41,7 @@ Before committing any changes, run the master end-to-end validation runner:
   ./run_all_validation.sh
   ```
 
-All 115 tests across pytest, model training, C99 compilation, and FPGA RTL bit-exact matching must pass with **0 errors**.
+All 119 tests across pytest, model training, C99 compilation, and FPGA RTL bit-exact matching must pass with **0 errors**.
 
 ---
 

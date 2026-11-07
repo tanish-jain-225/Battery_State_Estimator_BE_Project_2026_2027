@@ -140,8 +140,8 @@ def load_sim_state(force_db_read=False):
     global _last_state_load_time
     now = time.time()
     sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
-    # Cache state locally and query remote DB Atlas once every 2 seconds unless forced to minimize network roundtrips
-    if (force_db_read or (now - _last_state_load_time >= max(2.0, sync_interval))) and _ensure_db():
+    # Synchronize state with MongoDB on every sync_interval (1.0s default) for zero-latency lockstep
+    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and _ensure_db():
         try:
             doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
             _last_state_load_time = now
@@ -312,7 +312,8 @@ def generator_loop():
                     'prev_current': -I_meas,
                     'sim_running': True
                 })
-                if (now_wall - last_db_heartbeat >= 3.0) or (int(simulator.time) <= 1):
+                # Update configuration document with live heartbeat on every step delay for lockstep MongoDB sync
+                if (now_wall - last_db_heartbeat >= step_delay) or (int(simulator.time) <= 1):
                     last_db_heartbeat = now_wall
                     update_sim_progress({
                         'time': simulator.time,

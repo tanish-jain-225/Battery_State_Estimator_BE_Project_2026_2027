@@ -5,8 +5,12 @@
 ---
 
 **Project Mentor:** Dr. Kadambari Sharma  
-**Project Guide / Coordinator:** Prof. Gopalkrishnan Narayan  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Department:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai  
+
+> [!IMPORTANT]
+> **Active Deliverables Status (2 of the 4 Pending Deliverables):**  
+> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing (9.3 / 10)**, [`Review_Paper.pdf`](Review_Paper.pdf) and [`Research_Paper.pdf`](Research_Paper.pdf) currently exist as structured PDF preprints alongside their full companion drafts ([`reference/paper.md`](../../reference/paper.md) and [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)). Once finalized in camera-ready IEEE template format, they will elevate the repository to its **10.0 / 10** turnkey score.  
 
 ---
 

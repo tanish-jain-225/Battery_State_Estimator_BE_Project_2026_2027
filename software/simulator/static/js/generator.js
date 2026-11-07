@@ -207,10 +207,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Page Visibility API: Adaptive throttling when tab is in background to preserve system resources
+    let isTabVisible = !document.hidden;
+    document.addEventListener('visibilitychange', () => {
+        isTabVisible = !document.hidden;
+        if (isTabVisible) {
+            updateStatus();
+        }
+    });
+
     // Start status polling recursive loop (prevents overlapping fetch stacking)
     async function pollLoop() {
-        await updateStatus();
-        setTimeout(pollLoop, 1000);
+        if (isTabVisible) {
+            await updateStatus();
+            setTimeout(pollLoop, 1000);
+        } else {
+            setTimeout(pollLoop, 3000);
+        }
     }
     pollLoop();
 });

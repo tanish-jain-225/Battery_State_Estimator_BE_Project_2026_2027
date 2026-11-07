@@ -25,10 +25,14 @@ docs/
 ├── Paper_Proof/                   # 20 Marks Evaluation Submission/Acceptance Records
 │   └── README.md                  # Proof logging registry & mark criteria checklist
 ├── Review_1/                      # Review 1 Milestone Documentation
-│   ├── Review_1_PPT.pdf           # Milestone 1 Presentation Slides
+│   ├── README.md                  # Milestone narrative, screenshot, evaluator feedback & fixes
+│   ├── Review_1_PPT.pdf           # Milestone 1 Presentation Slides (Customized 16:9)
+│   ├── Review_1_Presentation_Title.png # Presentation slide defense screenshot
 │   └── Review_1_Progress.md       # Scope, initial 2-RC model, and preliminary results
 ├── Review_2/                      # Review 2 Milestone Documentation
-│   ├── Review_2_PPT.pdf           # Milestone 2 Presentation Slides (16:9 Widescreen)
+│   ├── README.md                  # Milestone narrative, geotag screenshot, evaluator feedback & fixes
+│   ├── Review_2_PPT.pdf           # Milestone 2 Presentation Slides (5-Act Widescreen)
+│   ├── Review_2_Geotag_Group_Photo.png # Institutional defense geotagged group photo
 │   ├── Review_2_Progress.md       # End-to-end milestone report (10/10 Verification)
 │   └── Outcomes/                  # Validated deliverables and evaluation reports
 │       ├── FPGA-Based-Echo-State-Network-...pdf
@@ -58,9 +62,9 @@ docs/
 
 ### 2. 🚀 The Developmental Milestones Stream
 *Chronological evolution from proposal through defense:*
-1. **Project Proposal (Aug 2026):** [`docs/Resources/PROJECT_PROPOSAL.md`](Resources/PROJECT_PROPOSAL.md) — Initial project problem statement, objectives, and departmental submission.
-2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/Review_1_Progress.md`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic.
-3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/Review_2_Progress.md`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation.
+1. **Project Proposal (Aug 2026):** [`docs/Resources/PROJECT_PROPOSAL.md`](Resources/PROJECT_PROPOSAL.md) — Initial problem scoping, ESN feasibility formulation, and departmental submission.
+2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/README.md`](Review_1/README.md) · [`Progress Report`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic. *Feedback Addressed: Added ESN Core Architecture Diagram & Customized 16:9 PPT.*
+3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
 4. **Hardware Acceleration & Commercial IP Block (v2.3.0):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface.
 5. **Final B.E. Capstone Dissertation (v2.3.1):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis.
 
@@ -72,7 +76,7 @@ docs/
 4. **Hardware Subsystem Architecture:** [`hardware/hardware.md`](../hardware/hardware.md) — Comprehensive guide to embedded C99 firmware and FPGA Verilog accelerators.
 5. **STM32 Embedded C99 Verifier:** [`hardware/STM_Verifier/README.md`](../hardware/STM_Verifier/README.md) — CSR SpMV 6.7× speedup, Q12/Q15 integer arithmetic, and LUT Tanh.
 6. **FPGA RTL Verifier & Subsystems:** [`hardware/FPGA_Verifier/README.md`](../hardware/FPGA_Verifier/README.md) — Bit-exact Verilog RTL for 100-neuron ESN, fixed-point EKF, and fixed-point UKF.
-7. **Automated Regression Suite (115 Tests):** [`tests/README.md`](../tests/README.md) — 15 specialized test modules with 94.49% coverage across physics, estimators, and hardware.
+7. **Automated Regression Suite (119 Tests):** [`tests/README.md`](../tests/README.md) — 15 specialized test modules with 94.49% coverage across physics, estimators, and hardware.
 
 ### 4. 🎓 The Defense & Academic Marks Stream
 *Exhibition, presentation, and university evaluation criteria:*

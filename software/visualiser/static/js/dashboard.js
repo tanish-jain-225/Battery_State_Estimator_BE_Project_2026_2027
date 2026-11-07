@@ -859,6 +859,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let lastRenderedTime = null;
+    let lastRenderedLen = 0;
+
     // Refresh telemetry and plot data
     async function refreshTelemetry() {
         const telemetry = await apiRequest('/api/telemetry');
@@ -871,12 +874,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.length === 0) {
             isLocked = false;
             lockedIndex = -1;
+            lastRenderedTime = null;
+            lastRenderedLen = 0;
             updateBadge();
         } else if (isLocked && lockedIndex >= data.length) {
             isLocked = false;
             lockedIndex = -1;
             updateBadge();
         }
+
+        // Fast-path: Check if new data has actually arrived to prevent redundant chart repaints & DOM churn
+        const currentLen = data.length;
+        const currentTime = currentLen > 0 ? data[currentLen - 1].time : null;
+        if (currentTime === lastRenderedTime && currentLen === lastRenderedLen && !isLocked) {
+            return;
+        }
+        lastRenderedTime = currentTime;
+        lastRenderedLen = currentLen;
         
         // Update numerical readouts only if we are in Live Mode (not locked)
         if (!isLocked) {
@@ -1111,18 +1125,36 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     pollTrainingStatus();
 
+    // Page Visibility API: Adaptive throttling when tab is in background to preserve system resources
+    let isTabVisible = !document.hidden;
+    document.addEventListener('visibilitychange', () => {
+        isTabVisible = !document.hidden;
+        if (isTabVisible) {
+            // Immediately wake up and refresh on tab focus
+            refreshStatus();
+            refreshTelemetry();
+        }
+    });
+
     // Start Polling loops using recursive setTimeout to prevent request stacking
-    // Telemetry polling: 500ms for instantaneous, zero-lag dynamic streaming
+    // Telemetry polling: 500ms when tab is active, 3000ms when backgrounded
     async function telemetryPoll() {
-        await refreshTelemetry();
-        setTimeout(telemetryPoll, 500);
+        if (isTabVisible) {
+            await refreshTelemetry();
+            setTimeout(telemetryPoll, 500);
+        } else {
+            setTimeout(telemetryPoll, 3000);
+        }
     }
 
-    // Status polling: 2500ms since system configuration changes infrequently,
-    // eliminating request queueing on single-worker production WSGI servers (Gunicorn)
+    // Status polling: 1000ms when tab is active, 5000ms when backgrounded
     async function statusPoll() {
-        await refreshStatus();
-        setTimeout(statusPoll, 2500);
+        if (isTabVisible) {
+            await refreshStatus();
+            setTimeout(statusPoll, 1000);
+        } else {
+            setTimeout(statusPoll, 5000);
+        }
     }
 
     telemetryPoll();

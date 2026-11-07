@@ -17,7 +17,7 @@ flowchart TD
     subgraph Phase 1: Environment & Setup
         Setup_1["Install requirements.txt"]
         Setup_2["Train ESN models (Software/Hardware)"]
-        Setup_3["Run automated tests (pytest: 115 tests)"]
+        Setup_3["Run automated tests (pytest: 119 tests)"]
         Setup_4["Master Validation (run_all_validation.bat)"]
         Setup_1 --> Setup_2
         Setup_2 --> Setup_3

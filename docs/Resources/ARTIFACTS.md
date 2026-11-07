@@ -68,7 +68,7 @@ The table below catalogs all model parameters, datasets and generated headers tr
 | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | PDF | ~500 KB | 29-page comprehensive review paper draft on Neuromorphic BMS & Reservoir Computing. | Compiled academic manuscript. | Review 2 deliverable (Review 3 submission scope). |
 | [`docs/Review_2/Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf) | PDF | ~570 KB | Official 16:9 widescreen presentation slide deck for Review 2 defense. | Standalone 16:9 widescreen presentation deck. | Formal Review 2 defense slide deck. |
 | [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) | PDF | Variable | Official B.E. Capstone Dissertation Report adhering to University of Mumbai guidelines. | Authored academic dissertation report. | Capstone degree defense deliverable. |
-| [`CHANGELOG.md`](../../CHANGELOG.md) | MD | ~4 KB | Formal versioning history and release notes log (v2.3.0 active today, v2.3.1 planned tomorrow). | Maintained in repository root. | Updated upon every milestone/tag release. |
+| [`CHANGELOG.md`](../../CHANGELOG.md) | MD | ~4 KB | Formal versioning history and release notes log (v2.4.0 active today, v2.4.1 planned turnkey). | Maintained in repository root. | Updated upon every milestone/tag release. |
 
 ---
 

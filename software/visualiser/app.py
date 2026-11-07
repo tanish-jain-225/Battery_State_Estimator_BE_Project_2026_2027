@@ -459,8 +459,8 @@ def load_sim_state(force_db_read=False):
     global _last_state_load_time
     now = time.time()
     sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
-    # Cache state locally and query remote DB Atlas once every 2 seconds unless forced to minimize network roundtrips
-    if (force_db_read or (now - _last_state_load_time >= max(2.0, sync_interval))) and check_db_connected():
+    # Synchronize state with MongoDB on every sync_interval (1.0s default) for zero-latency lockstep
+    if (force_db_read or (now - _last_state_load_time >= sync_interval)) and check_db_connected():
         try:
             state = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
             _last_state_load_time = now
@@ -1282,7 +1282,7 @@ def get_status():
             'accelerated_aging': accelerated_aging,
             'model_loaded': model_loaded,
             'mongodb_connected': check_db_connected(),
-            'battery_time': state.get('time', 0.0),
+            'battery_time': (port_data.get('time', state.get('time', 0.0)) if (port_online and port_data and 'time' in port_data) else state.get('time', 0.0)),
             'chemistry': chemistry,
             'ekf_mismatch': 1.0,
             'quantize_mode': 'float32',
@@ -1577,9 +1577,10 @@ def get_telemetry():
                     # Single fast indexed query: time > prev_time
                     cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
                     new_readings = list(cursor)
-                    # If empty, check if simulation was reset (in-memory zero-latency check)
+                    # If empty, check if simulation was reset with zero latency
                     if not new_readings and already_cached > 0:
-                        sim_time = state.get('time', 0.0)
+                        fresh_state = load_sim_state(force_db_read=True)
+                        sim_time = fresh_state.get('time', 0.0)
                         if sim_time < prev_time:
                             cache.update({
                                 'key':       None,
@@ -1589,6 +1590,26 @@ def get_telemetry():
                             })
                             already_cached = 0
                             prev_time = None
+                        else:
+                            # Instant B-tree index check if readings collection was purged or reset
+                            latest_doc = db[Config.MONGODB_READINGS_COLLECTION].find_one({}, {'time': 1, '_id': 0}, sort=[('time', -1)])
+                            if latest_doc is None or latest_doc.get('time', 0.0) < prev_time:
+                                cache.update({
+                                    'key':       None,
+                                    'pipeline':  None,
+                                    'processed': [],
+                                    'n_cached':  0
+                                })
+                                already_cached = 0
+                                prev_time = None
+
+                        # If reset detected, pull the fresh initial window immediately on this exact cycle
+                        if prev_time is None:
+                            limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
+                            cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
+                            new_readings = list(cursor)
+                            new_readings.reverse()
+                            already_cached = 0
                 else:
                     # Cap initial fetch to the most recent window (60 records) for instantaneous UI load
                     limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)

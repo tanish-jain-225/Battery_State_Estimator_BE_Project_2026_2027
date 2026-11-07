@@ -309,7 +309,7 @@ Robustness and estimation accuracy limits are verified using automated unit suit
 
 Run the test suite locally using:
 ```bash
-# Automated 115-test regression suite
+# Automated 119-test regression suite
 pytest tests/ -v
 
 # Master one-click end-to-end validation (Windows)
