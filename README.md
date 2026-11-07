@@ -26,6 +26,9 @@
   <a href="docs/Publications/Research_Paper.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Research%20Paper-IEEE%20Target-2563EB?style=for-the-badge&logo=ieee" alt="Research Paper PDF" />
   </a>
+  <a href="docs/Thesis/Final_Thesis.pdf" target="_blank">
+    <img src="https://img.shields.io/badge/Thesis-Project%20Thesis%20Shell-7C3AED?style=for-the-badge&logo=adobeacrobatreader" alt="Project Thesis Shell PDF" />
+  </a>
   <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
   </a>
