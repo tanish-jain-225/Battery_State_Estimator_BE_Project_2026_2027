@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Academic Research Paper**: Finalizing [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) camera-ready IEEE template.
 - **B.E. Capstone Final Thesis**: Finalizing [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) 100+ page University of Mumbai dissertation.
 - **Turnkey Completeness**: Elevates repository to 10.0 / 10 with zero remaining shells.
+- **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---
 

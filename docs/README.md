@@ -45,6 +45,7 @@ docs/
 │   ├── PRESENTATION.md            # Defense slide talking points & speaker notes
 │   ├── PROJECT_PROPOSAL.md        # Official BE project proposal & methodology
 │   ├── SYSTEM_SPECIFICATION.md    # Circuit parameters, sensor noise & observer math
+│   ├── TRANSITION_PLAN_V2.4.1.md  # Official runbook for v2.4.0 -> v2.4.1 turnkey transition
 │   └── WEB_RESEARCH.md            # Automotive BMS landscape & ISO 26262 audit
 └── literature_survey.md           # Detailed literature survey & academic taxonomy
 ```
