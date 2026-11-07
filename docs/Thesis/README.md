@@ -71,7 +71,7 @@ The final dissertation follows standard University of Mumbai academic specificat
 
 ## 🔁 How to Update / Finalize Deliverables
 
-To replace this placeholder shell with the final camera-ready dissertation exported from LaTeX or Word:
+To update this deliverable shell with the final camera-ready dissertation exported from LaTeX or Word:
 1. Compile your complete dissertation into a standard PDF (PDF/A compliant).
 2. Save or overwrite [`docs/Thesis/Final_Thesis.pdf`](Final_Thesis.pdf).
 3. Commit and push the final document to the repository.

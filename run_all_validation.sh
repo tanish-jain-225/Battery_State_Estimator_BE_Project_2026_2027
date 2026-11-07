@@ -38,9 +38,9 @@ fi
 echo ""
 
 # ── STEP 2: Run Full Pytest Suite ──────────────────────────────────────────
-echo "[2/8] Running Complete Pytest Suite (115 Unit/Integration Tests)..."
+echo "[2/8] Running Complete Pytest Suite (119 Unit/Integration Tests)..."
 if $PYTHON_BIN -m pytest "$ROOT_DIR/tests"; then
-    echo "[SUCCESS] Full Pytest suite executed and all 115 tests passed."
+    echo "[SUCCESS] Full Pytest suite executed and all 119 tests passed."
 else
     echo "[ERROR] Pytest suite execution failed."
     FAILURES=$((FAILURES+1))
