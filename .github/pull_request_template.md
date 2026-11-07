@@ -18,7 +18,7 @@
 ## Checklist
 
 - [ ] My code adheres to the project's coding standards and style guidelines (`.editorconfig`, `ruff`).
-- [ ] I have executed the local automated test suite (`pytest tests/`) and all 115 tests pass.
+- [ ] I have executed the local automated test suite (`pytest tests/`) and all 119 tests pass.
 - [ ] I have run the relative markdown link checker (`0 broken links`).
 - [ ] I have added / updated tests that prove my fix is effective or that my feature works.
 - [ ] New and existing unit tests pass locally with my changes.
