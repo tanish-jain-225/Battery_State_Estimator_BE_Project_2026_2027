@@ -19,7 +19,7 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 
 > [!IMPORTANT]
 > **Active Deliverables Status (Deliverable 4 of the 4 Pending Deliverables):**  
-> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing (9.3 / 10)**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Once the compiled University of Mumbai 100+ page dissertation PDF is dropped in, it will complete the final academic deliverable to achieve the **10.0 / 10** turnkey score.
+> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Once the compiled University of Mumbai 100+ page dissertation PDF is dropped in, it will complete the final academic deliverable to achieve the full turnkey capstone release.
 
 ---
 

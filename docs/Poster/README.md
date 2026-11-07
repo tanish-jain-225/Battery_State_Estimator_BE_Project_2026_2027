@@ -17,7 +17,7 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 
 > [!IMPORTANT]
 > **Active Deliverables Status (Deliverable 1 of the 4 Pending Deliverables):**  
-> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing (9.3 / 10)**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Once the final print-ready PDF is compiled and dropped in, it will complete Deliverable 1/4 toward the **10.0 / 10** turnkey score.  
+> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Once the final print-ready PDF is compiled and dropped in, it will complete Deliverable 1/4 toward the final turnkey capstone release.  
 
 ---
 

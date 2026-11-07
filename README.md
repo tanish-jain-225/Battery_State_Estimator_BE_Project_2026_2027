@@ -258,13 +258,13 @@ Navigate the repository according to your area of interest:
 
 ---
 
-## 📑 Project Milestones, Quality Ratings & Deliverables Map
+## 📑 Project Milestones & Deliverables Roadmap
 
-> ### 🌟 Master Repository Quality Rating & Ground Truth Status
-> * **Current State A (Today / Before the 4 Deliverables):** **`9.3 / 10`**  
->   *(All software, 2-RC physics, multi-chemistry simulator, visualiser dashboard, C99 firmware, Artix-7 synthesizable Verilog RTL, AXI4-Lite IP block with 3.7 MB bitstream, and 119 automated pytest tests are 100% complete, verified, and passing. The pure repository commercial asset value is **₹52,50,000 INR**).*
-> * **Final State B (Turnkey / After the 4 Deliverables):** **`10.0 / 10`**  
->   *(Achieved upon compilation and drop-in of the 4 designated academic publication and thesis deliverables into their respective directories. The pure repository asset value increases to **₹66,00,000 INR**).*
+> ### 🌟 Master Repository Delivery Status & Ground Truth Readiness
+> * **Current State A (Today / Before the 4 Deliverables):** **`Production Core Verified`**  
+>   *(All software, 2-RC physics, multi-chemistry simulator, visualiser dashboard, C99 firmware, Artix-7 synthesizable Verilog RTL, AXI4-Lite IP block with 3.7 MB bitstream, and 119 automated pytest tests are 100% complete, verified, and passing).*
+> * **Final State B (Turnkey / After the 4 Deliverables):** **`Complete Turnkey Capstone`**  
+>   *(Achieved upon compilation and drop-in of the 4 designated academic publication and thesis deliverables into their respective directories).*
 >
 > #### 📌 What is Left to be Updated (The Only 4 Pending Items Across the Entire Repo):
 > 1. [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) — High-resolution print-ready A1 exhibition poster (companion markdown: [`docs/Poster/README.md`](docs/Poster/README.md)).
@@ -274,17 +274,17 @@ Navigate the repository according to your area of interest:
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
-| **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / 10/10 Ready** |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test comprehensive suite, 32-cycle NASA outcomes | **Completed / 10/10 Ready** |
-| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/register_map.md) | IEEE 1685 IP-XACT component, concurrent Tri-Observer FPGA platform, 3.7 MB bitstream, UART HIL | **Completed / 10/10 Ready** |
+| **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test comprehensive suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
+| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/register_map.md) | IEEE 1685 IP-XACT component, concurrent Tri-Observer FPGA platform, 3.7 MB bitstream, UART HIL | **Completed / Fully Verified** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Final Drop (Active Deliverable 1/4)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 2/4)** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 3/4)** |
 | **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Final Drop (Active Deliverable 4/4)** |
-| **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **10/10 Ready (Registry Active)** |
-| **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **10/10 Ready (Master Index)** |
+| **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Fully Verified (Registry Active)** |
+| **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.4.0 Active Today (v2.4.1 Final Turnkey)** |
-| **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **10/10 Ready (Reference)** |
+| **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **10/10 Ready (Reference)** |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | **10/10 Ready (Reference)** |
 

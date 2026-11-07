@@ -2,7 +2,7 @@
 
 # Transition Plan: v2.4.0 (Active Today) → v2.4.1 (Turnkey Capstone)
 
-This document serves as the official transition plan and execution runbook to advance the **Battery State Estimator** repository from its current **v2.4.0** state (Rating: **9.3 / 10**) to its final, turnkey **v2.4.1** capstone release (Rating: **10.0 / 10**).
+This document serves as the official transition plan and execution runbook to advance the **Battery State Estimator** repository from its current **v2.4.0** state (Production Core Verified) to its final, turnkey **v2.4.1** capstone release.
 
 ---
 
@@ -12,10 +12,8 @@ This document serves as the official transition plan and execution runbook to ad
 flowchart LR
     subgraph State_A["<b>State A: Current Active Release (v2.4.0)</b>"]
         direction TB
-        A1["<b>Rating: 9.3 / 10</b>"]
-        A2["Pure Asset Buyout: <b>₹52,50,000 INR</b>"]
-        A3["Replacement Cost: <b>₹89,50,000 INR</b>"]
-        A4["• 119 Passing Tests (100% Pass)<br/>• Decoupled MongoDB 1.0s Intermediate<br/>• Anti-Freeze Browser UX (0.0% CPU)<br/>• Digilent Arty A7-100T Bitstream (3.7 MB)<br/>• Synthesizable AXI4-Lite ESN IP Block<br/>• Full Indian E-Mobility Research Synthesis"]
+        A1["<b>Status: Production Core Verified</b>"]
+        A2["• 119 Passing Tests (100% Pass)<br/>• Decoupled MongoDB 1.0s Intermediate<br/>• Anti-Freeze Browser UX (0.0% CPU)<br/>• Digilent Arty A7-100T Bitstream (3.7 MB)<br/>• Synthesizable AXI4-Lite ESN IP Block<br/>• Full Indian E-Mobility Research Synthesis"]
     end
 
     subgraph Transition["<b>The 4 Deliverables Drop-in</b>"]
@@ -28,10 +26,8 @@ flowchart LR
 
     subgraph State_B["<b>State B: Final Turnkey Release (v2.4.1)</b>"]
         direction TB
-        B1["<b>Rating: 10.0 / 10</b>"]
-        B2["Pure Asset Buyout: <b>₹66,00,000 INR</b>"]
-        B3["Replacement Cost: <b>₹1,08,50,000 INR</b>"]
-        B4["• Zero Shell Files Remaining<br/>• 100% Turnkey Academic Portfolio<br/>• Camera-Ready IEEE Research Paper<br/>• 29-Page Neuromorphic BMS Survey<br/>• 100+ Page B.E. Capstone Thesis<br/>• A1 High-Res Print-Ready Poster"]
+        B1["<b>Status: Complete Turnkey Capstone</b>"]
+        B2["• Zero Shell Files Remaining<br/>• 100% Turnkey Academic Portfolio<br/>• Camera-Ready IEEE Research Paper<br/>• 29-Page Neuromorphic BMS Survey<br/>• 100+ Page B.E. Capstone Thesis<br/>• A1 High-Res Print-Ready Poster"]
     end
 
     State_A --> Transition --> State_B
@@ -130,19 +126,20 @@ Commit all changes and tag the release as `v2.4.1`:
 ```bash
 git add docs/Poster/ docs/Publications/ docs/Thesis/ pyproject.toml CITATION.cff README.md CHANGELOG.md SECURITY.md docs/Resources/
 git commit -m "feat(release): bump version to v2.4.1 - complete turnkey capstone deliverables"
-git tag -a v2.4.1 -m "Release v2.4.1: Turnkey Capstone Release - All 4 Academic Deliverables Integrated (10.0/10)"
+git tag -a v2.4.1 -m "Release v2.4.1: Turnkey Capstone Release - All 4 Academic Deliverables Integrated"
 git push origin main --tags
 ```
 
 ---
 
-## 📈 Valuation & Rating Impact
+## 📈 Deliverables Readiness & Institutional Impact
 
-| Evaluation Dimension | State A: `v2.4.0` (Active Today) | State B: `v2.4.1` (Turnkey Capstone) | Delta / Gain |
+For in-depth market research, IP asset assessment, and economic analysis, refer to [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md).
+
+| Evaluation Dimension | State A: `v2.4.0` (Active Today) | State B: `v2.4.1` (Turnkey Capstone) | Impact / Evolution |
 | :--- | :---: | :---: | :---: |
-| **Overall Repository Rating** | **9.3 / 10** | **10.0 / 10** | **+0.7 (Flawless Turnkey)** |
-| **Pure Asset Cash Buyout** | **₹52,50,000 INR** (₹52.5 Lakhs) | **₹66,00,000 INR** (₹66.0 Lakhs) | **+₹13,50,000 INR** (+25.7%) |
-| **Full Replacement Cost** | **₹89,50,000 INR** (₹89.5 Lakhs) | **₹1,08,50,000 INR** (₹1.085 Crore) | **+₹19,00,000 INR** (+21.2%) |
-| **Shell Files Remaining** | 4 PDF shells | **0 (Zero)** | Complete Closure |
-| **Academic Marks Assurance** | 10/10 (Pre-submission) | **20/20 Marks (Complete Deliverables + Proofs)** | Maximum Distinction |
-| **National Competition Readiness** | Semi-Finalist / Regional Winner | **Grand Finalist / Winner (SIH, KPIT Sparkle, Formula Bharat)** | Tier-1 National Competitiveness |
+| **Delivery Status** | **Production Core Verified** | **Complete Turnkey Capstone** | Full Capstone Closure |
+| **Automated Tests** | 119 Passing Tests (100%) | 119 Passing Tests (100%) | Maintained with Zero Regressions |
+| **Pending Academic Deliverables** | 4 PDF Shells Pending | **0 (Zero Remaining Shells)** | All Academic Deliverables Integrated |
+| **Academic Evaluation Proofs** | Pre-submission Registry Active | **Complete Deliverables + Submission Proofs** | Maximum University Marks Allocation |
+| **National Competition Readiness** | Semi-Finalist / Regional Level | **Grand Finalist / Winner (SIH, KPIT Sparkle, Formula Bharat)** | Full National Competitive Tier |

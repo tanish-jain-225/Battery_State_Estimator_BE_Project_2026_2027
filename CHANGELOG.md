@@ -21,14 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Automated Regression Test Suite Expansion (119 Passing Tests)**:
   - Added [`tests/test_flask_api_comprehensive.py`](tests/test_flask_api_comprehensive.py) regression tests covering CORS preflight `OPTIONS` handling, Keep-Alive headers, sub-second delta streaming, and cryptographic API key authentication.
   - **119 / 119 tests passing in ~31s** with 100% pass rate.
-- **Complete Indian E-Mobility Web Research & Asset Valuation Overhaul**:
-  - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and 4-tier valuations in INR:
-    - State A (Current / Before 4 Things): **₹52.5 Lakhs cash buyout / ₹89.5 Lakhs replacement cost (9.3 / 10)**.
-    - State B (Turnkey / After 4 Things): **₹66.0 Lakhs cash buyout / ₹1.085 Crore replacement cost (10.0 / 10)**.
+- **Complete Indian E-Mobility Web Research Synthesis**:
+  - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
 - **Milestone Evolution Narrative Across Repository READMEs**:
   - Added dedicated milestone stories in root [`README.md`](README.md), [`docs/Review_1/README.md`](docs/Review_1/README.md), and [`docs/Review_2/README.md`](docs/Review_2/README.md) recording mentor feedback (*"Add ESN Core Architecture Diagram and Customise PPT"* / *"Change Flow of team's presentation to make things easy to understand and Add more Dataset Points to make simulator as close as real battery"*), defense screenshots, and technical changes.
-  - Clearly articulated the **4 Pending Academic Deliverables** (`Project_Poster.pdf`, `Review_Paper.pdf`, `Research_Paper.pdf`, `Final_Thesis.pdf`) as the sole items required to reach turnkey 10.0 / 10 completion.
+  - Clearly articulated the **4 Pending Academic Deliverables** (`Project_Poster.pdf`, `Review_Paper.pdf`, `Research_Paper.pdf`, `Final_Thesis.pdf`) as the sole items required to reach turnkey completion.
 
 ---
 
@@ -39,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **A1 Presentation Poster**: Finalizing [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) print-ready vector exhibition poster.
 - **Academic Research Paper**: Finalizing [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) camera-ready IEEE template.
 - **B.E. Capstone Final Thesis**: Finalizing [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) 100+ page University of Mumbai dissertation.
-- **Turnkey Completeness**: Elevates repository to 10.0 / 10 with zero remaining shells.
+- **Turnkey Completeness**: Elevates repository to full turnkey capstone release with zero remaining shells.
 - **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---

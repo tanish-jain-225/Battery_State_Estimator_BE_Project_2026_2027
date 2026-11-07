@@ -56,8 +56,8 @@
 
 The engineering milestones validated in Review 1 served as the baseline foundation for the subsequent phases:
 * **Advance to Review 2 (November 2026):** Transitioned from static ESN inference to online Recursive Least Squares (RLS) adaptation, expanded the simulator to 10 drive cycles with NASA PCoE aging data, and verified 200/200 bit-exact FPGA RTL parity on Artix-7.
-* **Current Working State (State A):** **`9.3 / 10`** across all software, hardware, firmware, and test suites (**119 passing tests**).
-* **Final Capstone Goal (State B):** **`10.0 / 10`** upon dropping in the 4 final academic publication deliverables ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf), [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf), [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
+* **Current Working State (State A):** Production core verified across all software, hardware, firmware, and test suites (**119 passing tests**).
+* **Final Capstone Goal (State B):** Complete turnkey capstone upon dropping in the 4 final academic publication deliverables ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf), [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf), [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
 
 ---
 
