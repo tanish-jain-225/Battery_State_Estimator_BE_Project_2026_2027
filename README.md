@@ -50,12 +50,12 @@
 
 ---
 
-## Mentor, Guide & Department Details
+## Guide Details
 
-**Project Mentor:** Dr. Kadambari Sharma  
-**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan (Assistant Professor, Instrumentation Dept)  
-**Department:** Department of Automation and Robotics / Instrumentation  
-**Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Hashu Advani Memorial Complex, Chembur, Mumbai - 400074  
+**Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan (Assistant Professor, Department of Instrumentation)  
+**Project Mentor:** Dr. Kadambari Sharma (Associate Professor, Department of Automation and Robotics)  
+**Department:** Automation and Robotics / Instrumentation  
+**Institute:** VESIT, Mumbai (Vivekanand Education Society's Institute of Technology, Chembur, Mumbai - 400074)  
 
 ---
 
@@ -440,7 +440,9 @@ The system architecture feeds 2-RC battery telemetry into a multi-estimator pipe
 7. **Testing and Validation:** Automated pytest suite, hardware CSR benchmarking (6.7x speedup), bit-exact RTL verification (200/200 matches).
 8. **Documentation and Publication:** Comprehensive technical documentation, demo checklist, research paper drafting.
 
-## Department BE Project Timeline & Milestones
+## Project Timeline
+
+### Department BE Project Timeline & Milestones
 
 As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Department), the official timeline for BE Project 2026-2027 is:
 
@@ -460,7 +462,9 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 
 ---
 
-## GitHub Log Book & Weekly Progress Updates (10 Marks Allocated)
+## Weekly Progress Updates
+
+### GitHub Log Book & Weekly Progress Updates (10 Marks Allocated)
 
 > 📌 **Note:** As per department policy, this GitHub Log Book is maintained directly in `README.md` and updated weekly to track project milestones, task distribution, hardware/software implementations, and challenges.  
 > 📑 **Project Proposal Document:** [`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)
@@ -852,9 +856,9 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 ---
 
-## Result Screenshots
+## Result Images / Videos
 
-### Software Web Services & Visualiser
+### Software Web Services & Visualiser Screenshots
 
 **Battery Physics Simulator (2-RC ECM Drive Cycle Telemetry & Accelerated Aging):**
 ![Battery Simulator](images/assets/screenshot_simulator_aging.png)
@@ -912,7 +916,9 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 ---
 
-## Research Papers & Publications (20 Marks Allocated)
+## Research Paper / Publication
+
+### Academic Publications & Capstone Poster (20 Marks Allocated)
 
 > 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof. Both official documentations strictly target peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**. All publications and exhibition deliverables are cataloged in [`docs/Publications/`](docs/Publications/README.md) and [`docs/Poster/`](docs/Poster/README.md).
 
@@ -988,7 +994,7 @@ We declare that this project work is carried out by our team as part of the BE C
 
 ---
 
-## License & Academic Governance
+## License
 
 This project is licensed under the **[MIT License](LICENSE)** with an academic attribution clause.
 
