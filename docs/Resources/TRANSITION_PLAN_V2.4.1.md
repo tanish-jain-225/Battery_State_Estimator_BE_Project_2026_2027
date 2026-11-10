@@ -16,12 +16,12 @@ flowchart LR
         A2["• 119 Passing Tests (100% Pass)<br/>• Decoupled MongoDB 1.0s Intermediate<br/>• Anti-Freeze Browser UX (0.0% CPU)<br/>• Digilent Arty A7-100T Bitstream (3.7 MB)<br/>• Synthesizable AXI4-Lite ESN IP Block<br/>• Full Indian E-Mobility Research Synthesis"]
     end
 
-    subgraph Transition["<b>The 4 Deliverables Drop-in</b>"]
+    subgraph Transition["<b>The 4 Deliverables (1 of 4 Finalized)</b>"]
         direction TB
-        T1["1. docs/Poster/Project_Poster.pdf"]
-        T2["2. docs/Publications/Review_Paper.pdf"]
-        T3["3. docs/Publications/Research_Paper.pdf"]
-        T4["4. docs/Thesis/Final_Thesis.pdf"]
+        T1["1. docs/Publications/Research_Paper.pdf (COMPLETED)"]
+        T2["2. docs/Publications/Review_Paper.pdf (Pending)"]
+        T3["3. docs/Poster/Project_Poster.pdf (Pending)"]
+        T4["4. docs/Thesis/Final_Thesis.pdf (Pending)"]
     end
 
     subgraph State_B["<b>State B: Final Turnkey Release (v2.4.1)</b>"]
@@ -35,9 +35,9 @@ flowchart LR
 
 ---
 
-## 📦 The 4 Pending Academic Deliverables (Exclusively Remaining Scope)
+## 📦 The 4 Academic Deliverables (1 of 4 Finalized — 3 Remaining)
 
-Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, microservice, database, and testing layers is **100% complete and verified**. Only the compilation and drop-in of the following **4 final academic documents** remain:
+Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, microservice, database, and testing layers is **100% complete and verified**. The **Research Paper** is now finalized and integrated; only the compilation and drop-in of the remaining **3 academic documents** remain:
 
 ### 1. Presentation Poster (`docs/Poster/Project_Poster.pdf`)
 - **Target File Path**: [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)
@@ -59,16 +59,18 @@ Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, m
   - 90+ cited peer-reviewed papers spanning 2018–2026.
   - Taxonomy of classical (Coulomb Counting, EKF, UKF) vs. data-driven (LSTM, Transformer) vs. neuromorphic (ESN, Spiking Neural Networks).
 
-### 3. Original Research Paper (`docs/Publications/Research_Paper.pdf`)
+### 3. Original Research Paper (`docs/Publications/Research_Paper.pdf`) — COMPLETED & INTEGRATED (1/4)
 - **Target File Path**: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)
-- **Format**: IEEE Conference / Transactions camera-ready 2-column format (6–8 pages).
-- **Source Manuscript on Disk**: [`reference/paper.md`](../../reference/paper.md)
+- **Format**: IEEE 2-column camera-ready format (6 pages, 668 KB).
+- **Status**: **Fully Finalized & Integrated on Disk**.
+- **Companion Manuscript**: [`reference/paper.md`](../../reference/paper.md)
 - **Companion Guide**: [`docs/Publications/README.md`](../Publications/README.md)
-- **Content Requirements**:
-  - Title: *"Hardware-Accelerated Echo State Networks for Real-Time Lithium-Ion Battery State Estimation on Reconfigurable FPGA Logic"*.
-  - Hardware experimental results on Xilinx Artix-7 (`xc7a100tcsg324-1`).
-  - Bit-exact parity verification (**200/200 exact stage matches** between Vivado XSim and Python golden model).
-  - NASA B0005 battery aging dataset validation ($R^2 = 0.8783$ vs. EKF $0.7818$).
+- **Key Results & Highlights**:
+  - Title: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"*.
+  - Authors: Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi, Kadambari Sharma, and Nilima Warke.
+  - 100-neuron Q6.10 ESN reservoir on Artix-7 FPGA (318 LUTs, 2 DSP slices, 80 MHz, 535.1 µs latency).
+  - Bit-exact verification in simulation (6,400 updates) and on programmed Digilent Arty A7-100T board.
+  - 29 NASA PCoE cells evaluated (2,201 discharge windows, 140,864 held-out steps); SOC MAE 0.067, RMSE 0.086 with 1.7–2.8× lower inter-cell SD of per-cell MAE than EKF ($p \le 0.007$).
 
 ### 4. Final B.E. Capstone Thesis (`docs/Thesis/Final_Thesis.pdf`)
 - **Target File Path**: [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)
@@ -140,6 +142,6 @@ For in-depth market research, IP asset assessment, and economic analysis, refer 
 | :--- | :---: | :---: | :---: |
 | **Delivery Status** | **Production Core Verified** | **Complete Turnkey Capstone** | Full Capstone Closure |
 | **Automated Tests** | 119 Passing Tests (100%) | 119 Passing Tests (100%) | Maintained with Zero Regressions |
-| **Pending Academic Deliverables** | 4 PDF Shells Pending | **0 (Zero Remaining Shells)** | All Academic Deliverables Integrated |
+| **Pending Academic Deliverables** | 1 of 4 Finalized (3 Remaining) | **0 (Zero Remaining Shells)** | All Academic Deliverables Integrated |
 | **Academic Evaluation Proofs** | Pre-submission Registry Active | **Complete Deliverables + Submission Proofs** | Maximum University Marks Allocation |
 | **National Competition Readiness** | Semi-Finalist / Regional Level | **Grand Finalist / Winner (SIH, KPIT Sparkle, Formula Bharat)** | Full National Competitive Tier |

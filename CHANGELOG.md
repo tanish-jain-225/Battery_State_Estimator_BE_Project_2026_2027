@@ -24,9 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Complete Indian E-Mobility Web Research Synthesis**:
   - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
-- **Milestone Evolution Narrative Across Repository READMEs**:
-  - Added dedicated milestone stories in root [`README.md`](README.md), [`docs/Review_1/README.md`](docs/Review_1/README.md), and [`docs/Review_2/README.md`](docs/Review_2/README.md) recording mentor feedback (*"Add ESN Core Architecture Diagram and Customise PPT"* / *"Change Flow of team's presentation to make things easy to understand and Add more Dataset Points to make simulator as close as real battery"*), defense screenshots, and technical changes.
-  - Clearly articulated the **4 Pending Academic Deliverables** (`Project_Poster.pdf`, `Review_Paper.pdf`, `Research_Paper.pdf`, `Final_Thesis.pdf`) as the sole items required to reach turnkey completion.
+- **Integrated Camera-Ready IEEE Research Paper (Deliverable 1 of 4 Finalized)**:
+  - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 668 KB).
+  - Documents 100-neuron Q6.10 ESN on Artix-7 FPGA (318 LUTs, 2 DSP slices, 80 MHz, 535.1 µs latency), 200/200 bit-exact verification, and 29-cell NASA PCoE cross-validation (2,201 windows, 140,864 held-out steps, SOC MAE 0.067, RMSE 0.086).
+  - Advances repository toward turnkey v2.4.1 milestone (1 of 4 deliverables finalized, 3 remaining).
 
 ---
 
@@ -35,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🎯 Scope & Planned Deliverables
 - **Academic Review Paper**: Finalizing [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) from draft.
 - **A1 Presentation Poster**: Finalizing [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) print-ready vector exhibition poster.
-- **Academic Research Paper**: Finalizing [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) camera-ready IEEE template.
+- **Academic Research Paper**: Integrated [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) in camera-ready IEEE template (6 pages, 668 KB) — Completed & Verified.
 - **B.E. Capstone Final Thesis**: Finalizing [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) 100+ page University of Mumbai dissertation.
 - **Turnkey Completeness**: Elevates repository to full turnkey capstone release with zero remaining shells.
 - **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).

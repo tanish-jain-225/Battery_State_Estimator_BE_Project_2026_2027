@@ -19,7 +19,7 @@ docs/
 │   ├── Final_Thesis.pdf           # Dissertation Document Shell (A4 Portrait)
 │   └── README.md                  # University format specs and chapter breakdown
 ├── Publications/                  # Official Academic Paper Deliverables
-│   ├── Research_Paper.pdf         # Original Experimental Research Paper (IEEE Target)
+│   ├── Research_Paper.pdf         # Original Experimental Research Paper (IEEE Camera-Ready)
 │   ├── Review_Paper.pdf           # Comprehensive Review Paper (29 Pages, 11 Sections)
 │   └── README.md                  # Publication abstracts, authorship, and scopes
 ├── Paper_Proof/                   # 20 Marks Evaluation Submission/Acceptance Records

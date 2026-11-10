@@ -1,4 +1,4 @@
-[← Back to README](../README.md) · [Review Paper Deliverable (IEEE / Q3 Scopus Target)](../docs/Publications/Review_Paper.pdf)
+[← Back to README](../README.md) · [Camera-Ready IEEE Research Paper (Final Deliverable 1/4)](../docs/Publications/Research_Paper.pdf) · [Review Paper Deliverable (IEEE Target)](../docs/Publications/Review_Paper.pdf)
 
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 

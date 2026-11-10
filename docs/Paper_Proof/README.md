@@ -25,8 +25,8 @@ This directory is designated for archiving all official correspondence, tracking
 - [ ] Acceptance Letter PDF: `docs/Paper_Proof/Review_Paper_Acceptance_Letter.pdf`
 
 ### 2. Experimental Research Paper (Target: IEEE / Q3 Scopus Journal)
-- [ ] Manuscript Title: *Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems*
-- [ ] Manuscript File: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)
+- [x] Manuscript Title: *A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout*
+- [x] Camera-Ready Manuscript File: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 Pages, 668 KB)
 - [ ] Submission Receipt PDF: `docs/Paper_Proof/Research_Paper_Submission_Receipt.pdf`
 - [ ] Paper ID / Tracking Reference logged.
 - [ ] Acceptance Letter PDF: `docs/Paper_Proof/Research_Paper_Acceptance_Letter.pdf`
@@ -38,7 +38,7 @@ This directory is designated for archiving all official correspondence, tracking
 | Entry Date | Target Paper | Journal / Conference Name | Paper ID | Submission Status | Verification Document | Evaluator Signature |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
 | 2026-11-07 | Neuromorphic BMS Review Paper | IEEE Transactions / Q3 Scopus Journal | BSE-REV-2026-01 | Draft Complete / Ready for Submission | [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) | Pending Editorial Receipt |
-| 2026-11-07 | Hardware-Accelerated ESN Research Paper | IEEE Transactions on Industrial Electronics | BSE-RES-2026-02 | Draft Complete / Ready for Submission | [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) | Pending Editorial Receipt |
+| 2026-11-10 | Hardware-Accelerated ESN Research Paper | IEEE Transactions on Industrial Electronics | BSE-RES-2026-02 | **Camera-Ready Complete / Portal Upload Ready** | [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) | Pending Editorial Receipt |
 
 ---
 

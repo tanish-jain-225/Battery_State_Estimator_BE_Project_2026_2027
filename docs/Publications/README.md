@@ -9,8 +9,8 @@
 **Department:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai  
 
 > [!IMPORTANT]
-> **Active Deliverables Status (2 of the 4 Pending Deliverables):**  
-> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing**, [`Review_Paper.pdf`](Review_Paper.pdf) and [`Research_Paper.pdf`](Research_Paper.pdf) currently exist as structured PDF preprints alongside their full companion drafts ([`reference/paper.md`](../../reference/paper.md) and [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)). Once finalized in camera-ready IEEE template format, they will elevate the repository to its final turnkey capstone release.  
+> **Active Deliverables Status (1 of 4 Finalized — 3 Pending):**  
+> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing**, [`Research_Paper.pdf`](Research_Paper.pdf) has been **fully finalized, compiled, and integrated in camera-ready IEEE format** (6 pages, 668 KB). [`Review_Paper.pdf`](Review_Paper.pdf), [`Project_Poster.pdf`](../Poster/Project_Poster.pdf), and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) currently remain as the only 3 pending deliverables awaiting final drop-in for the v2.4.1 turnkey release.  
 
 ---
 
@@ -26,10 +26,10 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 ## 📑 Tracked Manuscripts & Deliverables
 
-| Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Marks |
-| :--- | :--- | :---: | :---: | :--- | :---: |
-| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) |
-| **Paper 2: Original Experimental Research** | Edge-optimized CSR SpMV ESN, 2-RC cyber-physical simulator, Q15 fixed-point LUT, 200/200 FPGA Verilog RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) |
+| Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Marks | Deliverable Status |
+| :--- | :--- | :---: | :---: | :--- | :---: | :---: |
+| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) | **Pending Final Drop (Active Deliverable 2/4)** |
+| **Paper 2: Original Experimental Research** | Bit-exact fixed-point FPGA ESN reservoir (Q6.10), 2,201 NASA PCoE windows, 29-cell cross validation, Artix-7 RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) | **Completed & Camera-Ready Integrated (Deliverable 1/4 Finalized)** |
 
 ---
 
@@ -51,18 +51,20 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 ## 📄 Target Paper 2: Original Experimental Research Paper
 
-* **Title:** *A Bit-Exact Fixed-Point FPGA Echo State Network Reservoir for Lithium-Ion Battery SOC and SOH Estimation*
-* **Authors:** Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, and Nilima Warke
+* **Title:** *A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout*
+* **Authors:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi, Kadambari Sharma, and Nilima Warke
 * **Affiliation:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai, India
+* **Format:** IEEE Transactions / Conference 2-Column Camera-Ready PDF (6 Pages, 668 KB)
+* **Status:** **Completed & Integrated (Deliverable 1 of 4 Finalized)**
 * **Scope & Highlights:**
-  * Co-designed cyber-physical system integrating a 2-RC electro-thermal model, multi-timescale EKF, and continuous-time Leaky ESN.
-  * **6.7× Execution Speedup** on ARM Cortex-M microcontrollers via Compressed Sparse Row (CSR) matrix storage.
-  * **~10 KB Flash Memory Savings** achieved through sparse integer representation.
-  * **98.40% Thermal Safety Accuracy** under dynamic drive cycles using Q15 fixed-point arithmetic and a 256-word tanh lookup table.
-  * **200/200 Bit-Exact Verification** on Xilinx Artix-7 FPGA Verilog RTL against Python golden reference models.
+  * Non-spiking, fixed-point ESN (Q6.10 reservoir) with closed-form ridge readouts in Q4.14 for SOC with an exploratory SOH readout.
+  * **Resource-Efficient Artix-7 Implementation:** One time-multiplexed multiply-accumulate (MAC) core, BRAM weights, double-buffered state memory, and lookup-table tanh using **318 LUTs and 2 DSP slices** closing timing at 80 MHz.
+  * **Bit-Exact Verification:** 100% verified against an independent golden model across all 5 datapath stages in simulation (6,400 updates) and on programmed Digilent Arty A7-100T hardware.
+  * **29-Cell Cross-Validation:** Evaluated on **2,201 discharge windows (140,864 held-out steps)** across 29 NASA PCoE cells (4°C–44°C) with each evaluation cell held out in turn.
+  * **Superior Cross-Cell Consistency:** Achieves SOC MAE 0.067, RMSE 0.086 with **1.7–2.8× lower inter-cell standard deviation** of per-cell MAE than EKF configurations ($p \le 0.007$).
 * **Deliverable Files:**
-  * Formatted Preprint PDF: [`Research_Paper.pdf`](Research_Paper.pdf)
-  * Markdown Manuscript: [`reference/paper.md`](../../reference/paper.md)
+  * Camera-Ready IEEE PDF: [`Research_Paper.pdf`](Research_Paper.pdf) (668 KB, 6 Pages)
+  * Markdown Reference Manuscript: [`reference/paper.md`](../../reference/paper.md)
   * FPGA RTL Verification Report: [`docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf`](../Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)
 
 ---

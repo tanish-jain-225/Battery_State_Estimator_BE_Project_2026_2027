@@ -24,7 +24,7 @@
     <img src="https://img.shields.io/badge/Review%20Paper-IEEE%20Target-1E3A8A?style=for-the-badge&logo=ieee" alt="Review Paper PDF" />
   </a>
   <a href="docs/Publications/Research_Paper.pdf" target="_blank">
-    <img src="https://img.shields.io/badge/Research%20Paper-IEEE%20Target-2563EB?style=for-the-badge&logo=ieee" alt="Research Paper PDF" />
+    <img src="https://img.shields.io/badge/Research%20Paper-IEEE%20Camera--Ready-2563EB?style=for-the-badge&logo=ieee" alt="Research Paper PDF" />
   </a>
   <a href="docs/Thesis/Final_Thesis.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Thesis-Project%20Thesis%20Shell-7C3AED?style=for-the-badge&logo=adobeacrobatreader" alt="Project Thesis Shell PDF" />
@@ -269,11 +269,11 @@ Navigate the repository according to your area of interest:
 > * **Final State B (Turnkey / After the 4 Deliverables):** **`Complete Turnkey Capstone`**  
 >   *(Achieved upon compilation and drop-in of the 4 designated academic publication and thesis deliverables into their respective directories).*
 >
-> #### 📌 What is Left to be Updated (The Only 4 Pending Items Across the Entire Repo):
+> #### 📌 What is Left to be Updated (The Only 3 Pending Items Across the Entire Repo):
 > 1. [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) — High-resolution print-ready A1 exhibition poster (companion markdown: [`docs/Poster/README.md`](docs/Poster/README.md)).
 > 2. [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) — Comprehensive 29-page neuromorphic BMS survey paper (companion draft: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)).
-> 3. [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) — Original IEEE experimental research paper on edge ESN + Artix-7 RTL (companion manuscript: [`reference/paper.md`](reference/paper.md)).
-> 4. [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion guide: [`docs/Thesis/README.md`](docs/Thesis/README.md)).
+> 3. [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion guide: [`docs/Thesis/README.md`](docs/Thesis/README.md)).
+> *(Note: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) is completed & camera-ready integrated — Deliverable 1/4 Finalized).*
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
@@ -282,7 +282,7 @@ Navigate the repository according to your area of interest:
 | **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/register_map.md) | IEEE 1685 IP-XACT component, concurrent Tri-Observer FPGA platform, 3.7 MB bitstream, UART HIL | **Completed / Fully Verified** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Final Drop (Active Deliverable 1/4)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 2/4)** |
-| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 3/4)** |
+| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE camera-ready) | **Completed & Camera-Ready Integrated (Deliverable 1/4 Finalized)** |
 | **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Final Drop (Active Deliverable 4/4)** |
 | **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Fully Verified (Registry Active)** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
