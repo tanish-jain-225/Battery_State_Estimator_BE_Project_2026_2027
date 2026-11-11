@@ -64,17 +64,17 @@
 
 ## 🌟 Delivery Status & Final Capstone Roadmap (State A vs. State B)
 
-> ### 📊 Ground Truth Delivery Status
-> * **State A (Review 2 Complete / Current Working Codebase):** **`Production Core Verified`**  
->   *(All software microservices, 2-RC multi-chemistry physics, EKF/UKF/ESN/RLS estimators, C99 firmware, 100-neuron Artix-7 RTL, AXI4-Lite IP block with 3.7 MB bitstream, and 119 automated pytest tests are 100% complete and verified with zero defects. For comprehensive industrial landscape and research analysis, see [`docs/Resources/WEB_RESEARCH.md`](../Resources/WEB_RESEARCH.md)).*
-> * **State B (Final Turnkey Capstone / After the 4 Deliverables):** **`Complete Turnkey Capstone`**  
->   *(Achieved upon compiling and dropping in the 4 designated academic publication and thesis deliverables into their respective folders).*
+> ### 📊 Ground Truth Delivery Status (`v2.4.0` Synced)
+> * **State A (`v2.4.0` — Synced Today):** **`Production Core + Research Paper Verified`**  
+>   *(All software microservices, 2-RC multi-chemistry physics, EKF/UKF/ESN/RLS estimators, C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL + 3.7 MB bitstream, camera-ready IEEE [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), and 119 automated pytest tests in 21.60s are 100% complete and verified. For comprehensive industrial landscape and research analysis, see [`docs/Resources/WEB_RESEARCH.md`](../Resources/WEB_RESEARCH.md)).*
+> * **State B (`v2.4.1` — Final Turnkey Capstone):** **`Complete Turnkey Capstone`**  
+>   *(Achieved upon compiling and dropping in ONLY the remaining 3 academic deliverables below).*
 >
-> ### 📌 What is Left to be Updated (The 4 Final Deliverables):
+> ### 📌 What is Left to be Updated for `v2.4.1` (Only 3 Pending Deliverables):
 > 1. [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) — Print-ready A1 exhibition poster (companion: [`docs/Poster/README.md`](../Poster/README.md)).
 > 2. [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) — Comprehensive 29-page review survey (companion: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)).
-> 3. [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) — Original IEEE experimental research paper on edge ESN + Artix-7 RTL (companion: [`reference/paper.md`](../../reference/paper.md)).
-> 4. [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion: [`docs/Thesis/README.md`](../Thesis/README.md)).
+> 3. [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion: [`docs/Thesis/README.md`](../Thesis/README.md)).
+> *(Note: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) is already completed and integrated in `v2.4.0`).*
 
 ---
 

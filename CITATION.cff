@@ -27,7 +27,7 @@ authors:
     affiliation: "Vivekanand Education Society's Institute of Technology (VESIT)"
     role: "Project Guide / Coordinator"
 version: "2.4.0"
-date-released: "2026-11-07"
+date-released: "2026-11-11"
 license: "MIT"
 url: "https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027"
 repository-code: "https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027"
@@ -47,17 +47,19 @@ keywords:
 preferred-citation:
   type: article
   authors:
-    - family-names: "Patankar"
-      given-names: "Sanjna"
     - family-names: "Nambiar"
       given-names: "Akshay"
+    - family-names: "Patankar"
+      given-names: "Sanjna"
     - family-names: "Verma"
       given-names: "Satvik"
     - family-names: "Sanghvi"
       given-names: "Tanish"
     - family-names: "Sharma"
       given-names: "Kadambari"
-  title: "Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems"
+    - family-names: "Warke"
+      given-names: "Nilima"
+  title: "A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"
   year: 2026
   institution: "Vivekanand Education Society's Institute of Technology (VESIT)"
 

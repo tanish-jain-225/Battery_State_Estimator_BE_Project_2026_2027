@@ -16,8 +16,8 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 
 > [!IMPORTANT]
-> **Active Deliverables Status (Deliverable 1 of the 4 Pending Deliverables):**  
-> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Once the final print-ready PDF is compiled and dropped in, it will complete Deliverable 1/4 toward the final turnkey capstone release.  
+> **Active Deliverables Status (Remaining Deliverable 1 of 3 for `v2.4.1`):**  
+> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), and 119 automated tests are **100% complete and synced at `v2.4.0`**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Along with [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), it is one of only **3 remaining** deliverables toward `v2.4.1`.  
 
 ---
 

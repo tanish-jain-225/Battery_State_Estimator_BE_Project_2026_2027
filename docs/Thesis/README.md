@@ -18,8 +18,8 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan
 
 > [!IMPORTANT]
-> **Active Deliverables Status (Deliverable 4 of the 4 Pending Deliverables):**  
-> While the entire software pipeline, hardware RTL, and 119 automated tests are **100% complete and passing**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Once the compiled University of Mumbai 100+ page dissertation PDF is dropped in, it will complete the final academic deliverable to achieve the full turnkey capstone release.
+> **Active Deliverables Status (Remaining Deliverable 3 of 3 for `v2.4.1`):**  
+> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), and 119 automated tests are **100% complete and synced at `v2.4.0`**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Along with [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Review_Paper.pdf`](../Publications/Review_Paper.pdf), it is one of only **3 remaining** deliverables toward `v2.4.1`.
 
 ---
 
@@ -62,7 +62,7 @@ The final dissertation follows standard University of Mumbai academic specificat
 7. **Chapter 7 — Experimental Results & Comparative Validation**:
    * NASA PCoE battery aging dataset evaluation (32 cycles, 2,048 samples).
    * Multi-observer benchmark: ESN vs. UKF vs. EKF vs. Coulomb Counting.
-   * 119 automated regression tests with 94.49% code coverage.
+   * 119 automated regression tests passing with 88.60% shared-core code coverage.
 8. **Chapter 8 — Conclusion & Industrial Commercialization Roadmap**:
    * Real-time BMS headroom analysis (23× margin @ 100 Hz).
    * Technical trade-offs, patentable claims, and future physical benchtop deployment.

@@ -37,7 +37,7 @@ This directory is designated for archiving all official correspondence, tracking
 
 | Entry Date | Target Paper | Journal / Conference Name | Paper ID | Submission Status | Verification Document | Evaluator Signature |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-11-07 | Neuromorphic BMS Review Paper | IEEE Transactions / Q3 Scopus Journal | BSE-REV-2026-01 | Draft Complete / Ready for Submission | [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) | Pending Editorial Receipt |
+| 2026-11-07 | Neuromorphic BMS Review Paper | IEEE Transactions / Q3 Scopus Journal | BSE-REV-2026-01 | Draft Complete (Final PDF Pending `v2.4.1`) | [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) | Pending Editorial Receipt |
 | 2026-11-10 | Hardware-Accelerated ESN Research Paper | IEEE Transactions on Industrial Electronics | BSE-RES-2026-02 | **Camera-Ready Complete / Portal Upload Ready** | [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) | Pending Editorial Receipt |
 
 ---

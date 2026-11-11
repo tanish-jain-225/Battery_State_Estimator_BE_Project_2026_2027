@@ -10,8 +10,8 @@ Only the latest active major releases receive security updates and bug fixes:
 
 | Version | Supported | Release Date | Notes |
 | :---: | :---: | :--- | :--- |
-| **v2.4.1** | :white_check_mark: | Planned Turnkey | Final Academic Deliverables (Review Paper, Poster, Thesis, Research Paper - The 4 Things). |
-| **v2.4.0** | :white_check_mark: | 2026-11-07 (Today) | Current active release (119 tests, decoupled MongoDB sync, anti-freeze UX, Artix-7 IP block, Indian web research). |
+| **v2.4.1** | :white_check_mark: | Planned Turnkey | Remaining 3 Academic Deliverables Only (Poster, Review Paper, Final Thesis). |
+| **v2.4.0** | :white_check_mark: | 2026-11-11 (Synced Today) | Active synced release (119 tests, decoupled MongoDB sync, IP Block v1.2, Camera-Ready IEEE Research Paper, CSR/storage optimization). |
 | **v2.3.0** | :white_check_mark: | 2026-11-03 | Previous release (plug-and-play FPGA ESN IP block, IEEE research paper, footprint optimization). |
 | **v2.2.x** | :white_check_mark: | 2026-11-01 | Previous release (pub/sub decoupled microservices, FPGA EKF/UKF verification). |
 | **v2.1.x** | :white_check_mark: | 2026-11-01 | Academic publications, poster and governance release. |

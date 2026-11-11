@@ -14,7 +14,7 @@
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Reference:** [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md)  
-**Active Release Version:** `v2.4.0` (Active Today, Rating: **9.3 / 10**)  
+**Active Release Version:** `v2.4.0` (Synced Today, Rating: **9.5 / 10**)  
 **Target Turnkey Release:** `v2.4.1` (Planned Capstone, Rating: **10.0 / 10**)  
 **Turnkey Transition Plan:** [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md)  
 **Verification Date:** November 2026 (Synthesized Post-Review 2 & Aligned with Departmental BE Capstone Template)
@@ -366,7 +366,7 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Function:** Dual microservice suite generating 2-RC physics telemetry across dynamic drive cycles with real-time fault injection and live Chart.js visualization.
 
 ### 📦 Deliverable 5: Automated Regression Test Suite & Master Runners
-* **Automated Pytest Suite:** [`tests/`](../../tests/) (**119 automated tests** passing in ~33s with 100% pass rate, [`tests/README.md`](../../tests/README.md))
+* **Automated Pytest Suite:** [`tests/`](../../tests/) (**119 automated tests** passing in ~21.6s with 88.60% `software/shared` coverage, [`tests/README.md`](../../tests/README.md))
 * **Master 1-Click Runner (Windows):** [`run_all_validation.bat`](../../run_all_validation.bat)
 * **Master 1-Click Runner (Linux/macOS):** [`run_all_validation.sh`](../../run_all_validation.sh)
 * **Function:** Executes all 8 verification stages end-to-end (shared physics package, full 119-test suite, software ESN model training, estimator pipeline step, STM32 classifier and estimator C header export, FPGA RTL 200/200 and 512/512 bit-exact matches, and C99 desktop simulator) with zero failures.
@@ -378,12 +378,12 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Mentor Feedback Addressed:** 5-Act presentation narrative arc, 10 dynamic drive cycles with NASA PCoE aging data, and 1.0s multi-chemistry simulator pacing.
 * **Function:** Comprehensive academic evaluation reports, slide deck, and defense materials for Viva committee presentation.
 
-### 📦 Deliverable 7: Four Final Academic Deliverables (Positioned as Shells)
-* **Target Paper 1 (Original Research):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (Preprint PDF) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
-* **Target Paper 2 (Comprehensive Review):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (Preprint PDF) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29-page survey draft)
-* **Presentation Poster:** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster)
-* **Final B.E. Thesis:** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation)
-* **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in these 4 compiled PDFs transitions the repository from **`v2.4.0` (9.3 / 10)** to **`v2.4.1` (10.0 / 10)**.
+### 📦 Deliverable 7: Academic Deliverables (`Research_Paper.pdf` Complete in `v2.4.0`; Only 3 Remaining for `v2.4.1`)
+* **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 668 KB) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
+* **Target Paper 2 (Comprehensive Review — Pending `v2.4.1` [2/3]):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29-page survey draft)
+* **Presentation Poster (Pending `v2.4.1` [1/3]):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster shell)
+* **Final B.E. Thesis (Pending `v2.4.1` [3/3]):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation shell)
+* **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in the remaining **3** compiled PDFs (Poster, Review Paper, Thesis) transitions the repository from **`v2.4.0` (9.5 / 10)** to **`v2.4.1` (10.0 / 10)**.
 
 ---
 
@@ -492,7 +492,7 @@ xychart-beta
 | **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline. |
 | **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), 0 ruff/flake8 errors. |
 | **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, zero lag/lead. |
-| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 339 tracked files, 0 broken links across 763 links in 42 docs, root `.env`. |
+| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (17.24 MB deduplicated), 0 broken markdown links, root `.env`. |
 | **6. The 4 Academic Publications** | **7.5 / 10** *(1/4 Finalized)* | **10 / 10** *(Bound / Published)* | Research Paper integrated in camera-ready IEEE format; 3 remaining. |
 | **OVERALL REPOSITORY SCORE** | **`9.5 / 10`** | **`10.0 / 10`** | **State A is Production-Ready (1/4 Finalized); State B is Turnkey Masterwork.** |
 
@@ -537,18 +537,18 @@ xychart-beta
 This repository has completed a comprehensive, automated verification audit confirming zero technical debt and 100% compliance across all quality gates:
 
 ```
-============================= 119 passed in 32.93s =============================
+============================= 119 passed in 21.60s =============================
 ```
 
-- **Python Quality Gate (`pytest -q`)**: **119 / 119 passing tests (100% pass rate in ~33s)**.
+- **Python Quality Gate (`pytest -q`)**: **119 / 119 passing tests (`21.60s` with 88.60% `software/shared` coverage; `19.12s` without coverage)**.
 - **Master 8-Step Validation Runner (`run_all_validation.bat`)**: **[ALL PASSED] END-TO-END VALIDATION SUCCESSFUL**.
 - **Linter & Syntax Gate (`ruff check .`)**: **0 errors across all directories (All checks passed!)**.
 - **PEP 8 Compliance Gate (`flake8 .`)**: **0 errors, 0 warnings**.
-- **Empty File Audit**: **0 empty files across all 339 tracked repository files**.
-- **Link Integrity Audit**: **0 broken links across all 759 links in 42 documentation files**.
+- **Empty File Audit**: **0 empty files across all 483 tracked repository files (`85.45 MiB`, 17.24 MB deduplicated)**.
+- **Link Integrity Audit**: **0 broken links across all tracked Markdown documentation files**.
 - **Hardware-Software Parity**: **200 / 200 bit-exact ESN stage matches (100%)** & **512 / 512 bit-exact EKF / UKF traces**.
 - **Departmental BE Capstone Template**: **34 / 34 sections strictly aligned** with Department of Automation and Robotics / Instrumentation, VESIT Mumbai.
-- **Turnkey Transition Status**: **v2.4.0 Active Today (`9.3 / 10`)** $\to$ **v2.4.1 Turnkey Capstone Target (`10.0 / 10`)** via [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
+- **Turnkey Transition Status**: **v2.4.0 Synced Today (`9.5 / 10` — Research Paper Finalized)** $\to$ **v2.4.1 Turnkey Capstone Target (`10.0 / 10` — Only Poster, Review Paper & Thesis Pending)** via [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
 
 ---
 

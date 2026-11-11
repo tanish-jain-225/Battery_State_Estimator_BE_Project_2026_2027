@@ -288,12 +288,12 @@ python hardware/FPGA_Verifier/compare_results.py
 The developmental journey from Review 2 evolves directly into commercial silicon packaging and final academic degree defense:
 
 ```
-[Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination]
-- 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis
-- EKF & CC Baselines    - UKF Implementation    - Artix-7 3.7 MB Bitstream- Comprehensive Review
-- C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL Platform (115k)- A1 Exhibition Poster
-- Verilog RTL Core      - 119 Automated Tests   - Authored Research Paper - Degree Viva Defense
-(Completed)             (Completed)             (Completed in v2.3.0)     (Active Target)
+[Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination (v2.4.1)]
+- 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis (Pending)
+- EKF & CC Baselines    - UKF Implementation    - Artix-7 v1.2 Bitstream  - Comprehensive Review (Pending)
+- C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL + 29 Packs     - A1 Exhibition Poster (Pending)
+- Verilog RTL Core      - 119 Automated Tests   - Camera-Ready Paper PDF  - Degree Viva Defense
+(Completed)             (Completed)             (Synced in v2.4.0)        (Only 3 Remaining)
 ```
 
 1. **Phase 3 — Hardware IP Block & Acceleration ([`hardware/IP_Block/README.md`](../../hardware/IP_Block/README.md))**:
@@ -301,11 +301,12 @@ The developmental journey from Review 2 evolves directly into commercial silicon
    * **Concurrent Tri-Observer FPGA Platform (v1.2)**: Synthesized and implemented top-level RTL ([`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)) running ESN (serial or `P=10` fast core [`rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v)), EKF (Rev 0.5 optional ESN fusion), and UKF simultaneously.
    * **Pre-Compiled FPGA Bitstream**: Generated flash-ready 3.7 MB bitstream ([`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit)) for Digilent Arty A7-100T (`xc7a100tcsg324-1`).
    * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/host/esn_host.py`](../../hardware/IP_Block/host/esn_host.py)) with 29 held-out packs and `reproduce_paper.py` delivering real-time headroom over 115200-baud serial links.
-   * **Regression Suite**: Expanded to **119 passing tests** with 100% pass rate in ~32s.
+   * **Regression Suite**: Expanded to **119 passing tests** in `21.60s` (`88.60%` coverage on `software/shared`; `19.12s` without coverage).
 
-2. **Phase 4 — Capstone Dissertation & Academic Dissemination ([`docs/Thesis/README.md`](../Thesis/README.md))**:
+2. **Phase 4 — Remaining Deliverables for `v2.4.1` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
+   *(Only 3 deliverables remain pending after integrating camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) in `v2.4.0`)*:
    * **B.E. Final Thesis**: Official 8-chapter dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
-   * **Peer-Reviewed Publications (20 Marks)**: Target manuscripts for IEEE / Q3 Scopus review journals ([`docs/Publications/README.md`](../Publications/README.md) and [`docs/Paper_Proof/README.md`](../Paper_Proof/README.md)).
+   * **Comprehensive Review Paper**: Peer-review PDF for IEEE / Q3 Scopus review journal ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)).
    * **A1 Symposium Exhibition Poster**: High-resolution vector defense poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).
 
 ---

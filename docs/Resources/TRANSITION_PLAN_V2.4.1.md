@@ -12,8 +12,8 @@ This document serves as the official transition plan and execution runbook to ad
 flowchart LR
     subgraph State_A["<b>State A: Current Active Release (v2.4.0)</b>"]
         direction TB
-        A1["<b>Status: Production Core Verified</b>"]
-        A2["• 119 Passing Tests (100% Pass)<br/>• Decoupled MongoDB 1.0s Intermediate<br/>• Anti-Freeze Browser UX (0.0% CPU)<br/>• Digilent Arty A7-100T Bitstream (3.7 MB)<br/>• Synthesizable AXI4-Lite ESN IP Block<br/>• Full Indian E-Mobility Research Synthesis"]
+        A1["<b>Status: Production Core + Research Paper Synced</b>"]
+        A2["• 119 Passing Tests (~21.6s, 88.60% shared cov)<br/>• Decoupled MongoDB 1.0s Intermediate<br/>• Anti-Freeze Browser UX & CSR Pickle (~602 KB)<br/>• esn_ip_platform v1.2 + Bitstream (3.7 MB)<br/>• Camera-Ready IEEE Research Paper (668 KB)<br/>• Full Indian E-Mobility Research Synthesis"]
     end
 
     subgraph Transition["<b>The 4 Deliverables (1 of 4 Finalized)</b>"]
@@ -91,12 +91,12 @@ Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, m
 
 ## 🛠️ Step-by-Step Transition Execution Runbook
 
-Follow these exact steps when the 4 compiled PDF documents are ready:
+Follow these exact steps when the remaining **3 compiled PDF documents** ([`Project_Poster.pdf`](../Poster/Project_Poster.pdf), [`Review_Paper.pdf`](../Publications/Review_Paper.pdf), [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)) are ready (`Research_Paper.pdf` is already finalized in `v2.4.0`):
 
-### Step 1: Drop-In Document Files
-Copy the compiled PDFs into their designated directories:
+### Step 1: Drop-In the 3 Remaining Document Files
+Copy the compiled PDFs into their designated directories (verifying `Research_Paper.pdf` remains intact):
 ```bash
-# Verify all 4 files are placed correctly
+# Verify all 4 academic deliverable PDFs are in place
 ls -lh docs/Poster/Project_Poster.pdf
 ls -lh docs/Publications/Review_Paper.pdf
 ls -lh docs/Publications/Research_Paper.pdf
@@ -127,8 +127,8 @@ flake8 .
 Commit all changes and tag the release as `v2.4.1`:
 ```bash
 git add docs/Poster/ docs/Publications/ docs/Thesis/ pyproject.toml CITATION.cff README.md CHANGELOG.md SECURITY.md docs/Resources/
-git commit -m "feat(release): bump version to v2.4.1 - complete turnkey capstone deliverables"
-git tag -a v2.4.1 -m "Release v2.4.1: Turnkey Capstone Release - All 4 Academic Deliverables Integrated"
+git commit -m "feat(release): bump version to v2.4.1 - integrate remaining Poster, Review Paper, and Thesis"
+git tag -a v2.4.1 -m "Release v2.4.1: Turnkey Capstone Release - Poster, Review Paper, Thesis & Research Paper Complete"
 git push origin main --tags
 ```
 

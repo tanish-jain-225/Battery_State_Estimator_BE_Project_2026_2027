@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v2.4.0] - 2026-11-07 (Active Today - Decoupled MongoDB Sync, Anti-Freeze Browser UX & Indian E-Mobility Web Research)
+## [v2.4.0] - 2026-11-11 (Active & Synced Today - IP Block v1.2, IEEE Research Paper, Optimization & Decoupled Sync)
 
 ### 🚀 Highlights (v2.4.0)
 - **Decoupled MongoDB 1.0s Real-Time Intermediate Pipeline**:
@@ -20,32 +20,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Integrated Page Visibility API (`document.hidden`) throttling telemetry polling from 500ms to 3000ms when minimized or in background tabs.
 - **Automated Regression Test Suite Expansion (119 Passing Tests)**:
   - Added [`tests/test_flask_api_comprehensive.py`](tests/test_flask_api_comprehensive.py) regression tests covering CORS preflight `OPTIONS` handling, Keep-Alive headers, sub-second delta streaming, and cryptographic API key authentication.
-  - **119 / 119 tests passing in ~31s** with 100% pass rate.
+  - **119 / 119 tests passing in `21.60s`** with **`88.60%`** `software/shared` coverage (`19.12s` without coverage instrumentation).
 - **Complete Indian E-Mobility Web Research Synthesis**:
   - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
 - **Integrated Camera-Ready IEEE Research Paper (Deliverable 1 of 4 Finalized)**:
   - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 668 KB).
   - Documents 100-neuron Q6.10 ESN on Artix-7 FPGA (318 LUTs, 2 DSP slices, 80 MHz, 535.1 µs latency), 200/200 bit-exact verification, and 29-cell NASA PCoE cross-validation (2,201 windows, 140,864 held-out steps, SOC MAE 0.067, RMSE 0.086).
-  - Advances repository toward turnkey v2.4.1 milestone (1 of 4 deliverables finalized, 3 remaining).
+  - Advances repository to `v2.4.0` synced baseline — only **3 deliverables remain** for `v2.4.1` (Poster, Review Paper, Thesis).
 - **Upgraded Plug-and-Play FPGA IP Block to `esn_ip_platform` v1.2 ([`hardware/IP_Block/`](hardware/IP_Block/README.md))**:
   - Replaced flat v1.0 layout with structured v1.2 engineering hierarchy (`rtl/`, `mem/`, `xdc/`, `scripts/`, `tb/`, `verify/`, `test_data/`, `driver/`, `docs/`, `host/`) while preserving baseline IEEE 1685 [`component.xml`](hardware/IP_Block/component.xml), Arty A7-100T [`esn_platform_top.bit`](hardware/IP_Block/esn_platform_top.bit), and routed v1.0 reports in `reports_v10/`.
   - Added [`rtl/esn_core_fast.v`](hardware/IP_Block/rtl/esn_core_fast.v) (`FAST=1, P=10, K=24` parallel sparse ELL reservoir executing in **307 cycles / 3.84 µs** at 80 MHz vs 42,902 serial cycles) and [`rtl/ekf_core.v`](hardware/IP_Block/rtl/ekf_core.v) **Rev 0.5** with optional same-step ESN fusion (`FUSE=1`, 477 cycles).
   - Integrated `host/packs/general_32cells/`, all **29 held-out NASA PCoE cell packs** (`host/packs/heldout/`), self-contained `host/train_pack.py`, `host/reproduce_paper.py` (pooled SOC MAE 0.0667 ESN), `host/narma_board.py` (NARMA-10 dual-application packs), `host/replay_board.py`, causal/fused replay vectors (`test_data/sim_causal_b47`, `sim_fused_b47`), and dual-core Verilator 5.028 **10/10 PASS** regression logs (`docs/regression_2026-11-11.txt`).
 - **Repository Storage, Memory & Performance Optimization Pass**:
-  - Removed 316 redundant/superseded files across `hardware/IP_Block/host/legacy_oct2026/`, `hardware/IP_Block/backup_rev04/`, duplicate pack `.mem`/`.txt`/`.csv` assets (via shared canonical pack & dataset fallbacks in `esn_host.py`, `narma_board.py`, and `STM_Verifier/config.py`), and duplicate root `FPGA_Verifier/` copies (saving **17.25 MB / 16.45 MiB** on disk).
-  - Upgraded `EchoStateNetwork` with `scipy.sparse.csr_matrix` recurrent matvec caching, symmetric `np.linalg.solve` Ridge solve, and lossless zlib-compressed CSR pickle serialization (`software/visualiser/model_rc.pkl` reduced from `3.33 MB` to `602 KB` with 81.9% compression), alongside fast scalar `math`/tuple hotpaths across `battery_chemistry.py`, `battery_simulator.py`, `traditional_estimator.py`, and `estimator_pipeline.py`, halving full `pytest` + coverage runtime from `48.80s` to `23.26s`.
+  - Removed 316 redundant/superseded files across `hardware/IP_Block/host/legacy_oct2026/`, `hardware/IP_Block/backup_rev04/`, duplicate pack `.mem`/`.txt`/`.csv` assets (via shared canonical pack & dataset fallbacks in `esn_host.py`, `narma_board.py`, and `STM_Verifier/config.py`), and duplicate root `FPGA_Verifier/` copies (saving **17.24 MB / 16.45 MiB** on disk, from 799 to 483 tracked files).
+  - Upgraded `EchoStateNetwork` with `scipy.sparse.csr_matrix` recurrent matvec caching, symmetric `np.linalg.solve` Ridge solve, and lossless zlib-compressed CSR pickle serialization (`software/visualiser/model_rc.pkl` reduced from `3.33 MB` to `602 KB` with 81.9% compression), alongside fast scalar `math`/tuple hotpaths across `battery_chemistry.py`, `battery_simulator.py`, `traditional_estimator.py`, and `estimator_pipeline.py`, halving full `pytest` + coverage runtime from `48.80s` to `21.60s` (`19.12s` without coverage).
 
 ---
 
-## [v2.4.1] - Planned Turnkey Release (Final Academic Deliverables Release - The 4 Things)
+## [v2.4.1] - Planned Turnkey Release (Only 3 Pending Academic Deliverables Remaining)
 
-### 🎯 Scope & Planned Deliverables
-- **Academic Review Paper**: Finalizing [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) from draft.
-- **A1 Presentation Poster**: Finalizing [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) print-ready vector exhibition poster.
-- **Academic Research Paper**: Integrated [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) in camera-ready IEEE template (6 pages, 668 KB) — Completed & Verified.
-- **B.E. Capstone Final Thesis**: Finalizing [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) 100+ page University of Mumbai dissertation.
-- **Turnkey Completeness**: Elevates repository to full turnkey capstone release with zero remaining shells.
+### 🎯 Remaining Scope for `v2.4.1` (Post-`v2.4.0`)
+- **A1 Presentation Poster** *(Pending 1/3)*: Compiling and integrating print-ready vector poster [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf).
+- **Academic Review Paper** *(Pending 2/3)*: Compiling and integrating final peer-review PDF [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf).
+- **B.E. Capstone Final Thesis** *(Pending 3/3)*: Compiling and integrating 100+ page University of Mumbai dissertation [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf).
+- **Already Completed & Synced in `v2.4.0`**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `119/119` passing tests.
 - **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---

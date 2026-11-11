@@ -18,16 +18,16 @@
     <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
   </a>
   <a href="docs/Poster/Project_Poster.pdf" target="_blank">
-    <img src="https://img.shields.io/badge/Poster-Exhibition%20PDF-0D9488?style=for-the-badge&logo=adobeacrobatreader" alt="Project Poster PDF" />
+    <img src="https://img.shields.io/badge/Poster-Pending%20v2.4.1%20PDF-0D9488?style=for-the-badge&logo=adobeacrobatreader" alt="Project Poster PDF (Pending v2.4.1)" />
   </a>
   <a href="docs/Publications/Review_Paper.pdf" target="_blank">
-    <img src="https://img.shields.io/badge/Review%20Paper-IEEE%20Target-1E3A8A?style=for-the-badge&logo=ieee" alt="Review Paper PDF" />
+    <img src="https://img.shields.io/badge/Review%20Paper-Pending%20v2.4.1-1E3A8A?style=for-the-badge&logo=ieee" alt="Review Paper PDF (Pending v2.4.1)" />
   </a>
   <a href="docs/Publications/Research_Paper.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Research%20Paper-IEEE%20Camera--Ready-2563EB?style=for-the-badge&logo=ieee" alt="Research Paper PDF" />
   </a>
   <a href="docs/Thesis/Final_Thesis.pdf" target="_blank">
-    <img src="https://img.shields.io/badge/Thesis-Project%20Thesis%20Shell-7C3AED?style=for-the-badge&logo=adobeacrobatreader" alt="Project Thesis Shell PDF" />
+    <img src="https://img.shields.io/badge/Thesis-Pending%20v2.4.1%20PDF-7C3AED?style=for-the-badge&logo=adobeacrobatreader" alt="Project Thesis Shell PDF (Pending v2.4.1)" />
   </a>
   <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Walkthrough-red?style=for-the-badge&logo=youtube" alt="YouTube Walkthrough" />
@@ -206,8 +206,8 @@ This repository tells a complete, end-to-end engineering and scientific story: *
 flowchart LR
     M0["<b>Phase 0: Inception</b><br/>• Problem Scoping<br/>• Literature Survey<br/>• Proposal Submission<br/><i>(Aug 2026)</i>"] --> M1["<b>Phase 1: Baseline</b><br/>• Review 1 Defense<br/>• 2-RC ECM Engine<br/>• EKF & CC Baselines<br/>• C99 CSR Logic<br/><i>(Sep 2026)</i>"]
     M1 --> M2["<b>Phase 2: Maturity</b><br/>• Review 2 Defense<br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/>• 16:9 Deck & Report<br/><i>(Nov 2026)</i>"]
-    M2 --> M3["<b>Phase 3: Silicon IP & Telemetry</b><br/>• Release v2.4.0<br/>• Decoupled MongoDB Sync<br/>• Artix-7 Bitstream<br/>• 119 Passing Tests<br/><i>(Active Today)</i>"]
-    M3 --> M4["<b>Phase 4: Culmination</b><br/>• Turnkey v2.4.1<br/>• Final B.E. Thesis<br/>• IEEE Review Paper<br/>• Exhibition Poster<br/>• The 4 Things Complete<br/><i>(Active Target)</i>"]
+    M2 --> M3["<b>Phase 3: Silicon IP, Paper & Optimization</b><br/>• Release v2.4.0 (Synced)<br/>• IP Block v1.2 & Research Paper<br/>• Sparse/CSR Compression<br/>• 119 Tests (~21.6s)<br/><i>(Active Today)</i>"]
+    M3 --> M4["<b>Phase 4: Turnkey Culmination</b><br/>• Target Release v2.4.1<br/>• Final B.E. Thesis<br/>• Comprehensive Review Paper<br/>• A1 Exhibition Poster<br/><i>(Only 3 Remaining)</i>"]
 ```
 
 ---
@@ -263,27 +263,27 @@ Navigate the repository according to your area of interest:
 
 ## 📑 Project Milestones & Deliverables Roadmap
 
-> ### 🌟 Master Repository Delivery Status & Ground Truth Readiness
-> * **Current State A (Today / Before the 4 Deliverables):** **`Production Core Verified`**  
->   *(All software, 2-RC physics, multi-chemistry simulator, visualiser dashboard, C99 firmware, Artix-7 synthesizable Verilog RTL, AXI4-Lite IP block with 3.7 MB bitstream, and 119 automated pytest tests are 100% complete, verified, and passing).*
-> * **Final State B (Turnkey / After the 4 Deliverables):** **`Complete Turnkey Capstone`**  
->   *(Achieved upon compilation and drop-in of the 4 designated academic publication and thesis deliverables into their respective directories).*
+> ### 🌟 Master Repository Delivery Status & Ground Truth Readiness (`v2.4.0`)
+> * **Current State A (`v2.4.0` — Synced Today):** **`Production Core + Research Paper Verified`**  
+>   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), and 119 automated pytest tests in ~21.6s with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
+> * **Final State B (`v2.4.1` — Turnkey Capstone):** **`Complete Turnkey Capstone`**  
+>   *(Achieved upon compilation and drop-in of ONLY the **3 remaining** academic deliverables below into their respective directories).*
 >
-> #### 📌 What is Left to be Updated (The Only 3 Pending Items Across the Entire Repo):
+> #### 📌 What is Left to be Updated for `v2.4.1` (The Only 3 Pending Items Across the Entire Repo):
 > 1. [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) — High-resolution print-ready A1 exhibition poster (companion markdown: [`docs/Poster/README.md`](docs/Poster/README.md)).
 > 2. [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) — Comprehensive 29-page neuromorphic BMS survey paper (companion draft: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)).
 > 3. [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion guide: [`docs/Thesis/README.md`](docs/Thesis/README.md)).
-> *(Note: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) is completed & camera-ready integrated — Deliverable 1/4 Finalized).*
+> *(Note: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) is completed & camera-ready integrated in `v2.4.0` — only the 3 items above remain toward `v2.4.1`).*
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
-| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test comprehensive suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
-| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v1.2)** |
-| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Final Drop (Active Deliverable 1/4)** |
-| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 2/4)** |
-| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE camera-ready) | **Completed & Camera-Ready Integrated (Deliverable 1/4 Finalized)** |
-| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Final Drop (Active Deliverable 4/4)** |
+| **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
+| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.0)** |
+| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Drop (1 of 3 Remaining for v2.4.1)** |
+| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Drop (2 of 3 Remaining for v2.4.1)** |
+| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6 pages, 668 KB, IEEE camera-ready) | **Completed & Integrated (Synced in v2.4.0)** |
+| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Drop (3 of 3 Remaining for v2.4.1)** |
 | **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Fully Verified (Registry Active)** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.4.0 Active Today (v2.4.1 Final Turnkey)** |
@@ -590,17 +590,17 @@ BE-Capstone-Project/
 │   ├── README.md                          # Master documentation hub & 4-stream guide
 │   ├── literature_survey.md               # 29-page survey on SNNs, ESNs & Neuromorphic BMS
 │   │
-│   ├── Thesis/                            # B.E. Capstone Final Dissertation
-│   │   ├── Final_Thesis.pdf               # Camera-ready dissertation PDF shell (A4)
+│   ├── Thesis/                            # B.E. Capstone Final Dissertation (Pending v2.4.1)
+│   │   ├── Final_Thesis.pdf               # Dissertation PDF shell awaiting final drop-in (A4)
 │   │   └── README.md                      # University of Mumbai dissertation specifications
 │   │
-│   ├── Poster/                            # Academic Exhibition & Defense Poster
-│   │   ├── Project_Poster.pdf             # Formatted presentation poster PDF (A1)
+│   ├── Poster/                            # Academic Exhibition & Defense Poster (Pending v2.4.1)
+│   │   ├── Project_Poster.pdf             # Exhibition poster PDF shell awaiting final drop-in (A1)
 │   │   └── README.md                      # Print specs, high-res layout & cloud links
 │   │
 │   ├── Publications/                      # Official Academic Paper Deliverables
-│   │   ├── Research_Paper.pdf             # Original Experimental Research Paper (IEEE Target)
-│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (29 Pages, 11 Sections)
+│   │   ├── Research_Paper.pdf             # Camera-Ready IEEE Research Paper (Completed in v2.4.0)
+│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper shell (Pending v2.4.1)
 │   │   └── README.md                      # Publication abstracts, authorship, and scopes
 │   │
 │   ├── Paper_Proof/                       # 20 Marks Evaluation Submission/Acceptance Records
@@ -625,6 +625,7 @@ BE-Capstone-Project/
 │       ├── DEMO_CHECKLIST.md              # 10-minute presentation & viva defense checklist
 │       ├── ARTIFACTS.md                   # Model parameters and dataset versioning policy
 │       ├── PRESENTATION.md                # Slide-by-slide defense talking points & script
+│       ├── TRANSITION_PLAN_V2.4.1.md      # Official v2.4.0 -> v2.4.1 turnkey transition runbook (3 remaining PDFs)
 │       └── WEB_RESEARCH.md                # Automotive BMS landscape & ISO 26262 audit
 │
 ├── hardware/
@@ -648,15 +649,13 @@ BE-Capstone-Project/
 │   │   ├── main.c                         # Dual-mode (Float32 / Q15) C99 firmware
 │   │   ├── main.h                         # CSR structures, function prototypes, and fixed-point macros
 │   │   ├── Makefile.arm                   # ARM Cortex-M cross-compilation Makefile
-│   │   ├── config.py                      # Environment and hyperparameter configuration
+│   │   ├── config.py                      # Environment config & canonical software/visualiser/datasets resolution
 │   │   ├── train.py                       # Unified ESN training script
 │   │   ├── train_classifier.py            # Safety classification ESN trainer & header exporter
 │   │   ├── train_estimator.py             # Continuous estimator ESN trainer & header exporter
 │   │   ├── esn_classifier_weights.h       # Quantized CSR sparse classification weights
 │   │   ├── esn_estimator_weights.h        # Quantized CSR sparse estimation weights
 │   │   ├── requirements.txt               # Embedded training dependencies
-│   │   ├── original_ev_battery_dataset_multiclass.csv
-│   │   ├── training_ev_battery_dataset_multiclass.csv
 │   │   ├── run_c_simulator.bat            # 1-click Windows C99 compilation & execution test
 │   │   └── run_c_simulator.sh             # 1-click POSIX C99 compilation & execution test
 │   │
@@ -718,7 +717,7 @@ BE-Capstone-Project/
 │       ├── battery_simulator.py           # 2-RC physics classes for visualizer
 │       ├── gunicorn.conf.py               # Production WSGI server configuration
 │       ├── requirements.txt               # Visualiser Python dependencies
-│       ├── model_rc.pkl                   # Trained software ESN model binary
+│       ├── model_rc.pkl                   # Trained software ESN model binary (~602 KB CSR-compressed)
 │       ├── datasets/                      # EV dynamic driving telemetry datasets
 │       │   ├── original_ev_battery_dataset_multiclass.csv
 │       │   └── training_ev_battery_dataset_multiclass.csv
@@ -928,27 +927,28 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | :--- | :--- |
 | **Paper Title** | *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* |
 | **Target Venue** | IEEE Transactions / Q3 Scopus-Indexed Review Journal (Automotive Electronics / Energy Storage) |
-| **Paper Status** | **Drafting Complete / Ready for Submission** |
+| **Paper Status** | **Draft Complete (`Neuromorphic-BMS-Review-Paper-Draft.pdf`) — Final Drop Pending for `v2.4.1` (Remaining Deliverable 2/3)** |
 | **Formatted Deliverable** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) |
-| **Authoritative Manuscript** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (29 Pages, 11 Sections, 90+ Citations) |
+| **Authoritative Manuscript** | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29 Pages, 11 Sections, 90+ Citations) |
 | **Review Scope** | Theoretical foundations, 2-RC ECM, multi-timescale EKF, neuromorphic hardware (Loihi 2, Akida, SpiNNaker2, Artix-7), and SNN/ESN paradigms |
 | **Submission Proof (10 Marks)** | Official submission receipt and Paper ID logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) |
 
-### Target Paper 2: Original Experimental Research Paper (IEEE / Q3 Scopus Journal Target)
+### Target Paper 2: Original Experimental Research Paper (IEEE Camera-Ready — Completed in `v2.4.0`)
 | Item | Details |
 | :--- | :--- |
-| **Paper Title** | *Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems* |
+| **Paper Title** | *A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout* |
 | **Target Venue** | IEEE / Q3 Scopus-Indexed Journal on Industrial Electronics / Cyber-Physical Systems |
-| **Paper Status** | **Drafting Complete / Ready for Submission** |
+| **Paper Status** | **Completed & Camera-Ready Integrated (6 Pages, 668 KB — Synced in `v2.4.0`)** |
 | **Formatted Deliverable** | [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) |
 | **Authoritative Manuscript** | [`reference/paper.md`](reference/paper.md) (Hardware/Software Co-Design & Experimental Benchmarks) |
-| **Experimental Scope** | Co-designed 2-RC physics, 6.7× CSR SpMV embedded C99 speedup, Q15 fixed-point LUT math, 200/200 bit-exact FPGA RTL parity |
+| **Experimental Scope** | 100-neuron Q6.10 FPGA ESN on Artix-7 (`318 LUTs, 2 DSPs, 80 MHz`), bit-exact 200/200 & 6,400-step verification, 29-cell NASA PCoE cross-validation (`2,201 windows`, `140,864` held-out steps) |
 | **Submission Proof (10 Marks)** | Official submission confirmation PDF and tracking ID logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) |
 
 ### Capstone Presentation Poster (Academic Exhibition & Viva Defense)
 | Item | Details |
 | :--- | :--- |
 | **Deliverable Title** | *Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting (A1 Exhibition Poster)* |
+| **Poster Status** | **Pending Final Drop for `v2.4.1` (Remaining Deliverable 1/3)** |
 | **Poster Deliverable** | [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) |
 | **Specifications & Specs** | [`docs/Poster/README.md`](docs/Poster/README.md) (A1 Format, Layout Architecture, QR Cloud Links) |
 

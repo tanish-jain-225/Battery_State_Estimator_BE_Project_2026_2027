@@ -6,7 +6,7 @@
 
 ## 📌 Overview
 
-The repository features a rigorous, multi-layered automated regression test suite comprising **119 automated tests** across 15 specialized test modules, achieving **94.49% code coverage** on core shared physics and estimator packages.
+The repository features a rigorous, multi-layered automated regression test suite comprising **119 automated tests** across 15 specialized test modules, achieving **88.60% code coverage** on core shared physics modules (`software/shared`) and passing in **21.60s** (`19.12s` without coverage overhead).
 
 Every test executes in-memory with zero network or database dependencies (utilizing mock MongoDB fixtures in [`conftest.py`](conftest.py)).
 

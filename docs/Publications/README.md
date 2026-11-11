@@ -28,8 +28,8 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 | Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Marks | Deliverable Status |
 | :--- | :--- | :---: | :---: | :--- | :---: | :---: |
-| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) | **Pending Final Drop (Active Deliverable 2/4)** |
-| **Paper 2: Original Experimental Research** | Bit-exact fixed-point FPGA ESN reservoir (Q6.10), 2,201 NASA PCoE windows, 29-cell cross validation, Artix-7 RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) | **Completed & Camera-Ready Integrated (Deliverable 1/4 Finalized)** |
+| **Paper 1: Comprehensive Review** | Neuromorphic computing, SNNs, Reservoir Computing, Liquid State Machines & Edge AI for BMS | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | IEEE Transactions / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) | **Pending Drop (2 of 3 Remaining for v2.4.1)** |
+| **Paper 2: Original Experimental Research** | Bit-exact fixed-point FPGA ESN reservoir (Q6.10), 2,201 NASA PCoE windows, 29-cell cross validation, Artix-7 RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) | **Completed & Camera-Ready Integrated (v2.4.0)** |
 
 ---
 
@@ -72,6 +72,6 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 ## 🔁 Updating or Replacing Deliverables
 
 When camera-ready PDFs are compiled from LaTeX (Overleaf) or IEEE Word templates:
-1. Replace [`Review_Paper.pdf`](Review_Paper.pdf) and [`Research_Paper.pdf`](Research_Paper.pdf) with your compiled IEEE PDFs.
+1. Drop the finalized compiled [`Review_Paper.pdf`](Review_Paper.pdf) into `docs/Publications/` ([`Research_Paper.pdf`](Research_Paper.pdf) is already camera-ready integrated).
 2. Log official submission acknowledgement emails or tracking letters in [`docs/Paper_Proof/`](../Paper_Proof/README.md).
 
