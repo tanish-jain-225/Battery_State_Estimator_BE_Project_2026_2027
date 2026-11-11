@@ -298,9 +298,9 @@ The developmental journey from Review 2 evolves directly into commercial silicon
 
 1. **Phase 3 — Hardware IP Block & Acceleration ([`hardware/IP_Block/README.md`](../../hardware/IP_Block/README.md))**:
    * **IEEE 1685 IP-XACT Packaging**: Packaged the verified 100-neuron ESN RTL into an AXI4-Lite/Stream component descriptor ([`hardware/IP_Block/component.xml`](../../hardware/IP_Block/component.xml)) ready for the Vivado IP Catalog.
-   * **Concurrent Tri-Observer FPGA Platform**: Synthesized and implemented top-level RTL ([`hardware/IP_Block/esn_platform_top.v`](../../hardware/IP_Block/esn_platform_top.v)) running ESN, EKF, and UKF simultaneously.
+   * **Concurrent Tri-Observer FPGA Platform (v1.2)**: Synthesized and implemented top-level RTL ([`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)) running ESN (serial or `P=10` fast core [`rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v)), EKF (Rev 0.5 optional ESN fusion), and UKF simultaneously.
    * **Pre-Compiled FPGA Bitstream**: Generated flash-ready 3.7 MB bitstream ([`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit)) for Digilent Arty A7-100T (`xc7a100tcsg324-1`).
-   * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/esn_host.py`](../../hardware/IP_Block/esn_host.py)) delivering 23× real-time headroom over 115200-baud serial links.
+   * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/host/esn_host.py`](../../hardware/IP_Block/host/esn_host.py)) with 29 held-out packs and `reproduce_paper.py` delivering real-time headroom over 115200-baud serial links.
    * **Regression Suite**: Expanded to **119 passing tests** with 100% pass rate in ~32s.
 
 2. **Phase 4 — Capstone Dissertation & Academic Dissemination ([`docs/Thesis/README.md`](../Thesis/README.md))**:

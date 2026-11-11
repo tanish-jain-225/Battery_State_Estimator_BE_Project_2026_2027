@@ -83,7 +83,13 @@ Release/
 # ── Xilinx Vivado, XSim, Verilator & EDA FPGA Build Artifacts ─────────────────
 .Xil/
 xsim.dir/
+vivado/
 vivado_*/
+ip_repo/
+_regress/
+_draws/
+sweep_fast/
+sweep_nres/
 obj_dir/
 webtalk/
 webtalk*.log
@@ -163,10 +169,8 @@ $RECYCLE.BIN/
 !hardware/FPGA_Verifier/**/*.mem
 !hardware/FPGA_Verifier/**/*.json
 !hardware/IP_Block/esn_platform_top.bit
-!hardware/IP_Block/*.mem
-!hardware/IP_Block/*.csv
-!hardware/IP_Block/*.json
-!hardware/IP_Block/*.xml
-!hardware/IP_Block/*.rpt
-!hardware/IP_Block/xsim.ini
-!hardware/IP_Block/xsimSettings.ini
+!hardware/IP_Block/component.xml
+!hardware/IP_Block/backup_rev04/*.bak
+!hardware/IP_Block/**/*.mem
+!hardware/IP_Block/**/*.csv
+!hardware/IP_Block/**/*.json

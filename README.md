@@ -255,7 +255,7 @@ Navigate the repository according to your area of interest:
 | Persona / Interest | Recommended Reading Path | Primary Goal |
 | :--- | :--- | :--- |
 | **Project Evaluators & Guides** | [`docs/Review_1/README.md`](docs/Review_1/README.md) ──► [`docs/Review_2/README.md`](docs/Review_2/README.md) ──► [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) ──► [`docs/Thesis/README.md`](docs/Thesis/README.md) | Verify milestone progress, FPGA bit-exact parity, and capstone dissertation structure. |
-| **Embedded & Silicon Engineers** | [`docs/Resources/SYSTEM_SPECIFICATION.md`](docs/Resources/SYSTEM_SPECIFICATION.md) ──► [`hardware/hardware.md`](hardware/hardware.md) ──► [`hardware/STM_Verifier/README.md`](hardware/STM_Verifier/README.md) ──► [`hardware/IP_Block/register_map.md`](hardware/IP_Block/register_map.md) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) | Examine C99 CSR SpMV algorithms, Verilog RTL datapath, AXI4 memory maps, and Artix-7 bitstream. |
+| **Embedded & Silicon Engineers** | [`docs/Resources/SYSTEM_SPECIFICATION.md`](docs/Resources/SYSTEM_SPECIFICATION.md) ──► [`hardware/hardware.md`](hardware/hardware.md) ──► [`hardware/STM_Verifier/README.md`](hardware/STM_Verifier/README.md) ──► [`hardware/IP_Block/docs/register_map.md`](hardware/IP_Block/docs/register_map.md) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) | Examine C99 CSR SpMV algorithms, Verilog RTL datapath, AXI4 memory maps, and Artix-7 bitstream. |
 | **ML & Software Developers** | [`software/software.md`](software/software.md) ──► [`software/simulator/simulator.md`](software/simulator/simulator.md) ──► [`software/visualiser/visualiser.md`](software/visualiser/visualiser.md) ──► [`tests/`](tests/) | Explore 2-RC physics, ESN reservoir dynamics, online RLS filter, and 119 passing tests. |
 | **Academic Researchers** | [`docs/literature_survey.md`](docs/literature_survey.md) ──► [`docs/Publications/README.md`](docs/Publications/README.md) ──► [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) ──► [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) ──► [`docs/Paper_Proof/README.md`](docs/Paper_Proof/README.md) | Review scientific methodology, IEEE manuscript drafts, benchmarking data, and evaluation marks. |
 
@@ -279,7 +279,7 @@ Navigate the repository according to your area of interest:
 | :---: | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
 | **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test comprehensive suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
-| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/register_map.md) | IEEE 1685 IP-XACT component, concurrent Tri-Observer FPGA platform, 3.7 MB bitstream, UART HIL | **Completed / Fully Verified** |
+| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v1.2)** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Final Drop (Active Deliverable 1/4)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Final Drop (Active Deliverable 2/4)** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6.7× speedup, IEEE camera-ready) | **Completed & Camera-Ready Integrated (Deliverable 1/4 Finalized)** |
@@ -630,20 +630,18 @@ BE-Capstone-Project/
 ├── hardware/
 │   ├── hardware.md                        # Consolidated hardware subsystem guide
 │   │
-│   ├── IP_Block/                          # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform
-│   │   ├── README.md                      # IP-XACT Catalog, AXI4-Lite/Stream & Arty A7 Guide
+│   ├── IP_Block/                          # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform (v1.2)
+│   │   ├── README.md                      # v1.2 Fast/Serial IP-XACT Catalog & Arty A7 Platform Guide
+│   │   ├── RUN_COMMANDS.md                # Complete Build, Board & Regression Command Runbook
 │   │   ├── component.xml                  # IEEE 1685 IP-XACT Packaging Descriptor (VESIT UserIP)
-│   │   ├── register_map.md                # AXI4-Lite Memory-Mapped Register Specification
-│   │   ├── uart_protocol.md               # 115200-Baud Real-Time Multi-Observer UART Protocol
-│   │   ├── esn_axi_ip.v                   # Top-Level Reusable AXI4-Lite / AXI4-Stream IP Module
-│   │   ├── esn_platform_top.v             # Tri-Observer FPGA Top Module (ESN + EKF + UKF in Parallel)
-│   │   ├── esn_platform_top.bit           # Pre-Compiled Ready-to-Flash Bitstream (Arty A7-100T)
-│   │   ├── package_esn_ip.tcl             # Vivado IP Packaging Automation Script
-│   │   ├── build_platform.tcl             # Vivado Project Generation & Bitstream Build Script
-│   │   ├── esn_ip.h                       # C Driver API Header for MicroBlaze / Zynq ARM Cortex-A
-│   │   ├── esn_ip_example.c               # C Driver Example Implementation
-│   │   ├── esn_host.py                    # Multi-Cycle UART Host Communication & Live Replay CLI
-│   │   └── esn_platform_top_*.rpt         # Timing, Power (0.124 W) & Resource Utilization Reports
+│   │   ├── esn_platform_top.bit           # Pre-Compiled Serial Bitstream (Arty A7-100T)
+│   │   ├── rtl/                           # Verilog RTL (esn_core_fast.v, ekf_core.v Rev 0.5, esn_axi_ip.v, etc.)
+│   │   ├── scripts/                       # Vivado Tcl (build_platform.tcl, package_esn_ip.tcl) & Verilator regressions
+│   │   ├── driver/                        # C Driver API Header & Example (esn_ip.h, esn_ip_example.c)
+│   │   ├── docs/                          # register_map.md, uart_protocol.md, regression_2026-11-11.txt
+│   │   ├── test_data/                     # UART replay vectors (causal B0047, fused EKF, NARMA-10 draws)
+│   │   ├── host/                          # esn_host.py, reproduce_paper.py, train_pack.py & 29 held-out packs
+│   │   └── reports_v10/                   # Routed Vivado v1.0 serial timing, power & utilization reports
 │   │
 │   ├── STM_Verifier/                      # C99 Embedded Firmware & Microcontroller Verifier
 │   │   ├── README.md                      # STM32 C99 CSR SpMV & Fixed-Point Guide
@@ -832,9 +830,9 @@ Validate edge embedded execution and silicon RTL models:
   ```bash
   python hardware/FPGA_Verifier/compare_results.py
   ```
-* **FPGA Concurrent Tri-Observer IP Block Simulation (ESN + EKF + UKF):**
+* **FPGA Concurrent Tri-Observer IP Block Software Twin (v1.2, ESN + EKF + UKF):**
   ```bash
-  python hardware/IP_Block/esn_host.py run --pack pack_B0018 --data b18.csv --emit simdir
+  python hardware/IP_Block/host/esn_host.py twin --pack hardware/IP_Block/host/packs/heldout/pack_B0047 --data hardware/IP_Block/host/packs/heldout/pack_B0047/B0047_cycles.csv --cycle all
   ```
 
 #### 🛡️ Option D: Master 8-Step Validation Suite

@@ -1,0 +1,77 @@
+{
+ "name": "NASA-18650 all-condition fold, held-out B0056",
+ "trained_on": [
+  "B0005",
+  "B0006",
+  "B0007",
+  "B0018",
+  "B0025",
+  "B0026",
+  "B0027",
+  "B0028",
+  "B0029",
+  "B0030",
+  "B0031",
+  "B0032",
+  "B0033",
+  "B0034",
+  "B0036",
+  "B0038",
+  "B0039",
+  "B0040",
+  "B0041",
+  "B0042",
+  "B0043",
+  "B0044",
+  "B0046",
+  "B0047",
+  "B0048",
+  "B0049",
+  "B0050",
+  "B0051",
+  "B0052",
+  "B0054",
+  "B0055"
+ ],
+ "features": [
+  "voltage_measured",
+  "current_measured",
+  "temperature_measured",
+  "current_load"
+ ],
+ "scaler_min": {
+  "voltage_measured": 1.1932458808760276,
+  "current_measured": -4.033220119941255,
+  "temperature_measured": 3.440362613271007,
+  "current_load": -2.0
+ },
+ "scaler_max": {
+  "voltage_measured": 4.519252349646744,
+  "current_measured": 0.012394848127374099,
+  "temperature_measured": 69.86974573152932,
+  "current_load": 4.001
+ },
+ "input_scale": 1024,
+ "ocv_poly": [
+  36.50773586338688,
+  -98.5487535749028,
+  99.28316259478217,
+  -45.39963457026581,
+  9.575598489247257,
+  2.6573161125288203
+ ],
+ "r0": 0.000950562306267577,
+ "r1": 0.01,
+ "c1": 3000.0,
+ "cap_nominal": 1.317502710734752,
+ "ekf_calibration": [
+  "B0005",
+  "B0006",
+  "B0007",
+  "B0018"
+ ],
+ "window_rule": "discharge only: ends at last sample with current < -0.25 A",
+ "n_in": 4,
+ "n_res": 100,
+ "t_steps": 64
+}

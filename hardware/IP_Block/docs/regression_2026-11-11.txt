@@ -1,0 +1,39 @@
+Regression of esn_ip_platform 1.2, 11 Nov 2026, Verilator 5.028
+
+== Serial core (bash scripts/regression.sh): 10/10 PASS
+PASS AXI IP rtl_axil.csv SOC 64/64 + SOH 31ad
+PASS AXI IP rtl_axis.csv SOC 64/64 + SOH 31ad
+PASS platform sim_c115 : 64 steps, 1 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 42905 245 662
+PASS platform sim_b47 : 256 steps, 4 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 42905 245 662
+PASS platform sim_v11_general : 192 steps, 3 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 42905 245 662
+PASS platform sim_v11_b43clip : 128 steps, 2 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 42905 245 662
+PASS platform sim_narma10_task : 2200 steps, ESN mismatches = 0 | cycles/step [42905]
+PASS platform sim_narma10_battery : 2200 steps, ESN mismatches = 0 | cycles/step [42905]
+PASS platform sim_causal_b47 : 1732 steps, ESN mismatches = 0 | cycles/step [42905]
+PASS platform sim_fused_b47 : 1732 steps, ESN mismatches = 0 , fused EKF mismatches = 0 | cycles/step ESN [42905] EKF [43076]
+
+== Fast core P=10 K=24 (CORE_ARGS="-GFAST=1 -GP=10 -GK=24" bash scripts/regression.sh): 10/10 PASS
+PASS AXI IP rtl_axil.csv SOC 64/64 + SOH 31ad
+PASS AXI IP rtl_axis.csv SOC 64/64 + SOH 31ad
+PASS platform sim_c115 : 64 steps, 1 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 12714 245 662
+PASS platform sim_b47 : 256 steps, 4 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 12714 245 662
+PASS platform sim_v11_general : 192 steps, 3 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 12714 245 662
+PASS platform sim_v11_b43clip : 128 steps, 2 windows, ESN+EKF+UKF+SOH mismatches = 0 | cycles/step 12714 245 662
+PASS platform sim_narma10_task : 2200 steps, ESN mismatches = 0 | cycles/step [310, 12750]
+PASS platform sim_narma10_battery : 2200 steps, ESN mismatches = 0 | cycles/step [310, 12714]
+PASS platform sim_causal_b47 : 1732 steps, ESN mismatches = 0 | cycles/step [310, 12714]
+PASS platform sim_fused_b47 : 1732 steps, ESN mismatches = 0 , fused EKF mismatches = 0 | cycles/step ESN [310, 12714] EKF [477, 12881]
+
+== NARMA-10 draws 100-109, serial core (bash scripts/narma_draws.sh): 10/10 PASS
+PASS sim_narma10_draw100 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw101 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw102 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw103 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw104 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw105 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw106 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw107 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw108 : 2200 steps, mismatches = 0 | cycles/step [42905]
+PASS sim_narma10_draw109 : 2200 steps, mismatches = 0 | cycles/step [42905]
+
+Fast-core cycle sets show the first step after a weight load, which includes the one-time ELL compression pass.

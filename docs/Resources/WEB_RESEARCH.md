@@ -355,7 +355,7 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 
 ### 📦 Deliverable 3: Plug-and-Play FPGA ESN IP Block & Platform
 * **Packaging Specification:** [`hardware/IP_Block/component.xml`](../../hardware/IP_Block/component.xml) (IEEE 1685 IP-XACT Descriptor)
-* **Top-Level Verilog RTL:** [`hardware/IP_Block/esn_axi_ip.v`](../../hardware/IP_Block/esn_axi_ip.v) & [`hardware/IP_Block/esn_platform_top.v`](../../hardware/IP_Block/esn_platform_top.v)
+* **Top-Level Verilog RTL:** [`hardware/IP_Block/rtl/esn_axi_ip.v`](../../hardware/IP_Block/rtl/esn_axi_ip.v), [`hardware/IP_Block/rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v) & [`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)
 * **Pre-Compiled Bitstream:** [`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit) (3.7 MB, ready to flash Arty A7-100T)
 * **Function:** Commercial-grade AXI4-Lite/Stream IP block executing ESN, EKF, and UKF concurrently on FPGA over 115200-baud UART with a 23× real-time BMS execution margin.
 

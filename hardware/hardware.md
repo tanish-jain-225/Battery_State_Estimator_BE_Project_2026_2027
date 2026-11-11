@@ -33,20 +33,24 @@ The layout below maps out the key modules within the hardware directory:
 ```text
 hardware/
 ├── hardware.md                                  # Consolidated hardware documentation
-├── IP_Block/                                    # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform
-│   ├── README.md                                # Master IP-XACT Catalog, AXI4-Lite/Stream & Platform Guide
-│   ├── component.xml                            # IEEE 1685 IP-XACT packaging specification (VESIT UserIP)
-│   ├── register_map.md                          # AXI4-Lite memory-mapped register space specification
-│   ├── uart_protocol.md                         # 115200-baud real-time multi-observer UART protocol
-│   ├── esn_axi_ip.v                             # Reusable AXI4-Lite + AXI4-Stream ESN IP top module
-│   ├── esn_platform_top.v                       # Tri-observer FPGA top module (ESN + EKF + UKF in parallel)
-│   ├── esn_platform_top.bit                     # Pre-compiled ready-to-program bitstream (Arty A7-100T)
-│   ├── package_esn_ip.tcl                       # Vivado IP-XACT packaging automation script
-│   ├── build_platform.tcl                       # Vivado project generation and bitstream synthesis script
-│   ├── esn_ip.h                                 # C driver header for MicroBlaze / Zynq ARM Cortex-A
-│   ├── esn_ip_example.c                         # C driver example application
-│   ├── esn_host.py                              # Real-time UART host communication and evaluation CLI
-│   └── esn_platform_top_*.rpt                   # Synthesis, timing summary and power reports
+├── IP_Block/                                    # Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform (v1.2)
+│   ├── README.md                                # Master v1.2 IP-XACT Catalog, Fast/Serial Core & Platform Guide
+│   ├── RUN_COMMANDS.md                          # Complete Vivado, Arty A7, UART & Regression CLI Runbook
+│   ├── CHANGELOG.md                             # v1.0 -> v1.2 IP Platform Hardware & Host Evolution
+│   ├── component.xml                            # IEEE 1685 IP-XACT descriptor (VESIT UserIP baseline)
+│   ├── esn_platform_top.bit                     # Pre-compiled Arty A7-100T serial bitstream (FAST=0)
+│   ├── rtl/                                     # Verilog RTL (esn_axi_ip.v, esn_core.v, esn_core_fast.v, ekf_core.v Rev 0.5, ukf_core.v, esn_platform*.v)
+│   ├── mem/                                     # 5121-entry Q6.10 tanh lookup memory (tanh.mem)
+│   ├── xdc/                                     # Arty A7-100T physical & timing constraints (esn_platform_top.xdc)
+│   ├── scripts/                                 # Vivado Tcl (build_platform.tcl, package_esn_ip.tcl, sweeps) & Verilator regressions
+│   ├── tb/                                      # Verilog RTL testbenches (tb_esn_axi_ip.v, tb_esn_platform.v, core tests)
+│   ├── verify/                                  # Golden B0018 cycle 115 IP verification vectors (golden_readout.csv)
+│   ├── test_data/                               # UART replay vectors: battery windows, sim_causal_b47, sim_fused_b47, NARMA-10
+│   ├── driver/                                  # Bare-metal C driver API (esn_ip.h, esn_ip_example.c)
+│   ├── docs/                                    # register_map.md, uart_protocol.md, Verilator regression_2026-11-11.txt
+│   ├── host/                                    # esn_host.py, reproduce_paper.py, train_pack.py, replay_board.py, narma_board.py & packs/
+│   ├── backup_rev04/                            # Archived Rev 0.4 ekf_core & Rev 1.0 platform sources (reference only)
+│   └── reports_v10/                             # Routed Vivado 2023.1 v1.0 serial timing, power & utilization reports
 ├── STM_Verifier/                                # C99 embedded firmware and training scripts
 │   ├── main.c                                   # C99 classifier runtime & test simulation
 │   ├── main.h                                   # Host-side HAL shims & microcontroller config
@@ -161,20 +165,20 @@ Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FP
 
 ### 3.5 Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform (`hardware/IP_Block/`)
 
-The [`hardware/IP_Block/`](IP_Block/README.md) directory delivers our complete **commercial-grade, plug-and-play FPGA IP Block and Multi-Observer Hardware Platform** targeting the Xilinx Artix-7 FPGA (Digilent Arty A7-100T):
+The [`hardware/IP_Block/`](IP_Block/README.md) directory delivers our **v1.2 commercial-grade, plug-and-play FPGA IP Block and Multi-Observer Hardware Platform** targeting the Xilinx Artix-7 FPGA (Digilent Arty A7-100T):
 
-1. **Reusable AXI4 IP Block (`esn_axi_ip`)**:
-   - **Bus Protocols:** AXI4-Lite slave interface for memory-mapped parameter configuration and control; AXI4-Stream slave/master interfaces for streaming battery telemetry vectors and receiving predictions.
-   - **IP-XACT Packaging:** Packaged compliant with IEEE 1685 standard in [`component.xml`](IP_Block/component.xml) under taxonomy `/UserIP` (`vesit.ac.in:user:esn_axi_ip:1.0`), enabling drag-and-drop integration in Vivado IP Integrator / Block Designs.
-   - **Runtime Reconfigurability:** All ESN reservoir weights ($W_{\text{in}}, W$, bias) and linear readout weights ($W_{\text{out}}^{\text{SOC}}, W_{\text{out}}^{\text{SOH}}$) are loaded at runtime over AXI4-Lite, allowing one bitstream to service any trained ESN model or cell chemistry.
-   - **Embedded Software Driver:** Complete C driver API ([`esn_ip.h`](IP_Block/esn_ip.h), [`esn_ip_example.c`](IP_Block/esn_ip_example.c)) for MicroBlaze, Zynq ARM Cortex-A9/A53, or host microcontrollers.
+1. **Reusable AXI4 IP Block (`rtl/esn_axi_ip.v`)**:
+   - **Dual Reservoir Architectures (`FAST=0` vs. `FAST=1`):** Supports both the compact serial core ([`rtl/esn_core.v`](IP_Block/rtl/esn_core.v): 42,902 cycles / 536 µs @ 80 MHz; IP OOC 1,868 LUTs, 4 DSP, 0.131 W estimate) and the pipelined parallel sparse ELL core ([`rtl/esn_core_fast.v`](IP_Block/rtl/esn_core_fast.v), `P=10, K=24`: **307 cycles / 3.84 µs** @ 80 MHz; IP OOC 4,877 LUTs, 22 DSP, 0.156 W / 0.60 µJ per update).
+   - **Bus Protocols & IP-XACT Packaging:** AXI4-Lite slave interface ([`docs/register_map.md`](IP_Block/docs/register_map.md)) for memory-mapped parameter configuration and AXI4-Stream slave/master interfaces for vector streaming; packaged to IEEE 1685 in [`component.xml`](IP_Block/component.xml) under `/UserIP` (`vesit.ac.in:user:esn_axi_ip:1.0`) with automation in [`scripts/package_esn_ip.tcl`](IP_Block/scripts/package_esn_ip.tcl).
+   - **Runtime Reconfigurability & Dual-Application Support:** All ESN reservoir weights ($W_{\text{in}}, W$, bias) and linear readout weights ($W_{\text{out}}^{\text{SOC}}, W_{\text{out}}^{\text{SOH}}$) load at runtime over AXI4-Lite/UART—verified across both 29 held-out NASA PCoE battery cells ([`host/packs/general_32cells/`](IP_Block/host/packs/general_32cells/)) and NARMA-10 nonlinear benchmark workloads ([`host/narma_board.py`](IP_Block/host/narma_board.py)) with zero hardware mismatches.
+   - **Embedded Software Driver:** Complete bare-metal C driver API ([`driver/esn_ip.h`](IP_Block/driver/esn_ip.h), [`driver/esn_ip_example.c`](IP_Block/driver/esn_ip_example.c)) for MicroBlaze, Zynq ARM, or RISC-V soft cores.
 
-2. **Tri-Observer FPGA Platform (`esn_platform_top`)**:
-   - **Concurrent Hardware Observers:** Executes the 100-neuron ESN, 512-point Fixed-Point EKF, and 512-point Fixed-Point UKF **simultaneously in parallel** on the FPGA fabric upon receiving each battery telemetry frame.
-   - **Hardware UART Interface:** Real-time 115200-baud UART protocol ([`uart_protocol.md`](IP_Block/uart_protocol.md)) streaming telemetry frames from host laptops and returning concurrent predictions and measured execution cycle counts.
-   - **Cycle Latencies (at 80 MHz):** ESN: 42,905 cycles (536 µs); EKF: 226 cycles (2.8 µs); UKF: 597 cycles (7.5 µs).
-   - **Total Device Power:** 0.124 W on Digilent Arty A7-100T (`xc7a100tcsg324-1`).
-   - **Pre-Compiled Ready-to-Flash Bitstream:** Included as [`esn_platform_top.bit`](IP_Block/esn_platform_top.bit) (3.7 MB), enabling instant FPGA flashing and validation without waiting for full synthesis.
+2. **Tri-Observer & ESN-Fused FPGA Platform (`rtl/esn_platform_top.v`)**:
+   - **Concurrent & Fused Hardware Observers:** Executes the 100-neuron ESN (`esn_core` / `esn_core_fast`), Fixed-Point EKF ([`rtl/ekf_core.v`](IP_Block/rtl/ekf_core.v) **Rev 0.5** with optional same-step ESN SOC fusion via `FUSE=1`), and Fixed-Point UKF ([`rtl/ukf_core.v`](IP_Block/rtl/ukf_core.v)) in parallel on every telemetry frame.
+   - **Hardware UART Interface:** Real-time 115200-baud UART protocol ([`docs/uart_protocol.md`](IP_Block/docs/uart_protocol.md)) driven by [`host/esn_host.py`](IP_Block/host/esn_host.py) (with `-0.25 A` discharge-only window trimming) and [`host/replay_board.py`](IP_Block/host/replay_board.py).
+   - **Cycle Latencies (at 80 MHz):** Serial ESN `42,905` cycles (536 µs) / Fast ESN `310` cycles (first step after weight load `12,714` during ELL compression); EKF `245` cycles / ESN-fused EKF `477` cycles; UKF `662` cycles.
+   - **Routed FPGA Resources & Power (Arty A7-100T @ 80 MHz):** Serial platform: `13,861 LUTs`, `9,265 FFs`, `18.5 BRAM`, `12 DSP`, WNS `+1.317 ns`, `0.368 W` Vivado estimate ([`reports_v10/`](IP_Block/reports_v10/)). Fast `P=10` + fused EKF platform: `17,290 LUTs`, `12,098 FFs`, `38.5 BRAM`, `30 DSP`, WNS `+0.251 ns`, `0.447 W` Vivado estimate.
+   - **Dual-Core Verilator Regression & Pre-Compiled Bitstream:** Verified **10/10 PASS** on both serial and fast (`P=10, K=24`) cores in [`docs/regression_2026-11-11.txt`](IP_Block/docs/regression_2026-11-11.txt). Includes pre-compiled serial bitstream [`esn_platform_top.bit`](IP_Block/esn_platform_top.bit) plus [`scripts/build_platform.tcl`](IP_Block/scripts/build_platform.tcl) (`-tclargs fast` for v1.2 fast build).
 
 ---
 

@@ -109,7 +109,7 @@ if !errorlevel! neq 0 (
     echo [SUCCESS] All 3 FPGA Accelerator Cores - ESN, EKF, UKF - verified bit-exactly!
 )
 
-python -c "import sys; sys.path.insert(0, 'hardware/IP_Block'); from esn_host import Pack; p = Pack('hardware/IP_Block'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack verified end-to-end.')"
+python -c "import sys; sys.path.insert(0, 'hardware/IP_Block/host'); from esn_host import Pack; p = Pack('hardware/IP_Block/host/packs/general_32cells'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack v1.2 verified end-to-end.')"
 if !errorlevel! neq 0 (
     echo [ERROR] FPGA ESN IP Block verification failed.
     set /a FAILURES+=1

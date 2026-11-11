@@ -111,7 +111,7 @@ else
     FAILURES=$((FAILURES+1))
 fi
 
-if $PYTHON_BIN -c "import sys; sys.path.insert(0, 'hardware/IP_Block'); from esn_host import Pack; p = Pack('hardware/IP_Block'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack verified end-to-end.')"; then
+if $PYTHON_BIN -c "import sys; sys.path.insert(0, 'hardware/IP_Block/host'); from esn_host import Pack; p = Pack('hardware/IP_Block/host/packs/general_32cells'); assert p.nres == 100; print('[SUCCESS] FPGA Plug-and-Play ESN IP Block & Pack v1.2 verified end-to-end.')"; then
     :
 else
     echo "[ERROR] FPGA ESN IP Block verification failed."
