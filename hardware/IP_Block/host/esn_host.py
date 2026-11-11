@@ -124,12 +124,24 @@ class Pack:
         self.d = d; self.j = json.load(open(d + "/pack.json"))
         self.mn = np.array([self.j["scaler_min"][k] for k in self.j["features"]])
         self.mx = np.array([self.j["scaler_max"][k] for k in self.j["features"]])
-        self.win = rdmem(d + "/win_bram.mem"); self.w = rdmem(d + "/w_bram.mem"); self.bias = rdmem(d + "/bias_bram.mem")
+        base_pack = os.path.join(H, "packs", "general_32cells")
+
+        def _mem(name):
+            local = os.path.join(d, name)
+            if os.path.exists(local):
+                return rdmem(local)
+            if name == "tanh.mem":
+                ip_mem = os.path.abspath(os.path.join(H, "..", "mem", "tanh.mem"))
+                if os.path.exists(ip_mem):
+                    return rdmem(ip_mem)
+            return rdmem(os.path.join(base_pack, name))
+
+        self.win = _mem("win_bram.mem"); self.w = _mem("w_bram.mem"); self.bias = _mem("bias_bram.mem")
         self.ro_soc = [s18(v) for v in rdmem(d + "/readout_soc.mem")]; self.ro_soh = [s18(v) for v in rdmem(d + "/readout_soh.mem")]
-        self.luts = {n: rdmem(f"{d}/{n}.mem") for n in ("ekf_ocv", "ekf_slope", "ukf_ocv", "ukf_slope")}
+        self.luts = {n: _mem(f"{n}.mem") for n in ("ekf_ocv", "ekf_slope", "ukf_ocv", "ukf_slope")}
         self.params = dict(ocv_poly=np.poly1d(self.j["ocv_poly"]), r0=self.j["r0"], r1=self.j["r1"], c1=self.j["c1"])
         self.nres = self.j["n_res"]; self.nin = self.j["n_in"]
-        tanh = rdmem(d + "/tanh.mem")
+        tanh = _mem("tanh.mem")
         self.esn = FastESN(np.array([s16(v) for v in self.win], np.int64).reshape(self.nres, self.nin),
                            np.array([s16(v) for v in self.w], np.int64).reshape(self.nres, self.nres),
                            np.array([s16(v) for v in self.bias], np.int64), tanh)

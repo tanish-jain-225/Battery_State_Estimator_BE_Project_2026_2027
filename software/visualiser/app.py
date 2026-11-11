@@ -319,14 +319,15 @@ class SafeUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         if name == "EchoStateNetwork":
             return EchoStateNetwork
-        # Remap numpy._core -> numpy.core (handles loading NumPy 2.x pickles on NumPy 1.x environments)
-        if module.startswith("numpy._core"):
-            module = module.replace("numpy._core", "numpy.core")
-        # Remap numpy.core -> numpy._core (handles loading older pickles on environments where numpy.core is missing)
-        elif module.startswith("numpy.core"):
-            if hasattr(np, '_core'):
-                module = module.replace("numpy.core", "numpy._core")
-        return super().find_class(module, name)
+        try:
+            return super().find_class(module, name)
+        except ModuleNotFoundError:
+            # Handle cross-version NumPy pickles (numpy._core <-> numpy.core) only on fallback
+            if module.startswith("numpy._core"):
+                return super().find_class(module.replace("numpy._core", "numpy.core", 1), name)
+            if module.startswith("numpy.core"):
+                return super().find_class(module.replace("numpy.core", "numpy._core", 1), name)
+            raise
 
 def safe_pickle_loads(data):
     import io
@@ -955,7 +956,7 @@ def run_training_async():
 
     try:
         check_timeout()
-        from feature_engineering import extract_features_df
+        from feature_engineering import extract_features_df, normalize_battery_dataframe
         from train_rc import EchoStateNetwork, generate_full_range_dataset
 
         csv_path = Config.CSV_PATH
@@ -996,9 +997,16 @@ def run_training_async():
             except Exception as url_err:
                 training_status['logs'] += f"Doc link not accessible: {url_err}.\n"
 
-        # Priority 2: Doc link not accessible -> use previously loaded data
+        # Priority 2: Doc link not accessible -> use previously loaded data (slice early if decimated)
+        is_production = Config.is_production()
+        limit = Config.PRODUCTION_DECIMATION_LIMIT
         if df is None and _last_fetched_df is not None and not _last_fetched_df.empty:
-            df = _last_fetched_df.copy()
+            if (is_production or csv_url or len(_last_fetched_df) > limit) and len(_last_fetched_df) > limit:
+                step = int(np.ceil(len(_last_fetched_df) / limit))
+                df = _last_fetched_df.iloc[::step].reset_index(drop=True)
+                training_status['logs'] += f"Dynamically decimated dataset (sampled every {step}th row) to {len(df)} rows for cloud optimization.\n"
+            else:
+                df = _last_fetched_df.copy()
             source_name = "Previously Loaded Data"
             training_status['logs'] += f"Doc link not available. Using previously loaded dataset from memory ({len(df)} rows).\n"
 
@@ -1033,52 +1041,9 @@ def run_training_async():
         check_timeout()
 
         if df is not None:
-            # Recover if CSV was pasted into a single column
-            if len(df.columns) == 1 and ',' in str(df.columns[0]):
-                col_name = df.columns[0]
-                new_cols = [c.strip() for c in col_name.split(',')]
-                split_data = df[col_name].astype(str).str.split(',', expand=True)
-                if split_data.shape[1] == len(new_cols):
-                    split_data.columns = new_cols
-                    df = split_data.apply(pd.to_numeric, errors='coerce')
-
-            df.columns = [str(col).strip() for col in df.columns]
-            rename_dict = {}
-            for col in df.columns:
-                col_lower = col.lower()
-                if col_lower == 'voltage':
-                    rename_dict[col] = 'Voltage'
-                elif col_lower == 'current':
-                    rename_dict[col] = 'Current'
-                elif col_lower == 'temperature':
-                    rename_dict[col] = 'Temperature'
-                elif col_lower == 'soc':
-                    rename_dict[col] = 'SOC'
-                elif col_lower == 'soh':
-                    rename_dict[col] = 'SOH'
-                elif col_lower == 'time':
-                    rename_dict[col] = 'Time'
-            df.rename(columns=rename_dict, inplace=True)
-
-            # Coerce numeric columns, drop NaNs, and normalize percentage values
-            req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
-            for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
-            df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
-            if 'SOH' not in df.columns:
-                df['SOH'] = 1.0
-
-            # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
-            if df['SOC'].max() > 1.5:
-                df['SOC'] = df['SOC'] / 100.0
-            if df['SOH'].max() > 1.5:
-                df['SOH'] = df['SOH'] / 100.0
-            df.reset_index(drop=True, inplace=True)
+            df = normalize_battery_dataframe(df, require_soc=True, default_soh=1.0)
 
         # Dynamic decimation: Caps training dataset in production, for cloud URLs, or when dataset size > limit to guarantee sub-5s training
-        is_production = Config.is_production()
-        limit = Config.PRODUCTION_DECIMATION_LIMIT
         if (is_production or csv_url or len(df) > limit) and len(df) > limit:
             step = int(np.ceil(len(df) / limit))
             df = df.iloc[::step].reset_index(drop=True)
@@ -1147,7 +1112,7 @@ def run_training_async():
         try:
             training_status['logs'] += "Saving trained ESN to local file model_rc.pkl...\n"
             with open(model_path, 'wb') as f:
-                pickle.dump(package, f)
+                pickle.dump(package, f, protocol=pickle.HIGHEST_PROTOCOL)
             training_status['logs'] += "Model saved locally successfully.\n"
         except Exception as local_err:
             training_status['logs'] += f"Local save skipped (read-only filesystem): {local_err}\n"
@@ -1159,7 +1124,7 @@ def run_training_async():
                 {'_id': 'esn_package'},
                 {
                     '_id': 'esn_package',
-                    'pickle_data': pickle.dumps(package),
+                    'pickle_data': pickle.dumps(package, protocol=pickle.HIGHEST_PROTOCOL),
                     'soc_rmse': soc_rmse,
                     'soh_rmse': soh_rmse,
                     'updated_at': datetime.utcnow().isoformat()

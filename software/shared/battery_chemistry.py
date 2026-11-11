@@ -15,12 +15,36 @@ class BatteryChemistry:
         self.ocv_table = ocv_table                      # List of (SOC, OCV)
         self.n_cells = n_cells
 
-        # Precompute numpy arrays to prevent slow list comprehensions in high-frequency lookup_ocv
-        self.socs = np.array([x[0] for x in ocv_table])
-        self.ocvs = np.array([x[1] for x in ocv_table])
+        # Precompute numpy arrays (external compat) and pure-Python piecewise-linear
+        # lookup tuples so scalar lookup_ocv() avoids NumPy dispatch overhead.
+        self.socs = np.array([x[0] for x in ocv_table], dtype=float)
+        self.ocvs = np.array([x[1] for x in ocv_table], dtype=float)
+        self._socs_t = tuple(float(x[0]) for x in ocv_table)
+        self._ocvs_t = tuple(float(x[1]) for x in ocv_table)
+        self._slopes = tuple(
+            (self._ocvs_t[i + 1] - self._ocvs_t[i]) / (self._socs_t[i + 1] - self._socs_t[i])
+            if self._socs_t[i + 1] != self._socs_t[i] else 0.0
+            for i in range(len(self._socs_t) - 1)
+        )
+        self._soc_min = self._socs_t[0]
+        self._soc_max = self._socs_t[-1]
+        self._ocv_min = self._ocvs_t[0]
+        self._ocv_max = self._ocvs_t[-1]
+        self._n_seg = len(self._slopes)
 
     def lookup_ocv(self, soc):
-        return float(np.interp(np.clip(soc, 0.0, 1.0), self.socs, self.ocvs))
+        if isinstance(soc, (np.ndarray, list, tuple)):
+            return np.interp(np.clip(soc, 0.0, 1.0), self.socs, self.ocvs)
+        s = float(soc)
+        if s <= 0.0 or s <= self._soc_min:
+            return self._ocv_min
+        if s >= 1.0 or s >= self._soc_max:
+            return self._ocv_max
+        socs = self._socs_t
+        for i in range(self._n_seg):
+            if s <= socs[i + 1]:
+                return self._ocvs_t[i] + self._slopes[i] * (s - socs[i])
+        return self._ocv_max
 
 # NMC (Single Cell, 3.7V nominal)
 NMC_OCV_TABLE = [

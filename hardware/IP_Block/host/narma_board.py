@@ -31,10 +31,13 @@ def main():
     ap.add_argument("--pack", required=True); ap.add_argument("--port"); ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--skip-load", action="store_true")
     a = ap.parse_args(); d = a.pack
-    Win, W, b = rd16(d + "/win_bram.mem"), rd16(d + "/w_bram.mem"), rd16(d + "/bias_bram.mem")
+    def _res(name, fallback_pack="general_32cells"):
+        p = os.path.join(d, name)
+        return p if os.path.exists(p) else os.path.join(H, "packs", fallback_pack, name)
+    Win, W, b = rd16(_res("win_bram.mem")), rd16(_res("w_bram.mem")), rd16(_res("bias_bram.mem"))
     q = rd18(d + "/readout_soc.mem"); n = len(b)
-    tanh_path = d + "/tanh.mem" if os.path.exists(d + "/tanh.mem") else H + "/packs/general_32cells/tanh.mem"
-    u = np.loadtxt(d + "/narma_test_u.txt"); y = np.loadtxt(d + "/narma_test_y.txt")
+    tanh_path = _res("tanh.mem")
+    u = np.loadtxt(_res("narma_test_u.txt", "narma10_task_reservoir")); y = np.loadtxt(_res("narma_test_y.txt", "narma10_task_reservoir"))
     U = np.zeros((len(u), 4), np.int64); U[:, 1] = np.clip(np.round(u * 1024), -32768, 32767)   # input on channel 1, as trained
 
     esn = FastESN(Win.reshape(n, 4), W.reshape(n, n), b, eh.rdmem(tanh_path))

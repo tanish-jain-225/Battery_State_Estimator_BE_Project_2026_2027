@@ -49,7 +49,6 @@ hardware/
 │   ├── driver/                                  # Bare-metal C driver API (esn_ip.h, esn_ip_example.c)
 │   ├── docs/                                    # register_map.md, uart_protocol.md, Verilator regression_2026-11-11.txt
 │   ├── host/                                    # esn_host.py, reproduce_paper.py, train_pack.py, replay_board.py, narma_board.py & packs/
-│   ├── backup_rev04/                            # Archived Rev 0.4 ekf_core & Rev 1.0 platform sources (reference only)
 │   └── reports_v10/                             # Routed Vivado 2023.1 v1.0 serial timing, power & utilization reports
 ├── STM_Verifier/                                # C99 embedded firmware and training scripts
 │   ├── main.c                                   # C99 classifier runtime & test simulation
@@ -57,30 +56,24 @@ hardware/
 │   ├── train.py                                 # Core ESN Python implementation
 │   ├── train_classifier.py                      # Trains the 3-class ESN & exports C weights
 │   ├── train_estimator.py                       # Trains the SOC/SOH ESN & exports weights
-│   ├── config.py                                # Dimensions, thresholds and dataset settings
+│   ├── config.py                                # Dimensions, thresholds and canonical software/visualiser/datasets resolution
 │   ├── esn_classifier_weights.h                 # Generated sparse classifier weight arrays
 │   ├── esn_estimator_weights.h                  # Generated sparse estimator weight arrays
-│   ├── original_ev_battery_dataset_multiclass.csv   # Reference ground-truth multiclass drive-cycle data
-│   ├── training_ev_battery_dataset_multiclass.csv   # Primary training multiclass drive-cycle data
 │   ├── run_c_simulator.bat                      # Windows build-and-run script
 │   └── run_c_simulator.sh                       # Linux/macOS build-and-run script
 └── FPGA_Verifier/                               # Verilog RTL FPGA verification module
     ├── eval_fpga_outcomes.py                    # Master outcomes & dataset evaluation verifier
-    ├── esn_top.v                                # Top-level Verilog ESN wrapper with multi-timestep support
-    ├── esn_neuron.v                             # Single neuron datapath module & FSM
-    ├── reservoir_controller.v                   # Recurrent execution state machine
-    ├── address_generator.v                      # Memory base address generator
-    ├── mac_accum_q6_10.v                        # Q6.10 fixed-point MAC accumulator (40-bit internal)
-    ├── mult_q6_10.v                             # Q6.10 fixed-point multiplier (32-bit exact product)
-    ├── tanh_lut.v                               # Hardware odd-symmetry tanh LUT
-    ├── tb_esn_top.v                             # Testbench for 100-neuron Vivado / XSim simulation
-    ├── tb_esn_top_tiny.v                        # Testbench for multi-timestep sequence input verification
-    ├── tiny_bram_models.v                       # Behavioral BRAM models for tiny sequence testbench
     ├── golden_model.py                          # Dynamic, bit-exact golden reference generator (seed=42 support)
     ├── compare_results.py                       # Automated bit-exact parity verifier (--outcomes support)
     ├── golden_results.csv                       # Full 100-neuron golden reference output (200 rows)
     ├── golden_tiny.csv                          # Tiny sequence golden reference output (6 rows)
-    └── vivado_esn_results.csv                   # Vivado / XSim simulation outputs
+    ├── vivado_esn_results.csv                   # Vivado / XSim simulation outputs
+    ├── esn/rtl/                                 # Canonical ESN Verilog HDL (esn_top.v, esn_neuron.v, mac_accum_q6_10.v, ...)
+    ├── esn/mem/                                 # Canonical Q6.10 COE weights & 5121-entry tanh.mem LUT
+    ├── esn/tb/                                  # Vivado XSim testbenches (tb_esn_top.v, tb_esn_top_tiny.v, tiny_bram_models.v)
+    ├── esn/python/                              # Forwarding shims to parent compare_results/eval_fpga_outcomes/golden_model
+    ├── ekf/                                     # Fixed-point EKF RTL, LUT ROMs & bit-exact parity scripts
+    └── ukf/                                     # Fixed-point UKF RTL, microcode header & bit-exact parity scripts
 
 ```
 

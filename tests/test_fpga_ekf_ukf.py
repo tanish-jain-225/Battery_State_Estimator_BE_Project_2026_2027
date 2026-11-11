@@ -18,9 +18,8 @@ if ROOT_DIR not in sys.path:
 
 EKF_DIR = os.path.join(ROOT_DIR, "hardware", "FPGA_Verifier", "ekf")
 UKF_DIR = os.path.join(ROOT_DIR, "hardware", "FPGA_Verifier", "ukf")
-ESN_PY = os.path.join(ROOT_DIR, "hardware", "FPGA_Verifier", "esn", "python")
 
-for p in [EKF_DIR, UKF_DIR, ESN_PY]:
+for p in [EKF_DIR, UKF_DIR]:
     if p not in sys.path:
         sys.path.insert(0, p)
 

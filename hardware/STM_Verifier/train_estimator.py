@@ -30,15 +30,15 @@ def generate_full_range_dataset():
 
     import pandas as pd
 
-    records = []
+    times, voltages, currents, temps, socs, sohs = [], [], [], [], [], []
     soh_levels = [1.0, 0.95, 0.90, 0.85, 0.80]
     dt = 1.0
     global_time = 0.0
+    sim = BatterySimulator()
 
     for idx, soh_target in enumerate(soh_levels):
         next_soh = soh_levels[idx + 1] if idx + 1 < len(soh_levels) else soh_target - 0.05
         # 1. Discharging Cycle (Constant + Pulsed)
-        sim = BatterySimulator()
         sim.reset("li_ion")
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
@@ -49,7 +49,6 @@ def generate_full_range_dataset():
         step_count = 0
         while sim.soc > 0.01 and step_count < total_steps:
             step_count += 1
-            # Smoothly decay SOH over step progress to prevent artificial step shocks
             sim.soh = max(0.80, soh_target - (soh_target - next_soh) * (step_count / float(total_steps)))
             sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - sim.soh)
             I = 2.0
@@ -59,19 +58,16 @@ def generate_full_range_dataset():
                 I = -1.0
 
             out = sim.step(I, dt, accelerated_aging=False)
-            records.append({
-                'Time': global_time,
-                'Voltage': 3.0 * out['voltage'],
-                'Current': I,
-                'Temperature': out['temperature'],
-                'SOC': out['true_soc'],
-                'SOH': sim.soh
-            })
+            times.append(global_time)
+            voltages.append(3.0 * out['voltage'])
+            currents.append(I)
+            temps.append(out['temperature'])
+            socs.append(out['true_soc'])
+            sohs.append(sim.soh)
             t += dt
             global_time += dt
 
         # 2. Charging Cycle (CCCV Charge)
-        sim = BatterySimulator()
         sim.reset("li_ion")
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
@@ -81,6 +77,7 @@ def generate_full_range_dataset():
         t = 0.0
         step_count = 0
         last_cell_v = 3.5
+        inv_n_cells = 1.0 / float(sim.n_cells)
         while sim.soc < 0.99 and step_count < total_steps:
             step_count += 1
             sim.soh = max(0.80, soh_target - (soh_target - next_soh) * (step_count / float(total_steps)))
@@ -90,28 +87,39 @@ def generate_full_range_dataset():
                 I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
 
             out = sim.step(-I_charge, dt, accelerated_aging=False)
-            last_cell_v = out['voltage'] / float(sim.n_cells)
-            records.append({
-                'Time': global_time,
-                'Voltage': 3.0 * out['voltage'],
-                'Current': -I_charge,
-                'Temperature': out['temperature'],
-                'SOC': out['true_soc'],
-                'SOH': sim.soh
-            })
+            last_cell_v = out['voltage'] * inv_n_cells
+            times.append(global_time)
+            voltages.append(3.0 * out['voltage'])
+            currents.append(-I_charge)
+            temps.append(out['temperature'])
+            socs.append(out['true_soc'])
+            sohs.append(sim.soh)
             t += dt
             global_time += dt
 
-    return pd.DataFrame(records)
+    return pd.DataFrame({
+        'Time': times,
+        'Voltage': voltages,
+        'Current': currents,
+        'Temperature': temps,
+        'SOC': socs,
+        'SOH': sohs,
+    })
 
 def train_and_export_estimator(csv_path=None, header_path=None, grid_search=False):
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     # 1. Resolve paths
     if csv_path is None:
-        csv_path = os.path.join(base_dir, "training_ev_battery_dataset_multiclass.csv")
+        local_csv = os.path.join(base_dir, "training_ev_battery_dataset_multiclass.csv")
+        canonical_csv = os.path.abspath(
+            os.path.join(base_dir, "..", "..", "software", "visualiser", "datasets", "training_ev_battery_dataset_multiclass.csv")
+        )
+        csv_path = local_csv if os.path.exists(local_csv) else canonical_csv
     if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"Training dataset not found at {csv_path}. Please place training_ev_battery_dataset_multiclass.csv in the directory.")
+        raise FileNotFoundError(
+            f"Training dataset not found at {csv_path}. Please provide training_ev_battery_dataset_multiclass.csv."
+        )
 
     try:
         from hardware.STM_Verifier.config import Config as HWConfig

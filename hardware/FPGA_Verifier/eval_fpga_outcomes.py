@@ -19,7 +19,6 @@ import os
 import sys
 
 import numpy as np
-from sklearn.linear_model import Ridge
 
 # Force UTF-8 output if supported
 if hasattr(sys.stdout, 'reconfigure'):
@@ -226,12 +225,14 @@ def evaluate_fpga_outcomes():
     print(f"Verified {total_evaluations} timestep inferences across 32 cycles * 64 steps.")
     print()
 
-    # 4. Readout Training & Target Metric Validation
-    ridge_soc = Ridge(alpha=1.0)
-    ridge_soc.fit(X_train, y_soc_train)
-
-    ridge_soh = Ridge(alpha=10.0)
-    ridge_soh.fit(X_train, y_soh_train)
+    # 4. Readout Training & Target Metric Validation (closed-form ridge without sklearn import overhead)
+    X_mean = X_train.mean(axis=0)
+    X_c = X_train - X_mean
+    XtX = X_c.T @ X_c
+    eye_n = np.eye(X_c.shape[1])
+    w_soc = np.linalg.solve(XtX + 1.0 * eye_n, X_c.T @ (y_soc_train - y_soc_train.mean()))
+    w_soh = np.linalg.solve(XtX + 10.0 * eye_n, X_c.T @ (y_soh_train - y_soh_train.mean()))
+    _ = (w_soc, w_soh)
 
     # Outcomes table for reporting fidelity
     results_table = [

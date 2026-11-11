@@ -507,7 +507,7 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 | System Architecture | [System Architecture Diagram](images/system_architecture.png) | End-to-end telemetry & hardware verifier architecture |
 | ESN Architecture | [ESN Reservoir Architecture](images/esn_architecture.png) | Echo State Network (ESN) dynamical reservoir structure |
 | Flowchart | [System Flowchart](images/flowchart.png) | Flowchart for simulator and estimator execution |
-| RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn_top.v) | Top-level 100-neuron Verilog RTL module with multi-timestep support |
+| RTL Design File | [esn_top.v](hardware/FPGA_Verifier/esn/rtl/esn_top.v) | Top-level 100-neuron Verilog RTL module with multi-timestep support |
 | RTL Schematic | [FPGA RTL Schematic](images/assets/screenshot_fpga_schematic.png) | Vivado synthesized ESN top datapath schematic |
 | RTL Waveform | [Vivado Simulation Waveform](images/assets/screenshot_fpga_waveform.png) | Vivado XSim behavioral simulation timing waveform |
 | Simulation File | [golden_model.py](hardware/FPGA_Verifier/golden_model.py) | Python fixed-point golden model for FPGA verification (--full & --tiny) |

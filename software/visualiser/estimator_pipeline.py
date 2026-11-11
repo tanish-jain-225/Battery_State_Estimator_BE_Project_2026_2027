@@ -1,3 +1,4 @@
+import math
 import os
 import pickle
 import sys
@@ -25,12 +26,14 @@ class PipelineSafeUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         if name == "EchoStateNetwork" and EchoStateNetwork is not None:
             return EchoStateNetwork
-        if module.startswith("numpy._core"):
-            module = module.replace("numpy._core", "numpy.core")
-        elif module.startswith("numpy.core"):
-            if hasattr(np, '_core'):
-                module = module.replace("numpy.core", "numpy._core")
-        return super().find_class(module, name)
+        try:
+            return super().find_class(module, name)
+        except ModuleNotFoundError:
+            if module.startswith("numpy._core"):
+                return super().find_class(module.replace("numpy._core", "numpy.core", 1), name)
+            if module.startswith("numpy.core"):
+                return super().find_class(module.replace("numpy.core", "numpy._core", 1), name)
+            raise
 
 try:
     from software.visualiser.config import Config
@@ -273,6 +276,24 @@ class EstimatorPipeline:
         if rls_p_val is not None:
             self.rls.P = np.array(rls_p_val)
 
+    def _get_nmc_scaling(self):
+        """Return cached (V_min_nmc, V_min_c, v_scale, i_scale) for the active chemistry."""
+        if getattr(self, '_nmc_scale_chem', None) is not self.chem_obj:
+            nmc_chem = get_chemistry('nmc')
+            V_min_nmc = nmc_chem.lookup_ocv(0.0)
+            V_max_nmc = nmc_chem.lookup_ocv(1.0)
+            V_min_c = self.chem_obj.lookup_ocv(0.0)
+            V_max_c = self.chem_obj.lookup_ocv(1.0)
+            denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
+            self._nmc_scale_params = (
+                V_min_nmc,
+                V_min_c,
+                (V_max_nmc - V_min_nmc) / denom_v,
+                nmc_chem.nominal_capacity / max(self.chem_obj.nominal_capacity, 1e-6),
+            )
+            self._nmc_scale_chem = self.chem_obj
+        return self._nmc_scale_params
+
     def prime_esn(self, V_initial, T_initial=25.0, I_initial=0.0, priming_steps=50, selected_indices=None, dataset_dt=0.001, sim_dt=1.0, initial_soc=1.0, initial_soh=1.0):
         """Run ESN priming steps to populate reservoir memory from initial state.
 
@@ -289,15 +310,10 @@ class EstimatorPipeline:
             else:
                 selected_indices = [0, 1, 3, 4]  # V, I, dV/dt, I_MA
 
-        # Map initial voltage to NMC equivalent range
-        nmc_chem = get_chemistry('nmc')
-        V_min_nmc = nmc_chem.lookup_ocv(0.0)
-        V_max_nmc = nmc_chem.lookup_ocv(1.0)
-        V_min_c = self.chem_obj.lookup_ocv(0.0)
-        V_max_c = self.chem_obj.lookup_ocv(1.0)
-        denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
-        V_init_equiv = 3.0 * (V_min_nmc + (V_initial - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
-        I_init_equiv = I_initial * (nmc_chem.nominal_capacity / max(self.chem_obj.nominal_capacity, 1e-6))
+        # Map initial voltage to NMC equivalent range using cached chemistry scaling
+        V_min_nmc, V_min_c, v_scale, i_scale = self._get_nmc_scaling()
+        V_init_equiv = 3.0 * (V_min_nmc + (V_initial - V_min_c) * v_scale)
+        I_init_equiv = I_initial * i_scale
 
         # Generate priming input: use actual initial V/I/T to drive reservoir along
         # a realistic initial trajectory (not zero-current resting state)
@@ -330,18 +346,19 @@ class EstimatorPipeline:
         """
         Calculates State of Energy (SOE) using numerical integration of the OCV-SOC curve.
         """
-        steps = 20
         if soc <= 0.0:
             return 0.0
 
-        # Integral from 0 to soc
-        s_vals = np.linspace(0.0, soc, steps + 1)
-        ocv_vals = [self.chem_obj.lookup_ocv(s) for s in s_vals]
-        integrate = getattr(np, 'trapezoid', None) or getattr(np, 'trapz', None) or _trapezoidal_integration
-        integral_soc = integrate(ocv_vals, s_vals)
+        steps = 20
+        step_s = soc / steps
+        lookup = self.chem_obj.lookup_ocv
+        # Uniform 20-interval trapezoidal integration without allocating arrays
+        area = 0.5 * (lookup(0.0) + lookup(soc))
+        for i in range(1, steps):
+            area += lookup(i * step_s)
 
-        soe = integral_soc / max(self.integral_total, 1e-4)
-        return float(np.clip(soe, 0.0, 1.0))
+        soe = (area * step_s) / max(self.integral_total, 1e-4)
+        return 0.0 if soe < 0.0 else (1.0 if soe > 1.0 else float(soe))
 
     def step(self, V_meas=None, I_meas_discharge=None, T_meas=None, dt=1.0, quantize_mode='float32', dataset_dt=0.001, selected_indices=None, fault_short=False, fault_thermal=False, fault_dropout=False, record=None):
         """
@@ -432,12 +449,12 @@ class EstimatorPipeline:
                 T_c = max(-20.0, min(60.0, T_meas))
                 temp_kelvin = T_c + 273.15
                 temp_ref_kelvin = 25.0 + 273.15
-                temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+                temp_effect = math.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
                 r0_comp = rls_r0 / temp_effect if temp_effect > 0 else rls_r0
 
                 self.trad_r0 = rls_r0
                 soh_est = 1.0 - ((r0_comp / self.chem_obj.R0_nom) - 1.0) / 1.5
-                self.trad_soh = float(np.clip(soh_est, 0.2, 1.0))
+                self.trad_soh = 0.2 if soh_est < 0.2 else (1.0 if soh_est > 1.0 else float(soh_est))
             else:
                 self.trad_r0, self.trad_soh = self.soh_tracker.step(
                     self.trad_r0, self.prev_voltage, self.prev_current, V_meas, I_meas_discharge,
@@ -484,17 +501,11 @@ class EstimatorPipeline:
             esn_soc_pred = self.ekf_soc
             esn_soh_pred = self.trad_soh
         elif model_loaded:
-            # Map measured values to NMC equivalents for ESN
-            nmc_chem = get_chemistry('nmc')
-            V_min_nmc = nmc_chem.lookup_ocv(0.0)
-            V_max_nmc = nmc_chem.lookup_ocv(1.0)
-            V_min_c = self.chem_obj.lookup_ocv(0.0)
-            V_max_c = self.chem_obj.lookup_ocv(1.0)
-            denom_v = V_max_c - V_min_c if V_max_c != V_min_c else 1.0
+            # Map measured values to NMC equivalents for ESN using cached chemistry scaling
+            V_min_nmc, V_min_c, v_scale, i_scale = self._get_nmc_scaling()
 
-            V_equiv = 3.0 * (V_min_nmc + (V_meas - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
-            denom_cap = max(self.chem_obj.nominal_capacity, 1e-6)
-            I_equiv = I_meas_discharge * (nmc_chem.nominal_capacity / denom_cap)
+            V_equiv = 3.0 * (V_min_nmc + (V_meas - V_min_c) * v_scale)
+            I_equiv = I_meas_discharge * i_scale
 
             if not self.primed:
                 self.prime_esn(
@@ -517,12 +528,16 @@ class EstimatorPipeline:
 
             t_esn_start = time.perf_counter()
 
-            # Map rolling history for ESN feature extraction
-            esn_history = []
-            for r in self.rolling_history:
-                r_v_equiv = 3.0 * (V_min_nmc + (r['voltage'] - V_min_c) * (V_max_nmc - V_min_nmc) / denom_v)
-                r_i_equiv = r['current'] * (nmc_chem.nominal_capacity / denom_cap)
-                esn_history.append({'voltage': r_v_equiv, 'current': r_i_equiv, 'temperature': r['temperature']})
+            # Map only the trailing rolling window needed by extract_features_step
+            roll_win = max(1, getattr(Config, 'FEATURE_ROLLING_WINDOW', 5))
+            esn_history = [
+                {
+                    'voltage': 3.0 * (V_min_nmc + (r['voltage'] - V_min_c) * v_scale),
+                    'current': r['current'] * i_scale,
+                    'temperature': r['temperature'],
+                }
+                for r in self.rolling_history[-roll_win:]
+            ]
 
             # Feature extraction (extract_features_step expects discharge positive current)
             u_raw = extract_features_step(V_equiv, I_equiv, T_meas, esn_history)

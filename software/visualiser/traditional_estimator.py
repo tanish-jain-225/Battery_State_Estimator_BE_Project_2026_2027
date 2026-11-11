@@ -1,5 +1,9 @@
+import math
+
 import numpy as np
 from battery_chemistry import get_chemistry
+
+_TEMP_REF_INV = 1.0 / (25.0 + 273.15)
 
 
 class ExtendedKalmanFilter:
@@ -49,11 +53,7 @@ class ExtendedKalmanFilter:
         """
         # Dynamic parameter updates based on Temperature and SOH
         T_c = max(-20.0, min(60.0, T_meas))
-        temp_kelvin = T_c + 273.15
-        temp_ref_kelvin = 25.0 + 273.15
-
-        # Arrhenius temperature dependence
-        temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+        temp_effect = math.exp(1500.0 * (1.0 / (T_c + 273.15) - _TEMP_REF_INV))
 
         # Capacity derating at lower temperatures (drops to 66% at -20°C)
         temp_cap_factor = 1.0 - 0.0075 * (25.0 - T_c) if T_c < 25.0 else 1.0
@@ -62,22 +62,9 @@ class ExtendedKalmanFilter:
         # Resistance growth based on SOH
         resistance_growth = 1.0 + (1.0 - soh_est) * 1.5
 
-        # Compute active parameter values (favoring dynamically identified parameters when available)
-        if rls_r0 is not None:
-            R0 = rls_r0
-        else:
-            R0 = self.R0_nom * resistance_growth * temp_effect
-
-        if rls_r1 is not None:
-            R1 = rls_r1
-        else:
-            R1 = self.R1_nom * temp_effect
-
-        if rls_c1 is not None:
-            C1 = rls_c1
-        else:
-            C1 = self.C1_nom / temp_effect
-
+        R0 = rls_r0 if rls_r0 is not None else self.R0_nom * resistance_growth * temp_effect
+        R1 = rls_r1 if rls_r1 is not None else self.R1_nom * temp_effect
+        C1 = rls_c1 if rls_c1 is not None else self.C1_nom / temp_effect
         R2 = self.R2_nom * temp_effect
         C2 = self.C2_nom / temp_effect
 
@@ -85,69 +72,107 @@ class ExtendedKalmanFilter:
         tau1 = R1 * C1
         tau2 = R2 * C2
 
-        a1 = np.exp(-dt / tau1) if tau1 > 0 else 0.0
+        a1 = math.exp(-dt / tau1) if tau1 > 0.0 else 0.0
         b1 = R1 * (1.0 - a1)
 
-        a2 = np.exp(-dt / tau2) if tau2 > 0 else 0.0
+        a2 = math.exp(-dt / tau2) if tau2 > 0.0 else 0.0
         b2 = R2 * (1.0 - a2)
 
-        F = np.array([[1.0, 0.0, 0.0],
-                      [0.0, a1, 0.0],
-                      [0.0, 0.0, a2]])
-
         # 2. Prediction Step
-        # SOC prediction (Coulomb Counting using Cn_active)
         soc_pred = soc + (I_meas * dt) / (Cn_active * 3600.0)
-        soc_pred = np.clip(soc_pred, 0.0, 1.0)
+        if soc_pred < 0.0:
+            soc_pred = 0.0
+        elif soc_pred > 1.0:
+            soc_pred = 1.0
 
-        # Polarization voltages predictions
         v1_pred = a1 * v1 + b1 * I_meas
         v2_pred = a2 * v2 + b2 * I_meas
 
-        x_pred = np.array([[soc_pred], [v1_pred], [v2_pred]])
-        P_pred = np.dot(np.dot(F, P), F.T) + self.Q
+        Q = self.Q
+        # Unrolled F @ P @ F.T + Q where F = diag(1, a1, a2)
+        p00 = float(P[0, 0]) + float(Q[0, 0])
+        p01 = a1 * float(P[0, 1]) + float(Q[0, 1])
+        p02 = a2 * float(P[0, 2]) + float(Q[0, 2])
+        p10 = a1 * float(P[1, 0]) + float(Q[1, 0])
+        p11 = a1 * a1 * float(P[1, 1]) + float(Q[1, 1])
+        p12 = a1 * a2 * float(P[1, 2]) + float(Q[1, 2])
+        p20 = a2 * float(P[2, 0]) + float(Q[2, 0])
+        p21 = a2 * a1 * float(P[2, 1]) + float(Q[2, 1])
+        p22 = a2 * a2 * float(P[2, 2]) + float(Q[2, 2])
 
         # 3. Measurement Prediction
-        ocv = self.chemistry.lookup_ocv(soc_pred)
-        # Predicted terminal voltage: Vt = OCV(SOC) + I * R0 + V1 + V2
+        lookup_ocv = self.chemistry.lookup_ocv
+        ocv = lookup_ocv(soc_pred)
         V_pred = ocv + I_meas * R0 + v1_pred + v2_pred
 
         # 4. Measurement Jacobian H = [dOCV/dSOC, 1, 1]
         eps = 0.001
-        ocv_plus = self.chemistry.lookup_ocv(soc_pred + eps)
-        ocv_minus = self.chemistry.lookup_ocv(soc_pred - eps)
-        dOCV = (ocv_plus - ocv_minus) / (2.0 * eps)
-
-        H = np.array([[dOCV, 1.0, 1.0]])
+        dOCV = (lookup_ocv(soc_pred + eps) - lookup_ocv(soc_pred - eps)) / (2.0 * eps)
 
         # 5. Innovation / Correction Step
         residual = V_meas - V_pred
+        ph0 = p00 * dOCV + p01 + p02
+        ph1 = p10 * dOCV + p11 + p12
+        ph2 = p20 * dOCV + p21 + p22
+        H_P_HT = dOCV * ph0 + ph1 + ph2
 
-        # Dynamically adapt measurement noise covariance R_meas using innovation sequence (Sage-Husa)
+        # Dynamically adapt measurement noise covariance R_meas using Sage-Husa
         if self.adaptive_r:
-            H_P_HT = np.dot(np.dot(H, P_pred), H.T).item()
-            # Sage-Husa adaptation update with learning factor alpha = 0.95
-            R_est = 0.95 * self.R_meas + 0.05 * (residual**2 - H_P_HT)
-            self.R_meas = float(np.clip(R_est, 0.0001, 1.0))
+            R_est = 0.95 * self.R_meas + 0.05 * (residual * residual - H_P_HT)
+            if R_est < 0.0001:
+                R_est = 0.0001
+            elif R_est > 1.0:
+                R_est = 1.0
+            self.R_meas = float(R_est)
 
-        S = np.dot(np.dot(H, P_pred), H.T) + self.R_meas
-        K = np.dot(P_pred, H.T) / S[0, 0]
+        R_meas = self.R_meas
+        S = H_P_HT + R_meas
+        k0 = ph0 / S
+        k1 = ph1 / S
+        k2 = ph2 / S
 
-        x_updated = x_pred + K * residual
-        soc_updated = float(np.clip(x_updated[0, 0], 0.0, 1.0))
-        v1_updated = float(x_updated[1, 0])
-        v2_updated = float(x_updated[2, 0])
+        soc_updated = soc_pred + k0 * residual
+        if soc_updated < 0.0:
+            soc_updated = 0.0
+        elif soc_updated > 1.0:
+            soc_updated = 1.0
+        v1_updated = v1_pred + k1 * residual
+        v2_updated = v2_pred + k2 * residual
 
-        I_mat = np.eye(3)
-        I_KH = I_mat - np.dot(K, H)
-        # Joseph stabilized form: P = (I-KH)*P*(I-KH)^T + K*R*K^T
-        P_updated = np.dot(np.dot(I_KH, P_pred), I_KH.T) + np.dot(K, np.dot(np.array([[self.R_meas]]), K.T))
+        # Joseph stabilized form: P = (I-KH)*P_pred*(I-KH)^T + K*R*K^T
+        m00, m01, m02 = 1.0 - k0 * dOCV, -k0, -k0
+        m10, m11, m12 = -k1 * dOCV, 1.0 - k1, -k1
+        m20, m21, m22 = -k2 * dOCV, -k2, 1.0 - k2
 
-        # Trace guard and positive-definite check to prevent EKF filter divergence
-        if np.trace(P_updated) > 10.0 or np.any(np.diag(P_updated) < 0) or np.any(np.isnan(P_updated)) or np.any(np.isinf(P_updated)):
+        mp00 = m00 * p00 + m01 * p10 + m02 * p20
+        mp01 = m00 * p01 + m01 * p11 + m02 * p21
+        mp02 = m00 * p02 + m01 * p12 + m02 * p22
+        mp10 = m10 * p00 + m11 * p10 + m12 * p20
+        mp11 = m10 * p01 + m11 * p11 + m12 * p21
+        mp12 = m10 * p02 + m11 * p12 + m12 * p22
+        mp20 = m20 * p00 + m21 * p10 + m22 * p20
+        mp21 = m20 * p01 + m21 * p11 + m22 * p21
+        mp22 = m20 * p02 + m21 * p12 + m22 * p22
+
+        u00 = mp00 * m00 + mp01 * m01 + mp02 * m02 + k0 * k0 * R_meas
+        u01 = mp00 * m10 + mp01 * m11 + mp02 * m12 + k0 * k1 * R_meas
+        u02 = mp00 * m20 + mp01 * m21 + mp02 * m22 + k0 * k2 * R_meas
+        u10 = mp10 * m00 + mp11 * m01 + mp12 * m02 + k1 * k0 * R_meas
+        u11 = mp10 * m10 + mp11 * m11 + mp12 * m12 + k1 * k1 * R_meas
+        u12 = mp10 * m20 + mp11 * m21 + mp12 * m22 + k1 * k2 * R_meas
+        u20 = mp20 * m00 + mp21 * m01 + mp22 * m02 + k2 * k0 * R_meas
+        u21 = mp20 * m10 + mp21 * m11 + mp22 * m12 + k2 * k1 * R_meas
+        u22 = mp20 * m20 + mp21 * m21 + mp22 * m22 + k2 * k2 * R_meas
+
+        # Trace guard and positive-definite check
+        tr = u00 + u11 + u22
+        if not (math.isfinite(tr) and 0.0 <= tr <= 10.0 and u00 >= 0.0 and u11 >= 0.0 and u22 >= 0.0
+                and math.isfinite(u01) and math.isfinite(u02) and math.isfinite(u12)):
             P_updated = np.diag([0.01, 0.01, 0.01])
+        else:
+            P_updated = np.array([[u00, u01, u02], [u10, u11, u12], [u20, u21, u22]], dtype=np.float64)
 
-        return soc_updated, v1_updated, v2_updated, P_updated
+        return float(soc_updated), float(v1_updated), float(v2_updated), P_updated
 
 class UnscentedKalmanFilter:
     def __init__(self, chemistry_name="li_ion", mismatch=1.0, alpha=1e-3, beta=2.0, kappa=0.0):
@@ -203,9 +228,7 @@ class UnscentedKalmanFilter:
 
     def step(self, soc, v1, v2, P, I_meas, V_meas, dt, T_meas=25.0, soh_est=1.0, rls_r0=None, rls_r1=None, rls_c1=None):
         T_c = max(-20.0, min(60.0, T_meas))
-        temp_kelvin = T_c + 273.15
-        temp_ref_kelvin = 25.0 + 273.15
-        temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+        temp_effect = math.exp(1500.0 * (1.0 / (T_c + 273.15) - _TEMP_REF_INV))
         temp_cap_factor = 1.0 - 0.0075 * (25.0 - T_c) if T_c < 25.0 else 1.0
         Cn_active = self.Cn_nom * soh_est * temp_cap_factor
         resistance_growth = 1.0 + (1.0 - soh_est) * 1.5
@@ -218,67 +241,43 @@ class UnscentedKalmanFilter:
 
         tau1 = R1 * C1
         tau2 = R2 * C2
-        a1 = np.exp(-dt / tau1) if tau1 > 0 else 0.0
+        a1 = math.exp(-dt / tau1) if tau1 > 0.0 else 0.0
         b1 = R1 * (1.0 - a1)
-        a2 = np.exp(-dt / tau2) if tau2 > 0 else 0.0
+        a2 = math.exp(-dt / tau2) if tau2 > 0.0 else 0.0
         b2 = R2 * (1.0 - a2)
 
         x = np.array([[soc], [v1], [v2]])
         sigmas = self._generate_sigma_points(x, P)
 
-        # 1. State Prediction
-        sigmas_pred = np.zeros_like(sigmas)
-        for i in range(2 * self.n + 1):
-            s_soc = sigmas[0, i]
-            s_v1 = sigmas[1, i]
-            s_v2 = sigmas[2, i]
+        # 1. Vectorized State Prediction across all 2n+1 sigma points
+        sigmas_pred = np.empty_like(sigmas)
+        sigmas_pred[0] = np.clip(sigmas[0] + (I_meas * dt) / (Cn_active * 3600.0), 0.0, 1.0)
+        sigmas_pred[1] = a1 * sigmas[1] + b1 * I_meas
+        sigmas_pred[2] = a2 * sigmas[2] + b2 * I_meas
 
-            s_soc_pred = np.clip(s_soc + (I_meas * dt) / (Cn_active * 3600.0), 0.0, 1.0)
-            s_v1_pred = a1 * s_v1 + b1 * I_meas
-            s_v2_pred = a2 * s_v2 + b2 * I_meas
+        x_pred_1d = sigmas_pred @ self.Wm
+        diff_x = sigmas_pred - x_pred_1d[:, None]
+        P_pred = self.Q + (diff_x * self.Wc) @ diff_x.T
 
-            sigmas_pred[:, i] = [s_soc_pred, s_v1_pred, s_v2_pred]
+        # 2. Vectorized Measurement Prediction
+        ocv_vec = self.chemistry.lookup_ocv(sigmas_pred[0])
+        Z_sigmas = ocv_vec + (I_meas * R0) + sigmas_pred[1] + sigmas_pred[2]
+        z_pred = float(np.dot(self.Wm, Z_sigmas))
 
-        x_pred = np.zeros((self.n, 1))
-        for i in range(2 * self.n + 1):
-            x_pred += self.Wm[i] * sigmas_pred[:, i:i+1]
-
-        P_pred = np.copy(self.Q)
-        for i in range(2 * self.n + 1):
-            diff = sigmas_pred[:, i:i+1] - x_pred
-            P_pred += self.Wc[i] * np.dot(diff, diff.T)
-
-        # 2. Measurement Prediction
-        Z_sigmas = np.zeros(2 * self.n + 1)
-        for i in range(2 * self.n + 1):
-            s_soc = sigmas_pred[0, i]
-            s_v1 = sigmas_pred[1, i]
-            s_v2 = sigmas_pred[2, i]
-            ocv = self.chemistry.lookup_ocv(s_soc)
-            Z_sigmas[i] = ocv + I_meas * R0 + s_v1 + s_v2
-
-        z_pred = 0.0
-        for i in range(2 * self.n + 1):
-            z_pred += self.Wm[i] * Z_sigmas[i]
-
-        P_zz = self.R_meas
-        P_xz = np.zeros((self.n, 1))
-        for i in range(2 * self.n + 1):
-            diff_x = sigmas_pred[:, i:i+1] - x_pred
-            diff_z = Z_sigmas[i] - z_pred
-            P_zz += self.Wc[i] * (diff_z ** 2)
-            P_xz += self.Wc[i] * diff_x * diff_z
+        diff_z = Z_sigmas - z_pred
+        P_zz = float(self.R_meas + np.dot(self.Wc, diff_z * diff_z))
+        P_xz_1d = (diff_x * self.Wc) @ diff_z
 
         # 3. State & Covariance Update
-        K = P_xz / max(P_zz, 1e-9)
+        K_1d = P_xz_1d / max(P_zz, 1e-9)
         residual = V_meas - z_pred
-        x_updated = x_pred + K * residual
+        x_updated_1d = x_pred_1d + K_1d * residual
 
-        soc_updated = float(np.clip(x_updated[0, 0], 0.0, 1.0))
-        v1_updated = float(x_updated[1, 0])
-        v2_updated = float(x_updated[2, 0])
+        soc_updated = float(max(0.0, min(1.0, x_updated_1d[0])))
+        v1_updated = float(x_updated_1d[1])
+        v2_updated = float(x_updated_1d[2])
 
-        P_updated = P_pred - np.dot(K, np.dot(np.array([[P_zz]]), K.T))
+        P_updated = P_pred - np.outer(K_1d, K_1d) * P_zz
 
         if np.trace(P_updated) > 10.0 or np.any(np.diag(P_updated) < 0) or np.any(np.isnan(P_updated)) or np.any(np.isinf(P_updated)):
             P_updated = np.diag([0.01, 0.01, 0.01])
@@ -299,9 +298,7 @@ class ResistanceSOH:
         """
         # Calculate temperature effect using Arrhenius equation
         T_c = max(-20.0, min(60.0, T_meas))
-        temp_kelvin = T_c + 273.15
-        temp_ref_kelvin = 25.0 + 273.15
-        temp_effect = np.exp(1500.0 * (1.0 / temp_kelvin - 1.0 / temp_ref_kelvin))
+        temp_effect = math.exp(1500.0 * (1.0 / (T_c + 273.15) - _TEMP_REF_INV))
 
         dI = I_meas - prev_i
         dV = V_meas - prev_v
@@ -328,7 +325,7 @@ class ResistanceSOH:
 
         # Invert the resistance growth formula: R = R0_nom * (1 + 1.5 * (1 - SOH))
         soh_est = 1.0 - ((r0_est / self.R0_nom) - 1.0) / 1.5
-        soh_est = np.clip(soh_est, 0.2, 1.0)
+        soh_est = max(0.2, min(1.0, soh_est))
 
         return float(r0_est), float(soh_est)
 
@@ -391,12 +388,12 @@ class RecursiveLeastSquares:
         # Adapt lambda dynamically based on prediction error to speed up tracking during transitions
         lmbda_min = 0.95
         gamma = 10.0  # Sensitivity factor
-        self.lmbda = float(lmbda_min + (1.0 - lmbda_min) * np.exp(-gamma * (e ** 2)))
-        self.lmbda = np.clip(self.lmbda, 0.95, 0.999)
+        lmbda = lmbda_min + (1.0 - lmbda_min) * math.exp(-gamma * (e * e))
+        self.lmbda = 0.95 if lmbda < 0.95 else (0.999 if lmbda > 0.999 else lmbda)
 
         # Gain vector K(k) = P * phi / (lambda + phi^T * P * phi)
         P_phi = np.dot(self.P, phi)
-        denom = self.lmbda + np.dot(phi.T, P_phi).item()
+        denom = self.lmbda + float(np.dot(phi.T, P_phi).item())
         K = P_phi / max(denom, 1e-6)
 
         # Parameter update: theta = theta + K * e
@@ -406,7 +403,8 @@ class RecursiveLeastSquares:
         self.P = (self.P - np.dot(K, np.dot(phi.T, self.P))) / self.lmbda
 
         # Guard covariance from exploding or losing symmetry
-        if np.any(np.isnan(self.P)) or np.any(np.isinf(self.P)) or np.trace(self.P) > 100.0:
+        tr_p = float(self.P[0, 0] + self.P[1, 1] + self.P[2, 2])
+        if not (math.isfinite(tr_p) and tr_p <= 100.0):
             self.P = np.eye(3) * 10.0
 
         self.prev_y = y
@@ -421,7 +419,7 @@ class RecursiveLeastSquares:
         # Physical constraints checking
         # 1. Pole must be stable: -1 < theta1 < 0
         if -0.9999 < theta1 < -0.01:
-            tau = -self.dt / np.log(-theta1)
+            tau = -self.dt / math.log(-theta1)
             r0 = theta2
             # b1 = r1 * (1 + a1) + r0 * a1
             # theta3 = r1 * (1 + theta1) + r0 * theta1

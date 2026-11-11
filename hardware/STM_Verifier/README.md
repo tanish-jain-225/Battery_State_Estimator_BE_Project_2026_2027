@@ -28,7 +28,7 @@ To prove edge feasibility on an automotive microcontroller without hardware floa
 | [`esn_estimator_weights.h`](esn_estimator_weights.h) | C Header | Quantized CSR sparse weights for continuous SOC/SOH estimation. |
 | [`train_classifier.py`](train_classifier.py) | Python | Trains safety classification ESN and exports C weight headers. |
 | [`train_estimator.py`](train_estimator.py) | Python | Trains continuous SOC/SOH ESN and exports C weight headers. |
-| [`config.py`](config.py) | Python | Environment configuration and hyperparameter settings. |
+| [`config.py`](config.py) | Python | Environment configuration, dimensions, and canonical dataset resolution (`software/visualiser/datasets/` with optional local CSV override). |
 
 ---
 

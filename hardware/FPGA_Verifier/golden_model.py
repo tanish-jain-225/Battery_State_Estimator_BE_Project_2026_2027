@@ -270,11 +270,11 @@ def run_full(timesteps=None):
     print("RUNNING GOLDEN MODEL: FULL CONFIGURATION (N_IN=4, N_RES=100)")
     print("=" * 60)
 
-    win_raw = parse_coe_file(os.path.join(BASE_DIR, "win_bram.coe"))
-    w_raw = parse_coe_file(os.path.join(BASE_DIR, "w_bram.coe"))
-    bias_path = os.path.join(BASE_DIR, "bias.coe") if os.path.exists(os.path.join(BASE_DIR, "bias.coe")) else os.path.join(BASE_DIR, "bias_bram.coe")
+    win_raw = parse_coe_file(_resolve_resource_path("win_bram.coe"))
+    w_raw = parse_coe_file(_resolve_resource_path("w_bram.coe"))
+    bias_path = _resolve_resource_path("bias.coe") if os.path.exists(os.path.join(BASE_DIR, "bias.coe")) else _resolve_resource_path("bias_bram.coe")
     bias_raw = parse_coe_file(bias_path)
-    input_raw = parse_coe_file(os.path.join(BASE_DIR, "input_bram.coe"))
+    input_raw = parse_coe_file(_resolve_resource_path("input_bram.coe"))
 
     n_in = 4
     n_res = 100
@@ -330,12 +330,9 @@ def main():
         out_file = args.out or "golden_tiny.csv"
         save_csv(records, out_file)
     else:
-        # Default to full 100-neuron model
         records = run_full(timesteps=args.steps)
         out_file = args.out or "golden_results.csv"
         save_csv(records, out_file)
-        if out_file == "golden_results.csv":
-            save_csv(records, "golden.csv")
     print("Golden model execution complete.")
 
 

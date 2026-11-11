@@ -12,21 +12,21 @@ if fpga_dir not in sys.path:
     sys.path.insert(0, fpga_dir)
 
 from hardware.FPGA_Verifier.compare_results import load_csv
-from hardware.FPGA_Verifier.golden_model import parse_coe_file, run_full, to_hex_signed
+from hardware.FPGA_Verifier.golden_model import _resolve_resource_path, parse_coe_file, run_full, to_hex_signed
 
 
 def test_parse_coe_radix10_and_16():
     """Verify parse_coe_file handles both radix 10 and radix 16 formats."""
     # Test existing bias_bram.coe
-    bias_path = os.path.join(fpga_dir, "bias_bram.coe")
-    if os.path.exists(bias_path):
+    bias_path = _resolve_resource_path("bias_bram.coe")
+    if bias_path and os.path.exists(bias_path):
         biases = parse_coe_file(bias_path)
         assert len(biases) == 100
         assert all(isinstance(b, int) for b in biases)
 
     # Test existing input_bram.coe
-    input_path = os.path.join(fpga_dir, "input_bram.coe")
-    if os.path.exists(input_path):
+    input_path = _resolve_resource_path("input_bram.coe")
+    if input_path and os.path.exists(input_path):
         inputs = parse_coe_file(input_path)
         assert len(inputs) == 256
         assert all(isinstance(val, int) for val in inputs)

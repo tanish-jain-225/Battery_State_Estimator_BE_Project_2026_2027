@@ -39,7 +39,6 @@ rtl/        Verilog. Verified core (unchanged since the 200/200 and 6400/6400 ch
             mult_q6_10, tanh_lut, reservoir_controller, address_generator. Wrappers: esn_core, esn_core_fast
             (scalable core), esn_ram, esn_readout, esn_axi_ip (IP), esn_platform(_top), ekf_core (Rev 0.5, fusion),
             ukf_core, uart_rx/tx
-backup_rev04/ ekf_core and platform before ESN fusion (reference only)
 mem/        tanh.mem (5121-entry tanh table, needed by synthesis and simulation)
 xdc/        Arty A7-100T constraints for the platform
 scripts/    build_platform.tcl (fresh Vivado project + bitstream; `set ESN_FAST {1 10 24}` for the fast core),
@@ -56,9 +55,8 @@ host/       esn_host.py      run data on the board, or on the bit-exact software
             reproduce_paper.py  recompute the 29-cell results from the shipped packs
             replay_board.py  send any test_data vector set to the board and compare every step with the twin
             narma_board.py   NARMA-10 on the board with new weights only
-            packs/           model packs (below)
+            packs/           model packs (below; shared LUT/reservoir assets deduplicated in general_32cells/ & narma10_task_reservoir/)
             golden/          bit-exact Python models: EKF (EKFFixed, with fusion), UKF, fast core, EKF calibration
-            legacy_oct2026/  superseded October packs and builders (do not use)
 ```
 
 ## Quick start without a board (5 minutes)

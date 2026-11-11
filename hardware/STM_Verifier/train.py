@@ -78,8 +78,9 @@ else:
             return self.x.flatten().tolist()
 
         def _update(self, u):
-            u_biased = np.vstack(([1.0], np.array(u).reshape(-1, 1)))
-            arg = np.dot(self.W_in, u_biased) + np.dot(self.W_res, self.x)
+            u_arr = np.asarray(u, dtype=float).ravel()
+            # Prepend bias term via slice addition instead of allocating vstack
+            arg = self.W_in[:, 0:1] + self.W_in[:, 1:] @ u_arr.reshape(-1, 1) + self.W_res @ self.x
             self.x = (1.0 - self.leak_rate) * self.x + self.leak_rate * np.tanh(arg)
             return self.x
 
@@ -115,11 +116,14 @@ else:
 
             X_T = X.T
             Y_target = Y[washout:].reshape(-1, self.n_outputs).T
-            X_XT = np.dot(X_T, X)
-            reg_matrix = self.ridge_param * np.eye(state_dim)
-            self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
+            A = X_T @ X
+            A[np.diag_indices_from(A)] += self.ridge_param
+            try:
+                self.W_out = np.linalg.solve(A, X_T @ Y_target.T).T
+            except np.linalg.LinAlgError:
+                self.W_out = (X_T @ Y_target.T @ np.linalg.pinv(A)).T
 
-            return np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
+            return np.clip(X @ self.W_out.T, 0.0, 1.0)
 
     def adapt_online(self, u, y_target, learning_rate=0.01, mode='rls'):
         """

@@ -1,13 +1,20 @@
 import os
 import pickle
 import sys
+import zlib
 
 import numpy as np
 import pandas as pd
 
+try:
+    from scipy.sparse import csr_matrix as _csr_matrix
+except ImportError:
+    _csr_matrix = None
+
 # Add base directory to path to support config imports
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(base_dir)
+if base_dir not in sys.path:
+    sys.path.append(base_dir)
 
 try:
     from software.visualiser.config import Config
@@ -15,9 +22,9 @@ except ImportError:
     from config import Config
 
 try:
-    from feature_engineering import extract_features_df
+    from feature_engineering import extract_features_df, normalize_battery_dataframe
 except ImportError:
-    from training.feature_engineering import extract_features_df
+    from training.feature_engineering import extract_features_df, normalize_battery_dataframe
 
 def simulate_quantization(val, bits_limit):
     """Helper function to quantize arrays to simulate fixed-point precision."""
@@ -65,23 +72,79 @@ class EchoStateNetwork:
 
         # Reservoir state vector
         self.x = np.zeros((n_reservoir, 1))
+        self._rebuild_sparse_cache()
+
+    def _rebuild_sparse_cache(self):
+        """Build cached CSR matrix for sparse W_res to accelerate recurrent matvec."""
+        if _csr_matrix is not None and self.sparsity > 0.0 and getattr(self, 'W_res', None) is not None:
+            self._W_res_csr = _csr_matrix(self.W_res)
+        else:
+            self._W_res_csr = None
+
+    def _res_matvec(self, x_1d):
+        csr = getattr(self, '_W_res_csr', None)
+        if csr is None and _csr_matrix is not None and getattr(self, 'sparsity', 0.0) > 0.0:
+            self._rebuild_sparse_cache()
+            csr = self._W_res_csr
+        return csr.dot(x_1d) if csr is not None else np.dot(self.W_res, x_1d)
+
+    def __getstate__(self):
+        """Serialize sparse reservoir weights compactly without altering float64 precision."""
+        state = self.__dict__.copy()
+        csr = state.pop('_W_res_csr', None)
+        if csr is None and _csr_matrix is not None and getattr(self, 'sparsity', 0.0) > 0.5:
+            csr = _csr_matrix(self.W_res)
+        if csr is not None and csr.nnz < 0.45 * self.W_res.size:
+            state.pop('W_res', None)
+            state['_w_res_sparse'] = (
+                zlib.compress(csr.data.tobytes(), 6),
+                zlib.compress(csr.indices.astype(np.int32).tobytes(), 6),
+                zlib.compress(csr.indptr.astype(np.int32).tobytes(), 6),
+                csr.shape,
+                str(csr.data.dtype),
+            )
+        return state
+
+    def __setstate__(self, state):
+        sparse_pkg = state.pop('_w_res_sparse', None)
+        self.__dict__.update(state)
+        if sparse_pkg is not None:
+            data_z, idx_z, ptr_z, shape, dtype_str = sparse_pkg
+            data = np.frombuffer(zlib.decompress(data_z), dtype=np.dtype(dtype_str)).copy()
+            indices = np.frombuffer(zlib.decompress(idx_z), dtype=np.int32).copy()
+            indptr = np.frombuffer(zlib.decompress(ptr_z), dtype=np.int32).copy()
+            if _csr_matrix is not None:
+                self._W_res_csr = _csr_matrix((data, indices, indptr), shape=shape)
+                self.W_res = self._W_res_csr.toarray()
+            else:
+                W = np.zeros(shape, dtype=np.dtype(dtype_str))
+                for r in range(shape[0]):
+                    s, e = indptr[r], indptr[r + 1]
+                    W[r, indices[s:e]] = data[s:e]
+                self.W_res = W
+                self._W_res_csr = None
+        else:
+            self._rebuild_sparse_cache()
 
     def reset_state(self, state_vector=None):
         if state_vector is not None:
-            self.x = np.array(state_vector).reshape(self.n_reservoir, 1)
+            arr = np.asarray(state_vector, dtype=np.float64)
+            self.x = arr.reshape(self.n_reservoir, 1).copy() if arr.shape != (self.n_reservoir, 1) else arr.copy()
         else:
-            self.x = np.zeros((self.n_reservoir, 1))
+            self.x.fill(0.0)
 
     def get_state(self):
-        return self.x.flatten().tolist()
+        return self.x.ravel().tolist()
 
     def _update(self, u):
-        # u is shape (n_inputs, 1)
-        u_biased = np.vstack(([1.0], u))
-        # Reservoir state update:
-        # x(t) = (1 - alpha)*x(t-1) + alpha * tanh(W_in * u_biased + W_res * x(t-1))
-        arg = np.dot(self.W_in, u_biased) + np.dot(self.W_res, self.x)
-        self.x = (1.0 - self.leak_rate) * self.x + self.leak_rate * np.tanh(arg)
+        # u is shape (n_inputs, 1) or (n_inputs,)
+        u_1d = np.asarray(u, dtype=np.float64).ravel()
+        x_1d = self.x.ravel()
+        # arg = W_in[:, 0] + W_in[:, 1:] @ u + W_res @ x
+        arg = self.W_in[:, 0] + np.dot(self.W_in[:, 1:], u_1d) + self._res_matvec(x_1d)
+        leak = self.leak_rate
+        x_next = (1.0 - leak) * x_1d + leak * np.tanh(arg)
+        self.x = x_next.reshape(self.n_reservoir, 1)
         return self.x
 
     def train(self, U, Y, washout=50, timeout_check=None):
@@ -96,13 +159,13 @@ class EchoStateNetwork:
         n_samples = U.shape[0]
         self.reset_state()
 
-        # Pre-compute input projections: U_biased shape (n_samples, 1 + n_inputs)
-        U_biased = np.hstack((np.ones((n_samples, 1)), U))
-        W_in_U = np.dot(U_biased, self.W_in.T) # shape (n_samples, n_reservoir)
+        # Pre-compute input projections directly without building full hstack(ones, U)
+        W_in_U = np.dot(U, self.W_in[:, 1:].T)
+        W_in_U += self.W_in[:, 0]
 
-        # Cache variables locally using 1D vector representation for fast operations
         x_vec = self.x.ravel().copy()
-        W_res = self.W_res
+        csr = getattr(self, '_W_res_csr', None)
+        W_res_mat = csr if csr is not None else self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
 
@@ -114,31 +177,26 @@ class EchoStateNetwork:
             if t % 2000 == 0 and timeout_check is not None:
                 timeout_check()
 
-            # Fast 1D vector recurrence update (avoids allocations & reshapes)
-            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
+            # Fast 1D sparse recurrence update (avoids allocations & reshapes)
+            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res_mat.dot(x_vec))
 
-            # Skip the washout phase
             if t >= washout:
                 idx = t - washout
                 X[idx, 0] = 1.0
-                X[idx, 1:1+self.n_inputs] = U[t]
-                X[idx, 1+self.n_inputs:] = x_vec
+                X[idx, 1:1 + self.n_inputs] = U[t]
+                X[idx, 1 + self.n_inputs:] = x_vec
 
-        self.x = x_vec.reshape(-1, 1) # Save final state back
+        self.x = x_vec.reshape(-1, 1)
 
         if timeout_check is not None:
             timeout_check()
 
-        # Design matrix transpose X_T: shape (state_dim, n_effective)
+        # Symmetric Ridge Solve: (X^T X + lambda I) W_out^T = X^T Y
         X_T = X.T
-
-        # Target matrix Y_target: (n_outputs, n_effective)
-        Y_target = Y[washout:].reshape(-1, self.n_outputs).T
-
-        # Ridge Regression: W_out = Y_target * X * (X^T * X + lambda * I)^-1
+        Y_mat = Y[washout:].reshape(-1, self.n_outputs)
         X_XT = np.dot(X_T, X)
-        reg_matrix = self.ridge_param * np.eye(state_dim)
-        self.W_out = np.dot(np.dot(Y_target, X), np.linalg.inv(X_XT + reg_matrix))
+        X_XT[np.diag_indices(state_dim)] += self.ridge_param
+        self.W_out = np.linalg.solve(X_XT, np.dot(X_T, Y_mat)).T
 
         y_pred_washout = np.clip(np.dot(X, self.W_out.T), 0.0, 1.0)
         return y_pred_washout
@@ -198,20 +256,9 @@ class EchoStateNetwork:
         :param u: input vector of shape (n_inputs,)
         :param quantize_mode: 'float32', 'int16', or 'int8'
         """
-        u_t = np.array(u).reshape(-1, 1)
-
         if quantize_mode in ('int8', 'int16'):
+            u_t = np.asarray(u, dtype=np.float64).reshape(-1, 1)
             bits = 8 if quantize_mode == 'int8' else 16
-
-            # Helper function to quantize arrays to simulate fixed-point precision
-            def simulate_quantization(val, bits_limit):
-                if val is None:
-                    return None
-                v_max = max(1e-4, np.max(np.abs(val)))
-                scale = (2**(bits_limit - 1) - 1) / v_max
-                val_q = np.round(val * scale)
-                val_q = np.clip(val_q, -(2**(bits_limit - 1)), 2**(bits_limit - 1) - 1)
-                return val_q / scale
 
             # Quantize input, weights and states
             u_t_q = simulate_quantization(u_t, bits)
@@ -233,12 +280,13 @@ class EchoStateNetwork:
             state_vec_q = simulate_quantization(state_vec, bits)
 
             y_pred = np.dot(W_out_q, state_vec_q)
-            return np.clip(y_pred, 0.0, 1.0).flatten()
-        else:
-            x_t = self._update(u_t)
-            state_vec = np.vstack(([1.0], u_t, x_t))
-            y_pred = np.dot(self.W_out, state_vec)
-            return np.clip(y_pred, 0.0, 1.0).flatten()
+            return np.clip(y_pred, 0.0, 1.0).ravel()
+
+        u_1d = np.asarray(u, dtype=np.float64).ravel()
+        x_t = self._update(u_1d).ravel()
+        W_out = self.W_out
+        y_pred = W_out[:, 0] + np.dot(W_out[:, 1:1 + self.n_inputs], u_1d) + np.dot(W_out[:, 1 + self.n_inputs:], x_t)
+        return np.clip(y_pred, 0.0, 1.0).ravel()
 
     def predict(self, U, timeout_check=None):
         """
@@ -249,11 +297,12 @@ class EchoStateNetwork:
         n_samples = U.shape[0]
         self.reset_state()
 
-        U_biased = np.hstack((np.ones((n_samples, 1)), U))
-        W_in_U = np.dot(U_biased, self.W_in.T)
+        W_in_U = np.dot(U, self.W_in[:, 1:].T)
+        W_in_U += self.W_in[:, 0]
 
         x_vec = self.x.ravel().copy()
-        W_res = self.W_res
+        csr = getattr(self, '_W_res_csr', None)
+        W_res_mat = csr if csr is not None else self.W_res
         leak = self.leak_rate
         one_minus_leak = 1.0 - leak
 
@@ -263,15 +312,14 @@ class EchoStateNetwork:
         for t in range(n_samples):
             if t % 2000 == 0 and timeout_check is not None:
                 timeout_check()
-            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res.dot(x_vec))
+            x_vec = one_minus_leak * x_vec + leak * np.tanh(W_in_U[t] + W_res_mat.dot(x_vec))
 
             state_matrix[t, 0] = 1.0
-            state_matrix[t, 1:1+self.n_inputs] = U[t]
-            state_matrix[t, 1+self.n_inputs:] = x_vec
+            state_matrix[t, 1:1 + self.n_inputs] = U[t]
+            state_matrix[t, 1 + self.n_inputs:] = x_vec
 
         self.x = x_vec.reshape(-1, 1)
-        predictions = np.clip(np.dot(state_matrix, self.W_out.T), 0.0, 1.0)
-        return predictions
+        return np.clip(np.dot(state_matrix, self.W_out.T), 0.0, 1.0)
 
 def generate_full_range_dataset(timeout_check=None, max_rows=None):
     """
@@ -291,17 +339,17 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
 
     import pandas as pd
 
-    records = []
+    times, voltages, currents, temps, socs, sohs = [], [], [], [], [], []
     is_prod = getattr(Config, 'is_production', lambda: False)()
     soh_levels = [1.0, 0.90, 0.80] if is_prod else [1.0, 0.95, 0.90, 0.85, 0.80]
     dt = 2.0 if is_prod else 1.0
+    sim = BatterySimulator()
 
     step_counter = 0
     for soh_target in soh_levels:
         if timeout_check is not None:
             timeout_check()
         # 1. Discharging Cycle (Constant + Pulsed)
-        sim = BatterySimulator()
         sim.reset("li_ion")
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
@@ -319,23 +367,20 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
                 I = -1.0
 
             out = sim.step(I, dt, accelerated_aging=False)
-            records.append({
-                'Time': t,
-                'Voltage': 3.0 * out['voltage'],
-                'Current': I,
-                'Temperature': out['temperature'],
-                'SOC': out['true_soc'],
-                'SOH': out['true_soh']
-            })
+            times.append(t)
+            voltages.append(3.0 * out['voltage'])
+            currents.append(I)
+            temps.append(out['temperature'])
+            socs.append(out['true_soc'])
+            sohs.append(out['true_soh'])
             t += dt
-            if max_rows and len(records) >= max_rows:
+            if max_rows and len(times) >= max_rows:
                 break
 
-        if max_rows and len(records) >= max_rows:
+        if max_rows and len(times) >= max_rows:
             break
 
         # 2. Charging Cycle (CCCV Charge)
-        sim = BatterySimulator()
         sim.reset("li_ion")
         sim.soh = soh_target
         sim.internal_resistance_growth = 1.0 + 1.5 * (1.0 - soh_target)
@@ -344,6 +389,7 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
 
         t = 0.0
         last_cell_v = 3.5
+        inv_n_cells = 1.0 / float(sim.n_cells)
         while sim.soc < 0.99:
             step_counter += 1
             if step_counter % 100 == 0 and timeout_check is not None:
@@ -353,23 +399,28 @@ def generate_full_range_dataset(timeout_check=None, max_rows=None):
                 I_charge = max(0.1, 2.0 * (4.2 - last_cell_v) / 0.05)
 
             out = sim.step(-I_charge, dt, accelerated_aging=False)
-            last_cell_v = out['voltage'] / float(sim.n_cells)
-            records.append({
-                'Time': t,
-                'Voltage': 3.0 * out['voltage'],
-                'Current': -I_charge,
-                'Temperature': out['temperature'],
-                'SOC': out['true_soc'],
-                'SOH': out['true_soh']
-            })
+            last_cell_v = out['voltage'] * inv_n_cells
+            times.append(t)
+            voltages.append(3.0 * out['voltage'])
+            currents.append(-I_charge)
+            temps.append(out['temperature'])
+            socs.append(out['true_soc'])
+            sohs.append(out['true_soh'])
             t += dt
-            if max_rows and len(records) >= max_rows:
+            if max_rows and len(times) >= max_rows:
                 break
 
-        if max_rows and len(records) >= max_rows:
+        if max_rows and len(times) >= max_rows:
             break
 
-    return pd.DataFrame(records)
+    return pd.DataFrame({
+        'Time': times,
+        'Voltage': voltages,
+        'Current': currents,
+        'Temperature': temps,
+        'SOC': socs,
+        'SOH': sohs,
+    })
 
 def main():
     csv_path = Config.CSV_PATH
@@ -425,49 +476,7 @@ def main():
     print(f"[DATA SOURCE] Training model using: {source_name}")
 
     if df is not None:
-        # Recover if CSV was pasted into a single column
-        if len(df.columns) == 1 and ',' in str(df.columns[0]):
-            col_name = df.columns[0]
-            new_cols = [c.strip() for c in col_name.split(',')]
-            split_data = df[col_name].astype(str).str.split(',', expand=True)
-            if split_data.shape[1] == len(new_cols):
-                split_data.columns = new_cols
-                df = split_data.apply(pd.to_numeric, errors='coerce')
-                print(f"DEBUG: Recovered single-column CSV into {len(new_cols)} columns.")
-
-        df.columns = [str(col).strip() for col in df.columns]
-        rename_dict = {}
-        for col in df.columns:
-            col_lower = col.lower()
-            if col_lower == 'voltage':
-                rename_dict[col] = 'Voltage'
-            elif col_lower == 'current':
-                rename_dict[col] = 'Current'
-            elif col_lower == 'temperature':
-                rename_dict[col] = 'Temperature'
-            elif col_lower == 'soc':
-                rename_dict[col] = 'SOC'
-            elif col_lower == 'soh':
-                rename_dict[col] = 'SOH'
-            elif col_lower == 'time':
-                rename_dict[col] = 'Time'
-        df.rename(columns=rename_dict, inplace=True)
-
-        # Coerce numeric columns, drop NaNs, and normalize percentage values
-        req_cols = ['Voltage', 'Current', 'Temperature', 'SOC']
-        for col in req_cols + (['SOH'] if 'SOH' in df.columns else []):
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-        df.dropna(subset=[c for c in req_cols if c in df.columns], inplace=True)
-        if 'SOH' not in df.columns:
-            df['SOH'] = 1.0
-
-        # Auto-normalize SOC / SOH if provided in percentage (0-100%) scale
-        if df['SOC'].max() > 1.5:
-            df['SOC'] = df['SOC'] / 100.0
-        if df['SOH'].max() > 1.5:
-            df['SOH'] = df['SOH'] / 100.0
-        df.reset_index(drop=True, inplace=True)
+        df = normalize_battery_dataframe(df, require_soc=True, default_soh=1.0)
     is_production = Config.is_production() or (os.environ.get("VALIDATION_PIPELINE") == "1")
     limit = Config.PRODUCTION_DECIMATION_LIMIT
     if (is_production or len(df) > limit) and len(df) > limit:
@@ -559,7 +568,7 @@ def main():
     print(f"Saving trained ESN models locally to {model_save_path}...")
     try:
         with open(model_save_path, 'wb') as f:
-            pickle.dump(model_package, f)
+            pickle.dump(model_package, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Model package saved locally successfully!")
     except Exception as local_err:
         print(f"Failed to save local file (read-only filesystem or path error): {local_err}")
@@ -579,7 +588,7 @@ def main():
             {'_id': 'esn_package'},
             {
                 '_id': 'esn_package',
-                'pickle_data': pickle.dumps(model_package),
+                'pickle_data': pickle.dumps(model_package, protocol=pickle.HIGHEST_PROTOCOL),
                 'soc_rmse': float(soc_rmse),
                 'soh_rmse': float(soh_rmse),
                 'updated_at': datetime.utcnow().isoformat()

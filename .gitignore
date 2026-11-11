@@ -159,18 +159,15 @@ $RECYCLE.BIN/
 # ── Explicitly Whitelisted Project Assets (Never Ignored) ─────────────────────
 !hardware/STM_Verifier/esn_classifier_weights.h
 !hardware/STM_Verifier/esn_estimator_weights.h
-!hardware/STM_Verifier/original_ev_battery_dataset_multiclass.csv
-!hardware/STM_Verifier/training_ev_battery_dataset_multiclass.csv
 !hardware/FPGA_Verifier/*.csv
-!hardware/FPGA_Verifier/*.coe
-!hardware/FPGA_Verifier/*.mem
+!hardware/FPGA_Verifier/esn/mem/*.coe
+!hardware/FPGA_Verifier/esn/mem/*.mem
 !hardware/FPGA_Verifier/**/*.csv
 !hardware/FPGA_Verifier/**/*.coe
 !hardware/FPGA_Verifier/**/*.mem
 !hardware/FPGA_Verifier/**/*.json
 !hardware/IP_Block/esn_platform_top.bit
 !hardware/IP_Block/component.xml
-!hardware/IP_Block/backup_rev04/*.bak
 !hardware/IP_Block/**/*.mem
 !hardware/IP_Block/**/*.csv
 !hardware/IP_Block/**/*.json
