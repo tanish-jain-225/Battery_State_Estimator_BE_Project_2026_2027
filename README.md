@@ -73,7 +73,8 @@ flowchart LR
     P1 -->|"Evaluator Feedback:<br/>Add Architecture & Customise PPT"| P1_Fix["<b>Review 1 Changes</b><br/>• Added ESN Core Diagram<br/>• Redesigned 16:9 Deck<br/>• Fixed-Point Datapath"]
     P1_Fix --> P2["<b>Phase 2: Review 2 Defense</b><br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/><i>(Nov 2026)</i>"]
     P2 -->|"Evaluator Feedback:<br/>Simplify Presentation & Add Datasets"| P2_Fix["<b>Review 2 Changes</b><br/>• 5-Act Presentation Story<br/>• 10 Drive Cycles + NASA Aging<br/>• 1.0s Multi-Chemistry Simulator"]
-    P2_Fix --> P3["<b>Phase 3: Turnkey Capstone</b><br/>• Artix-7 IP Block<br/>• 119 Passing Tests<br/>• B.E. Thesis & Publications<br/><i>(Final Defense)</i>"]
+    P2_Fix --> P3["<b>Phase 3: v2.4.0 (Synced)</b><br/>• IP Block v1.2 & Research Paper<br/>• CSR/Storage Optimization<br/>• 119 Passing Tests (88.6% Cov)"]
+    P3 --> P4["<b>Phase 4: v2.4.1 Turnkey</b><br/>• Poster, Review Paper, Thesis<br/><i>(Only 3 Deliverables Left)</i>"]
 ```
 
 ---
@@ -237,12 +238,12 @@ flowchart TD
 
     subgraph P4["4. Dual-Target Silicon Acceleration"]
         ESN --> MCU["STM32 C99 Firmware<br/>CSR SpMV (6.7× Speedup)<br/>Q12/Q15 Fixed-Point Arithmetic"]
-        ESN --> FPGA["Xilinx Artix-7 FPGA IP Block<br/>IEEE 1685 IP-XACT (component.xml)<br/>Pre-Compiled Bitstream (3.7 MB)"]
+        ESN --> FPGA["Xilinx Artix-7 IP Block v1.2<br/>307-Cycle Fast Core & Rev 0.5 EKF<br/>IP-XACT + Pre-Built 3.7 MB Bitstream"]
     end
 
     subgraph P5["5. Dashboard Telemetry & Academic Outputs"]
         RLS --> DASH["Flask Web Visualiser Dashboard<br/>(Real-Time Chart.js Multi-Observer UI)"]
-        FPGA --> PUB["Academic Publications & Thesis Hub<br/>(Research Paper, Review, Poster, Thesis)"]
+        FPGA --> PUB["Academic Deliverables Hub<br/>(Research Paper Done; 3 PDFs Pending v2.4.1)"]
     end
 ```
 
@@ -289,7 +290,7 @@ Navigate the repository according to your area of interest:
 | **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.4.0 Active Today (v2.4.1 Final Turnkey)** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **10/10 Ready (Reference)** |
-| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Automotive BMS landscape, ISO 26262 / AutoSAR audit, and complete deliverables map | **10/10 Ready (Reference)** |
+| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and 4-tier INR valuation (`v2.4.0` vs `v2.4.1`) | **10/10 Ready (Reference)** |
 
 ---
 
@@ -450,12 +451,12 @@ The system architecture feeds 2-RC battery telemetry into a multi-estimator pipe
 As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Department), the official timeline for BE Project 2026-2027 is:
 
 | Milestone / Review Event | Scheduled Date | Mode | Status |
-| :--- | :---: | :---: | :---: |
-| **Proposal of Project** | 12/08/2026 | Online | **Ready for Submission** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
-| **Acceptance / Modification** | 17/08/2026 | Online | Pending Guide Feedback |
-| **First Review** | 21/09/2026 – 24/09/2026 | Offline | Completed ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)) |
-| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **10/10 Ready** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md), [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf), [`Outcomes PDF`](docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)) |
-| **Final External Review** | 21/11/2026 | Offline | Scheduled |
+| :--- | :---: | :---: | :--- |
+| **Proposal of Project** | 12/08/2026 | Online | **Submitted / Approved** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
+| **Acceptance / Modification** | 17/08/2026 | Online | **Approved / Completed** |
+| **First Review** | 21/09/2026 – 24/09/2026 | Offline | **Completed** ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)) |
+| **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **Completed** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md), [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf), [`Outcomes PDF`](docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)) |
+| **Final External Review** | 21/11/2026 | Offline | **Scheduled** (`v2.4.0` synced; 3 deliverables pending for `v2.4.1`) |
 
 ### Marks Allocation & Evaluation Policy
 * **10 Marks — GitHub Log Book:** Weekly progress updates maintained directly in `README.md`.
@@ -495,6 +496,7 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 | **Week 19** | 2026-10-19 | Developed cross-platform master 8-step validation runner (`run_all_validation.bat` and `run_all_validation.sh`) | Comprehensive Review Paper drafting | Windows PowerShell UTF-8 BOM encoding breaking DictReader; enforced utf-8-sig across all CSV parsers | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 | **Week 20** | 2026-10-26 | Completed 29-page academic review paper manuscript on Neuromorphic BMS & Reservoir Computing | Review 2 presentation deck & report | Consolidating 90+ citations and neuromorphic silicon comparisons (Loihi 2, Akida, SpiNNaker, Artix-7) | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 | **Week 21** | 2026-11-02 | Finalized Review 2 deliverables: 16:9 presentation deck, progress report, defense playbook, and live demo | Review 2 defense & transition to Phase 3 | Ensuring seamless end-to-end reproducibility across software, C99 firmware, and FPGA RTL | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
+| **Week 22** | 2026-11-11 | Upgraded FPGA platform to `esn_ip_platform` v1.2 (310-cyc fast core, Rev 0.5 fused EKF, 10/10 Verilator, 29 NASA packs), integrated camera-ready Research Paper PDF, compressed `model_rc.pkl` (CSR ~602 KB), eliminated repo bloat, and synced all `v2.4.0` code/docs/CI gates (119 tests passing) | Complete final 3 PDF deliverables (`Project_Poster.pdf`, `Review_Paper.pdf`, `Final_Thesis.pdf`) for turnkey `v2.4.1` release | Reconciling bit-exact `v1.2` fast core / Rev 0.5 EKF timing closure (`+0.251 ns` WNS @ 80 MHz) and isolating pending academic PDFs via `TRANSITION_PLAN_V2.4.1.md` | [Link](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027) |
 
 ---
 
@@ -542,13 +544,13 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 
 ### Hardware Implementation
 
-* **STM32 C99 Embedded Verifier:** Standalone C99 firmware utilizing Compressed Sparse Row (CSR) matrix representation, sparse matrix-vector multiplication (SpMV), Q12/Q15 fixed-point arithmetic, and Tanh LUT lookup. Delivers a **6.7× speedup** over dense matrix execution.
-* **ARTIX-7 FPGA Verilog RTL:** 100-neuron hardware datapath written in Verilog HDL. Features BRAM state storage, hardware Tanh LUT, and fixed-point datapath. Verified against Python golden model with **200/200 bit-exact stage matches**.
+* **STM32 C99 Embedded Verifier:** Standalone C99 firmware utilizing Compressed Sparse Row (CSR) matrix representation, sparse matrix-vector multiplication (SpMV), Q12/Q15 fixed-point arithmetic, and a 33-point linear interpolated $\tanh$ LUT. Delivers a **6.7× speedup** and **82.4% RAM reduction** (`7.5 KB` vs. `42.6 KB`) with **98.40%–99.80%** float32/Q15 diagnostic parity.
+* **ARTIX-7 FPGA Verilog RTL & IP Block (`esn_ip_platform` v1.2):** 100-neuron hardware datapath featuring **200/200 ESN** and **512/512 EKF/UKF** bit-exact golden matches (`FPGA_Verifier`), packaged as an IEEE 1685 IP-XACT AXI4-Lite/Stream `IP_Block` (`v1.2`) with `esn_core_fast.v` (`310` cyc / `3.9 µs` @ `80 MHz`, `307` cyc RV32I), `ekf_core.v` (`Rev 0.5` fused EKF `477` cyc), `10/10` Verilator `5.028` regressions, 29 NASA pack + NARMA-10 validations, and pre-built `v1.0` `~3.7 MB` Arty A7-100T bitstream.
 
 ### Software Implementation
 
-* **2-RC Electro-Thermal Simulator:** Written in Python using NumPy and SciPy. Models OCV(SOC), Ohmic resistance ($R_0$), polarization branches ($R_1-C_1, R_2-C_2$), thermal balance, and fault injection.
-* **Flask Web Visualiser:** Modular REST application rendering dynamic Chart.js plots comparing ground truth SOC against ESN, EKF, and Coulomb Counting.
+* **2-RC Electro-Thermal Simulator & CSR ESN:** Written in Python using NumPy and SciPy. Models OCV(SOC), Ohmic resistance ($R_0$), polarization branches ($R_1-C_1, R_2-C_2$), thermal balance, and fault injection, paired with CSR-compressed `model_rc.pkl` (`~602 KB`) and online RLS adaptation (`0.72%` simulator RMSE; `0.067` MAE across 29 held-out NASA cells).
+* **Flask Web Visualiser:** Modular REST application with decoupled `1.0s` MongoDB intermediate sync (Keep-Alive pooling + in-memory fallback) and dynamic Chart.js plots comparing ground truth SOC against ESN, EKF, and Coulomb Counting.
 
 ---
 
@@ -626,7 +628,7 @@ BE-Capstone-Project/
 │       ├── ARTIFACTS.md                   # Model parameters and dataset versioning policy
 │       ├── PRESENTATION.md                # Slide-by-slide defense talking points & script
 │       ├── TRANSITION_PLAN_V2.4.1.md      # Official v2.4.0 -> v2.4.1 turnkey transition runbook (3 remaining PDFs)
-│       └── WEB_RESEARCH.md                # Automotive BMS landscape & ISO 26262 audit
+│       └── WEB_RESEARCH.md                # Indian EV/BMS market, AIS/BIS/2025 CRI audit, v1.2 specs & 4-tier valuation
 │
 ├── hardware/
 │   ├── hardware.md                        # Consolidated hardware subsystem guide
@@ -900,19 +902,19 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 ## Limitations
 
-1. **Simulated Telemetry Target:** Physical HIL load-cell testing is targeted for next deployment phase.
-2. **Data Dependence:** ESN accuracy relies on diverse dynamic drive cycle training data.
-3. **Single-Cell Scope:** Extension to multi-cell balanced battery packs is planned in future scope.
-4. **Hardware Verification Target:** Currently validated on STM32 C99 and Artix-7 RTL simulation platform.
+1. **Recorded & Simulated Telemetry Scope:** Continuous live sensor charge/rest/partial-cycle HIL testing on physical battery packs is targeted for the next deployment phase (recorded discharge window & causal replays are verified).
+2. **Data Dependence:** ESN accuracy relies on diverse dynamic drive-cycle training data (`train_pack.py` recalibration required for new chemistries/temperature regimes).
+3. **Single-Cell Scope:** Extension to multi-cell series-parallel actively balanced battery packs is planned in future scope.
+4. **STM32 Silicon Bench Scope:** Artix-7 (`xc7a100tcsg324-1`) FPGA hardware replay and Verilator co-simulation are verified, whereas C99 MCU validation currently targets host simulation rather than a physical STM32 Nucleo CAN bench.
 
 ---
 
 ## Future Scope
 
-1. Physical Hardware-in-the-Loop (HIL) benchtop testing with physical lithium-ion cells and programmable electronic loads.
+1. Physical Hardware-in-the-Loop (HIL) benchtop testing with physical lithium-ion cells, programmable electronic loads, and live CAN bus streaming.
 2. Direct flashing of C99 firmware onto physical STM32 Nucleo boards with CAN bus transceiver interfacing.
 3. Multi-cell series-parallel battery pack SOC/SOH state estimation with active cell balancing.
-4. On-chip Artix A7100T FPGA bitstream synthesis and dynamic power consumption profiling.
+4. On-board FPGA rail power telemetry (extending current Vivado vectorless estimates) and turnkey academic finalization (**`v2.4.1`**: Poster, Review Paper, and Thesis).
 
 ---
 
@@ -1007,13 +1009,14 @@ This project is licensed under the **[MIT License](LICENSE)** with an academic a
 * **Security & Vulnerability Policy:** [`SECURITY.md`](SECURITY.md)
 
 ### Academic Citation
-When citing this repository or using its code, telemetry datasets, C99 firmware, or Verilog HDL models, please cite:
+When citing this repository or using its code, telemetry datasets, C99 firmware, or Verilog HDL IP block (`v2.4.0`), please cite:
 ```bibtex
-@article{patankar2026edge,
-  author      = {Patankar, Sanjna and Nambiar, Akshay and Verma, Satvik and Sanghvi, Tanish and Sharma, Kadambari},
-  title       = {Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems},
-  journal     = {BE Capstone Technical Report \& IEEE / Q3 Scopus Target Manuscript},
+@article{nambiar2026bitexact,
+  author      = {Nambiar, Akshay and Patankar, Sanjna and Verma, Satvik and Sanghvi, Tanish and Sharma, Kadambari and Warke, Nilima},
+  title       = {A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout},
+  journal     = {BE Capstone Experimental Manuscript \& IEEE / Q3 Scopus Submission (`docs/Publications/Research_Paper.pdf`)},
   institution = {Vivekanand Education Society's Institute of Technology (VESIT)},
-  year        = {2026}
+  year        = {2026},
+  version     = {2.4.0}
 }
 ```

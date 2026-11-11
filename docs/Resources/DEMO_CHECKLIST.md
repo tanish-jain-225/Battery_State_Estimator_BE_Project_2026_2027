@@ -52,7 +52,8 @@ flowchart TD
 - [ ] **Install Prerequisites**: Run `python -m pip install -r requirements.txt`.
 - [ ] **Clean Configuration**: Confirm `.env` files contain only local config values and are excluded from Git tracking.
 - [ ] **Execute Master 1-Click Validation**: Run `.\run_all_validation.bat` (Windows) or `./run_all_validation.sh` (Linux) and confirm all 8 pipeline stages pass with 0 errors.
-- [ ] **Run Complete Automated Test Suite**: Run `pytest tests/ -v` and verify that all **107 automated tests pass**.
+- [ ] **Run Complete Automated Test Suite**: Run `pytest tests/ -v` and verify that all **119 automated tests pass** (`~21.6s` with `88.60%` `software/shared` coverage).
+- [ ] **Verify IP Block v1.2 Digital Twin**: Run `python hardware/IP_Block/host/esn_host.py twin --pack hardware/IP_Block/host/packs/heldout/pack_B0047 --data hardware/IP_Block/host/packs/heldout/pack_B0047/B0047_cycles.csv --cycle all` to confirm held-out hardware/software twin parity.
 - [ ] **Train ESN Estimator Model**: Execute `python software/visualiser/training/train_rc.py` and confirm `model_rc.pkl` is exported.
 - [ ] **Train Hardware Classifier**: Execute `python hardware/STM_Verifier/train_classifier.py` and confirm [`hardware/STM_Verifier/esn_classifier_weights.h`](../../hardware/STM_Verifier/esn_classifier_weights.h) is created.
 - [ ] **Train Hardware Estimator**: Execute `python hardware/STM_Verifier/train_estimator.py` and check [`hardware/STM_Verifier/esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h).

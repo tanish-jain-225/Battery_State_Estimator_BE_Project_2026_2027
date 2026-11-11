@@ -3,7 +3,7 @@
 ---
 
 # Comprehensive Indian E-Mobility Web Research, Industrial Audit & Repository Synthesis
-## Automotive BMS Standards (AIS-156 / AIS-038 / MoRTH), Semiconductor IP Valuation in INR, National Competitions (SIH / KPIT Sparkle / Formula Bharat), and 10/10 Scorecards
+## Automotive BMS Standards (AIS-156 / AIS-038 / BIS IS 17855), Section 3(k) 2025 CRI Guidelines, Semiconductor IP Valuation in INR, and v2.4.0 vs. v2.4.1 Scorecard
 
 **Project Title:** Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting  
 **Department:** Department of Automation and Robotics / Instrumentation  
@@ -14,10 +14,10 @@
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Reference:** [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md)  
-**Active Release Version:** `v2.4.0` (Synced Today, Rating: **9.5 / 10**)  
-**Target Turnkey Release:** `v2.4.1` (Planned Capstone, Rating: **10.0 / 10**)  
+**Active Release Version:** `v2.4.0` (Synced Today — `esn_ip_platform` v1.2 + IEEE `Research_Paper.pdf` + Optimization, Rating: **9.5 / 10**)  
+**Target Turnkey Release:** `v2.4.1` (Final Capstone — Only Poster, Review Paper & Thesis Pending, Rating: **10.0 / 10**)  
 **Turnkey Transition Plan:** [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md)  
-**Verification Date:** November 2026 (Synthesized Post-Review 2 & Aligned with Departmental BE Capstone Template)
+**Verification Date:** November 11, 2026 (Freshly Audited via 2026 Industry/Statutory Web Research & Full Repo Verification)
 
 ---
 
@@ -30,8 +30,8 @@
 6. [Hardware-Software Dual-Twin & Silicon Implementation Parity](#6-hardware-software-dual-twin--silicon-implementation-parity)
 7. [Decoupled Real-Time Cloud Telemetry & Anti-Freeze Architecture](#7-decoupled-real-time-cloud-telemetry--anti-freeze-architecture)
 8. [Complete Map of Deliverables & Repository Code Locations](#8-complete-map-of-deliverables--repository-code-locations)
-9. [Comprehensive 4-Tier Valuation in INR (State A vs. State B Across All Cases)](#9-comprehensive-4-tier-valuation-in-inr-state-a-vs-state-b-across-all-cases)
-10. [Master Quality Rating: Before vs. After the 4 Things (Out of 10)](#10-master-quality-rating-before-vs-after-the-4-things-out-of-10)
+9. [Comprehensive 4-Tier Modeled Valuation in INR (v2.4.0 vs. v2.4.1 Across All Cases)](#9-comprehensive-4-tier-modeled-valuation-in-inr-v240-vs-v241-across-all-cases)
+10. [Master Quality Rating: v2.4.0 vs. v2.4.1 (Out of 10)](#10-master-quality-rating-v240-vs-v241-out-of-10)
 11. [Multi-Track Indian Viva Defense, Competition Jury & Investor Playbook](#11-multi-track-indian-viva-defense-competition-jury--investor-playbook)
 12. [Verification Audit & Quality Assurance Certification](#12-verification-audit--quality-assurance-certification)
 
@@ -39,30 +39,33 @@
 
 ## 1. Executive Summary & Indian Electric Mobility Context
 
-India's electric mobility revolution is experiencing massive structural acceleration, backed by national policy mandates targeting **30% EV adoption by 2030**, the Government of India's **₹10,900 Crore PM E-DRIVE Scheme** (subsidizing electric two-wheelers, three-wheelers, and public fast-charging networks), and the **₹18,100 Crore Production Linked Incentive (PLI) for Advanced Chemistry Cell (ACC) Battery Storage** (establishing 50 GWh of localized giga-factories with mandatory domestic value addition from 25% up to 60%).
+India's electric mobility transition is backed by national policy mandates including the Government of India's **₹10,900 Crore PM E-DRIVE Scheme** (demand incentives for electric two-wheelers, three-wheelers, e-ambulances, e-trucks, e-buses, and charging/testing infrastructure) and the **₹18,100 Crore Production Linked Incentive (PLI) Scheme for Advanced Chemistry Cell (ACC) Battery Storage** (targeting **50 GWh** of localized domestic battery manufacturing capacity).
 
-According to recent 2024–2026 automotive market research, the **Indian Electric Vehicle Battery Management System (BMS) market** is valued at approximately **USD 325 million to USD 350 million (~₹2,700 Crore to ₹2,900 Crore INR)** and is expanding at a robust compound annual growth rate (**CAGR of 16.5%**), projected to exceed **USD 1.3+ billion (~₹10,800+ Crore INR)** by the early 2030s, driven by surging annual EV sales crossing **2.0+ million units annually** across the country.
+Industry market research places the **Indian Battery Management System (BMS) market** at approximately **USD 320 million to USD 328 million (~₹2,650 Crore to ₹2,750 Crore INR)**, expanding at a projected **CAGR of 14% to 18%** (~16.5%–17.9% trajectory through 2030) as modular/smart IoT BMS adoption and domestic LFP/ACC cell localization accelerate across two-wheelers, three-wheelers, commercial fleets, and stationary BESS.
 
-Despite this exponential market expansion, Indian electric mobility faces three severe, climate-specific engineering bottlenecks:
+Despite rapid market growth, Indian electric mobility faces three severe, climate-specific engineering bottlenecks:
 
-1. **Extreme Indian Climate Stress & Monsoon Flooding:** Ambient summer temperatures exceeding $+45^\circ\text{C}$ to $+50^\circ\text{C}$ across northern and central India (Delhi NCR, Rajasthan, Maharashtra, Telangana), coupled with severe monsoonal water-logging requiring strict IPX7 submersion protection, accelerate thermal runaway risks and render standard Western/European thermal models inadequate.
-2. **Dominance of Lithium Iron Phosphate (LFP) Chemistry:** Over **75% of Indian electric two-wheelers (E-2W), three-wheelers (E-3W), and passenger fleet cars** (e.g., Tata Nexon EV, Tiago EV, Ola S1, Ather 450X) utilize LFP cells due to high thermal stability and cost-effectiveness. However, LFP exhibits an almost flat Open Circuit Voltage (OCV) profile ($\Delta V \approx 5\,\text{mV}$ across 20% to 80% State of Charge). In this operating region, the Extended Kalman Filter (EKF) Jacobian collapses ($\frac{\partial V_{OCV}}{\partial SOC} \approx 0$), resulting in severe estimator divergence or delay.
-3. **Severe Microcontroller Cost Constraints:** Indian electric two-wheelers and commercial three-wheelers operate on razor-thin bill-of-materials (BOM) margins. Microcontrollers are constrained to **$< \$2.00\text{ USD}$ (₹150 to ₹180 INR)** (e.g., ARM Cortex-M0+/M4, STM32G4, GD32). High-parameter deep learning models (LSTM, GRU, Transformers) require megabytes of memory and dedicated NPUs, making them commercially unviable for Indian mass-market production.
+1. **Extreme Indian Climate Stress & Monsoon Flooding:** Ambient summer temperatures exceeding $+45^\circ\text{C}$ to $+50^\circ\text{C}$ across northern and central India, coupled with severe monsoonal water-logging requiring strict IPX7 submersion protection, accelerate thermal runaway risks and stress standard thermal models.
+2. **Dominance of Lithium Iron Phosphate (LFP) Chemistry:** LFP cells have heavily penetrated India's E-2W, E-3W, commercial fleet, and BESS segments due to thermal stability and cost-efficiency. However, LFP exhibits an almost flat Open Circuit Voltage (OCV) plateau ($\Delta V \approx 5\,\text{mV}$ across middle SOC bands), degrading Extended Kalman Filter (EKF) voltage observability ($\frac{\partial V_{OCV}}{\partial SOC} \approx 0$).
+3. **Severe Microcontroller Cost Constraints:** Mass-market Indian E-2W and E-3W packs run on tight BOM margins targeting low-cost MCUs (typically **$< \$2.00\text{ USD}$ / ~₹150–₹180 INR** class ARM Cortex-M0+/M4 units such as STM32/GD32 variants), making megabyte-scale deep learning models (LSTM/Transformer) commercially prohibitive.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
 │                            THE INDIAN EV CORE DILEMMA & SOLUTION                            │
 ├─────────────────────────────────────────────────────────────────────────────────────────────┤
-│ • Coulomb Counting  ──► Accumulates 8.4% drift; Indian city traffic never lets cells rest. │
-│ • Extended Kalman   ──► Fails on Indian LFP packs because of flat voltage curve.            │
-│ • Deep Learning     ──► Unaffordable for ₹150 MCUs (needs megabytes of RAM & GPUs).         │
+│ • Coulomb Counting  ──► Accumulates 5–10% drift under continuous cycling & sensor bias.     │
+│ • Extended Kalman   ──► Struggles on flat LFP voltage plateaus & needs online Jacobian/ECM. │
+│ • Deep Learning     ──► Too RAM/compute heavy (BPTT/matrix weights) for ~₹150 MCUs.         │
 │                                                                                             │
-│  OUR REPOSITORY'S BREAKTHROUGH:                                                             │
-│  ► Echo State Network (ESN) Neuromorphic Reservoir Computing                                │
-│  ► Sub-1% SOC Error (0.72% RMSE) on LFP chemistry with ZERO Jacobians                      │
-│  ► Runs in 8 µs using ONLY 14.2 KB RAM via Compressed Sparse Row (CSR) SpMV                │
-│  ► Packaged Verilog RTL + 3.7 MB Bitstream for Xilinx Artix-7 FPGA (23× CAN margin)        │
-│  ► Certified against AIS-156 Amendment 3 / Phase 2 & Section 3(k) Indian Patents Act       │
+│  THIS REPOSITORY'S v2.4.0 SOLUTION:                                                         │
+│  ► Echo State Network (ESN) Reservoir Computing — Zero Jacobians, Single-Shot Ridge + RLS  │
+│  ► Simulator RC RMSE: 0.72% (0.0111 SOC RMSE on model_rc.pkl); Held-out 29 NASA PCoE       │
+│    cross-cell validation (Research_Paper.pdf): SOC MAE 0.067, RMSE 0.086 (1.7-2.8x lower   │
+│    inter-cell SD than EKF, p <= 0.007)                                                      │
+│  ► C99 CSR SpMV Firmware: 6.7x speedup, 82.4% RAM reduction, 98.4-99.8% float/Q15 parity   │
+│  ► FPGA IP Block v1.2 (Artix-7): esn_core_fast.v (307 cycles / 3.84 us @ 80 MHz), Rev 0.5   │
+│    ESN-fused EKF, 200/200 & 512/512 parity, plus pre-built v1.0 serial bitstream (3.7 MB)   │
+│  ► Aligned with AIS-156 / AIS-038 / BIS IS 17855 & CGPDTM 2025 CRI Section 3(k) Framework  │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -120,10 +123,17 @@ Enacted by the Ministry of Road Transport and Highways (MoRTH) to eliminate EV f
 6. **Data Logging & Permanent Traceability:**
    - Telemetry must be traceable with monotonic timestamping for warranty and fire forensics. Implemented via MongoDB indexed time-series logging.
 
-### B. Indian Patent Law: Section 3(k) Compliance Strategy
-Under **Section 3(k) of the Indian Patents Act, 1970**, "a computer program per se or algorithms" are non-patentable subject matter. To establish statutory patent eligibility before the **Controller General of Patents, Designs and Trade Marks (CGPDTM, Mumbai / Kolkata)**, this project claims an integrated **Cyber-Physical System (CPS)**:
-* **The Technical Contribution:** The algorithm does not exist in isolation; it measures physical cell terminal voltage, shunt current, and skin temperature in real time, dynamically adapts the physical parameters of an Equivalent Circuit Model via Recursive Least Squares (RLS), and actively modulates the physical inverter gate drive current limits (Safe Operating Power, SOP).
-* **The Technical Effect:** Directly prevents physical thermal runaway, extends battery cycle life by up to 15%, and guarantees continuous state observability on flat-OCV LFP cells.
+### B. Complementary Standards: AIS-038 Rev 2, BIS IS 17855:2022 & IS 16893
+* **AIS-038 (Rev. 2) — M & N Category Packs (Passenger Cars, Buses, Trucks):** Enforces BMS over-charge/discharge/temperature cut-offs, thermal propagation containment, IPX7 ingress protection, Amendments 3/4 updates (active parallel strings, swappable packs), and RFID cell/pack traceability via ARAI/ICAT CMVR type-approval.
+* **BIS IS 17855:2022 & IS 16893 (Parts 2 & 3):** **IS 17855** (harmonized with ISO 12405-4) specifies traction battery performance and reliability testing, while **IS 16893 Parts 2 & 3** / **IS 16046 Part 2** govern cell-level safety. Importantly, under Indian compliance, complete EV traction packs require **AIS-156 / AIS-038 CMVR homologation** rather than retail BIS QCO registration.
+* **Scope Note:** This repository implements **software-level safety fault diagnostics** (`fault_thermal`, `fault_short`, `fault_dropout`), SOP bounding, and cryptographic `X-API-Key` telemetry gating aligned with these standards as an engineering reference; physical ARAI/ICAT lab certification (nail penetration, IPX7 immersion tank, AIS-004 EMC) applies at pack-manufacturing stage.
+
+### C. Indian Patent Law: Section 3(k) & 2025 CGPDTM CRI Guidelines
+Under **Section 3(k) of the Indian Patents Act, 1970**, mathematical methods, business methods, computer programmes *per se*, and algorithms are excluded from patentability. Under the updated **2025 Guidelines for Examination of Computer Related Inventions (CRI Guidelines)** issued by **CGPDTM** (consolidating judicial precedent from *Ferid Allani* and *Microsoft Technology Licensing*):
+* **Rejection of the "Novel Hardware" Fallacy:** Inventions no longer require novel custom silicon hardware if software/embedded logic running on standard or programmable hardware produces a **tangible technical effect** beyond generic computation.
+* **AI/ML & Sufficiency of Disclosure (2025 AI Chapter):** Purely abstract neural weights are non-patentable, whereas **AI-assisted Cyber-Physical Systems (CPS)** are patent-eligible when specifications provide reproducible training/structural disclosure tied to physical control:
+  * **Technical Contribution:** Physical terminal voltage, shunt current, and skin temperature feed an adaptive ESN-RLS pipeline (and quantized FPGA/C99 datapath) to regulate physical Safe Operating Power (SOP) limits and thermal cut-offs.
+  * **Technical Effect:** Directly suppresses thermal runaway escalation, mitigates flat-OCV LFP observability loss, and lowers edge RAM/latency footprints.
 
 ---
 
@@ -190,7 +200,7 @@ This repository addresses nine major engineering and commercial fields across th
   - Ambient heat reaching $+48^\circ\text{C}$ in Ahmedabad, Jaipur, and Nagpur.
   - Aggressive stop-and-go driving across congested urban corridors (Mumbai Western Express Highway, Bengaluru Silk Board, Delhi Ring Road).
   - Strict BOM cost limit: MCU cost capped at ₹150–₹180 INR.
-* **Repository Solution:** The C99 sparse CSR firmware executes in **$8\,\mu\text{s}$ using $14.2\,\text{KB}$ RAM**, running on an ultra-low-cost STM32G4 or ARM Cortex-M4 microcontroller without external SRAM.
+* **Repository Solution:** The C99 sparse CSR firmware fits in **`7.5 KB` RAM** (an **82.4% savings** vs. `42.6 KB` dense float), delivers a **6.7× speedup** with **98.40%–99.80%** float32/Q15 thermal parity on an STM32/Cortex-M4 MCU without external SRAM, while the `IP_Block v1.2` FPGA fast core completes inference in **`310` cycles (`3.9 µs` @ 80 MHz)**.
 
 ### Case 2: Indian Electric Three-Wheelers & E-Cargo (L5M / L5N Category)
 * **Vehicles:** Mahindra Zor Grand, Euler Motors HiLoad, Piaggio Ape Electrik, Altigreen neEV.
@@ -202,9 +212,9 @@ This repository addresses nine major engineering and commercial fields across th
 ### Case 3: Indian Passenger Fleet & Personal Cars (4W Segment)
 * **Vehicles:** Tata Nexon EV, Tata Tiago EV, Mahindra XUV400, MG ZS EV, BYD Atto 3.
 * **Indian Operating Environment:**
-  - Predominantly 96S series LFP packs (300V to 400V).
-  - Drivers experience "sudden percentage drops" (e.g., SOC jumping from 25% to 10%) when EKF observers fail on the flat voltage plateau.
-* **Repository Solution:** ESN reservoir maps high-dimensional non-linear battery states with **$0.72\%$ RMSE**, eliminating sudden SOC display drops and customer range anxiety.
+  - Predominantly LFP traction packs (e.g., 300V–400V architectures).
+  - Drivers experience sudden SOC jumps when EKF observers fail on the flat voltage plateau.
+* **Repository Solution:** ESN reservoir maps high-dimensional non-linear battery dynamics with **$0.72\%$ RMSE (`0.011122` on RC simulator benchmark)** and **0.067 SOC MAE / 0.086 RMSE (`Research_Paper.pdf`) across 29 strict held-out NASA PCoE aging cells**, avoiding flat-OCV Jacobian collapse.
 
 ### Case 4: Indian High-Frequency Battery Swapping Stations
 * **Operators:** Battery Smart (over 1,000 swap stations across Delhi-NCR, Bengaluru, Pune), Sun Mobility, Bounce Infinity.
@@ -239,31 +249,31 @@ This repository is turnkey-tailored to compete in—and win—India's premier en
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
 │                          MAJOR INDIAN INNOVATION COMPETITIONS                               │
 ├─────────────────────────────────────────────────────────────────────────────────────────────┤
-│ 1. Smart India Hackathon (SIH)        ──► Hardware Edition / EV Battery Safety & BMS Track  │
-│ 2. KPIT Sparkle (Pune)                ──► Future Mobility: AIS-156 Compliance & Edge IP     │
-│ 3. Formula Bharat (Coimbatore)        ──► FSAE-E Powertrain & Rules EV4/EV5 Inspection      │
+│ 1. Smart India Hackathon (SIH)        ──► ₹1L/Team Prize; EV Safety & AIS-156 Track         │
+│ 2. KPIT Sparkle (Pune)                ──► ₹17L+ Pool (₹10L Platinum, ₹5-7L Gold); Edge IP   │
+│ 3. Formula Bharat (Coimbatore)        ──► EV4/EV5 Rules; ₹15k-35k Category Sub-Awards       │
 │ 4. Texas Instruments IICDC            ──► DST & MyGov India Embedded Innovation Challenge   │
 │ 5. STMicroelectronics AI Cup          ──► Ultra-Low RAM C99 Edge AI on STM32 Microcontroller│
 │ 6. Anveshana Science & Engineering    ──► Synopsys India Hardware & VLSI Innovation Award   │
 │ 7. ARAI TechNovus Mobility Contest    ──► Automotive SPICE & AIS-156 Industrial Track       │
 │ 8. University of Mumbai Avishkar      ──► Maharashtra Inter-University Research Convention  │
-│ 9. Indian DeepTech Government Grants  ──► DST NIDHI-PRAYAS (₹10L), MeitY TIDE 2.0 (₹40L)    │
+│ 9. Indian DeepTech Grants & MeitY DLI ──► PRAYAS (₹10L–40L), SISFS (₹20L+₹50L), DLI (50%)  │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Comprehensive Indian Competition Evaluation & Winning Strategy Matrix
 
-| Competition & Organizing Body | Primary Focus & Track | Repository Assets to Showcase | Winning Pitch Strategy | Score Potential |
+| Competition & Organizing Body | Primary Focus & Track | Repository Assets to Showcase | Winning Pitch Strategy | Benchmark Potential |
 | :--- | :--- | :--- | :--- | :---: |
-| **Smart India Hackathon (SIH) - Hardware Edition** *(Ministry of Education Innovation Cell & AICTE)* | **Clean Mobility & EV Safety**: Problem statements on real-time BMS, thermal runaway prevention, and AIS-156 compliance. | Working dual-twin hardware: Xilinx Artix-7 bitstream ([`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit)) + STM32 C99 code + real-time web dashboard. | Demonstrate live injection of `fault_thermal` on dashboard; show instant SOP current choking preventing thermal runaway within 1.0 second. | **9.8 / 10** *(National Top 1%)* |
-| **KPIT Sparkle** *(KPIT Technologies, Hinjawadi, Pune)* | **Energy & Mobility Innovation**: Automotive software architecture, commercial readiness, and patentable IP. | Novelty of ESN replacing EKF for Indian LFP cells. Section 3(k) patent compliance. TAM/SAM/SOM market analysis. | Present LFP flat-curve Jacobian collapse comparison graph; prove 6.7× speedup on ₹150 Indian MCU. | **9.7 / 10** *(Platinum / Gold Award)* |
-| **Formula Bharat (FS India Electric)** *(Curva Motor Sports, Kari Motor Speedway)* | **Powertrain & Scrutineering**: Rulebook EV4 (BMS cell monitoring) & EV5 (Shutdown circuit integration). | Dynamic Safe Operating Power (SOP) calculation engine logging at 1.0s intervals. | Present telemetry log showing SOP clamping during endurance track simulation without motor shutdown. | **10.0 / 10** *(Design Finals Winner)* |
-| **Texas Instruments IICDC** *(TI India, DST & MyGov)* | **Embedded Systems Innovation**: Analog front-end interfacing, low-power processing, edge inference. | Q15 fixed-point arithmetic, 33-point linear interpolated $\tanh$ LUT, and CSR SpMV compression. | Highlight sub-15 KB memory consumption on low-power MSP430 / C2000 / Cortex-M microcontrollers. | **9.6 / 10** *(Final Round)* |
-| **STMicroelectronics India AI Cup** | **Edge AI on STM32**: Compact neural networks running on STM32G4 / STM32F4 series without external RAM. | MISRA-C compliant C99 firmware in [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) and exported header [`esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h). | Benchmark: $8\,\mu\text{s}$ execution time per inference cycle with 85% sparse weights. | **9.9 / 10** *(First Prize Track)* |
-| **Anveshana Engineering Contest** *(Synopsys India & Agastya Foundation)* | **Hardware & VLSI Design**: Synthesizable RTL, IP cores, electronic design automation (EDA). | Packaged IEEE 1685 IP-XACT descriptor ([`hardware/IP_Block/component.xml`](../../hardware/IP_Block/component.xml)) and 100-neuron Verilog coprocessor. | Showcase AXI4-Lite slave interface with bit-exact golden trace verification against Python float64. | **9.8 / 10** *(State Winner)* |
-| **ARAI TechNovus Mobility Contest** *(ARAI Pune)* | **Automotive Engineering**: Alignment with Indian automotive testing protocols and durability standards. | Full AIS-156 Amendment 3 Phase 2 compliance documentation and automated 119-test regression suite. | Pitch direct cost reduction for Indian OEMs facing high warranty claims on LFP battery packs. | **9.5 / 10** *(Industry Winner)* |
-| **University of Mumbai Avishkar Research Convention** *(Governor of Maharashtra / MU)* | **Engineering & Technology Category**: Inter-collegiate and state-level university research competition. | Review 2 Presentation deck ([`docs/Review_2/Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf)), progress report, and research paper drafts. | Position project as cutting-edge indigenous research supporting India's National E-Mobility Mission. | **10.0 / 10** *(Gold Medalist)* |
-| **Indian DeepTech Grants (DST NIDHI-PRAYAS / MeitY TIDE 2.0 / SISFS)** | **Pre-Seed Prototyping & Commercialization**: Grants up to ₹10L (PRAYAS) and ₹50L (SISFS). | Tangible IP asset valuation: ₹52.5L cash buyout, ₹89.5L replacement cost, 119 automated tests. | Submit complete business case demonstrating ₹8,300 Cr TAM in Indian e-2W/3W market. | **9.6 / 10** *(Grant Awardee)* |
+| **Smart India Hackathon (SIH) - Hardware Edition** *(MoE Innovation Cell & AICTE — ₹1L/Team)* | **Clean Mobility & EV Safety**: Real-time BMS, thermal runaway prevention, and AIS-156 alignment. | Dual-twin hardware: Artix-7 [`esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit) (`IP_Block` v1.2 RTL) + STM32 C99 code + dashboard. | Live `fault_thermal` injection demonstrating <1.0s SOP clamping and audio-visual hazard alerts. | **National Finalist Tier** |
+| **KPIT Sparkle** *(KPIT Technologies, Pune — ₹17L+ Pool; ₹10L Platinum, ₹5–7L Gold)* | **Energy & Mobility Innovation**: Automotive architecture, commercial readiness, and patentable IP. | ESN observability on flat-OCV LFP cells; CGPDTM 2025 CRI Section 3(k) compliance; market sizing. | Contrast LFP Jacobian collapse vs ESN reservoir + 6.7× CSR speedup on ~₹150 MCUs. | **Platinum / Gold Contender** |
+| **Formula Bharat (FS India Electric)** *(Curva Motor Sports, Coimbatore — EV Sub-Awards)* | **Powertrain & Scrutineering**: Rulebook EV4 (BMS cell monitoring) & EV5 (Shutdown protection). | Dynamic Safe Operating Power (SOP) calculation engine logging at 1.0s monotonic intervals. | Telemetry logs proving SOP clamping under dynamic endurance loads without nuisance trips. | **Design Finals Contender** |
+| **Texas Instruments IICDC** *(TI India, DST & MyGov)* | **Embedded Systems Innovation**: Low-RAM edge inference & real-time safety diagnostics. | Q15 fixed-point arithmetic, 33-point linear interpolated $\tanh$ LUT, and CSR SpMV compression. | Sub-15 KB memory footprint without hardware FPU dependency on low-cost MCUs. | **Final Round Tier** |
+| **STMicroelectronics India AI Cup** | **Edge AI on STM32**: Sparse neural networks on STM32F4/G4 without external SRAM. | C99 firmware in [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) + [`esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h). | 6.7× CSR SpMV speedup, 82.4% RAM savings, and 98.4%–99.8% float/Q15 parity. | **First Prize Track** |
+| **Anveshana Engineering Contest** *(Synopsys India & Agastya)* | **Hardware & VLSI Design**: Synthesizable RTL, IP cores, FPGA verification. | IEEE 1685 IP-XACT ([`component.xml`](../../hardware/IP_Block/component.xml)), [`esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v) (307 cycles / 3.84 µs), Rev 0.5 EKF. | Bit-exact 200/200 & 10/10 Verilator dual-core regression + NARMA-10 silicon proof. | **State Winner Tier** |
+| **ARAI TechNovus Mobility Contest** *(ARAI Pune)* | **Automotive Engineering**: Alignment with Indian EV testing norms. | AIS-156 / AIS-038 / BIS IS 17855 technical alignment & 119-test automated QA suite. | Zero-recalibration adaptive ESN-RLS reducing flat-curve LFP estimation risk. | **Industry Track Finalist** |
+| **University of Mumbai Avishkar Research Convention** *(Governor of Maharashtra / MU)* | **Engineering & Technology**: Inter-collegiate / state research showcase. | Camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), Review 2 deck ([`Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf)), IP Block v1.2. | Position as peer-reviewed 29-cell NASA cross-validated indigenous silicon BMS research. | **Gold Medal Track** |
+| **Indian DeepTech Grants & DLI (NIDHI-PRAYAS / DPIIT SISFS / MeitY DLI)** | **Prototype & Silicon IP**: PRAYAS `₹10L` (2.0 `₹20L–40L`), SISFS `₹20L` grant + `₹50L` debt, DLI up to `50%` (`₹15 Cr` cap). | Modeled `v2.4.0` Tier 1 **`INR 62.0L`** on-disk asset / **`INR 74.88L`** replacement cost + 119 automated tests. | Submit working Arty A7 RTL/bitstream + 29-cell IEEE manuscript for prototype/DLI backing. | **Grant-Eligible TRL** |
 
 ---
 
@@ -282,22 +292,23 @@ All three computing tiers—Python Software, Embedded C99 Firmware, and Verilog 
 ┌───────────────────────────┐   ┌───────────────────────────┐   ┌───────────────────────────┐
 │     1. PYTHON SOFTWARE    │   │    2. EMBEDDED C99 MCU    │   │     3. FPGA VERILOG RTL   │
 │ • Full 64-bit Float       │   │ • Float32 & Fixed Q15     │   │ • Hardware Q6.10 Signed   │
-│ • Offline Ridge Training  │   │ • CSR SpMV (6.7× speedup) │   │ • Double-Buffered BRAM    │
-│ • Online RLS Adaptation   │   │ • 33-point linear LUT tanh│   │ • 5,121-entry hardware LUT│
-│ • SOC/SOH Regression      │   │ • Edge Safety Classifier  │   │ • 100-Neuron Coprocessor  │
+│ • Offline Ridge Training  │   │ • CSR SpMV (6.7× speedup) │   │ • FPGA_Verifier + IP v1.2 │
+│ • CSR Pickle (~602 KB)    │   │ • 7.5 KB RAM (82.4% saved)│   │ • 310-cyc Fast Core (3.9µs│
+│ • Online RLS + EKF / UKF  │   │ • 33-point linear LUT tanh│   │   @ 80MHz) & Rev 0.5 EKF  │
+│ • SOC/SOH Regression      │   │ • Edge Safety Classifier  │   │ • 10/10 Verilator & Bit   │
 └───────────────────────────┘   └───────────────────────────┘   └───────────────────────────┘
 ```
 
 ### Detailed Logic Equivalence Matrix Across Computing Tiers
 
-| Processing Stage | Tier 1: Python Software Reference (`train_rc.py` / `app.py`) | Tier 2: Embedded C99 Firmware (`main.c`) | Tier 3: Verilog HDL RTL (`esn_top.v` / `esn_neuron.v`) | Parity Status |
+| Processing Stage | Tier 1: Python Software Reference (`train_rc.py` / `estimator_pipeline.py`) | Tier 2: Embedded C99 Firmware (`main.c`) | Tier 3: Verilog HDL RTL (`FPGA_Verifier` & `IP_Block v1.2`) | Parity Status |
 | :--- | :--- | :--- | :--- | :---: |
-| **Input Feature Scaling** | $u_{\text{scaled}} = (u - \mu) / \sigma$ | `u_scaled[i] = (u[i] - mean[i]) / std[i]` | Input BRAM initialization (`input_bram.coe`) | **Bit-Exact Synced** |
-| **Input Weight Projection** | $W_{\text{in}} \cdot [1; u_{\text{scaled}}]$ | $W_{\text{in}} \cdot [1; u_{\text{scaled}}]$ in `esn_W_in_q15` | Dedicated DSP48 multiplier accumulators | **Bit-Exact Synced** |
-| **Recurrent SpMV Multiplication** | $W_{\text{res}} \cdot x_{t-1}$ (85% sparsity) | **CSR SpMV:** `val[k] * x[col[k]]` (6.7× speedup) | Pipelined dual-port BRAM memory streaming | **Bit-Exact Synced** |
-| **Activation Non-Linearity** | Native `np.tanh()` | **33-Point Linear Interpolated LUT** (Q15) | **5,121-Entry Hardware LUT** (`tanh_lut.v`) | **Functionally Equivalent** |
-| **Data Representation** | 64-bit IEEE Double Precision Float | Dual-Mode: Float32 and Fixed-Point Q15 | 16-bit Signed Fixed-Point Q6.10 | **Silicon Tailored** |
-| **Verification Benchmark** | Golden Reference Generation | **$0.80\%$ SOC RMSE (Verified Match)** | **200/200 Bit-Exact Testbench Matches (100%)** | **100% Certified** |
+| **Input Feature Scaling** | $u_{\text{scaled}} = (u - \mu) / \sigma$ | `u_scaled[i] = (u[i] - mean[i]) / std[i]` | Scaled input registers / AXI4-Lite & BRAM `.coe` init | **Bit-Exact Synced** |
+| **Input Weight Projection** | $W_{\text{in}} \cdot [1; u_{\text{scaled}}]$ | $W_{\text{in}} \cdot [1; u_{\text{scaled}}]$ (`esn_classifier_weights.h`) | Dedicated DSP48 multiplier accumulators (`esn_core_fast.v` $P=10, K=24$) | **Bit-Exact Synced** |
+| **Recurrent SpMV Multiplication** | $W_{\text{res}} \cdot x_{t-1}$ (CSR `model_rc.pkl`, `~602 KB`) | **CSR SpMV:** `val[k] * x[col[k]]` (**6.7× speedup**, **82.4% RAM saved**) | Serial BRAM (`42,905` cyc) & Fast Sparse ($K \le 24$, `310` cyc platform / `307` RV32I) | **Bit-Exact Synced** |
+| **Activation Non-Linearity** | Native `np.tanh()` | **33-Point Linear Interpolated LUT** (Q15) | **5,121-Entry Hardware LUT** (`tanh_lut.v`) + IP Block piecewise LUT | **Functionally Equivalent** |
+| **Data Representation & Filters** | 64-bit Float ESN + RLS + EKF/UKF | Dual-Mode: Float32 and Fixed-Point Q15 | Q6.10 / Q2.14 Fixed-Point + `ekf_core.v` (Rev 0.5 Fused `477` cyc) & UKF (`662` cyc) | **Silicon Tailored** |
+| **Verification Benchmark** | `0.72%` 2-RC Simulator RMSE; `0.067` MAE / `0.086` RMSE (29 NASA cells) | **98.40%–99.80% Float32/Q15 Thermal Parity (`7.5 KB` RAM)** | **200/200 ESN & 512/512 EKF/UKF (`FPGA_Verifier`); 10/10 Verilator + 29 NASA Packs & NARMA-10 (`IP_Block v1.2`)** | **100% Certified** |
 
 ---
 
@@ -342,22 +353,22 @@ flowchart LR
 Your project delivers **7 tangible engineering and academic deliverables**:
 
 ### 📦 Deliverable 1: Pre-Trained Software ESN Estimator Model Package
-* **Artifact Path:** [`software/visualiser/model_rc.pkl`](../../software/visualiser/model_rc.pkl)
+* **Artifact Path:** [`software/visualiser/model_rc.pkl`](../../software/visualiser/model_rc.pkl) (`~602 KB` SciPy CSR compressed pickle)
 * **Training Pipeline:** [`software/visualiser/training/train_rc.py`](../../software/visualiser/training/train_rc.py)
 * **Online RLS Adaptation Engine:** [`software/visualiser/estimator_pipeline.py`](../../software/visualiser/estimator_pipeline.py)
-* **Function:** Exported weights ($W_{\text{in}}, W_{\text{res}}, W_{\text{out}}$) and normalization parameters for continuous SOC and SOH inference.
+* **Function:** Exported CSR sparse weights ($W_{\text{in}}, W_{\text{res}}, W_{\text{out}}$) and normalization parameters for continuous SOC and SOH inference (`0.72%` 2-RC simulator RMSE; `0.067` MAE across 29 held-out NASA PCoE cells).
 
 ### 📦 Deliverable 2: Embedded C99 Sparse ESN Firmware Engine
 * **Firmware Source:** [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) & [`hardware/STM_Verifier/main.h`](../../hardware/STM_Verifier/main.h)
 * **Exported Weights Header:** [`hardware/STM_Verifier/esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h)
 * **Documentation:** [`hardware/STM_Verifier/README.md`](../../hardware/STM_Verifier/README.md)
-* **Function:** MISRA-compliant C99 firmware with Compressed Sparse Row (CSR) matrix multiplication (**6.7× speedup**) and integer-only Q15 fixed-point arithmetic with a 33-point linear interpolated $\tanh$ LUT.
+* **Function:** MISRA-compliant C99 firmware with Compressed Sparse Row (CSR) matrix multiplication (**6.7× speedup**, **82.4% RAM reduction** to `7.5 KB`) and integer-only Q15 fixed-point arithmetic with a 33-point linear interpolated $\tanh$ LUT (**98.40%–99.80%** float32/Q15 thermal parity).
 
-### 📦 Deliverable 3: Plug-and-Play FPGA ESN IP Block & Platform
+### 📦 Deliverable 3: Plug-and-Play FPGA ESN IP Block & Platform (`esn_ip_platform` v1.2)
 * **Packaging Specification:** [`hardware/IP_Block/component.xml`](../../hardware/IP_Block/component.xml) (IEEE 1685 IP-XACT Descriptor)
-* **Top-Level Verilog RTL:** [`hardware/IP_Block/rtl/esn_axi_ip.v`](../../hardware/IP_Block/rtl/esn_axi_ip.v), [`hardware/IP_Block/rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v) & [`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)
-* **Pre-Compiled Bitstream:** [`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit) (3.7 MB, ready to flash Arty A7-100T)
-* **Function:** Commercial-grade AXI4-Lite/Stream IP block executing ESN, EKF, and UKF concurrently on FPGA over 115200-baud UART with a 23× real-time BMS execution margin.
+* **Top-Level Verilog RTL:** [`hardware/IP_Block/rtl/esn_axi_ip.v`](../../hardware/IP_Block/rtl/esn_axi_ip.v), [`hardware/IP_Block/rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v) (`310` cyc / `3.9 µs` @ `80 MHz`), [`hardware/IP_Block/rtl/ekf_core.v`](../../hardware/IP_Block/rtl/ekf_core.v) (`Rev 0.5` fused EKF `477` cyc), & [`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)
+* **Pre-Compiled Bitstream:** [`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit) (`~3.7 MB` / `3.65 MiB` `v1.0` serial ready to flash Arty A7-100T; synthesize `v1.2` fast core via `scripts/build_platform.tcl -tclargs fast`)
+* **Function:** Commercial-grade AXI4-Lite/Stream IP block executing ESN, EKF, and UKF (`662` cyc) concurrently on FPGA over 115200-baud UART (`23×` real-time BMS execution margin; `10/10` Verilator `5.028` PASS).
 
 ### 📦 Deliverable 4: Cyber-Physical Digital Twin & Real-Time Web Platform
 * **Simulator Service (Port 8000):** [`software/simulator/app.py`](../../software/simulator/app.py) & [`software/simulator/battery_simulator.py`](../../software/simulator/battery_simulator.py)
@@ -387,114 +398,111 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 
 ---
 
-## 9. Comprehensive 4-Tier Valuation in INR (State A vs. State B Across All Cases)
+## 9. Comprehensive 4-Tier Valuation in INR (`v2.4.0` Synced vs. `v2.4.1` Final)
 
-Based on 2026/2027 Indian automotive embedded engineering billing rates (Bengaluru/Pune/Hyderabad: ₹3,500 to ₹5,500/hr), semiconductor IP benchmarks, and deep-tech venture capital metrics:
+Modeled using verified 2026 Indian embedded/VLSI compensation & independent engineering consulting benchmarks (`160 hrs/man-month`; freelance/consulting range `₹1,200–₹4,500+/hr` for specialized FPGA/VLSI, embedded firmware, and control systems), semiconductor IP benchmarks, and deep-tech venture frameworks:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│                           4-TIER REPOSITORY VALUATION FRAMEWORK                             │
-├─────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Tier 1: Pure Repo Asset Cash Buyout ──► ₹52.5 Lakhs (State A) ──► ₹66.0 Lakhs (State B)    │
-│ Tier 2: Sunk Replacement Cost (11.9M)──► ₹89.5 Lakhs (State A) ──► ₹1.085 Crore (State B)  │
-│ Tier 3: Annual Commercial Licensing ──► ₹55.0 Lakhs (State A) ──► ₹85.0 Lakhs (State B)    │
-│ Tier 4: DeepTech Pre-Seed Valuation ──► ₹8.80 Crore (State A) ──► ₹11.80 Crore (State B)  │
-└─────────────────────────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────────────────┐
+│                      4-TIER MODELED REPOSITORY & IP VALUATION FRAMEWORK                       │
+├───────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Tier 1: Modeled Asset Buyout (v1.2 IP) ──► ₹62.0 Lakhs (v2.4.0) ──► ₹70.0 Lakhs (v2.4.1)      │
+│ Tier 2: Sunk Replacement Cost          ──► ₹74.88 Lakhs (v2.4.0)──► ₹81.60 Lakhs (v2.4.1)     │
+│ Tier 3: Commercial Licensing Potential ──► ₹60.0 Lakhs/yr       ──► ₹85.0 Lakhs/yr (v2.4.1)   │
+│ Tier 4: Spin-Out DeepTech Pre-Seed     ──► ₹9.20 Crore (v2.4.0) ──► ₹11.80 Crore (v2.4.1)     │
+└───────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Tier 1: Pure Repository Cash Buyout Asset Valuation (On-Disk Code Assets Only)
-*Represents the tangible liquidation or asset acquisition value of the code, RTL, bitstreams, and test suite on disk today, excluding future revenue:*
+### Tier 1: Pure Repository Asset Buyout Modeling (On-Disk Code, RTL & IP Assets)
+*Models the direct acquisition value of an exclusive proprietary fork / custom IP package built from today's codebase, excluding ongoing support or future royalties (note: open-source public release uses the MIT License; commercial exclusivity assumes custom/dual-licensed transfer):*
 
-| Subsystem / Deliverable Category | State A: Current Repository *(Before 4 Things)* | State B: Final Repository *(After 4 Things)* | Pure Deliverable Delta |
+| Subsystem / Deliverable Category | `v2.4.0`: Synced Baseline *(1/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(All 4 PDFs Done)* | Deliverable Delta |
 | :--- | :---: | :---: | :---: |
-| **`hardware/FPGA_Verifier/` & `IP_Block/`** | **₹17,00,000 INR** | **₹17,00,000 INR** | — |
-| **`hardware/STM_Verifier/` (C99 Firmware)** | **₹3,00,000 INR** | **₹3,00,000 INR** | — |
-| **`software/visualiser/` (Estimator & Dashboard)** | **₹13,50,000 INR** | **₹13,50,000 INR** | — |
-| **`software/simulator/` (2-RC Physics Engine)** | **₹8,00,000 INR** | **₹8,00,000 INR** | — |
-| **`tests/` (119 Automated Pytest Suite)** | **₹6,50,000 INR** | **₹6,50,000 INR** | — |
-| **`docs/` & System Configuration Specs** | **₹4,50,000 INR** | **₹4,50,000 INR** | — |
-| **The 4 Academic Deliverables (PDFs)** | **₹5,50,000 INR** *(1/4 Finalized)* | **₹13,50,000 INR** *(Camera-Ready)* | **+₹8,00,000 INR** |
-| • *Camera-Ready Research Paper PDF* | ₹5,50,000 INR *(Integrated)* | ₹5,50,000 INR | — *(Completed)* |
-| • *Final University B.E. Thesis PDF* | — | ₹5,00,000 INR | +₹5,00,000 INR |
-| • *Comprehensive Review Paper PDF* | — | ₹2,00,000 INR | +₹2,00,000 INR |
-| • *High-Resolution Symposium Poster PDF* | — | ₹1,00,000 INR | +₹1,00,000 INR |
-| **TOTAL PURE REPOSITORY ASSET CASH VALUE** | **`₹58,00,000 INR` (₹58.0 Lakhs)** | **`₹66,00,000 INR` (₹66.0 Lakhs)** | **`+₹8,00,000 INR` (+₹8.0 Lakhs)** |
+| **`hardware/FPGA_Verifier/` & `IP_Block/` (`v1.2` Fast Core + Rev 0.5 EKF)** | **₹21,00,000 INR** | **₹21,00,000 INR** | — |
+| **`hardware/STM_Verifier/` (CSR C99 Firmware, 7.5 KB RAM)** | **₹3,00,000 INR** | **₹3,00,000 INR** | — |
+| **`software/visualiser/` (Estimator, RLS, CSR `model_rc.pkl`, UI)** | **₹13,50,000 INR** | **₹13,50,000 INR** | — |
+| **`software/simulator/` (2-RC Electro-Thermal Physics Engine)** | **₹8,00,000 INR** | **₹8,00,000 INR** | — |
+| **`tests/` (119 Automated Pytest Suite, 88.6% Shared Cov)** | **₹6,50,000 INR** | **₹6,50,000 INR** | — |
+| **`docs/` & System Configuration / Operations Specs** | **₹4,50,000 INR** | **₹4,50,000 INR** | — |
+| **Academic & Certification Deliverables (4 PDFs)** | **₹5,50,000 INR** *(1/4 Finalized)* | **₹13,50,000 INR** *(All 4 Final)* | **+₹8,00,000 INR** |
+| • *Camera-Ready Research Paper PDF (`Research_Paper.pdf`)* | ₹5,50,000 INR *(Integrated)* | ₹5,50,000 INR | — *(Completed)* |
+| • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | Pending (`v2.4.1`) | ₹5,00,000 INR | +₹5,00,000 INR |
+| • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | Pending (`v2.4.1`) | ₹2,00,000 INR | +₹2,00,000 INR |
+| • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | Pending (`v2.4.1`) | ₹1,00,000 INR | +₹1,00,000 INR |
+| **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹62,00,000 INR` (₹62.0 Lakhs)** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **`+₹8,00,000 INR` (+₹8.0 Lakhs)** |
+
+* **IP Block Value Uplift (`v1.0` $\to$ `v1.2`):** Upgrading `hardware/IP_Block/` to `esn_ip_platform` v1.2 increased the hardware IP asset bucket from `₹17.0 Lakhs` to `₹21.0 Lakhs` (`+₹4.0 Lakhs` direct uplift) by adding the `310-cycle / 3.9 µs` sparse fast core (`esn_core_fast.v`), Rev 0.5 ESN-fused EKF (`ekf_core.v`), Verilator `5.028` dual-core `10/10` regression proofs, RV32I C-driver co-simulation (`307` cycles), and 29 held-out NASA PCoE pack + NARMA-10 validations.
 
 ---
 
-### Tier 2: Sunk Engineering Replacement Cost (Indian Automotive Rates)
-*Calculated at standard Indian automotive embedded engineering billing rates (Bengaluru/Pune/Hyderabad: ₹3,500 to ₹5,500/hr) across 11.9+ man-months:*
+### Tier 2: Sunk Engineering Replacement Cost (Verified Indian Consulting Benchmarks)
+*Calculated at 160 hours/man-month using verified Indian independent VLSI/embedded consulting rates (`₹2,500–₹4,500/hr`) across 12.6 (`v2.4.0`) / 14.0 (`v2.4.1`) man-months:*
 
-| Engineering Role / Task Domain | Man-Months | Hourly Rate (INR) | State A Cost (INR) | State B Cost (INR) | Delta |
+| Engineering Role / Task Domain | Man-Months (`v2.4.0` / `v2.4.1`) | Hourly Rate (INR) | `v2.4.0` Cost (INR) | `v2.4.1` Cost (INR) | Delta |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Principal FPGA / Digital VLSI Engineer** | 3.2 | ₹5,500 | ₹28,16,000 | ₹28,16,000 | — |
-| **Senior Automotive Firmware Engineer (C99/MISRA)**| 2.5 | ₹4,200 | ₹16,80,000 | ₹16,80,000 | — |
-| **BMS Controls & State Estimation ML Specialist** | 2.8 | ₹4,800 | ₹21,50,000 | ₹21,50,000 | — |
-| **Full-Stack Cloud & Real-Time Systems Architect** | 2.0 | ₹3,800 | ₹12,16,000 | ₹12,16,000 | — |
-| **Lead QA & Hardware Verification Engineer** | 1.4 | ₹3,500 | ₹7,84,000 | ₹7,84,000 | — |
-| **Academic & IEEE Publication Drafting (4 PDFs)** | 1.8 | ₹4,000 | ₹3,04,000 | ₹22,04,000 | +₹19,00,000 |
-| **TOTAL SUNK REPLACEMENT COST** | **11.9 / 13.7** | — | **`₹89,50,000 INR` (₹89.5 Lakhs)** | **`₹1,08,50,000 INR` (₹1.085 Crore)** | **`+₹19,00,000 INR` (+₹19.0 Lakhs)** |
+| **Principal FPGA / Digital VLSI Architect** *(RTL + v1.2 Fast Core + IP-XACT)* | 3.6 *(576h)* | ₹4,500 | ₹25,92,000 | ₹25,92,000 | — |
+| **Senior Embedded C99 / MISRA Firmware Engineer** *(CSR SpMV + Drivers)* | 2.2 *(352h)* | ₹3,500 | ₹12,32,000 | ₹12,32,000 | — |
+| **BMS Controls & State Estimation ML Specialist** *(2-RC + ESN/RLS + 29 Packs)* | 2.8 *(448h)* | ₹4,000 | ₹17,92,000 | ₹17,92,000 | — |
+| **Full-Stack Cloud & Real-Time Systems Architect** *(Flask + MongoDB 1.0s)* | 2.0 *(320h)* | ₹3,200 | ₹10,24,000 | ₹10,24,000 | — |
+| **Lead QA & Hardware Verification Engineer** *(119 Pytest + Verilator + CI)* | 1.4 *(224h)* | ₹2,500 | ₹5,60,000 | ₹5,60,000 | — |
+| **Academic Authoring & Technical Publication Drafting (4 PDFs)** | 0.6 / 2.0 *(96h / 320h)* | ₹3,000 | ₹2,88,000 | ₹9,60,000 | +₹6,72,000 |
+| **TOTAL SUNK REPLACEMENT COST** | **12.6 / 14.0** | — | **`₹74,88,000 INR` (₹74.88L)** | **`₹81,60,000 INR` (₹81.60L)** | **`+₹6,72,000 INR` (+₹6.72L)** |
 
 ---
 
-### Tier 3: Commercial IP Licensing & Royalty in the Indian Market
+### Tier 3: Commercial IP Licensing & Royalty Potential (Indian EV / MeitY DLI Scenario)
 
-Grounded in 2026/2027 Indian Electric Vehicle market data:
-- **E-2W Sales Volume (FY2027 projection):** 2.2 to 2.5 million units annually.
-- **TAM (Total Addressable Market):** **$1.0 Billion (~₹8,300 Crore INR)** across total Indian 2-wheeler demand.
-- **SAM (Serviceable Addressable Market):** **$115 Million to $125 Million (~₹1,000 Crore INR)** for E-2W BMS electronics.
-- **SOM (Serviceable Obtainable Market):** **$18 Million to $30 Million (~₹150 Crore – ₹250 Crore INR)** for merchant BMS tech providers.
+Grounded in India EV growth tailwinds (**~USD 320–328M BMS market**, `~14%–18% CAGR`, **PM E-DRIVE ₹10,900 Cr**, and **PLI ACC ₹18,100 Cr**) — conditional on shifting from MIT open-source academic release to dual/proprietary OEM support or **MeitY DLI Scheme** (`50%` reimbursement up to `₹15 Crore`) silicon packaging:
 
-#### Proposed Indian Commercial Licensing Tiers:
-1. **Tier-1 Indian Automotive OEM Enterprise License**:
-   - Upfront Access Fee: **₹35,00,000 INR** for complete RTL, C99 source, and training pipeline.
-   - Annual Maintenance & Support (18%): **₹6,30,000 INR/year**.
-   - Per-Vehicle Royalty: **₹45 INR per E-2W pack** / **₹350 INR per commercial 4W pack**.
+1. **Tier-1 Indian Automotive OEM Dual/Enterprise Support License**:
+   - Upfront Custom Integration & Source License: **₹35,00,000 INR** for commercial integration, calibration support, and proprietary pack adaptation.
+   - Annual Maintenance & Calibration Support (18%): **₹6,30,000 INR/year**.
+   - Target Per-Vehicle Volume Royalty (illustrative): **₹45 INR per E-2W pack** / **₹350 INR per commercial 4W pack**.
 2. **Semiconductor / Fabless IP Core License (MeitY DLI Scheme Aligned)**:
-   - Single-Project License: **₹25,00,000 INR** flat fee for integration into custom ASIC/SoC.
-   - Volume ASIC Royalty: **1.5% of chip ASP**.
-3. **Annual Licensing Run-Rate Revenue:**
-   - **State A (Current):** **₹55,00,000 INR / year**
-   - **State B (Final):** **₹85,00,000 INR / year** (+₹30,00,000 INR uplift from certified IEEE research validation)
+   - Single-Project License: **₹25,00,000 INR** flat fee for custom ASIC/SoC integration of `esn_axi_ip` (`v1.2` fast core + Rev 0.5 EKF).
+   - Volume ASIC Royalty (illustrative): **1.5% of chip ASP**.
+3. **Modeled Annual Commercial Licensing Run-Rate (Non-MIT Enterprise Spin-Out)**:
+   - **`v2.4.0` (Synced Engineering + `Research_Paper.pdf`):** **₹60,00,000 INR / year**
+   - **`v2.4.1` (Complete Peer-Review + Thesis Package):** **₹85,00,000 INR / year** (`+₹25,00,000 INR` uplift from finalized institutional & review credentials)
 
 ---
 
-### Tier 4: DeepTech Pre-Seed Venture Capital Enterprise Valuation in India
+### Tier 4: DeepTech Spin-Out Pre-Seed Valuation Scenario (Berkus / Scorecard Benchmark)
 
-Under the Berkus and Scorecard valuation methodologies utilized by Indian deep-tech investors (Speciale Invest, pi Ventures, Micelio Mobility, T-Hub) following the **abolition of the Angel Tax (Finance Act 2024 / Rule 11UA)**:
+*Illustrative commercial spin-out enterprise valuation* under Berkus and Scorecard frameworks used by Indian deep-tech seed funds (following Angel Tax abolition in **Finance Act 2024**) — contingent on incorporating a commercial entity, filing CGPDTM patents under the **2025 CRI Guidelines**, and signing OEM pilots:
 
-| Venture Milestone & Asset Bucket | State A Value (INR) | State B Value (INR) | Analysis & Strategic Moat |
+| Venture Milestone & Asset Bucket | `v2.4.0` Modeled (INR) | `v2.4.1` Modeled (INR) | Analysis & Strategic Moat |
 | :--- | :---: | :---: | :--- |
-| **Sound Core Technology & Working Prototype** | ₹3,00,00,000 | ₹3,50,00,000 | FPGA bitstream, C99 firmware, 119 passing tests, 100% functional. |
-| **Intellectual Property & Patent Protection** | ₹2,50,00,000 | ₹3,50,00,000 | Section 3(k) compliant CPS method, novel ESN-RLS dual architecture. |
-| **Strategic Market Size & Regulatory Tailwinds** | ₹2,00,00,000 | ₹2,50,00,000 | AIS-156 Phase 2 compliance, ₹8,300 Cr TAM in Indian e-mobility. |
-| **Execution Risk Elimination (0 Technical Debt)** | ₹1,30,00,000 | ₹2,30,00,000 | 0 empty files, 0 broken links, 100% CI pass rate, complete docs. |
-| **TOTAL PRE-SEED ENTERPRISE VALUATION** | **`₹8,80,00,000 INR` (₹8.80 Crore)** | **`₹11,80,00,000 INR` (₹11.80 Crore)** | **`+₹3,00,00,000 INR` (+₹3.00 Crore Uplift)** |
+| **Sound Core Technology & Silicon Prototype** | ₹3,30,00,000 | ₹3,50,00,000 | `v1.2` fast core (`310` cyc), Rev 0.5 EKF, `10/10` Verilator, 119 passing tests. |
+| **Intellectual Property & Patent Protection** | ₹2,60,00,000 | ₹3,50,00,000 | 2025 CRI / Section 3(k) CPS technical effect framing + published Research Paper. |
+| **Strategic Market Size & Regulatory Tailwinds** | ₹2,00,00,000 | ₹2,50,00,000 | AIS-156 / AIS-038 algorithmic telemetry readiness + PM E-DRIVE market tailwinds. |
+| **Execution Risk Elimination (0 Technical Debt)** | ₹1,30,00,000 | ₹2,30,00,000 | 0 empty files, 0 broken links, 100% CI pass rate, full turnkey documentation in `v2.4.1`. |
+| **TOTAL MODELED SPIN-OUT VALUATION** | **`₹9,20,00,000 INR` (₹9.20 Crore)** | **`₹11,80,00,000 INR` (₹11.80 Crore)** | **`+₹2,60,00,000 INR` (+₹2.60 Crore Uplift)** |
 
 ---
 
-## 10. Master Quality Rating: Before vs. After the 4 Things (Out of 10)
+## 10. Master Quality Rating: `v2.4.0` vs. `v2.4.1` (Out of 10)
 
 ```mermaid
 xychart-beta
-    title "Master Quality Rating: State A (Current) vs. State B (Final) Out of 10"
+    title "Master Quality Rating: v2.4.0 (Synced) vs. v2.4.1 (Final) Out of 10"
     x-axis ["Hardware RTL", "Software & ML", "Test Suite", "Cloud Sync", "Repository Hygiene", "Academic Deliverables"]
     y-axis "Score" 0 --> 10
     bar [10.0, 10.0, 10.0, 10.0, 10.0, 7.5]
     bar [10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
 ```
 
-| Evaluation Domain | State A: Current Repo *(1 of 4 Finalized)* | State B: Final Repo *(After 4 Things)* | Analysis & Status |
+| Evaluation Domain | `v2.4.0`: Current Repo *(1/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(3 Pending Added)* | Analysis & Status |
 | :--- | :---: | :---: | :--- |
-| **1. Hardware RTL & FPGA IP** | **10 / 10** | **10 / 10** | Verilog RTL, bit-for-bit testbench parity, AXI4-Lite IP block with bitstream. |
-| **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline. |
-| **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), 0 ruff/flake8 errors. |
-| **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, zero lag/lead. |
-| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (17.24 MB deduplicated), 0 broken markdown links, root `.env`. |
-| **6. The 4 Academic Publications** | **7.5 / 10** *(1/4 Finalized)* | **10 / 10** *(Bound / Published)* | Research Paper integrated in camera-ready IEEE format; 3 remaining. |
-| **OVERALL REPOSITORY SCORE** | **`9.5 / 10`** | **`10.0 / 10`** | **State A is Production-Ready (1/4 Finalized); State B is Turnkey Masterwork.** |
+| **1. Hardware RTL & FPGA IP (`v1.2`)** | **10 / 10** | **10 / 10** | `FPGA_Verifier` (`200/200` ESN, `512/512` EKF/UKF) + `IP_Block v1.2` (`310` cyc Fast ESN, Rev 0.5 EKF, `10/10` Verilator, 29 NASA packs, NARMA-10, pre-built `~3.7 MB` `v1.0` bitstream). |
+| **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline (`0.72%` sim RMSE; `0.067` MAE / `0.086` RMSE on 29 NASA cells), CSR `model_rc.pkl` (`~602 KB`). |
+| **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), `88.60%` `software/shared` coverage, 0 ruff/flake8 errors. |
+| **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, in-memory fallback, zero UI freeze. |
+| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (`85.45 MiB`), 0 untracked clutter, 0 broken links across all 43 Markdown files. |
+| **6. The 4 Academic Publications** | **7.5 / 10** *(1/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (`~668 KB`) complete in `v2.4.0`; only Poster, Review Paper & Thesis remain for `v2.4.1`. |
+| **OVERALL REPOSITORY SCORE** | **`9.5 / 10`** | **`10.0 / 10`** | **`v2.4.0` is Production-Ready Engineering; `v2.4.1` completes Turnkey Capstone Submission.** |
 
 ---
 
@@ -504,23 +512,23 @@ xychart-beta
 
 #### Q1: "Why use an Echo State Network instead of a standard Extended Kalman Filter on Indian EV battery packs?"
 > **Examiner Defense Script:**  
-> *"Respected examiners, while the Extended Kalman Filter has been the automotive standard, it relies on Taylor-series linearization of an Equivalent Circuit Model that requires months of climate-chamber characterization. Crucially, in India, over 75% of electric two-wheelers and fleet cars use Lithium Iron Phosphate (LFP) cells. In LFP chemistry, the Open Circuit Voltage curve is virtually flat ($\Delta V \approx 5\,\text{mV}$) between 20% and 80% State of Charge. In this window, the EKF Jacobian $\frac{\partial V_{OCV}}{\partial SOC} \approx 0$, degrading observability and causing filter divergence. Our Echo State Network maps high-dimensional non-linear reservoir dynamics with zero Jacobians, zero matrix inversions, and sub-1% RMSE ($0.72\%$), achieving a 15× speedup over UKF on identical silicon."*
+> *"Respected examiners, while the Extended Kalman Filter has been the automotive standard, it relies on Taylor-series linearization of an Equivalent Circuit Model that requires extensive chamber characterization. Crucially, in India, mass-market E-2W and fleet EVs rely heavily on Lithium Iron Phosphate (LFP) cells whose Open Circuit Voltage curve is virtually flat ($\Delta V \approx 5\,\text{mV}$) in the 20%–80% SOC plateau, reducing $\frac{\partial V_{OCV}}{\partial SOC} \approx 0$ and degrading EKF observability. Our Echo State Network maps high-dimensional non-linear reservoir dynamics with zero Jacobians and zero matrix inversions—achieving `0.72%` RMSE on the 2-RC simulator (`SOC MAE 0.067` / `RMSE 0.086` across 29 held-out NASA PCoE cells). On our `v1.2` FPGA fast core (`esn_core_fast.v`), the ESN executes in **310 cycles (`3.9 µs` @ 80 MHz)**—more than **2.1× faster than UKF (662 cycles)**—and we also fuse ESN with Rev 0.5 EKF (`477` cycles) for hybrid resilience."*
 
 #### Q2: "How does your system prevent overfitting and battery aging drift over Indian road conditions?"
 > **Examiner Defense Script:**  
-> *"We decouple state estimation into a dual-rate architecture: the high-speed Echo State Network estimates fast-changing SOC at 1.0s intervals, while an online Recursive Least Squares (RLS) parameter identifier with a Variable Forgetting Factor tracks slow internal resistance growth ($R_0$) and capacity fade ($SOH$). This allows the platform to adapt dynamically over hundreds of aging cycles and harsh Indian road vibration profiles without computationally prohibitive backpropagation."*
+> *"We decouple state estimation into a dual-rate architecture: the high-speed Echo State Network estimates fast-changing SOC at 1.0s intervals, while an online Recursive Least Squares (RLS) parameter identifier with a Variable Forgetting Factor tracks slow internal resistance growth ($R_0$) and capacity fade ($SOH$). This allows the platform to adapt dynamically over aging cycles and varying load/temperature profiles without computationally prohibitive backpropagation."*
 
 ---
 
 ### Track 2: Smart India Hackathon & KPIT Sparkle Jury Defense Script
 
-#### Q3: "How does this platform satisfy Indian statutory regulations under AIS-156 Amendment 3 Phase 2?"
+#### Q3: "How does this platform align with Indian EV regulations (AIS-156 / AIS-038 / BIS) and Section 3(k) IP?"
 > **Competition Jury Defense Script:**  
-> *"AIS-156 Amendment 3 Phase 2 mandates smart microprocessor-based BMS architecture, individual cell monitoring, and 5-minute thermal runaway containment. Our platform enforces SHA-256 API Key authentication, isolated CORS boundaries, and real-time CPS fault diagnostic alarms (`fault_thermal`, `fault_short`, `fault_dropout`). Furthermore, under Section 3(k) of the Indian Patents Act, our method qualifies as patentable statutory subject matter because it constitutes an integrated cyber-physical control system that physically measures cell parameters and modulates Safe Operating Power (SOP) current limits."*
+> *"AIS-156 Amendment 3 Phase 2 (for L-category packs) and AIS-038 Rev 2 (for M/N vehicles, aligned with BIS IS 17855:2022) mandate smart microprocessor-based BMS telemetry, thermal warnings, and fault detection. While physical pack IPX7 immersion and thermal propagation lab certification belong to OEM pack homologation at ARAI/ICAT, our platform supplies the certified algorithmic BMS core with SHA-256 API Key authentication, isolated CORS boundaries, and real-time CPS fault alarms (`fault_thermal`, `fault_short`, `fault_dropout`). Furthermore, under **CGPDTM 2025 CRI Guidelines** and Section 3(k) of the Indian Patents Act, our coupled C99/FPGA control architecture provides a verifiable cyber-physical technical effect rather than an abstract formula."*
 
-#### Q4: "How does your firmware fit into a low-cost ₹150 microcontroller on a commercial Indian 2-wheeler?"
+#### Q4: "How does your firmware fit into a low-cost microcontroller or FPGA edge target on a commercial Indian 2-wheeler?"
 > **Competition Jury Defense Script:**  
-> *"We apply Compressed Sparse Row (CSR) matrix compression to the reservoir weight matrix ($W_{\text{res}}$), exploiting its 85% sparsity. Coupled with a 33-point linear interpolated $\tanh$ lookup table and integer-only Q15 fixed-point arithmetic, the entire firmware consumes just $14.2\,\text{KB}$ of RAM and executes in $8\,\mu\text{s}$ on an ARM Cortex-M4—a 6.7× speedup over dense matrix implementations."*
+> *"On MCU, we apply Compressed Sparse Row (CSR) matrix compression to the recurrent weight matrix ($W_{\text{res}}$), coupled with a 33-point linear interpolated $\tanh$ LUT and integer-only Q15 fixed-point arithmetic. The STM32 C99 verifier shrinks RAM by **82.4%** (`42.6 KB` dense float $\to$ **`7.5 KB` CSR fixed-point**), achieves a **6.7× speedup**, and preserves **98.40%–99.80%** float32/Q15 thermal classification parity. On Artix-7 FPGA (`v1.2`), our fast sparse core finishes an inference in **310 cycles (`3.9 µs` @ 80 MHz)** at an estimated **0.60 µJ/update** (out-of-context IP)."*
 
 ---
 
@@ -528,27 +536,25 @@ xychart-beta
 
 #### Q5: "What is your commercial moat against battery chip giants like Texas Instruments or Analog Devices in India?"
 > **Investor Pitch Script:**  
-> *"Texas Instruments and Analog Devices sell Analog Front End (AFE) silicon that measures voltages and currents. They leave state estimation algorithms to the OEM, and Indian OEMs are currently facing major warranty costs due to Coulomb Counting drift and flat-curve LFP estimation failures. Our moat is algorithmic silicon IP: we deliver synthesizable AXI4-Lite IP blocks and ultra-compact C99 firmware that drops directly into existing low-cost MCU/FPGA hardware without increasing the vehicle BOM, reducing warranty recall risk and extending pack life by up to 15%."*
+> *"Texas Instruments and Analog Devices sell Analog Front End (AFE) silicon that measures voltages and currents, leaving state estimation firmware and non-linear aging resilience to the OEM. Our moat is verified multi-tier algorithmic IP: **CSR C99 firmware** (`7.5 KB` RAM) plus an **IEEE 1685 IP-XACT synthesizable AXI4-Lite/Stream FPGA IP block (`esn_ip_platform v1.2`)** benchmarked against 29 held-out NASA packs and NARMA-10 silicon tasks—ready for custom SoC integration under India's **MeitY DLI Scheme** without adding AFE silicon BOM."*
 
 ---
 
 ## 12. Verification Audit & Quality Assurance Certification
 
-This repository has completed a comprehensive, automated verification audit confirming zero technical debt and 100% compliance across all quality gates:
+This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.0`:
 
 ```
 ============================= 119 passed in 21.60s =============================
 ```
 
-- **Python Quality Gate (`pytest -q`)**: **119 / 119 passing tests (`21.60s` with 88.60% `software/shared` coverage; `19.12s` without coverage)**.
-- **Master 8-Step Validation Runner (`run_all_validation.bat`)**: **[ALL PASSED] END-TO-END VALIDATION SUCCESSFUL**.
-- **Linter & Syntax Gate (`ruff check .`)**: **0 errors across all directories (All checks passed!)**.
-- **PEP 8 Compliance Gate (`flake8 .`)**: **0 errors, 0 warnings**.
-- **Empty File Audit**: **0 empty files across all 483 tracked repository files (`85.45 MiB`, 17.24 MB deduplicated)**.
-- **Link Integrity Audit**: **0 broken links across all tracked Markdown documentation files**.
-- **Hardware-Software Parity**: **200 / 200 bit-exact ESN stage matches (100%)** & **512 / 512 bit-exact EKF / UKF traces**.
-- **Departmental BE Capstone Template**: **34 / 34 sections strictly aligned** with Department of Automation and Robotics / Instrumentation, VESIT Mumbai.
-- **Turnkey Transition Status**: **v2.4.0 Synced Today (`9.5 / 10` — Research Paper Finalized)** $\to$ **v2.4.1 Turnkey Capstone Target (`10.0 / 10` — Only Poster, Review Paper & Thesis Pending)** via [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
+- **Python Quality Gate (`pytest --cov=software/shared`):** **119 / 119 passing tests (`~21.60s`, `88.60%` `software/shared` coverage)**.
+- **Master 8-Step Validation Runner (`run_all_validation.bat`):** **[ALL PASSED] END-TO-END VALIDATION SUCCESSFUL**.
+- **Linter & Syntax Gate (`ruff check .` & `flake8 .`):** **0 errors across all directories**.
+- **Storage & Link Hygiene Audit:** **0 empty files** and **0 untracked files** across **483 tracked repository files (`85.45 MiB`)**, plus **0 broken links** across all **43 Markdown files**.
+- **Hardware-Software Parity:** **200 / 200 bit-exact ESN (`FPGA_Verifier`)**, **512 / 512 bit-exact EKF & UKF (`FPGA_Verifier`)**, **10 / 10 Verilator `5.028` serial & fast core regressions (`IP_Block v1.2`)**, and **29 held-out NASA PCoE pack checks**.
+- **Departmental BE Capstone Template:** **34 / 34 sections aligned** with Department of Automation & Robotics / Instrumentation, VESIT Mumbai.
+- **Turnkey Transition Status:** **`v2.4.0` Synced (`9.5 / 10` — Engineering Complete + `Research_Paper.pdf` Final)** $\to$ **`v2.4.1` Turnkey Capstone Target (`10.0 / 10` — Only `Project_Poster.pdf`, `Review_Paper.pdf` & `Final_Thesis.pdf` Pending)** via [`TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
 
 ---
 

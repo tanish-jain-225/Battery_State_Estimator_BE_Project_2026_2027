@@ -111,6 +111,7 @@ Update the version string across all primary configuration and metadata files:
 4. **`CHANGELOG.md`**: Promote `## [v2.4.1]` from "Planned Turnkey Release" to active release with release date and verified deliverables list.
 5. **`SECURITY.md`**: Update supported versions table to include `v2.4.1` as latest active.
 6. **`docs/Resources/ARTIFACTS.md`**: Mark all 4 PDF assets as verified, immutable deliverables.
+7. **`docs/Resources/WEB_RESEARCH.md`**: Promote State B (`10.0 / 10` turnkey capstone) to active status.
 
 ### Step 3: Run Full Quality Gate Verification
 Execute all automated test suites and static analysis tools:

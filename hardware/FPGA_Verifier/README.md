@@ -172,7 +172,7 @@ The fixed-point UKF accelerator (`ukf_core.v`) handles extreme non-linearities (
 ## 🔬 How to Run Simulation & Parity Verification
 
 ### 1. Master Cross-Platform Validation (1 Click)
-Run the root automated verification suite, which executes ESN, EKF, UKF, and all 107+ tests:
+Run the root automated verification suite, which executes ESN, EKF, UKF, and all 119 tests:
 ```cmd
 run_all_validation.bat
 ```
