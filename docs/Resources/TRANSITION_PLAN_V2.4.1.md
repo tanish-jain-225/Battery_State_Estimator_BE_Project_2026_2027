@@ -49,15 +49,17 @@ Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, m
   - Student authors: Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi.
   - Visuals: ESN Reservoir Topology, 200/200 FPGA Parity chart, 2-RC transient equations, and live comparative error metrics ($RMSE < 1.0\%$).
 
-### 2. Comprehensive Review Paper (`docs/Publications/Review_Paper.pdf`)
+### 2. Comprehensive Review Paper (`docs/Publications/Review_Paper.pdf`) — COMPLETED & INTEGRATED (2/4)
 - **Target File Path**: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)
-- **Format**: IEEE 2-column or Elsevier journal preprint format (29 pages, 11 sections).
-- **Source Draft on Disk**: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)
+- **Format**: Elsevier / ScienceDirect 2-column camera-ready format (12 pages, 231 KB, 77 references).
+- **Status**: **Fully Finalized & Integrated on Disk**.
+- **Companion Manuscript**: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) & review draft [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)
 - **Companion Guide**: [`docs/Publications/README.md`](../Publications/README.md)
-- **Content Requirements**:
-  - Title: *"A Comprehensive Review of Neuromorphic Edge Computing and Reservoir Computing Architectures for Battery Management Systems"*.
-  - 90+ cited peer-reviewed papers spanning 2018–2026.
-  - Taxonomy of classical (Coulomb Counting, EKF, UKF) vs. data-driven (LSTM, Transformer) vs. neuromorphic (ESN, Spiking Neural Networks).
+- **Key Results & Scope**:
+  - Title: *"Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements"*.
+  - Authors: Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, and Sangeetha Prasanna Ram.
+  - 77 cited peer-reviewed papers spanning 2004–2026.
+  - Systematic derivation of arithmetic and storage cost per update, side-by-side comparison of 8 embedded/hardware SOC estimators and 6 FPGA recurrent accelerators, and a reporting checklist for learned battery hardware.
 
 ### 3. Original Research Paper (`docs/Publications/Research_Paper.pdf`) — COMPLETED & INTEGRATED (1/4)
 - **Target File Path**: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)
@@ -91,10 +93,10 @@ Everything on the technical, mathematical, algorithmic, firmware, RTL silicon, m
 
 ## 🛠️ Step-by-Step Transition Execution Runbook
 
-Follow these exact steps when the remaining **3 compiled PDF documents** ([`Project_Poster.pdf`](../Poster/Project_Poster.pdf), [`Review_Paper.pdf`](../Publications/Review_Paper.pdf), [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)) are ready (`Research_Paper.pdf` is already finalized in `v2.4.0`):
+Follow these exact steps when the remaining **2 compiled PDF documents** ([`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)) are ready (`Research_Paper.pdf` and `Review_Paper.pdf` are already finalized and integrated):
 
-### Step 1: Drop-In the 3 Remaining Document Files
-Copy the compiled PDFs into their designated directories (verifying `Research_Paper.pdf` remains intact):
+### Step 1: Drop-In the 2 Remaining Document Files
+Copy the compiled PDFs into their designated directories (verifying `Research_Paper.pdf` and `Review_Paper.pdf` remain intact):
 ```bash
 # Verify all 4 academic deliverable PDFs are in place
 ls -lh docs/Poster/Project_Poster.pdf
@@ -143,6 +145,6 @@ For in-depth market research, IP asset assessment, and economic analysis, refer 
 | :--- | :---: | :---: | :---: |
 | **Delivery Status** | **Production Core Verified** | **Complete Turnkey Capstone** | Full Capstone Closure |
 | **Automated Tests** | 119 Passing Tests (100%) | 119 Passing Tests (100%) | Maintained with Zero Regressions |
-| **Pending Academic Deliverables** | 1 of 4 Finalized (3 Remaining) | **0 (Zero Remaining Shells)** | All Academic Deliverables Integrated |
+| **Pending Academic Deliverables** | 2 of 4 Finalized (2 Remaining) | **0 (Zero Remaining Shells)** | All Academic Deliverables Integrated |
 | **Academic Evaluation Proofs** | Pre-submission Registry Active | **Complete Deliverables + Submission Proofs** | Maximum University Marks Allocation |
 | **National Competition Readiness** | Semi-Finalist / Regional Level | **Grand Finalist / Winner (SIH, KPIT Sparkle, Formula Bharat)** | Full National Competitive Tier |

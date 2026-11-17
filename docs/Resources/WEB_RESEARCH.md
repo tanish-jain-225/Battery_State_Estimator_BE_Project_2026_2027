@@ -389,12 +389,12 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Mentor Feedback Addressed:** 5-Act presentation narrative arc, 10 dynamic drive cycles with NASA PCoE aging data, and 1.0s multi-chemistry simulator pacing.
 * **Function:** Comprehensive academic evaluation reports, slide deck, and defense materials for Viva committee presentation.
 
-### 📦 Deliverable 7: Academic Deliverables (`Research_Paper.pdf` Complete in `v2.4.0`; Only 3 Remaining for `v2.4.1`)
-* **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 668 KB) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
-* **Target Paper 2 (Comprehensive Review — Pending `v2.4.1` [2/3]):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29-page survey draft)
-* **Presentation Poster (Pending `v2.4.1` [1/3]):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster shell)
-* **Final B.E. Thesis (Pending `v2.4.1` [3/3]):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation shell)
-* **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in the remaining **3** compiled PDFs (Poster, Review Paper, Thesis) transitions the repository from **`v2.4.0` (9.5 / 10)** to **`v2.4.1` (10.0 / 10)**.
+### 📦 Deliverable 7: Academic Deliverables (`Research_Paper.pdf` & `Review_Paper.pdf` Complete; Only 2 Remaining for `v2.4.1`)
+* **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
+* **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 231 KB, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
+* **Presentation Poster (Pending `v2.4.1` [1/2]):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster shell)
+* **Final B.E. Thesis (Pending `v2.4.1` [2/2]):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation shell)
+* **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in the remaining **2** compiled PDFs (Poster & Thesis) transitions the repository from **`v2.4.0` (9.7 / 10)** to **`v2.4.1` (10.0 / 10)**.
 
 ---
 
@@ -406,7 +406,7 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 ┌───────────────────────────────────────────────────────────────────────────────────────────────┐
 │                      4-TIER MODELED REPOSITORY & IP VALUATION FRAMEWORK                       │
 ├───────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Tier 1: Modeled Asset Buyout (v1.2 IP) ──► ₹62.0 Lakhs (v2.4.0) ──► ₹70.0 Lakhs (v2.4.1)      │
+│ Tier 1: Modeled Asset Buyout (v1.2 IP) ──► ₹64.0 Lakhs (v2.4.0) ──► ₹70.0 Lakhs (v2.4.1)      │
 │ Tier 2: Sunk Replacement Cost          ──► ₹74.88 Lakhs (v2.4.0)──► ₹81.60 Lakhs (v2.4.1)     │
 │ Tier 3: Commercial Licensing Potential ──► ₹60.0 Lakhs/yr       ──► ₹85.0 Lakhs/yr (v2.4.1)   │
 │ Tier 4: Spin-Out DeepTech Pre-Seed     ──► ₹9.20 Crore (v2.4.0) ──► ₹11.80 Crore (v2.4.1)     │
@@ -418,7 +418,7 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 ### Tier 1: Pure Repository Asset Buyout Modeling (On-Disk Code, RTL & IP Assets)
 *Models the direct acquisition value of an exclusive proprietary fork / custom IP package built from today's codebase, excluding ongoing support or future royalties (note: open-source public release uses the MIT License; commercial exclusivity assumes custom/dual-licensed transfer):*
 
-| Subsystem / Deliverable Category | `v2.4.0`: Synced Baseline *(1/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(All 4 PDFs Done)* | Deliverable Delta |
+| Subsystem / Deliverable Category | `v2.4.0`: Synced Baseline *(2/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(All 4 PDFs Done)* | Deliverable Delta |
 | :--- | :---: | :---: | :---: |
 | **`hardware/FPGA_Verifier/` & `IP_Block/` (`v1.2` Fast Core + Rev 0.5 EKF)** | **₹21,00,000 INR** | **₹21,00,000 INR** | — |
 | **`hardware/STM_Verifier/` (CSR C99 Firmware, 7.5 KB RAM)** | **₹3,00,000 INR** | **₹3,00,000 INR** | — |
@@ -426,12 +426,12 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 | **`software/simulator/` (2-RC Electro-Thermal Physics Engine)** | **₹8,00,000 INR** | **₹8,00,000 INR** | — |
 | **`tests/` (119 Automated Pytest Suite, 88.6% Shared Cov)** | **₹6,50,000 INR** | **₹6,50,000 INR** | — |
 | **`docs/` & System Configuration / Operations Specs** | **₹4,50,000 INR** | **₹4,50,000 INR** | — |
-| **Academic & Certification Deliverables (4 PDFs)** | **₹5,50,000 INR** *(1/4 Finalized)* | **₹13,50,000 INR** *(All 4 Final)* | **+₹8,00,000 INR** |
+| **Academic & Certification Deliverables (4 PDFs)** | **₹7,50,000 INR** *(2/4 Finalized)* | **₹13,50,000 INR** *(All 4 Final)* | **+₹6,00,000 INR** |
 | • *Camera-Ready Research Paper PDF (`Research_Paper.pdf`)* | ₹5,50,000 INR *(Integrated)* | ₹5,50,000 INR | — *(Completed)* |
+| • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | ₹2,00,000 INR *(Integrated)* | ₹2,00,000 INR | — *(Completed)* |
 | • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | Pending (`v2.4.1`) | ₹5,00,000 INR | +₹5,00,000 INR |
-| • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | Pending (`v2.4.1`) | ₹2,00,000 INR | +₹2,00,000 INR |
 | • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | Pending (`v2.4.1`) | ₹1,00,000 INR | +₹1,00,000 INR |
-| **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹62,00,000 INR` (₹62.0 Lakhs)** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **`+₹8,00,000 INR` (+₹8.0 Lakhs)** |
+| **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹64,00,000 INR` (₹64.0 Lakhs)** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **`+₹6,00,000 INR` (+₹6.0 Lakhs)** |
 
 * **IP Block Value Uplift (`v1.0` $\to$ `v1.2`):** Upgrading `hardware/IP_Block/` to `esn_ip_platform` v1.2 increased the hardware IP asset bucket from `₹17.0 Lakhs` to `₹21.0 Lakhs` (`+₹4.0 Lakhs` direct uplift) by adding the `310-cycle / 3.9 µs` sparse fast core (`esn_core_fast.v`), Rev 0.5 ESN-fused EKF (`ekf_core.v`), Verilator `5.028` dual-core `10/10` regression proofs, RV32I C-driver co-simulation (`307` cycles), and 29 held-out NASA PCoE pack + NARMA-10 validations.
 
@@ -490,19 +490,19 @@ xychart-beta
     title "Master Quality Rating: v2.4.0 (Synced) vs. v2.4.1 (Final) Out of 10"
     x-axis ["Hardware RTL", "Software & ML", "Test Suite", "Cloud Sync", "Repository Hygiene", "Academic Deliverables"]
     y-axis "Score" 0 --> 10
-    bar [10.0, 10.0, 10.0, 10.0, 10.0, 7.5]
+    bar [10.0, 10.0, 10.0, 10.0, 10.0, 8.8]
     bar [10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
 ```
 
-| Evaluation Domain | `v2.4.0`: Current Repo *(1/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(3 Pending Added)* | Analysis & Status |
+| Evaluation Domain | `v2.4.0`: Current Repo *(2/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(2 Pending Added)* | Analysis & Status |
 | :--- | :---: | :---: | :--- |
 | **1. Hardware RTL & FPGA IP (`v1.2`)** | **10 / 10** | **10 / 10** | `FPGA_Verifier` (`200/200` ESN, `512/512` EKF/UKF) + `IP_Block v1.2` (`310` cyc Fast ESN, Rev 0.5 EKF, `10/10` Verilator, 29 NASA packs, NARMA-10, pre-built `~3.7 MB` `v1.0` bitstream). |
 | **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline (`0.72%` sim RMSE; `0.067` MAE / `0.086` RMSE on 29 NASA cells), CSR `model_rc.pkl` (`~602 KB`). |
 | **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), `88.60%` `software/shared` coverage, 0 ruff/flake8 errors. |
 | **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, in-memory fallback, zero UI freeze. |
-| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (`85.45 MiB`), 0 untracked clutter, 0 broken links across all 43 Markdown files. |
-| **6. The 4 Academic Publications** | **7.5 / 10** *(1/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (`~668 KB`) complete in `v2.4.0`; only Poster, Review Paper & Thesis remain for `v2.4.1`. |
-| **OVERALL REPOSITORY SCORE** | **`9.5 / 10`** | **`10.0 / 10`** | **`v2.4.0` is Production-Ready Engineering; `v2.4.1` completes Turnkey Capstone Submission.** |
+| **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (`85.7 MiB`), 0 untracked clutter, 0 broken links across all 43 Markdown files. |
+| **6. The 4 Academic Publications** | **8.8 / 10** *(2/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (674 KB encrypted) and `Review_Paper.pdf` (12 pages, 231 KB, Elsevier format) complete; only Poster & Thesis remain for `v2.4.1`. |
+| **OVERALL REPOSITORY SCORE** | **`9.7 / 10`** | **`10.0 / 10`** | **`v2.4.0` is Production-Ready Engineering & Dual Publications; `v2.4.1` completes Turnkey Capstone Submission.** |
 
 ---
 
@@ -554,7 +554,7 @@ This repository has completed a comprehensive, automated verification audit conf
 - **Storage & Link Hygiene Audit:** **0 empty files** and **0 untracked files** across **483 tracked repository files (`85.45 MiB`)**, plus **0 broken links** across all **43 Markdown files**.
 - **Hardware-Software Parity:** **200 / 200 bit-exact ESN (`FPGA_Verifier`)**, **512 / 512 bit-exact EKF & UKF (`FPGA_Verifier`)**, **10 / 10 Verilator `5.028` serial & fast core regressions (`IP_Block v1.2`)**, and **29 held-out NASA PCoE pack checks**.
 - **Departmental BE Capstone Template:** **34 / 34 sections aligned** with Department of Automation & Robotics / Instrumentation, VESIT Mumbai.
-- **Turnkey Transition Status:** **`v2.4.0` Synced (`9.5 / 10` — Engineering Complete + `Research_Paper.pdf` Final)** $\to$ **`v2.4.1` Turnkey Capstone Target (`10.0 / 10` — Only `Project_Poster.pdf`, `Review_Paper.pdf` & `Final_Thesis.pdf` Pending)** via [`TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
+- **Turnkey Transition Status:** **`v2.4.0` Synced (`9.7 / 10` — Engineering Complete + `Research_Paper.pdf` & `Review_Paper.pdf` Final)** $\to$ **`v2.4.1` Turnkey Capstone Target (`10.0 / 10` — Only `Project_Poster.pdf` & `Final_Thesis.pdf` Pending)** via [`TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
 
 ---
 

@@ -17,16 +17,16 @@ This directory is designated for archiving all official correspondence, tracking
 
 ## 📑 Required Documentation Checklist
 
-### 1. Review Paper (Target: IEEE / Q3 Scopus Review Journal)
-- [ ] Manuscript Title: *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI*
-- [ ] Manuscript File: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)
+### 1. Review Paper (Target: Elsevier / ScienceDirect / Q3 Scopus Review Journal)
+- [x] Manuscript Title: *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements*
+- [x] Camera-Ready Manuscript File: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 Pages, 231 KB, 77 Citations)
 - [ ] Submission Receipt PDF: `docs/Paper_Proof/Review_Paper_Submission_Receipt.pdf`
 - [ ] Paper ID / Tracking Reference logged.
 - [ ] Acceptance Letter PDF: `docs/Paper_Proof/Review_Paper_Acceptance_Letter.pdf`
 
 ### 2. Experimental Research Paper (Target: IEEE / Q3 Scopus Journal)
 - [x] Manuscript Title: *A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout*
-- [x] Camera-Ready Manuscript File: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 Pages, 668 KB)
+- [x] Camera-Ready Manuscript File: [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 Pages, 674 KB Encrypted)
 - [ ] Submission Receipt PDF: `docs/Paper_Proof/Research_Paper_Submission_Receipt.pdf`
 - [ ] Paper ID / Tracking Reference logged.
 - [ ] Acceptance Letter PDF: `docs/Paper_Proof/Research_Paper_Acceptance_Letter.pdf`
@@ -37,7 +37,7 @@ This directory is designated for archiving all official correspondence, tracking
 
 | Entry Date | Target Paper | Journal / Conference Name | Paper ID | Submission Status | Verification Document | Evaluator Signature |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: |
-| 2026-11-07 | Neuromorphic BMS Review Paper | IEEE Transactions / Q3 Scopus Journal | BSE-REV-2026-01 | Draft Complete (Final PDF Pending `v2.4.1`) | [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) | Pending Editorial Receipt |
+| 2026-11-17 | Learned BMS Hardware Accelerators Review Paper | Elsevier / ScienceDirect / Q3 Scopus Journal | BSE-REV-2026-01 | **Camera-Ready Complete / Portal Upload Ready** | [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) | Pending Editorial Receipt |
 | 2026-11-10 | Hardware-Accelerated ESN Research Paper | IEEE Transactions on Industrial Electronics | BSE-RES-2026-02 | **Camera-Ready Complete / Portal Upload Ready** | [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) | Pending Editorial Receipt |
 
 ---

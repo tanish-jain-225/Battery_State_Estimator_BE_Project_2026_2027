@@ -4,7 +4,7 @@
 
 This document synthesizes the academic literature, theoretical foundations, and state-of-the-art estimation paradigms for Battery Management Systems (BMS). It traces the field from conventional control-theoretic observers and deep learning architectures to neuromorphic computing, Spiking Neural Networks (SNNs), Reservoir Computing (RC), Liquid State Machines (LSMs), event-driven sensing, and hardware acceleration platforms.
 
-> **Full Manuscript Reference:** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) — *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* (September 2026 Edition).
+> **Full Manuscript Reference:** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) — *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements* (12 Pages, 231 KB, Elsevier / ScienceDirect Camera-Ready).
 
 ---
 

@@ -268,23 +268,22 @@ Navigate the repository according to your area of interest:
 > * **Current State A (`v2.4.0` — Synced Today):** **`Production Core + Research Paper Verified`**  
 >   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), and 119 automated pytest tests in ~21.6s with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
 > * **Final State B (`v2.4.1` — Turnkey Capstone):** **`Complete Turnkey Capstone`**  
->   *(Achieved upon compilation and drop-in of ONLY the **3 remaining** academic deliverables below into their respective directories).*
+>   *(Achieved upon compilation and drop-in of ONLY the **2 remaining** academic deliverables below into their respective directories).*
 >
-> #### 📌 What is Left to be Updated for `v2.4.1` (The Only 3 Pending Items Across the Entire Repo):
+> #### 📌 What is Left to be Updated for `v2.4.1` (The Only 2 Pending Items Across the Entire Repo):
 > 1. [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) — High-resolution print-ready A1 exhibition poster (companion markdown: [`docs/Poster/README.md`](docs/Poster/README.md)).
-> 2. [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) — Comprehensive 29-page neuromorphic BMS survey paper (companion draft: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf)).
-> 3. [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion guide: [`docs/Thesis/README.md`](docs/Thesis/README.md)).
-> *(Note: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) is completed & camera-ready integrated in `v2.4.0` — only the 3 items above remain toward `v2.4.1`).*
+> 2. [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion guide: [`docs/Thesis/README.md`](docs/Thesis/README.md)).
+> *(Note: Both [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) and [`Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) are completed & camera-ready integrated — only the 2 items above remain toward `v2.4.1`).*
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
-| :---: | :--- | :--- | :---: |
+| :--- | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
 | **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
 | **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.0)** |
-| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Drop (1 of 3 Remaining for v2.4.1)** |
-| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Comprehensive 11-section review of SNNs, Reservoir Computing & Edge AI for BMS (IEEE / Q3 Scopus target) | **Pending Drop (2 of 3 Remaining for v2.4.1)** |
-| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6 pages, 668 KB, IEEE camera-ready) | **Completed & Integrated (Synced in v2.4.0)** |
-| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Drop (3 of 3 Remaining for v2.4.1)** |
+| **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (A1 format, 2-RC physics, RTL & metrics) | **Pending Drop (1 of 2 Remaining for v2.4.1)** |
+| **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Hardware architectures for learned battery SOC estimation: recurrent & reservoir accelerators review (Elsevier, 12 pages, 231 KB, 77 citations) | **Completed & Integrated (Camera-Ready)** |
+| **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6 pages, 674 KB encrypted, IEEE camera-ready) | **Completed & Integrated (Synced in v2.4.0)** |
+| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT format) | **Pending Drop (2 of 2 Remaining for v2.4.1)** |
 | **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Fully Verified (Registry Active)** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) | Full version history, milestone audit trail, and release changelog | **v2.4.0 Active Today (v2.4.1 Final Turnkey)** |
@@ -602,7 +601,7 @@ BE-Capstone-Project/
 │   │
 │   ├── Publications/                      # Official Academic Paper Deliverables
 │   │   ├── Research_Paper.pdf             # Camera-Ready IEEE Research Paper (Completed in v2.4.0)
-│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper shell (Pending v2.4.1)
+│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (12 Pages, Camera-Ready Integrated)
 │   │   └── README.md                      # Publication abstracts, authorship, and scopes
 │   │
 │   ├── Paper_Proof/                       # 20 Marks Evaluation Submission/Acceptance Records
@@ -924,16 +923,18 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 > 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof. Both official documentations strictly target peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**. All publications and exhibition deliverables are cataloged in [`docs/Publications/`](docs/Publications/README.md) and [`docs/Poster/`](docs/Poster/README.md).
 
-### Target Paper 1: Comprehensive Review Paper (IEEE / Q3 Scopus Review Journal Target)
+### Target Paper 1: Comprehensive Review Paper (Elsevier / ScienceDirect Format — Completed)
 | Item | Details |
 | :--- | :--- |
-| **Paper Title** | *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI* |
-| **Target Venue** | IEEE Transactions / Q3 Scopus-Indexed Review Journal (Automotive Electronics / Energy Storage) |
-| **Paper Status** | **Draft Complete (`Neuromorphic-BMS-Review-Paper-Draft.pdf`) — Final Drop Pending for `v2.4.1` (Remaining Deliverable 2/3)** |
-| **Formatted Deliverable** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) |
-| **Authoritative Manuscript** | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29 Pages, 11 Sections, 90+ Citations) |
-| **Review Scope** | Theoretical foundations, 2-RC ECM, multi-timescale EKF, neuromorphic hardware (Loihi 2, Akida, SpiNNaker2, Artix-7), and SNN/ESN paradigms |
-| **Submission Proof (10 Marks)** | Official submission receipt and Paper ID logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) |
+| **Paper Title** | *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements* |
+| **Authors** | Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, Sangeetha Prasanna Ram |
+| **Affiliation** | Department of Automation and Robotics, VES Institute of Technology, Mumbai, India |
+| **Target Venue** | Elsevier / ScienceDirect / Q3 Scopus-Indexed Review Journal (Energy Storage / Embedded Hardware) |
+| **Paper Status** | **Completed & Integrated (12 Pages, 231 KB, Camera-Ready PDF — Deliverable 2 of 4 Finalized)** |
+| **Formatted Deliverable** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (12 Pages, 77 References) |
+| **Authoritative Manuscript** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) & companion review draft [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) |
+| **Review Scope** | Examines hardware architectures for learned battery SOC estimation against BMS requirements, bridging data-driven SOC estimation, FPGA recurrent accelerators, and reservoir computing across 8 embedded/hardware SOC and 6 FPGA recurrent network implementations |
+| **Submission Proof (10 Marks)** | Submission tracking logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) (portal upload ready) |
 
 ### Target Paper 2: Original Experimental Research Paper (IEEE Camera-Ready — Completed in `v2.4.0`)
 | Item | Details |

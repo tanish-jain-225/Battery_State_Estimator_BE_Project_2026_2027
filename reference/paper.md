@@ -116,10 +116,10 @@ Our project bifurcates its academic contributions into two complementary, high-i
    - **Primary Venues:** *IEEE Transactions on Industrial Electronics*, *IEEE Transactions on Transportation Electrification*, *IEEE Access*, or *IEEE Embedded Systems Letters*.
    - **Student Journal Track:** *IEEE Potentials* (flagship IEEE publication for student and young professionals) or the *VESIT Journal of Technology & Innovation*, providing an accessible avenue for capstone undergraduate dissemination.
 
-2. **Target Paper 2: Comprehensive Literature Review & Survey Paper** ([`docs/Publications/Review_Paper.pdf`](../docs/Publications/Review_Paper.pdf)):
-   - **Title:** *Neuromorphic Computing for Intelligent Battery Management Systems: A Comprehensive Review of Spiking Neural Networks, Reservoir Computing and Edge AI*
-   - **Focus:** Extensive 29-page survey (11 sections, 90+ citations) tracing BMS estimation from Coulomb counting and Kalman filters (EKF, UKF) through deep learning (LSTM, Transformers) to neuromorphic hardware (Intel Loihi 2, BrainChip Akida, SpiNNaker2, and FPGA accelerators).
-   - **Target Venues:** IEEE Transactions / Q3 Scopus-indexed review journal.
+2. **Target Paper 2: Comprehensive Literature Review Paper** ([`docs/Publications/Review_Paper.pdf`](../docs/Publications/Review_Paper.pdf)):
+   - **Title:** *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements*
+   - **Focus:** 12-page camera-ready review (77 citations, Elsevier/ScienceDirect format) comparing 8 embedded/hardware SOC estimators and 6 FPGA recurrent accelerators, with arithmetic/storage derivations and hardware reporting guidelines.
+   - **Target Venues:** Elsevier / ScienceDirect / Q3 Scopus-indexed review journal.
 
 ### B. Theoretical Linkage to Benchmarks
 Our publications explicitly build upon and cite:

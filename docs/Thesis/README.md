@@ -18,8 +18,8 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan
 
 > [!IMPORTANT]
-> **Active Deliverables Status (Remaining Deliverable 3 of 3 for `v2.4.1`):**  
-> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), and 119 automated tests are **100% complete and synced at `v2.4.0`**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Along with [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Review_Paper.pdf`](../Publications/Review_Paper.pdf), it is one of only **3 remaining** deliverables toward `v2.4.1`.
+> **Active Deliverables Status (Remaining Deliverable 2 of 2 for `v2.4.1`):**  
+> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 pages, 674 KB encrypted), camera-ready [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 pages, 231 KB, Elsevier format), and 119 automated tests are **100% complete and integrated**, [`Final_Thesis.pdf`](Final_Thesis.pdf) currently serves as the formatted dissertation shell. Along with [`Project_Poster.pdf`](../Poster/Project_Poster.pdf), it is one of only **2 remaining** deliverables toward `v2.4.1`.
 
 ---
 

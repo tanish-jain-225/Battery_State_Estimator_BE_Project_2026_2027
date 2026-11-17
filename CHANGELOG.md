@@ -24,10 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Complete Indian E-Mobility Web Research Synthesis**:
   - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
+- **Integrated Camera-Ready Review Paper (Deliverable 2 of 4 Finalized)**:
+  - Integrated official 12-page camera-ready review manuscript: *"Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements"* ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf), 231 KB, 77 citations, Elsevier / ScienceDirect format).
+  - Authors: Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, Sangeetha Prasanna Ram (Department of Automation & Robotics, VESIT).
+  - Side-by-side comparison of 8 embedded/hardware SOC implementations and 6 FPGA recurrent network accelerators, detailing cost per sample, fixed-point error, and hardware reporting guidelines.
+  - Leaves only **2 deliverables remaining** for `v2.4.1` ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) and [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf)).
 - **Integrated Camera-Ready IEEE Research Paper (Deliverable 1 of 4 Finalized)**:
-  - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 668 KB).
+  - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 674 KB encrypted).
   - Documents 100-neuron Q6.10 ESN on Artix-7 FPGA (318 LUTs, 2 DSP slices, 80 MHz, 535.1 µs latency), 200/200 bit-exact verification, and 29-cell NASA PCoE cross-validation (2,201 windows, 140,864 held-out steps, SOC MAE 0.067, RMSE 0.086).
-  - Advances repository to `v2.4.0` synced baseline — only **3 deliverables remain** for `v2.4.1` (Poster, Review Paper, Thesis).
 - **Upgraded Plug-and-Play FPGA IP Block to `esn_ip_platform` v1.2 ([`hardware/IP_Block/`](hardware/IP_Block/README.md))**:
   - Replaced flat v1.0 layout with structured v1.2 engineering hierarchy (`rtl/`, `mem/`, `xdc/`, `scripts/`, `tb/`, `verify/`, `test_data/`, `driver/`, `docs/`, `host/`) while preserving baseline IEEE 1685 [`component.xml`](hardware/IP_Block/component.xml), Arty A7-100T [`esn_platform_top.bit`](hardware/IP_Block/esn_platform_top.bit), and routed v1.0 reports in `reports_v10/`.
   - Added [`rtl/esn_core_fast.v`](hardware/IP_Block/rtl/esn_core_fast.v) (`FAST=1, P=10, K=24` parallel sparse ELL reservoir executing in **307 cycles / 3.84 µs** at 80 MHz vs 42,902 serial cycles) and [`rtl/ekf_core.v`](hardware/IP_Block/rtl/ekf_core.v) **Rev 0.5** with optional same-step ESN fusion (`FUSE=1`, 477 cycles).
@@ -38,13 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v2.4.1] - Planned Turnkey Release (Only 3 Pending Academic Deliverables Remaining)
+## [v2.4.1] - Planned Turnkey Release (Only 2 Pending Academic Deliverables Remaining)
 
 ### 🎯 Remaining Scope for `v2.4.1` (Post-`v2.4.0`)
-- **A1 Presentation Poster** *(Pending 1/3)*: Compiling and integrating print-ready vector poster [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf).
-- **Academic Review Paper** *(Pending 2/3)*: Compiling and integrating final peer-review PDF [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf).
-- **B.E. Capstone Final Thesis** *(Pending 3/3)*: Compiling and integrating 100+ page University of Mumbai dissertation [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf).
-- **Already Completed & Synced in `v2.4.0`**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `119/119` passing tests.
+- **A1 Presentation Poster** *(Pending 1/2)*: Compiling and integrating print-ready vector poster [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf).
+- **B.E. Capstone Final Thesis** *(Pending 2/2)*: Compiling and integrating 100+ page University of Mumbai dissertation [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf).
+- **Already Completed & Integrated**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (camera-ready 12-page Elsevier PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `119/119` passing tests.
 - **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---

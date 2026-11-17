@@ -20,7 +20,7 @@ docs/
 │   └── README.md                  # University format specs and chapter breakdown
 ├── Publications/                  # Official Academic Paper Deliverables
 │   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed in v2.4.0)
-│   ├── Review_Paper.pdf           # Comprehensive Review Paper shell (Pending v2.4.1)
+│   ├── Review_Paper.pdf           # Comprehensive Review Paper (12 Pages, Camera-Ready Integrated)
 │   └── README.md                  # Publication abstracts, authorship, and scopes
 ├── Paper_Proof/                   # 20 Marks Evaluation Submission/Acceptance Records
 │   └── README.md                  # Proof logging registry & mark criteria checklist
@@ -82,8 +82,8 @@ docs/
 ### 4. 🎓 The Defense & Academic Marks Stream
 *Exhibition, presentation, and university evaluation criteria:*
 1. **Academic Publications Hub (20 Marks):** [`docs/Publications/README.md`](Publications/README.md)
-   * **Experimental Research Paper (`v2.4.0` Completed):** [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf) (Camera-Ready 6-Page IEEE PDF, 668 KB)
-   * **Comprehensive Review Paper (`Pending v2.4.1`):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (29-Page Draft Shell, 11 Sections, 90+ Citations)
+   * **Experimental Research Paper (`v2.4.0` Completed):** [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf) (Camera-Ready 6-Page IEEE PDF, 674 KB encrypted)
+   * **Comprehensive Review Paper (`v2.4.0` Completed):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 231 KB, 77 Citations)
 2. **Publication Proofs & Evaluation Registry (20 Marks):** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — 10 Marks submission receipt + 10 Marks acceptance letter tracking.
 3. **Academic Exhibition Poster (`Pending v2.4.1`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official A1 symposium poster shell.
 4. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.
