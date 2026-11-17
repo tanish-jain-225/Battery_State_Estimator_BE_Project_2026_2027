@@ -19,7 +19,7 @@ This directory is designated for archiving all official correspondence, tracking
 
 ### 1. Review Paper (Target: Elsevier / ScienceDirect / Q3 Scopus Review Journal)
 - [x] Manuscript Title: *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements*
-- [x] Camera-Ready Manuscript File: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 Pages, 231 KB, 77 Citations)
+- [x] Camera-Ready Manuscript File: [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 Pages, 232 KB Encrypted, 77 Citations)
 - [ ] Submission Receipt PDF: `docs/Paper_Proof/Review_Paper_Submission_Receipt.pdf`
 - [ ] Paper ID / Tracking Reference logged.
 - [ ] Acceptance Letter PDF: `docs/Paper_Proof/Review_Paper_Acceptance_Letter.pdf`

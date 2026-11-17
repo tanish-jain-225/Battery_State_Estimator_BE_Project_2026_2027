@@ -10,7 +10,7 @@
 
 > [!IMPORTANT]
 > **Active Deliverables Status (2 of 4 Finalized — 2 Pending):**  
-> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing**, both [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted, IEEE camera-ready) and [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 231 KB, 77 references, Elsevier camera-ready) have been **fully finalized, compiled, and integrated**. [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) currently remain as the only **2 pending** deliverables awaiting final drop-in for the v2.4.1 turnkey release.  
+> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing**, both [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted/password-protected, IEEE camera-ready) and [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 232 KB encrypted/password-protected, 77 references, Elsevier camera-ready) have been **fully finalized, compiled, and integrated**. [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) currently remain as the only **2 pending** deliverables awaiting final drop-in for the v2.4.1 turnkey release.  
 
 ---
 
@@ -38,7 +38,7 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 * **Title:** *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements*
 * **Authors:** Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, and Sangeetha Prasanna Ram
 * **Affiliation:** Department of Automation and Robotics, VES Institute of Technology, Mumbai, India
-* **Format:** Elsevier / ScienceDirect 2-Column Camera-Ready PDF (12 Pages, 231 KB, 77 References)
+* **Format:** Elsevier / ScienceDirect 2-Column Camera-Ready PDF (12 Pages, 232 KB Encrypted, 77 References)
 * **Status:** **Completed & Integrated (Deliverable 2 of 4 Finalized)**
 * **Scope & Highlights:**
   * Examines hardware architectures for learned battery SOC estimation and judges trade-offs against BMS requirements.
@@ -47,7 +47,7 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
   * Systematic analysis of arithmetic and storage cost per sample, fixed-point error in recurrent state, and BMS timing headroom.
   * Formulates a reporting checklist and research agenda for reproducible learned battery hardware estimators.
 * **Deliverable Files:**
-  * Camera-Ready PDF: [`Review_Paper.pdf`](Review_Paper.pdf) (12 Pages, 231 KB, 77 Citations)
+  * Camera-Ready PDF: [`Review_Paper.pdf`](Review_Paper.pdf) (12 Pages, 232 KB Encrypted, 77 Citations)
   * Milestone Outcome Draft: [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (29 Pages)
 
 ---

@@ -391,7 +391,7 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 
 ### 📦 Deliverable 7: Academic Deliverables (`Research_Paper.pdf` & `Review_Paper.pdf` Complete; Only 2 Remaining for `v2.4.1`)
 * **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
-* **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 231 KB, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
+* **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 232 KB encrypted, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
 * **Presentation Poster (Pending `v2.4.1` [1/2]):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster shell)
 * **Final B.E. Thesis (Pending `v2.4.1` [2/2]):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation shell)
 * **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in the remaining **2** compiled PDFs (Poster & Thesis) transitions the repository from **`v2.4.0` (9.7 / 10)** to **`v2.4.1` (10.0 / 10)**.
@@ -501,7 +501,7 @@ xychart-beta
 | **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), `88.60%` `software/shared` coverage, 0 ruff/flake8 errors. |
 | **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, in-memory fallback, zero UI freeze. |
 | **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (`85.7 MiB`), 0 untracked clutter, 0 broken links across all 43 Markdown files. |
-| **6. The 4 Academic Publications** | **8.8 / 10** *(2/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (674 KB encrypted) and `Review_Paper.pdf` (12 pages, 231 KB, Elsevier format) complete; only Poster & Thesis remain for `v2.4.1`. |
+| **6. The 4 Academic Publications** | **8.8 / 10** *(2/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (674 KB encrypted) and `Review_Paper.pdf` (12 pages, 232 KB encrypted, Elsevier format) complete; only Poster & Thesis remain for `v2.4.1`. |
 | **OVERALL REPOSITORY SCORE** | **`9.7 / 10`** | **`10.0 / 10`** | **`v2.4.0` is Production-Ready Engineering & Dual Publications; `v2.4.1` completes Turnkey Capstone Submission.** |
 
 ---
