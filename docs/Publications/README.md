@@ -9,8 +9,8 @@
 **Department:** Department of Automation and Robotics / Instrumentation, VESIT, Mumbai  
 
 > [!IMPORTANT]
-> **Active Deliverables Status (2 of 4 Finalized — 2 Pending):**  
-> While the codebase, models, firmware, RTL, bitstream, and 119 automated tests are **100% complete and passing**, both [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted/password-protected, IEEE camera-ready) and [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 232 KB encrypted/password-protected, 77 references, Elsevier camera-ready) have been **fully finalized, compiled, and integrated**. [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) currently remain as the only **2 pending** deliverables awaiting final drop-in for the v2.4.1 turnkey release.  
+> **Active Deliverables Status (All 4 Academic Deliverables Finalized & Integrated):**  
+> While the codebase, models, firmware, RTL, bitstream, and 125 automated tests are **100% complete and passing**, all 4 academic deliverables have been **fully finalized, compiled, and integrated on disk**: [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted, IEEE camera-ready), [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 232 KB encrypted, 77 references, Elsevier camera-ready), [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) (2 sheets, 535 KB, 11 panels, A3 portrait), and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (41 pages, 5.04 MB, University of Mumbai B.E. dissertation). The repository has achieved **100% turnkey academic completion (`v2.4.1`)**.  
 
 ---
 

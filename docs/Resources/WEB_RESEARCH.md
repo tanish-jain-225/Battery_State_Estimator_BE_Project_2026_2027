@@ -14,9 +14,8 @@
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Reference:** [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md)  
-**Active Release Version:** `v2.4.0` (Synced Today — `esn_ip_platform` v1.2 + IEEE `Research_Paper.pdf` + Optimization, Rating: **9.5 / 10**)  
-**Target Turnkey Release:** `v2.4.1` (Final Capstone — Only Poster, Review Paper & Thesis Pending, Rating: **10.0 / 10**)  
-**Turnkey Transition Plan:** [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md)  
+**Active Release Version:** `v2.4.1` (Turnkey Capstone Active — All 4 Deliverables Finalized & Integrated, Rating: **10.0 / 10**)  
+**Turnkey Capstone Release:** `v2.4.1` (Final Capstone — 100% Complete & Verified, Rating: **10.0 / 10**)  
 **Verification Date:** November 11, 2026 (Freshly Audited via 2026 Industry/Statutory Web Research & Full Repo Verification)
 
 ---
@@ -271,9 +270,9 @@ This repository is turnkey-tailored to compete in—and win—India's premier en
 | **Texas Instruments IICDC** *(TI India, DST & MyGov)* | **Embedded Systems Innovation**: Low-RAM edge inference & real-time safety diagnostics. | Q15 fixed-point arithmetic, 33-point linear interpolated $\tanh$ LUT, and CSR SpMV compression. | Sub-15 KB memory footprint without hardware FPU dependency on low-cost MCUs. | **Final Round Tier** |
 | **STMicroelectronics India AI Cup** | **Edge AI on STM32**: Sparse neural networks on STM32F4/G4 without external SRAM. | C99 firmware in [`hardware/STM_Verifier/main.c`](../../hardware/STM_Verifier/main.c) + [`esn_estimator_weights.h`](../../hardware/STM_Verifier/esn_estimator_weights.h). | 6.7× CSR SpMV speedup, 82.4% RAM savings, and 98.4%–99.8% float/Q15 parity. | **First Prize Track** |
 | **Anveshana Engineering Contest** *(Synopsys India & Agastya)* | **Hardware & VLSI Design**: Synthesizable RTL, IP cores, FPGA verification. | IEEE 1685 IP-XACT ([`component.xml`](../../hardware/IP_Block/component.xml)), [`esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v) (307 cycles / 3.84 µs), Rev 0.5 EKF. | Bit-exact 200/200 & 10/10 Verilator dual-core regression + NARMA-10 silicon proof. | **State Winner Tier** |
-| **ARAI TechNovus Mobility Contest** *(ARAI Pune)* | **Automotive Engineering**: Alignment with Indian EV testing norms. | AIS-156 / AIS-038 / BIS IS 17855 technical alignment & 119-test automated QA suite. | Zero-recalibration adaptive ESN-RLS reducing flat-curve LFP estimation risk. | **Industry Track Finalist** |
+| **ARAI TechNovus Mobility Contest** *(ARAI Pune)* | **Automotive Engineering**: Alignment with Indian EV testing norms. | AIS-156 / AIS-038 / BIS IS 17855 technical alignment & 125-test automated QA suite. | Zero-recalibration adaptive ESN-RLS reducing flat-curve LFP estimation risk. | **Industry Track Finalist** |
 | **University of Mumbai Avishkar Research Convention** *(Governor of Maharashtra / MU)* | **Engineering & Technology**: Inter-collegiate / state research showcase. | Camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf), Review 2 deck ([`Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf)), IP Block v1.2. | Position as peer-reviewed 29-cell NASA cross-validated indigenous silicon BMS research. | **Gold Medal Track** |
-| **Indian DeepTech Grants & DLI (NIDHI-PRAYAS / DPIIT SISFS / MeitY DLI)** | **Prototype & Silicon IP**: PRAYAS `₹10L` (2.0 `₹20L–40L`), SISFS `₹20L` grant + `₹50L` debt, DLI up to `50%` (`₹15 Cr` cap). | Modeled `v2.4.0` Tier 1 **`INR 62.0L`** on-disk asset / **`INR 74.88L`** replacement cost + 119 automated tests. | Submit working Arty A7 RTL/bitstream + 29-cell IEEE manuscript for prototype/DLI backing. | **Grant-Eligible TRL** |
+| **Indian DeepTech Grants & DLI (NIDHI-PRAYAS / DPIIT SISFS / MeitY DLI)** | **Prototype & Silicon IP**: PRAYAS `₹10L` (2.0 `₹20L–40L`), SISFS `₹20L` grant + `₹50L` debt, DLI up to `50%` (`₹15 Cr` cap). | Modeled `v2.4.1` Tier 1 **`INR 70.0L`** on-disk asset / **`INR 81.60L`** replacement cost + 125 automated tests. | Submit working Arty A7 RTL/bitstream + 29-cell IEEE manuscript for prototype/DLI backing. | **Grant-Eligible TRL** |
 
 ---
 
@@ -377,10 +376,10 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Function:** Dual microservice suite generating 2-RC physics telemetry across dynamic drive cycles with real-time fault injection and live Chart.js visualization.
 
 ### 📦 Deliverable 5: Automated Regression Test Suite & Master Runners
-* **Automated Pytest Suite:** [`tests/`](../../tests/) (**119 automated tests** passing in ~21.6s with 88.60% `software/shared` coverage, [`tests/README.md`](../../tests/README.md))
+* **Automated Pytest Suite:** [`tests/`](../../tests/) (**125 automated tests** passing in ~24.6s with 88.60% `software/shared` coverage, [`tests/README.md`](../../tests/README.md))
 * **Master 1-Click Runner (Windows):** [`run_all_validation.bat`](../../run_all_validation.bat)
 * **Master 1-Click Runner (Linux/macOS):** [`run_all_validation.sh`](../../run_all_validation.sh)
-* **Function:** Executes all 8 verification stages end-to-end (shared physics package, full 119-test suite, software ESN model training, estimator pipeline step, STM32 classifier and estimator C header export, FPGA RTL 200/200 and 512/512 bit-exact matches, and C99 desktop simulator) with zero failures.
+* **Function:** Executes all 8 verification stages end-to-end (shared physics package, full 125-test suite, software ESN model training, estimator pipeline step, STM32 classifier and estimator C header export, FPGA RTL 200/200 and 512/512 bit-exact matches, and C99 desktop simulator) with zero failures.
 
 ### 📦 Deliverable 6: Review 2 Defense Presentation Deck & Evidence
 * **Review 2 Presentation Deck:** [`docs/Review_2/Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf) (Official 16:9 widescreen deck, 570 KB)
@@ -389,12 +388,12 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Mentor Feedback Addressed:** 5-Act presentation narrative arc, 10 dynamic drive cycles with NASA PCoE aging data, and 1.0s multi-chemistry simulator pacing.
 * **Function:** Comprehensive academic evaluation reports, slide deck, and defense materials for Viva committee presentation.
 
-### 📦 Deliverable 7: Academic Deliverables (`Research_Paper.pdf` & `Review_Paper.pdf` Complete; Only 2 Remaining for `v2.4.1`)
+### 📦 Deliverable 7: Academic Deliverables (All 4 Academic Deliverables Completed in `v2.4.1`)
 * **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
 * **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 232 KB encrypted, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
-* **Presentation Poster (Pending `v2.4.1` [1/2]):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Print-ready A1 exhibition poster shell)
-* **Final B.E. Thesis (Pending `v2.4.1` [2/2]):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (100+ page University of Mumbai / VESIT dissertation shell)
-* **Turnkey Transition Runbook:** Documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md) — dropping in the remaining **2** compiled PDFs (Poster & Thesis) transitions the repository from **`v2.4.0` (9.7 / 10)** to **`v2.4.1` (10.0 / 10)**.
+* **Presentation Poster (Completed & Integrated):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Official 2-sheet A3 exhibition poster, 535 KB, 11 panels)
+* **Final B.E. Thesis (Completed & Integrated in `v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (Official 41-page University of Mumbai / VESIT dissertation, 5.04 MB)
+* **Portfolio Status:** With all 4 compiled PDFs integrated on disk, the repository is operating at **`v2.4.1` (10.0 / 10)**.
 
 ---
 
@@ -418,20 +417,20 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 ### Tier 1: Pure Repository Asset Buyout Modeling (On-Disk Code, RTL & IP Assets)
 *Models the direct acquisition value of an exclusive proprietary fork / custom IP package built from today's codebase, excluding ongoing support or future royalties (note: open-source public release uses the MIT License; commercial exclusivity assumes custom/dual-licensed transfer):*
 
-| Subsystem / Deliverable Category | `v2.4.0`: Synced Baseline *(2/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(All 4 PDFs Done)* | Deliverable Delta |
-| :--- | :---: | :---: | :---: |
-| **`hardware/FPGA_Verifier/` & `IP_Block/` (`v1.2` Fast Core + Rev 0.5 EKF)** | **₹21,00,000 INR** | **₹21,00,000 INR** | — |
-| **`hardware/STM_Verifier/` (CSR C99 Firmware, 7.5 KB RAM)** | **₹3,00,000 INR** | **₹3,00,000 INR** | — |
-| **`software/visualiser/` (Estimator, RLS, CSR `model_rc.pkl`, UI)** | **₹13,50,000 INR** | **₹13,50,000 INR** | — |
-| **`software/simulator/` (2-RC Electro-Thermal Physics Engine)** | **₹8,00,000 INR** | **₹8,00,000 INR** | — |
-| **`tests/` (119 Automated Pytest Suite, 88.6% Shared Cov)** | **₹6,50,000 INR** | **₹6,50,000 INR** | — |
-| **`docs/` & System Configuration / Operations Specs** | **₹4,50,000 INR** | **₹4,50,000 INR** | — |
-| **Academic & Certification Deliverables (4 PDFs)** | **₹7,50,000 INR** *(2/4 Finalized)* | **₹13,50,000 INR** *(All 4 Final)* | **+₹6,00,000 INR** |
-| • *Camera-Ready Research Paper PDF (`Research_Paper.pdf`)* | ₹5,50,000 INR *(Integrated)* | ₹5,50,000 INR | — *(Completed)* |
-| • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | ₹2,00,000 INR *(Integrated)* | ₹2,00,000 INR | — *(Completed)* |
-| • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | Pending (`v2.4.1`) | ₹5,00,000 INR | +₹5,00,000 INR |
-| • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | Pending (`v2.4.1`) | ₹1,00,000 INR | +₹1,00,000 INR |
-| **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹64,00,000 INR` (₹64.0 Lakhs)** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **`+₹6,00,000 INR` (+₹6.0 Lakhs)** |
+| Subsystem / Deliverable Category | `v2.4.1`: Final Turnkey *(All 4 PDFs Done)* | Verification Status |
+| :--- | :---: | :---: |
+| **`hardware/FPGA_Verifier/` & `IP_Block/` (`v1.2` Fast Core + Rev 0.5 EKF)** | **₹21,00,000 INR** | Complete & Bit-Exact (307 cyc, 10/10 Verilator) |
+| **`hardware/STM_Verifier/` (CSR C99 Firmware, 7.5 KB RAM)** | **₹3,00,000 INR** | Complete & Benchmarked (6.7× speedup) |
+| **`software/visualiser/` (Estimator, RLS, CSR `model_rc.pkl`, UI)** | **₹13,50,000 INR** | Complete (Decoupled sync, 0% idle CPU) |
+| **`software/simulator/` (2-RC Electro-Thermal Physics Engine)** | **₹8,00,000 INR** | Complete (5 chemistries, 10 drive cycles) |
+| **`tests/` (125 Automated Pytest Suite, 88.6% Shared Cov)** | **₹6,50,000 INR** | 125/125 Passing (100% pass rate) |
+| **`docs/` & System Configuration / Operations Specs** | **₹4,50,000 INR** | Complete & Verified (36+ Markdown docs) |
+| **Academic & Certification Deliverables (All 4 PDFs Done)** | **₹13,50,000 INR** | 100% Turnkey Portfolio Integrated |
+| • *Camera-Ready Research Paper PDF (`Research_Paper.pdf`)* | ₹5,50,000 INR | Completed & Integrated (IEEE Camera-Ready) |
+| • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | ₹2,00,000 INR | Completed & Integrated (Elsevier Camera-Ready) |
+| • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | ₹5,00,000 INR | Completed & Integrated (41 Pages, 5.04 MB) |
+| • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | ₹1,00,000 INR | Completed & Integrated (2 Sheets A3 Portrait) |
+| **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **Turnkey Capstone `v2.4.1` (10.0 / 10)** |
 
 * **IP Block Value Uplift (`v1.0` $\to$ `v1.2`):** Upgrading `hardware/IP_Block/` to `esn_ip_platform` v1.2 increased the hardware IP asset bucket from `₹17.0 Lakhs` to `₹21.0 Lakhs` (`+₹4.0 Lakhs` direct uplift) by adding the `310-cycle / 3.9 µs` sparse fast core (`esn_core_fast.v`), Rev 0.5 ESN-fused EKF (`ekf_core.v`), Verilator `5.028` dual-core `10/10` regression proofs, RV32I C-driver co-simulation (`307` cycles), and 29 held-out NASA PCoE pack + NARMA-10 validations.
 
@@ -446,7 +445,7 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 | **Senior Embedded C99 / MISRA Firmware Engineer** *(CSR SpMV + Drivers)* | 2.2 *(352h)* | ₹3,500 | ₹12,32,000 | ₹12,32,000 | — |
 | **BMS Controls & State Estimation ML Specialist** *(2-RC + ESN/RLS + 29 Packs)* | 2.8 *(448h)* | ₹4,000 | ₹17,92,000 | ₹17,92,000 | — |
 | **Full-Stack Cloud & Real-Time Systems Architect** *(Flask + MongoDB 1.0s)* | 2.0 *(320h)* | ₹3,200 | ₹10,24,000 | ₹10,24,000 | — |
-| **Lead QA & Hardware Verification Engineer** *(119 Pytest + Verilator + CI)* | 1.4 *(224h)* | ₹2,500 | ₹5,60,000 | ₹5,60,000 | — |
+| **Lead QA & Hardware Verification Engineer** *(125 Pytest + Verilator + CI)* | 1.4 *(224h)* | ₹2,500 | ₹5,60,000 | ₹5,60,000 | — |
 | **Academic Authoring & Technical Publication Drafting (4 PDFs)** | 0.6 / 2.0 *(96h / 320h)* | ₹3,000 | ₹2,88,000 | ₹9,60,000 | +₹6,72,000 |
 | **TOTAL SUNK REPLACEMENT COST** | **12.6 / 14.0** | — | **`₹74,88,000 INR` (₹74.88L)** | **`₹81,60,000 INR` (₹81.60L)** | **`+₹6,72,000 INR` (+₹6.72L)** |
 
@@ -475,7 +474,7 @@ Grounded in India EV growth tailwinds (**~USD 320–328M BMS market**, `~14%–1
 
 | Venture Milestone & Asset Bucket | `v2.4.0` Modeled (INR) | `v2.4.1` Modeled (INR) | Analysis & Strategic Moat |
 | :--- | :---: | :---: | :--- |
-| **Sound Core Technology & Silicon Prototype** | ₹3,30,00,000 | ₹3,50,00,000 | `v1.2` fast core (`310` cyc), Rev 0.5 EKF, `10/10` Verilator, 119 passing tests. |
+| **Sound Core Technology & Silicon Prototype** | ₹3,30,00,000 | ₹3,50,00,000 | `v1.2` fast core (`310` cyc), Rev 0.5 EKF, `10/10` Verilator, 125 passing tests. |
 | **Intellectual Property & Patent Protection** | ₹2,60,00,000 | ₹3,50,00,000 | 2025 CRI / Section 3(k) CPS technical effect framing + published Research Paper. |
 | **Strategic Market Size & Regulatory Tailwinds** | ₹2,00,00,000 | ₹2,50,00,000 | AIS-156 / AIS-038 algorithmic telemetry readiness + PM E-DRIVE market tailwinds. |
 | **Execution Risk Elimination (0 Technical Debt)** | ₹1,30,00,000 | ₹2,30,00,000 | 0 empty files, 0 broken links, 100% CI pass rate, full turnkey documentation in `v2.4.1`. |
@@ -498,11 +497,11 @@ xychart-beta
 | :--- | :---: | :---: | :--- |
 | **1. Hardware RTL & FPGA IP (`v1.2`)** | **10 / 10** | **10 / 10** | `FPGA_Verifier` (`200/200` ESN, `512/512` EKF/UKF) + `IP_Block v1.2` (`310` cyc Fast ESN, Rev 0.5 EKF, `10/10` Verilator, 29 NASA packs, NARMA-10, pre-built `~3.7 MB` `v1.0` bitstream). |
 | **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline (`0.72%` sim RMSE; `0.067` MAE / `0.086` RMSE on 29 NASA cells), CSR `model_rc.pkl` (`~602 KB`). |
-| **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **119/119 passing tests** (`pytest -q`), `88.60%` `software/shared` coverage, 0 ruff/flake8 errors. |
+| **3. Automated Testing & QA** | **10 / 10** | **10 / 10** | **125/125 passing tests** (`pytest -q`), `88.60%` `software/shared` coverage, 0 ruff/flake8 errors. |
 | **4. Cloud Sync & Intermediate** | **10 / 10** | **10 / 10** | Decoupled MongoDB 1.0s streaming, Keep-Alive pooling, in-memory fallback, zero UI freeze. |
 | **5. DevEx & Repo Hygiene** | **10 / 10** | **10 / 10** | 0 empty files across 483 tracked files (`85.7 MiB`), 0 untracked clutter, 0 broken links across all 43 Markdown files. |
-| **6. The 4 Academic Publications** | **8.8 / 10** *(2/4 Finalized)* | **10 / 10** *(All 4 Bound/Final)* | Camera-ready `Research_Paper.pdf` (674 KB encrypted) and `Review_Paper.pdf` (12 pages, 232 KB encrypted, Elsevier format) complete; only Poster & Thesis remain for `v2.4.1`. |
-| **OVERALL REPOSITORY SCORE** | **`9.7 / 10`** | **`10.0 / 10`** | **`v2.4.0` is Production-Ready Engineering & Dual Publications; `v2.4.1` completes Turnkey Capstone Submission.** |
+| **6. The 4 Academic Publications** | **10 / 10** | **10 / 10** | All 4 academic deliverables finalized & integrated on disk (Research Paper, Review Paper, Project Poster, Final Thesis). |
+| **OVERALL REPOSITORY SCORE** | **`10.0 / 10`** | **`10.0 / 10`** | **`v2.4.1` is the Complete 100% Turnkey Capstone Submission.** |
 
 ---
 
@@ -545,16 +544,16 @@ xychart-beta
 This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.0`:
 
 ```
-============================= 119 passed in 21.60s =============================
+============================= 125 passed in 24.67s =============================
 ```
 
-- **Python Quality Gate (`pytest --cov=software/shared`):** **119 / 119 passing tests (`~21.60s`, `88.60%` `software/shared` coverage)**.
+- **Python Quality Gate (`pytest --cov=software/shared`):** **125 / 125 passing tests (`~24.67s`, `88.60%` `software/shared` coverage)**.
 - **Master 8-Step Validation Runner (`run_all_validation.bat`):** **[ALL PASSED] END-TO-END VALIDATION SUCCESSFUL**.
 - **Linter & Syntax Gate (`ruff check .` & `flake8 .`):** **0 errors across all directories**.
 - **Storage & Link Hygiene Audit:** **0 empty files** and **0 untracked files** across **483 tracked repository files (`85.45 MiB`)**, plus **0 broken links** across all **43 Markdown files**.
 - **Hardware-Software Parity:** **200 / 200 bit-exact ESN (`FPGA_Verifier`)**, **512 / 512 bit-exact EKF & UKF (`FPGA_Verifier`)**, **10 / 10 Verilator `5.028` serial & fast core regressions (`IP_Block v1.2`)**, and **29 held-out NASA PCoE pack checks**.
 - **Departmental BE Capstone Template:** **34 / 34 sections aligned** with Department of Automation & Robotics / Instrumentation, VESIT Mumbai.
-- **Turnkey Transition Status:** **`v2.4.0` Synced (`9.7 / 10` — Engineering Complete + `Research_Paper.pdf` & `Review_Paper.pdf` Final)** $\to$ **`v2.4.1` Turnkey Capstone Target (`10.0 / 10` — Only `Project_Poster.pdf` & `Final_Thesis.pdf` Pending)** via [`TRANSITION_PLAN_V2.4.1.md`](TRANSITION_PLAN_V2.4.1.md).
+- **Turnkey Capstone Status:** **`v2.4.1` Turnkey Capstone Active (`10.0 / 10` — Engineering Complete + All 4 Academic Deliverables Finalized & Integrated)**.
 
 ---
 

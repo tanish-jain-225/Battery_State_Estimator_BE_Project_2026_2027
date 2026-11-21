@@ -7,7 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v2.4.0] - 2026-11-11 (Active & Synced Today - IP Block v1.2, IEEE Research Paper, Optimization & Decoupled Sync)
+## [v2.4.1] - 2026-11-21 (Active Today - 100% Turnkey Capstone Release: All 4 Academic Deliverables Finalized & Integrated)
+
+### 🚀 Highlights (v2.4.1)
+- **Integrated Official Final Year Capstone Dissertation (Deliverable 4 of 4 Finalized)**:
+  - Integrated the official 41-page Bachelor of Engineering dissertation report: *"Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation"* ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 5.04 MB unencrypted PDF, University of Mumbai / VESIT, Academic Year 2026–2027).
+  - Authors: Satvik Verma (Roll No. 32), Tanish Sanghvi (Roll No. 61), Sanjna Patankar (Roll No. 19), Akshay Nambiar (Roll No. 17).
+  - Project Supervisor: Dr. Kadambari Sharma; Head of Department: Dr. Sangeeta Prasannaram; Principal: Dr. (Mrs.) J. M. Nair.
+  - Complete 8-chapter monograph: Chapter 1 (Introduction & Motivation), Chapter 2 (Literature Review), Chapter 3 (Problem Analysis & Requirements), Chapter 4 (2-RC Modeling, ESN Mathematics & AXI4 IP Block Architecture), Chapter 5 (Microservices, C99 Firmware & Verilog RTL Implementation), Chapter 6 (Testing & Bit-Exact Verification), Chapter 7 (NASA PCoE 29-Cell Cross-Validation, Artix-7 Synthesis & Wilcoxon Statistics), Chapter 8 (Conclusions, Limitations & Future Roadmap), Appendices I–III (reproducibility notes, evidence inventory, AXI4-Lite register map), and 17 academic citations.
+  - Detailed chapter transcription and verification records documented in [`docs/Thesis/README.md`](docs/Thesis/README.md).
+- **100% Turnkey Academic Portfolio Completion (All 4 Academic Deliverables Integrated)**:
+  - 1. Original Experimental Research Paper ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 6 pages, 674 KB encrypted, IEEE camera-ready)
+  - 2. Comprehensive Review Paper ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf), 12 pages, 232 KB encrypted, 77 citations, Elsevier camera-ready)
+  - 3. Official Presentation Poster ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf), 2 sheets A3 portrait, 535 KB, 11 panels)
+  - 4. Final B.E. Capstone Dissertation ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 41 pages, 5.04 MB unencrypted)
+  - **Zero shell or placeholder files remaining across the entire repository.**
+- **Repository-Wide Turnkey State Promotion**:
+  - Full synchronization of version declarations to `v2.4.1` across `pyproject.toml`, `CITATION.cff`, `SECURITY.md`, `README.md`, and master documentation indices.
+  - Test suite maintained at **125 / 125 passing tests** with **88.60%** code coverage on `software/shared` and 0 linter errors (`ruff`, `flake8`).
+
+---
+
+## [v2.4.0] - 2026-11-11 (IP Block v1.2, IEEE Research Paper, Optimization & Decoupled Sync)
 
 ### 🚀 Highlights (v2.4.0)
 - **Decoupled MongoDB 1.0s Real-Time Intermediate Pipeline**:
@@ -26,11 +47,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Complete Indian E-Mobility Web Research Synthesis**:
   - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
+- **Integrated Official 2-Sheet A3 Presentation Poster (Deliverable 3 of 4 Finalized)**:
+  - Integrated official 2-sheet A3 portrait academic symposium poster ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf), 535 KB, 11 numbered panels, Department of Automation & Robotics, VESIT Mumbai).
+  - Authors: Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi; Guide: Dr. Kadambari Sharma.
+  - Documents Vivado 2023.1 synthesized ESN reservoir schematic, Arty A7-100T FPGA board photo, 318 LUT / 2 DSP IP core metrics, timing closure (+0.023 ns slack at 80 MHz, 535.1 µs update latency), 6,400 XSim bit-exact updates, 29-cell NASA PCoE evaluation (2,214 windows, pooled SOC MAE 0.067 with zero capacity knowledge, per-cell SD 0.020 vs 0.035–0.056 for EKF), and Wilcoxon signed-rank test validation ($p=0.011$ vs measured-capacity EKF).
+  - Detailed panel breakdown and transcription documented in [`docs/Poster/README.md`](docs/Poster/README.md).
+  - Leaves **ONLY 1 single academic deliverable remaining** for `v2.4.1` ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf)).
 - **Integrated Camera-Ready Review Paper (Deliverable 2 of 4 Finalized)**:
   - Integrated official 12-page camera-ready review manuscript: *"Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements"* ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf), 232 KB encrypted, 77 citations, Elsevier / ScienceDirect format).
   - Authors: Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, Sangeetha Prasanna Ram (Department of Automation & Robotics, VESIT).
   - Side-by-side comparison of 8 embedded/hardware SOC implementations and 6 FPGA recurrent network accelerators, detailing cost per sample, fixed-point error, and hardware reporting guidelines.
-  - Leaves only **2 deliverables remaining** for `v2.4.1` ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) and [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf)).
 - **Integrated Camera-Ready IEEE Research Paper (Deliverable 1 of 4 Finalized)**:
   - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 674 KB encrypted).
   - Documents 100-neuron Q6.10 ESN on Artix-7 FPGA (318 LUTs, 2 DSP slices, 80 MHz, 535.1 µs latency), 200/200 bit-exact verification, and 29-cell NASA PCoE cross-validation (2,201 windows, 140,864 held-out steps, SOC MAE 0.067, RMSE 0.086).
@@ -41,16 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Repository Storage, Memory & Performance Optimization Pass**:
   - Removed 316 redundant/superseded files across `hardware/IP_Block/host/legacy_oct2026/`, `hardware/IP_Block/backup_rev04/`, duplicate pack `.mem`/`.txt`/`.csv` assets (via shared canonical pack & dataset fallbacks in `esn_host.py`, `narma_board.py`, and `STM_Verifier/config.py`), and duplicate root `FPGA_Verifier/` copies (saving **17.24 MB / 16.45 MiB** on disk, from 799 to 483 tracked files).
   - Upgraded `EchoStateNetwork` with `scipy.sparse.csr_matrix` recurrent matvec caching, symmetric `np.linalg.solve` Ridge solve, and lossless zlib-compressed CSR pickle serialization (`software/visualiser/model_rc.pkl` reduced from `3.33 MB` to `602 KB` with 81.9% compression), alongside fast scalar `math`/tuple hotpaths across `battery_chemistry.py`, `battery_simulator.py`, `traditional_estimator.py`, and `estimator_pipeline.py`, halving full `pytest` + coverage runtime from `48.80s` to `21.60s` (`19.12s` without coverage).
-
----
-
-## [v2.4.1] - Planned Turnkey Release (Only 2 Pending Academic Deliverables Remaining)
-
-### 🎯 Remaining Scope for `v2.4.1` (Post-`v2.4.0`)
-- **A1 Presentation Poster** *(Pending 1/2)*: Compiling and integrating print-ready vector poster [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf).
-- **B.E. Capstone Final Thesis** *(Pending 2/2)*: Compiling and integrating 100+ page University of Mumbai dissertation [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf).
-- **Already Completed & Integrated**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (camera-ready 12-page Elsevier PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `125/125` passing tests.
-- **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---
 

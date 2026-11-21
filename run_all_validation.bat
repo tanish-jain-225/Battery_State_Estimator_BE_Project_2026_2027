@@ -28,13 +28,13 @@ if !errorlevel! neq 0 (
 echo.
 
 REM == STEP 2: Run Full Pytest Suite ========================================
-echo [2/8] Running Complete Pytest Suite (119 Unit/Integration Tests)...
+echo [2/8] Running Complete Pytest Suite (125 Unit/Integration Tests)...
 python -m pytest "%ROOT_DIR%tests"
 if !errorlevel! neq 0 (
     echo [ERROR] Pytest suite execution failed.
     set /a FAILURES+=1
 ) else (
-    echo [SUCCESS] Full Pytest suite executed and all 119 tests passed.
+    echo [SUCCESS] Full Pytest suite executed and all 125 tests passed.
 )
 echo.
 

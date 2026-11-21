@@ -177,21 +177,40 @@ mongodb_connected = False
 _last_db_ping_time = 0.0
 _last_db_failure_time = 0.0
 
+def _handle_db_disconnect(error=None):
+    """Gracefully handle MongoDB disconnection, closing broken pools and resetting state."""
+    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_failure_time
+    _mongodb_connected = False
+    mongodb_connected = False
+    _last_db_failure_time = time.time()
+    try:
+        if db_client is not None:
+            db_client.close()
+    except Exception:
+        pass
+    db_client = None
+    db = None
+
 def check_db_connected():
-    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time, _last_db_failure_time
+    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time
     # Fast non-blocking check when already connected
     if _mongodb_connected and db is not None:
         return True
 
     now = time.time()
-    failure_cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2.0
+    failure_cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 5.0
     if now - _last_db_failure_time < failure_cooldown:
         return False
 
     timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2000
     if IS_SERVERLESS:
         try:
-            db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
+            db_client = MongoClient(
+                mongodb_uri,
+                serverSelectionTimeoutMS=timeout_ms,
+                connectTimeoutMS=timeout_ms,
+                socketTimeoutMS=timeout_ms
+            )
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
             try:
@@ -202,21 +221,22 @@ def check_db_connected():
             mongodb_connected = True
             return True
         except Exception as e:
-            _last_db_failure_time = now
+            _handle_db_disconnect(e)
             print(f"Visualiser Database connection failed: {e}")
-            _mongodb_connected = False
-            mongodb_connected = False
-            db_client = None
-            db = None
             return False
 
-    # Reconnect check paced by MONGODB_SYNC_INTERVAL (1.0 second)
-    sync_interval = getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
+    # Reconnect check paced by MONGODB_SYNC_INTERVAL (5.0s when online, 10.0s when offline)
+    sync_interval = 5.0 if _mongodb_connected else 10.0
     if (now - _last_db_ping_time >= sync_interval):
         _last_db_ping_time = now
         try:
             if db_client is None:
-                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=timeout_ms)
+                db_client = MongoClient(
+                    mongodb_uri,
+                    serverSelectionTimeoutMS=timeout_ms,
+                    connectTimeoutMS=timeout_ms,
+                    socketTimeoutMS=timeout_ms
+                )
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
             try:
@@ -227,12 +247,8 @@ def check_db_connected():
             mongodb_connected = True
             return True
         except Exception as e:
-            _last_db_failure_time = now
+            _handle_db_disconnect(e)
             print(f"Visualiser Database connection failed: {e}")
-            _mongodb_connected = False
-            mongodb_connected = False
-            db_client = None
-            db = None
             return False
 
     return _mongodb_connected and db is not None
@@ -412,7 +428,20 @@ def check_simulator_port(force=False):
         _last_sim_port_check_time = now
         was_online = _simulator_port_online
 
-        # 1. Primary decoupled check via MongoDB Atlas sim_state (zero HTTP overhead)
+        # 1. Fast local HTTP probe (< 1ms when co-located on same host)
+        try:
+            with make_simulator_request("/api/status", timeout=0.3) as response:
+                if response.status == 200:
+                    data = json.loads(response.read().decode())
+                    _simulator_port_online = True
+                    _simulator_port_data = data
+                    if not was_online:
+                        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+                    return True, data
+        except Exception:
+            pass
+
+        # 2. Decoupled check via shared MongoDB Atlas sim_state (for cloud deployments)
         if check_db_connected():
             try:
                 doc = db[Config.MONGODB_STATE_COLLECTION].find_one({'_id': 'singleton'})
@@ -425,21 +454,8 @@ def check_simulator_port(force=False):
                         if not was_online:
                             _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
                         return True, doc
-            except Exception:
-                pass
-
-        # 2. Local fallback check via HTTP only if DB is offline
-        try:
-            with make_simulator_request("/api/status", timeout=1.0) as response:
-                if response.status == 200:
-                    data = json.loads(response.read().decode())
-                    _simulator_port_online = True
-                    _simulator_port_data = data
-                    if not was_online:
-                        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
-                    return True, data
-        except Exception:
-            pass
+            except Exception as e:
+                _handle_db_disconnect(e)
 
         _simulator_port_online = False
         _simulator_port_data = None
@@ -471,6 +487,7 @@ def load_sim_state(force_db_read=False):
                 return local_sim_state
         except Exception as e:
             print(f"Error loading state from MongoDB: {e}")
+            _handle_db_disconnect(e)
     return local_sim_state
 
 def save_sim_state(state):
@@ -484,6 +501,7 @@ def save_sim_state(state):
             db[Config.MONGODB_STATE_COLLECTION].replace_one({'_id': 'singleton'}, state_copy, upsert=True)
         except Exception as e:
             print(f"Error saving state to MongoDB: {e}")
+            _handle_db_disconnect(e)
 
 def update_sim_progress(progress_dict):
     local_sim_state.update(progress_dict)
@@ -496,6 +514,7 @@ def update_sim_progress(progress_dict):
             )
         except Exception as e:
             print(f"Error updating simulation progress in MongoDB: {e}")
+            _handle_db_disconnect(e)
 
 def sync_simulation_locally():
     global current_chemistry
@@ -608,14 +627,18 @@ def sync_simulation_locally():
         }
 
         if check_db_connected():
-            # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
-            exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
-            if not exists:
-                db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+            try:
+                # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
+                exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
+                if not exists:
+                    db[Config.MONGODB_READINGS_COLLECTION].insert_one(dict(record))
+            except Exception as ins_err:
+                _handle_db_disconnect(ins_err)
         else:
-            # Make sure we don't duplicate locally either
-            if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
-                local_telemetry_buffer.append(record)
+            clean_rec = dict(record)
+            clean_rec.pop('_id', None)
+            if not any(r['time'] == clean_rec['time'] for r in local_telemetry_buffer):
+                local_telemetry_buffer.append(clean_rec)
                 if len(local_telemetry_buffer) > Config.TELEMETRY_FALLBACK_LIMIT:
                     local_telemetry_buffer.pop(0)
 
@@ -635,59 +658,24 @@ def sync_simulation_locally():
 # ── Asynchronous Status Checker & Simulation Threads (Standalone mode) ──
 
 def status_checker_loop():
-    global _mongodb_connected, mongodb_connected, db_client, db
+    if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+        return
     print("Visualizer background status checker thread active.")
-
-    # Try initial mongo connection
-    try:
-        db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
-        db_client.server_info()
-        db = db_client[Config.MONGODB_DB_NAME]
-        _mongodb_connected = True
-        mongodb_connected = True
-        try:
-            db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
-        except Exception:
-            pass
-    except Exception:
-        _mongodb_connected = False
-        mongodb_connected = False
-        db_client = None
-        db = None
 
     while True:
         # 1. Asynchronously check Simulator Status (via shared MongoDB or local probe)
-        check_simulator_port()
+        try:
+            check_simulator_port()
+        except Exception:
+            pass
 
         # 2. Asynchronously check MongoDB Connection
-        if not _mongodb_connected or db_client is None:
-            try:
-                db_client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=2000)
-                db_client.server_info()
-                db = db_client[Config.MONGODB_DB_NAME]
-                _mongodb_connected = True
-                mongodb_connected = True
-                try:
-                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
-                except Exception:
-                    pass
-            except Exception:
-                _mongodb_connected = False
-                mongodb_connected = False
-                db_client = None
-                db = None
-        else:
-            try:
-                db_client.server_info()
-                _mongodb_connected = True
-                mongodb_connected = True
-            except Exception:
-                _mongodb_connected = False
-                mongodb_connected = False
-                db_client = None
-                db = None
+        try:
+            check_db_connected()
+        except Exception:
+            pass
 
-        time.sleep(getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0))
+        time.sleep(5.0 if _mongodb_connected else 10.0)
 
 def local_generator_loop():
     global current_chemistry
@@ -800,9 +788,14 @@ def local_generator_loop():
 
                 # Push record to readings collection
                 if check_db_connected():
-                    db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+                    try:
+                        db[Config.MONGODB_READINGS_COLLECTION].insert_one(dict(record))
+                    except Exception as ins_err:
+                        _handle_db_disconnect(ins_err)
                 else:
-                    local_telemetry_buffer.append(record)
+                    clean_rec = dict(record)
+                    clean_rec.pop('_id', None)
+                    local_telemetry_buffer.append(clean_rec)
                     if len(local_telemetry_buffer) > Config.TELEMETRY_FALLBACK_LIMIT:
                         local_telemetry_buffer.pop(0)
 

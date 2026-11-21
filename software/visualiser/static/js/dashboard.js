@@ -956,24 +956,21 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStart.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'start' });
-            await refreshStatus();
-            await refreshTelemetry();
+            await Promise.all([refreshStatus(), refreshTelemetry()]);
         });
     }
     if (btnPause) {
         btnPause.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'pause' });
-            await refreshStatus();
-            await refreshTelemetry();
+            await Promise.all([refreshStatus(), refreshTelemetry()]);
         });
     }
     if (btnStop) {
         btnStop.addEventListener('click', async () => {
             resumeLiveMode();
             await apiRequest('/api/control', 'POST', { command: 'stop' });
-            await refreshStatus();
-            await refreshTelemetry();
+            await Promise.all([refreshStatus(), refreshTelemetry()]);
         });
     }
     if (btnReset) {
@@ -983,8 +980,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await apiRequest('/api/control', 'POST', { command: 'reset' });
                 if (chartSOC) { chartSOC.data.datasets.forEach(d => d.data = []); chartSOC.update(); }
                 if (chartSOH) { chartSOH.data.datasets.forEach(d => d.data = []); chartSOH.update(); }
-                await refreshStatus();
-                await refreshTelemetry();
+                await Promise.all([refreshStatus(), refreshTelemetry()]);
             }
         });
     }

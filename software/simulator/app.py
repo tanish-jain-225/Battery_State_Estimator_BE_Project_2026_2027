@@ -108,20 +108,41 @@ _mongodb_error = None
 _last_state_load_time = 0.0
 _last_db_connect_attempt = 0.0
 
+def _handle_db_disconnect(error=None):
+    """Gracefully handle MongoDB disconnection, closing broken pools and resetting state."""
+    global _mongodb_connected, mongodb_connected, db_client, db, _mongodb_error, _last_db_connect_attempt
+    _mongodb_connected = False
+    mongodb_connected = False
+    _last_db_connect_attempt = time.time()
+    if error:
+        _mongodb_error = str(error)
+    try:
+        if db_client is not None:
+            db_client.close()
+    except Exception:
+        pass
+    db_client = None
+    db = None
+
 def _ensure_db():
     global mongodb_connected, _mongodb_connected, db_client, db, _last_db_connect_attempt
     if _mongodb_connected and db is not None:
         return True
     now = time.time()
-    cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2.0
+    cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 5.0
     if now - _last_db_connect_attempt < cooldown:
         return False
     _last_db_connect_attempt = now
     try:
         timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1') else 2000
         if db_client is None:
-            db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=timeout_ms)
-        db_client.server_info()
+            db_client = MongoClient(
+                Config.MONGODB_URI,
+                serverSelectionTimeoutMS=timeout_ms,
+                connectTimeoutMS=timeout_ms,
+                socketTimeoutMS=timeout_ms
+            )
+        db_client.admin.command('ping')
         db = db_client[Config.MONGODB_DB_NAME]
         _mongodb_connected = True
         mongodb_connected = True
@@ -131,9 +152,8 @@ def _ensure_db():
         except Exception:
             pass
         return True
-    except Exception:
-        _mongodb_connected = False
-        mongodb_connected = False
+    except Exception as e:
+        _handle_db_disconnect(e)
         return False
 
 def load_sim_state(force_db_read=False):
@@ -151,6 +171,7 @@ def load_sim_state(force_db_read=False):
                 return local_state
         except Exception as e:
             print(f"Battery State Estimator — Error loading state from MongoDB: {e}")
+            _handle_db_disconnect(e)
     return local_state
 
 def save_sim_state(state):
@@ -164,6 +185,7 @@ def save_sim_state(state):
             db[Config.MONGODB_STATE_COLLECTION].replace_one({'_id': 'singleton'}, doc_copy, upsert=True)
         except Exception as e:
             print(f"Battery State Estimator — Error saving state to MongoDB: {e}")
+            _handle_db_disconnect(e)
 
 def update_sim_progress(progress_dict):
     local_state.update(progress_dict)
@@ -176,6 +198,7 @@ def update_sim_progress(progress_dict):
             )
         except Exception as e:
             print(f"Battery State Estimator — Error updating simulation progress: {e}")
+            _handle_db_disconnect(e)
 
 # Spawns physics-based battery simulator
 simulator = BatterySimulator()
@@ -280,7 +303,7 @@ def generator_loop():
                 # Push record to readings collection
                 if _ensure_db():
                     try:
-                        db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+                        db[Config.MONGODB_READINGS_COLLECTION].insert_one(dict(record))
                         # Zero DB Load: prune older records periodically so DB stays small, fast, and light
                         if int(simulator.time) % 30 == 0:
                             oldest_cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'time': 1, '_id': 0}).sort('time', -1).skip(1000).limit(1)
@@ -290,9 +313,12 @@ def generator_loop():
                                 db[Config.MONGODB_READINGS_COLLECTION].delete_many({'time': {'$lt': cutoff_time}})
                     except Exception as ins_err:
                         print(f"Error inserting reading into MongoDB: {ins_err}")
+                        _handle_db_disconnect(ins_err)
 
                 # Always maintain fast in-memory circular ring buffer for zero-latency direct HTTP streaming
-                local_telemetry_buffer.append(record)
+                clean_rec = dict(record)
+                clean_rec.pop('_id', None)
+                local_telemetry_buffer.append(clean_rec)
                 limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
                 if len(local_telemetry_buffer) > limit:
                     local_telemetry_buffer.pop(0)
@@ -458,14 +484,19 @@ def sync_simulation_on_demand():
         }
 
         if _ensure_db():
-            # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
-            exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
-            if not exists:
-                db[Config.MONGODB_READINGS_COLLECTION].insert_one(record)
+            try:
+                # Check if this reading already exists to prevent duplicate inserts from concurrent workers/instances
+                exists = db[Config.MONGODB_READINGS_COLLECTION].find_one({'time': out['time']})
+                if not exists:
+                    db[Config.MONGODB_READINGS_COLLECTION].insert_one(dict(record))
+            except Exception as ins_err:
+                _handle_db_disconnect(ins_err)
 
         # Maintain fast in-memory circular buffer for zero-latency direct streaming
-        if not any(r['time'] == record['time'] for r in local_telemetry_buffer):
-            local_telemetry_buffer.append(record)
+        clean_rec = dict(record)
+        clean_rec.pop('_id', None)
+        if not any(r['time'] == clean_rec['time'] for r in local_telemetry_buffer):
+            local_telemetry_buffer.append(clean_rec)
             limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
             if len(local_telemetry_buffer) > limit:
                 local_telemetry_buffer.pop(0)
@@ -518,7 +549,13 @@ def get_readings():
         except (ValueError, TypeError):
             pass
 
-    return jsonify(readings)
+    clean_readings = []
+    for r in readings:
+        item = dict(r)
+        item.pop('_id', None)
+        clean_readings.append(item)
+
+    return jsonify(clean_readings)
 
 @app.route('/api/chemistry/register', methods=['POST'])
 def post_register_chemistry():
@@ -812,35 +849,32 @@ def db_checker_loop():
     while True:
         if not _mongodb_connected or db_client is None:
             try:
-                db_client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
-                db_client.server_info()
+                db_client = MongoClient(
+                    Config.MONGODB_URI,
+                    serverSelectionTimeoutMS=2000,
+                    connectTimeoutMS=2000,
+                    socketTimeoutMS=2000
+                )
+                db_client.admin.command('ping')
                 db = db_client[Config.MONGODB_DB_NAME]
                 _mongodb_connected = True
                 mongodb_connected = True
                 _mongodb_error = None
                 try:
-                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)])
+                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
                 except Exception:
                     pass
             except Exception as e:
-                _mongodb_connected = False
-                mongodb_connected = False
-                db_client = None
-                db = None
-                _mongodb_error = str(e)
+                _handle_db_disconnect(e)
         else:
             try:
-                db_client.server_info()
+                db_client.admin.command('ping')
                 _mongodb_connected = True
                 mongodb_connected = True
                 _mongodb_error = None
             except Exception as e:
-                _mongodb_connected = False
-                mongodb_connected = False
-                db_client = None
-                db = None
-                _mongodb_error = str(e)
-        time.sleep(getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0))
+                _handle_db_disconnect(e)
+        time.sleep(5.0 if _mongodb_connected else 10.0)
 
 # Battery State Estimator — Physics Engine startup
 # Thread starts at module level so it works under gunicorn AND direct execution.

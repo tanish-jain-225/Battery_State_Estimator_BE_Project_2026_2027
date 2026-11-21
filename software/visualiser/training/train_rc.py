@@ -579,8 +579,15 @@ def main():
 
         from pymongo import MongoClient
         print("Checking MongoDB Model Registry connection...")
-        client = MongoClient(Config.MONGODB_URI, serverSelectionTimeoutMS=2000)
-        client.server_info()  # trigger connection check
+        client = MongoClient(
+            Config.MONGODB_URI,
+            serverSelectionTimeoutMS=3000,
+            connectTimeoutMS=3000,
+            socketTimeoutMS=3000,
+            maxIdleTimeMS=30000,
+            retryWrites=True
+        )
+        client.admin.command('ping')  # trigger fast connection check
         db = client[Config.MONGODB_DB_NAME]
 
         print("Uploading package to MongoDB registry cluster...")

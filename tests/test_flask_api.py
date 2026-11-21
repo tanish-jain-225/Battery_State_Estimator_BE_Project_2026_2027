@@ -36,10 +36,16 @@ def test_simulator_status_endpoint(simulator_client):
     assert 'status' in data or 'sim_running' in data
 
 def test_simulator_readings_endpoint(simulator_client):
-    res = simulator_client.get('/api/status')
+    from bson.objectid import ObjectId
+
+    from software.simulator.app import local_telemetry_buffer
+    # Inject a record with an ObjectId to verify serialization robustness
+    local_telemetry_buffer.append({"time": 999.0, "voltage": 3.9, "_id": ObjectId()})
+    res = simulator_client.get('/api/readings')
     assert res.status_code == 200
     data = res.get_json()
-    assert isinstance(data, dict)
+    assert isinstance(data, list)
+    assert any(r.get("time") == 999.0 for r in data)
 
 def test_visualiser_status_endpoint(visualiser_client):
     res = visualiser_client.get('/api/status')

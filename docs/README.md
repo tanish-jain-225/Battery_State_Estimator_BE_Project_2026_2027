@@ -12,12 +12,12 @@ This repository's documentation is engineered to follow a clear, continuous **St
 
 ```
 docs/
-├── Poster/                        # Academic Exhibition & Defense Poster (Pending v2.4.1)
-│   ├── Project_Poster.pdf         # Presentation Poster PDF shell awaiting final drop (A1)
-│   └── README.md                  # Layout specifications and print guidelines
-├── Thesis/                        # B.E. Capstone Final Dissertation (Pending v2.4.1)
-│   ├── Final_Thesis.pdf           # Dissertation PDF shell awaiting final drop (A4 Portrait)
-│   └── README.md                  # University format specs and chapter breakdown
+├── Poster/                        # Academic Exhibition & Defense Poster (Completed & Integrated)
+│   ├── Project_Poster.pdf         # Official 2-Sheet A3 Presentation Poster (535 KB, 11 Panels)
+│   └── README.md                  # Layout specifications, 11-panel transcription & metrics
+├── Thesis/                        # B.E. Capstone Final Dissertation (Completed in v2.4.1)
+│   ├── Final_Thesis.pdf           # Official B.E. Capstone Dissertation Report (41 Pages, 5.04 MB)
+│   └── README.md                  # Complete 8-chapter monograph breakdown & verification
 ├── Publications/                  # Official Academic Paper Deliverables
 │   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed in v2.4.0)
 │   ├── Review_Paper.pdf           # Comprehensive Review Paper (12 Pages, Camera-Ready Integrated)
@@ -45,7 +45,6 @@ docs/
 │   ├── PRESENTATION.md            # Defense slide talking points & speaker notes
 │   ├── PROJECT_PROPOSAL.md        # Official BE project proposal & methodology
 │   ├── SYSTEM_SPECIFICATION.md    # Circuit parameters, sensor noise & observer math
-│   ├── TRANSITION_PLAN_V2.4.1.md  # Official runbook for v2.4.0 -> v2.4.1 turnkey transition
 │   └── WEB_RESEARCH.md            # Automotive BMS landscape & ISO 26262 audit
 └── literature_survey.md           # Detailed literature survey & academic taxonomy
 ```
@@ -67,7 +66,7 @@ docs/
 2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/README.md`](Review_1/README.md) · [`Progress Report`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic. *Feedback Addressed: Added ESN Core Architecture Diagram & Customized 16:9 PPT.*
 3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
 4. **Hardware Acceleration & Commercial IP Block (`v2.4.0`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
-5. **Final B.E. Capstone Dissertation (`Pending v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis.
+5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.04 MB).
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*
@@ -77,15 +76,15 @@ docs/
 4. **Hardware Subsystem Architecture:** [`hardware/hardware.md`](../hardware/hardware.md) — Comprehensive guide to embedded C99 firmware and FPGA Verilog accelerators.
 5. **STM32 Embedded C99 Verifier:** [`hardware/STM_Verifier/README.md`](../hardware/STM_Verifier/README.md) — CSR SpMV 6.7× speedup, Q12/Q15 integer arithmetic, and LUT Tanh.
 6. **FPGA RTL Verifier & Subsystems:** [`hardware/FPGA_Verifier/README.md`](../hardware/FPGA_Verifier/README.md) — Bit-exact Verilog RTL for 100-neuron ESN, fixed-point EKF, and fixed-point UKF.
-7. **Automated Regression Suite (119 Tests):** [`tests/README.md`](../tests/README.md) — 15 specialized test modules with 88.60% coverage on `software/shared` (`119 passed in 21.60s`).
+7. **Automated Regression Suite (125 Tests):** [`tests/README.md`](../tests/README.md) — 16 specialized test modules with 88.60% coverage on `software/shared` (`125 passed in 24.67s`).
 
 ### 4. 🎓 The Defense & Academic Marks Stream
 *Exhibition, presentation, and university evaluation criteria:*
 1. **Academic Publications Hub (20 Marks):** [`docs/Publications/README.md`](Publications/README.md)
-   * **Experimental Research Paper (`v2.4.0` Completed):** [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf) (Camera-Ready 6-Page IEEE PDF, 674 KB encrypted)
-   * **Comprehensive Review Paper (`v2.4.0` Completed):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 231 KB, 77 Citations)
+   * **Experimental Research Paper (`Completed & Integrated`):** [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf) (Camera-Ready 6-Page IEEE PDF, 674 KB encrypted)
+   * **Comprehensive Review Paper (`Completed & Integrated`):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 232 KB encrypted, 77 Citations)
 2. **Publication Proofs & Evaluation Registry (20 Marks):** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — 10 Marks submission receipt + 10 Marks acceptance letter tracking.
-3. **Academic Exhibition Poster (`Pending v2.4.1`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official A1 symposium poster shell.
+3. **Academic Exhibition Poster (`Completed & Integrated`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official 2-sheet A3 symposium poster (535 KB, 11 panels, VESIT 2026–27).
 4. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.
 5. **Speaker Notes & Defense Talking Points:** [`docs/Resources/PRESENTATION.md`](Resources/PRESENTATION.md) — Comprehensive slide-by-slide script for Review viva.
 
