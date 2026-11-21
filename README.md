@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/CI%20Pipeline-Passing-2ea44f?style=for-the-badge&logo=githubactions" alt="CI Pipeline Passing" />
   </a>
   <a href="#testing-and-results">
-    <img src="https://img.shields.io/badge/Tests-119%20Passing-brightgreen?style=for-the-badge&logo=pytest" alt="119 Pytest Passing" />
+    <img src="https://img.shields.io/badge/Tests-125%20Passing-brightgreen?style=for-the-badge&logo=pytest" alt="125 Pytest Passing" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License" />
@@ -73,7 +73,7 @@ flowchart LR
     P1 -->|"Evaluator Feedback:<br/>Add Architecture & Customise PPT"| P1_Fix["<b>Review 1 Changes</b><br/>• Added ESN Core Diagram<br/>• Redesigned 16:9 Deck<br/>• Fixed-Point Datapath"]
     P1_Fix --> P2["<b>Phase 2: Review 2 Defense</b><br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/><i>(Nov 2026)</i>"]
     P2 -->|"Evaluator Feedback:<br/>Simplify Presentation & Add Datasets"| P2_Fix["<b>Review 2 Changes</b><br/>• 5-Act Presentation Story<br/>• 10 Drive Cycles + NASA Aging<br/>• 1.0s Multi-Chemistry Simulator"]
-    P2_Fix --> P3["<b>Phase 3: v2.4.0 (Synced)</b><br/>• IP Block v1.2 & Research Paper<br/>• CSR/Storage Optimization<br/>• 119 Passing Tests (88.6% Cov)"]
+    P2_Fix --> P3["<b>Phase 3: v2.4.0 (Synced)</b><br/>• IP Block v1.2 & Research Paper<br/>• CSR/Storage Optimization<br/>• 125 Passing Tests (88.6% Cov)"]
     P3 --> P4["<b>Phase 4: v2.4.1 Turnkey</b><br/>• Poster, Review Paper, Thesis<br/><i>(Only 3 Deliverables Left)</i>"]
 ```
 
@@ -162,7 +162,7 @@ flowchart LR
 4. **Hardware Dual-Twin Parity on Xilinx Artix-7:**  
    Synthesized and verified the 100-neuron Verilog RTL datapath on Xilinx Artix-7 (`xc7a100tcsg324-1`), achieving **200/200 bit-exact testbench matches (100%)** against the Python golden model. Packaged the core as an **IEEE 1685 IP-XACT AXI4 IP Block** (`component.xml`) with a pre-compiled 3.7 MB bitstream (`esn_platform_top.bit`).
 5. **Comprehensive Automated Test Harness:**  
-   Expanded the automated test suite to 62 tests at Review 2 (and subsequently expanded to 119 tests today) with 100% pass rate.  
+   Expanded the automated test suite to 62 tests at Review 2 (and subsequently expanded to 125 tests today) with 100% pass rate.  
 
 ---
 
@@ -207,7 +207,7 @@ This repository tells a complete, end-to-end engineering and scientific story: *
 flowchart LR
     M0["<b>Phase 0: Inception</b><br/>• Problem Scoping<br/>• Literature Survey<br/>• Proposal Submission<br/><i>(Aug 2026)</i>"] --> M1["<b>Phase 1: Baseline</b><br/>• Review 1 Defense<br/>• 2-RC ECM Engine<br/>• EKF & CC Baselines<br/>• C99 CSR Logic<br/><i>(Sep 2026)</i>"]
     M1 --> M2["<b>Phase 2: Maturity</b><br/>• Review 2 Defense<br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/>• 16:9 Deck & Report<br/><i>(Nov 2026)</i>"]
-    M2 --> M3["<b>Phase 3: Silicon IP, Paper & Optimization</b><br/>• Release v2.4.0 (Synced)<br/>• IP Block v1.2 & Research Paper<br/>• Sparse/CSR Compression<br/>• 119 Tests (~21.6s)<br/><i>(Active Today)</i>"]
+    M2 --> M3["<b>Phase 3: Silicon IP, Paper & Optimization</b><br/>• Release v2.4.0 (Synced)<br/>• IP Block v1.2 & Research Paper<br/>• Sparse/CSR Compression<br/>• 125 Tests (~21.6s)<br/><i>(Active Today)</i>"]
     M3 --> M4["<b>Phase 4: Turnkey Culmination</b><br/>• Target Release v2.4.1<br/>• Final B.E. Thesis<br/>• Comprehensive Review Paper<br/>• A1 Exhibition Poster<br/><i>(Only 3 Remaining)</i>"]
 ```
 
@@ -257,7 +257,7 @@ Navigate the repository according to your area of interest:
 | :--- | :--- | :--- |
 | **Project Evaluators & Guides** | [`docs/Review_1/README.md`](docs/Review_1/README.md) ──► [`docs/Review_2/README.md`](docs/Review_2/README.md) ──► [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) ──► [`docs/Thesis/README.md`](docs/Thesis/README.md) | Verify milestone progress, FPGA bit-exact parity, and capstone dissertation structure. |
 | **Embedded & Silicon Engineers** | [`docs/Resources/SYSTEM_SPECIFICATION.md`](docs/Resources/SYSTEM_SPECIFICATION.md) ──► [`hardware/hardware.md`](hardware/hardware.md) ──► [`hardware/STM_Verifier/README.md`](hardware/STM_Verifier/README.md) ──► [`hardware/IP_Block/docs/register_map.md`](hardware/IP_Block/docs/register_map.md) ──► [`hardware/IP_Block/README.md`](hardware/IP_Block/README.md) | Examine C99 CSR SpMV algorithms, Verilog RTL datapath, AXI4 memory maps, and Artix-7 bitstream. |
-| **ML & Software Developers** | [`software/software.md`](software/software.md) ──► [`software/simulator/simulator.md`](software/simulator/simulator.md) ──► [`software/visualiser/visualiser.md`](software/visualiser/visualiser.md) ──► [`tests/`](tests/) | Explore 2-RC physics, ESN reservoir dynamics, online RLS filter, and 119 passing tests. |
+| **ML & Software Developers** | [`software/software.md`](software/software.md) ──► [`software/simulator/simulator.md`](software/simulator/simulator.md) ──► [`software/visualiser/visualiser.md`](software/visualiser/visualiser.md) ──► [`tests/`](tests/) | Explore 2-RC physics, ESN reservoir dynamics, online RLS filter, and 125 passing tests. |
 | **Academic Researchers** | [`docs/literature_survey.md`](docs/literature_survey.md) ──► [`docs/Publications/README.md`](docs/Publications/README.md) ──► [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) ──► [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) ──► [`docs/Paper_Proof/README.md`](docs/Paper_Proof/README.md) | Review scientific methodology, IEEE manuscript drafts, benchmarking data, and evaluation marks. |
 
 ---
@@ -266,7 +266,7 @@ Navigate the repository according to your area of interest:
 
 > ### 🌟 Master Repository Delivery Status & Ground Truth Readiness (`v2.4.0`)
 > * **Current State A (`v2.4.0` — Synced Today):** **`Production Core + Research Paper Verified`**  
->   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), and 119 automated pytest tests in ~21.6s with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
+>   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), and 125 automated pytest tests in ~21.6s with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
 > * **Final State B (`v2.4.1` — Turnkey Capstone):** **`Complete Turnkey Capstone`**  
 >   *(Achieved upon compilation and drop-in of ONLY the **2 remaining** academic deliverables below into their respective directories).*
 >
@@ -742,7 +742,7 @@ BE-Capstone-Project/
 │       ├── screenshot_fpga_schematic.png
 │       └── screenshot_fpga_waveform.png
 │
-├── tests/                                 # Unified Pytest Regression Suite (119 Tests)
+├── tests/                                 # Unified Pytest Regression Suite (125 Tests)
 │   ├── README.md                          # Comprehensive test suite guide & coverage map
 │   ├── conftest.py                        # Test fixtures & mock database configuration
 │   ├── test_battery_chemistry.py          # Chemistry validation & OCV monotonicity (3 tests)
@@ -853,7 +853,7 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | 3 | Live Fault Injection Testing | Visualiser detects runaway & drops transients | Safety diagnostics triggered | Pass |
 | 4 | Embedded C99 CSR Inference | CSR sparse SpMV execution speedup | 6.7× speedup verified | Pass |
 | 5 | FPGA RTL Golden Model Test | 100-neuron Verilog datapath vs Python model | 200/200 bit-exact matches | Pass |
-| 6 | Automated Pytest Suite | 119 test cases execution across all modules (software, hardware, APIs, IP block) | 100% test pass rate | Pass |
+| 6 | Automated Pytest Suite | 125 test cases execution across all modules (software, hardware, APIs, IP block) | 100% test pass rate | Pass |
 
 ---
 

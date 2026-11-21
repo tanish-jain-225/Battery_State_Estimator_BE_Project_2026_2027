@@ -14,10 +14,11 @@ timeout = 300
 keepalive = 65
 
 # ── Binding ───────────────────────────────────────────────────────────────────
-# Render sets the PORT environment variable automatically
+# Prioritize SIMULATOR_PORT, then fallback to PORT (Render sets PORT automatically)
 import os
 
-bind = f"0.0.0.0:{os.environ.get('PORT', '8000')}"
+port = os.environ.get('SIMULATOR_PORT') or os.environ.get('PORT', '8000')
+bind = f"0.0.0.0:{port}"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 accesslog = "-"   # Log HTTP access to stdout

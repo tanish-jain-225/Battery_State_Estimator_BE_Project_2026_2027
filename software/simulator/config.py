@@ -6,11 +6,11 @@ except ImportError:
     def load_dotenv(*_args, **_kwargs):
         return False
 
-# Load environmental variables from root .env and local .env
+# Load environmental variables: local service .env takes precedence, falling back to root .env
 base_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(os.path.dirname(base_dir))
-load_dotenv(os.path.join(root_dir, '.env'))
-load_dotenv(os.path.join(base_dir, '.env'))
+load_dotenv(os.path.join(base_dir, '.env'), override=False)
+load_dotenv(os.path.join(root_dir, '.env'), override=False)
 
 class Config:
     # -------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class Config:
     # -------------------------------------------------------------------------
     # Flask server settings
     # -------------------------------------------------------------------------
-    PORT = int(os.environ.get("PORT", 8000))
+    PORT = int(os.environ.get("SIMULATOR_PORT") or os.environ.get("PORT") or 8000)
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1", "t", "yes")
 
     # -------------------------------------------------------------------------

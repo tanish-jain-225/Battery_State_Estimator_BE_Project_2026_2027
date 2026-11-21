@@ -18,6 +18,12 @@ from typing import Optional
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(ROOT_DIR, '.env'))
+except ImportError:
+    pass
+
 def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
     """Check if a given network port is already bound."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -66,8 +72,13 @@ def main():
     if not check_dependencies():
         sys.exit(1)
 
-    sim_port = 8000
-    vis_port = 5000
+    sim_port = int(os.environ.get("SIMULATOR_PORT", 8000))
+    vis_port = int(os.environ.get("VISUALISER_PORT", 5000))
+
+    if sim_port == vis_port:
+        print(f"\n[ERROR] Port collision detected: Simulator and Visualiser are both configured on port {sim_port}.")
+        print("Please configure distinct ports (e.g. SIMULATOR_PORT=8000 and VISUALISER_PORT=5000) in .env.\n")
+        sys.exit(1)
 
     if is_port_in_use(sim_port):
         print(f"[WARNING] Port {sim_port} is already in use. A simulator instance may already be running.")
@@ -86,6 +97,8 @@ def main():
 
     env = os.environ.copy()
     env["PYTHONUNBUFFERED"] = "1"
+    env["SIMULATOR_PORT"] = str(sim_port)
+    env["VISUALISER_PORT"] = str(vis_port)
 
     sim_proc: Optional[subprocess.Popen] = None
     vis_proc: Optional[subprocess.Popen] = None

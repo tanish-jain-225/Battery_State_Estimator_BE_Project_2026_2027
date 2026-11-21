@@ -15,10 +15,11 @@ timeout = 300
 keepalive = 65
 
 # ── Binding ───────────────────────────────────────────────────────────────────
-# Render sets the PORT environment variable automatically
+# Prioritize VISUALISER_PORT, then fallback to PORT (Render sets PORT automatically)
 import os
 
-bind = f"0.0.0.0:{os.environ.get('PORT', '10000')}"
+port = os.environ.get('VISUALISER_PORT') or os.environ.get('PORT', '5000')
+bind = f"0.0.0.0:{port}"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 accesslog = "-"   # Log HTTP access to stdout

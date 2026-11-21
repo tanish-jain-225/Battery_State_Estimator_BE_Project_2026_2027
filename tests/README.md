@@ -1,4 +1,4 @@
-# Automated Regression Test Suite (119 Tests)
+# Automated Regression Test Suite (125 Tests)
 
 [← Back to Main Repository](../README.md) · [Software Subsystem](../software/software.md) · [Hardware Subsystem](../hardware/hardware.md) · [Operations Guide](../docs/Resources/OPERATIONS.md)
 
@@ -6,7 +6,7 @@
 
 ## 📌 Overview
 
-The repository features a rigorous, multi-layered automated regression test suite comprising **119 automated tests** across 15 specialized test modules, achieving **88.60% code coverage** on core shared physics modules (`software/shared`) and passing in **21.60s** (`19.12s` without coverage overhead).
+The repository features a rigorous, multi-layered automated regression test suite comprising **125 automated tests** across 16 specialized test modules, achieving **88.60% code coverage** on core shared physics modules (`software/shared`) and passing in **21.60s** (`19.12s` without coverage overhead).
 
 Every test executes in-memory with zero network or database dependencies (utilizing mock MongoDB fixtures in [`conftest.py`](conftest.py)).
 
@@ -30,14 +30,15 @@ Every test executes in-memory with zero network or database dependencies (utiliz
 | [`test_integration.py`](test_integration.py) | **6** | End-to-end multi-timestep simulation loop (Simulator $\to$ Pipeline $\to$ Visualiser). | 100 consecutive timesteps execute without NaN, memory leaks, or state corruption. |
 | [`test_ip_block.py`](test_ip_block.py) | **5** | v1.2 IP Block (`rtl/esn_axi_ip.v`, `esn_core_fast.v`, `ekf_core.v` Rev 0.5), IEEE 1685 `component.xml`, packs & fusion vectors. | Fast-core ELL sparsity ($\le 24$ nonzeros/row); held-out B0047 trimmed twin parity; `sim_fused_b47` vectors; `verify/golden_readout.csv` (`0x31ad`). |
 | [`test_online_training.py`](test_online_training.py) | **9** | Dynamic online Recursive Least Squares (RLS) adaptive readout weight filter. | Tracks capacity degradation over 32 cycles; SOC RMSE remains below 1.0%. |
+| [`test_service_ports.py`](test_service_ports.py) | **6** | Network port resolution and service isolation for Simulator (Port 8000) and Visualiser (Port 5000). | Simulator and Visualiser bind to distinct ports; env var precedence (`SIMULATOR_PORT`/`VISUALISER_PORT` over generic `PORT`); Gunicorn bind parity. |
 | [`test_traditional_estimator.py`](test_traditional_estimator.py) | **10** | Baseline Extended Kalman Filter (EKF), Unscented Kalman Filter (UKF), and Coulomb Counting. | EKF covariance Riccati updates; UKF Merwe sigma points; Coulomb integration drift. |
-| **Total Suite** | **119** | **Complete Full-Stack Coverage** | **100% Pass Rate** |
+| **Total Suite** | **125** | **Complete Full-Stack Coverage** | **100% Pass Rate** |
 
 ---
 
 ## 🚀 How to Run Tests
 
-### Run All 119 Tests:
+### Run All 125 Tests:
 ```bash
 python -m pytest tests/
 ```

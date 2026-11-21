@@ -17,7 +17,7 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 
 > [!IMPORTANT]
 > **Active Deliverables Status (Remaining Deliverable 1 of 2 for `v2.4.1`):**  
-> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 pages, 674 KB encrypted), camera-ready [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 pages, 231 KB, Elsevier format), and 119 automated tests are **100% complete and integrated**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Along with [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), it is one of only **2 remaining** deliverables toward `v2.4.1`.  
+> While the entire software pipeline, hardware RTL, IP Block v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 pages, 674 KB encrypted), camera-ready [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 pages, 231 KB, Elsevier format), and 125 automated tests are **100% complete and integrated**, [`Project_Poster.pdf`](Project_Poster.pdf) currently serves as the formatted A1 symposium poster shell. Along with [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), it is one of only **2 remaining** deliverables toward `v2.4.1`.
 
 ---
 

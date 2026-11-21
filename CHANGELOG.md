@@ -18,9 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Browser Anti-Freeze & Power Throttling Architecture**:
   - Implemented fast-path render skipping in `software/visualiser/static/js/dashboard.js` (`if (currentTime === lastRenderedTime) return;`), dropping idle browser CPU consumption to **0.0%**.
   - Integrated Page Visibility API (`document.hidden`) throttling telemetry polling from 500ms to 3000ms when minimized or in background tabs.
-- **Automated Regression Test Suite Expansion (119 Passing Tests)**:
+- **Automated Regression Test Suite Expansion (125 Passing Tests) & Service Port Isolation**:
+  - Implemented decoupled service network port resolution in `software/simulator/config.py` (Port 8000 default) and `software/visualiser/config.py` (Port 5000 default), with service-specific `.env` precedence and `SIMULATOR_PORT` / `VISUALISER_PORT` environment variables ensuring reliable multi-service execution without port conflicts.
+  - Added [`tests/test_service_ports.py`](tests/test_service_ports.py) regression tests validating port assignment, environment variable precedence, dynamic `SIMULATOR_URL` derivation, and Gunicorn bind parity.
   - Added [`tests/test_flask_api_comprehensive.py`](tests/test_flask_api_comprehensive.py) regression tests covering CORS preflight `OPTIONS` handling, Keep-Alive headers, sub-second delta streaming, and cryptographic API key authentication.
-  - **119 / 119 tests passing in `21.60s`** with **`88.60%`** `software/shared` coverage (`19.12s` without coverage instrumentation).
+  - **125 / 125 tests passing** with **`88.60%`** `software/shared` coverage.
 - **Complete Indian E-Mobility Web Research Synthesis**:
   - Expanded [`docs/Resources/WEB_RESEARCH.md`](docs/Resources/WEB_RESEARCH.md) to audit AIS-156 Amendment 3 Phase 2 (5-min thermal runaway warning, IPX7 monsoon water ingress), Section 3(k) Indian Patents Act compliance, and comprehensive industrial research synthesis.
   - Mapped national engineering competitions: Smart India Hackathon (SIH), KPIT Sparkle, Formula Bharat (FSAE-E), and Indian deep-tech grants (DST NIDHI-PRAYAS, SISFS).
@@ -47,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🎯 Remaining Scope for `v2.4.1` (Post-`v2.4.0`)
 - **A1 Presentation Poster** *(Pending 1/2)*: Compiling and integrating print-ready vector poster [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf).
 - **B.E. Capstone Final Thesis** *(Pending 2/2)*: Compiling and integrating 100+ page University of Mumbai dissertation [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf).
-- **Already Completed & Integrated**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (camera-ready 12-page Elsevier PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `119/119` passing tests.
+- **Already Completed & Integrated**: [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) (camera-ready 6-page IEEE PDF), [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (camera-ready 12-page Elsevier PDF), `hardware/IP_Block/` (`esn_ip_platform` v1.2), all software/firmware/RTL modules, and `125/125` passing tests.
 - **Official Transition Plan & Runbook**: Detailed drop-in and verification runbook documented in [`docs/Resources/TRANSITION_PLAN_V2.4.1.md`](docs/Resources/TRANSITION_PLAN_V2.4.1.md).
 
 ---
