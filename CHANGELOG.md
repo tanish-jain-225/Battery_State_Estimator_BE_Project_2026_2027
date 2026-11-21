@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Highlights (v2.4.1)
 - **Integrated Official Final Year Capstone Dissertation (Deliverable 4 of 4 Finalized)**:
-  - Integrated the official 41-page Bachelor of Engineering dissertation report: *"Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation"* ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 5.04 MB unencrypted PDF, University of Mumbai / VESIT, Academic Year 2026–2027).
+  - Integrated the official 41-page Bachelor of Engineering dissertation report: *"Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation"* ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 5.07 MB encrypted PDF, University of Mumbai / VESIT, Academic Year 2026–2027).
   - Authors: Satvik Verma (Roll No. 32), Tanish Sanghvi (Roll No. 61), Sanjna Patankar (Roll No. 19), Akshay Nambiar (Roll No. 17).
   - Project Supervisor: Dr. Kadambari Sharma; Head of Department: Dr. Sangeeta Prasannaram; Principal: Dr. (Mrs.) J. M. Nair.
   - Complete 8-chapter monograph: Chapter 1 (Introduction & Motivation), Chapter 2 (Literature Review), Chapter 3 (Problem Analysis & Requirements), Chapter 4 (2-RC Modeling, ESN Mathematics & AXI4 IP Block Architecture), Chapter 5 (Microservices, C99 Firmware & Verilog RTL Implementation), Chapter 6 (Testing & Bit-Exact Verification), Chapter 7 (NASA PCoE 29-Cell Cross-Validation, Artix-7 Synthesis & Wilcoxon Statistics), Chapter 8 (Conclusions, Limitations & Future Roadmap), Appendices I–III (reproducibility notes, evidence inventory, AXI4-Lite register map), and 17 academic citations.
@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% Turnkey Academic Portfolio Completion (All 4 Academic Deliverables Integrated)**:
   - 1. Original Experimental Research Paper ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 6 pages, 674 KB encrypted, IEEE camera-ready)
   - 2. Comprehensive Review Paper ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf), 12 pages, 232 KB encrypted, 77 citations, Elsevier camera-ready)
-  - 3. Official Presentation Poster ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf), 2 sheets A3 portrait, 535 KB, 11 panels)
-  - 4. Final B.E. Capstone Dissertation ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 41 pages, 5.04 MB unencrypted)
+  - 3. Official Presentation Poster ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf), 2 sheets A3 portrait, 535 KB, open / unencrypted public exhibition format, 11 panels)
+  - 4. Final B.E. Capstone Dissertation ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 41 pages, 5.07 MB encrypted)
   - **Zero shell or placeholder files remaining across the entire repository.**
 - **Repository-Wide Turnkey State Promotion**:
   - Full synchronization of version declarations to `v2.4.1` across `pyproject.toml`, `CITATION.cff`, `SECURITY.md`, `README.md`, and master documentation indices.

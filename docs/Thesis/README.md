@@ -31,9 +31,9 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 | :--- | :--- |
 | **File Path** | [`docs/Thesis/Final_Thesis.pdf`](Final_Thesis.pdf) |
 | **Document Format** | Standard University of Mumbai B.E. Dissertation (A4 Portrait, Vector PDF) |
-| **File Size** | **5,289,634 bytes (5.04 MB)** |
+| **File Size** | **5,314,078 bytes (5.07 MB)** |
 | **Page Count** | **41 Pages** (Full academic monograph with Certificate, Declarations, 8 Chapters, 3 Appendices & Literature Cited) |
-| **Encryption Status** | **Unencrypted / Open Access** (Fully inspectable and printable) |
+| **Encryption Status** | **Encrypted** (Official institutional submission format with password security permissions) |
 | **Status** | **Completed & Integrated (Turnkey v2.4.1 Capstone)** |
 
 ---
@@ -187,7 +187,7 @@ The dissertation report has been authored and compiled in strict accordance with
 ```
 ================================================================================
 VESIT B.E. CAPSTONE DISSERTATION VERIFICATION:
-• File: docs/Thesis/Final_Thesis.pdf (5,289,634 bytes / 5.04 MB)
+• File: docs/Thesis/Final_Thesis.pdf (5,314,078 bytes / 5.07 MB encrypted)
 • Status: 100% COMPLETE & VERIFIED (Deliverable 4 of 4)
 • Turnkey Release: v2.4.1 Turnkey Capstone Reached
 ================================================================================

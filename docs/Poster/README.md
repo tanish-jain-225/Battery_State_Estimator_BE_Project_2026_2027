@@ -17,11 +17,15 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
   3. **Satvik Verma** (Roll No. 32)  
   4. **Tanish Sanghvi** (Roll No. 61)  
 * **Project Guide:** **Dr. Kadambari Sharma**  
-* **Deliverable Asset:** [`docs/Poster/Project_Poster.pdf`](Project_Poster.pdf) (**535 KB / 522.65 KiB**, 2 Sheets, A3 Portrait Format, Vector PDF)
+* **Deliverable Asset:** [`docs/Poster/Project_Poster.pdf`](Project_Poster.pdf) (**535 KB / 522.65 KiB**, 2 Sheets, A3 Portrait Format, Vector PDF, Open / Unencrypted)
 
 > [!NOTE]
 > **Academic Portfolio Status (All 4 Deliverables Finalized & Integrated):**  
 > Alongside [`Project_Poster.pdf`](Project_Poster.pdf), all **4 out of 4** academic deliverables are now 100% complete, integrated, and verified alongside the entire software, firmware, C99 CSR acceleration, Artix-7 RTL silicon IP block (`esn_ip_platform` v1.2), and 125 automated regression tests in the turnkey `v2.4.1` release.
+> 
+> *Encryption Policy Across Deliverables:*  
+> * [`Project_Poster.pdf`](Project_Poster.pdf) is intentionally **Open / Unencrypted** for unrestricted public exhibition, seminar display, and defense presentation.  
+> * [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf), [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), and [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) are **Encrypted** as official academic camera-ready and institutional submission monographs.
 
 ---
 
@@ -29,7 +33,7 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 
 | Asset File | Format | Geometry | File Size | Description | Status |
 | :--- | :---: | :---: | :---: | :--- | :---: |
-| [`Project_Poster.pdf`](Project_Poster.pdf) | Vector PDF | 2 Sheets, A3 Portrait | **535,198 bytes** (~523 KB) | Official B.E. Capstone Academic Exhibition & Defense Poster across 11 structured panels. | **Completed & Integrated** |
+| [`Project_Poster.pdf`](Project_Poster.pdf) | Vector PDF | 2 Sheets, A3 Portrait | **535,198 bytes** (~523 KB) | Official B.E. Capstone Academic Exhibition & Defense Poster across 11 structured panels (Open / Unencrypted format for public exhibition and defense). | **Completed & Integrated (Open)** |
 
 ---
 

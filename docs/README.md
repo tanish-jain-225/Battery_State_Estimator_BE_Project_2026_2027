@@ -13,10 +13,10 @@ This repository's documentation is engineered to follow a clear, continuous **St
 ```
 docs/
 ├── Poster/                        # Academic Exhibition & Defense Poster (Completed & Integrated)
-│   ├── Project_Poster.pdf         # Official 2-Sheet A3 Presentation Poster (535 KB, 11 Panels)
+│   ├── Project_Poster.pdf         # Official 2-Sheet A3 Presentation Poster (535 KB, Open / Unencrypted, 11 Panels)
 │   └── README.md                  # Layout specifications, 11-panel transcription & metrics
 ├── Thesis/                        # B.E. Capstone Final Dissertation (Completed in v2.4.1)
-│   ├── Final_Thesis.pdf           # Official B.E. Capstone Dissertation Report (41 Pages, 5.04 MB)
+│   ├── Final_Thesis.pdf           # Official B.E. Capstone Dissertation Report (41 Pages, 5.07 MB Encrypted)
 │   └── README.md                  # Complete 8-chapter monograph breakdown & verification
 ├── Publications/                  # Official Academic Paper Deliverables
 │   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed in v2.4.1)
@@ -66,7 +66,7 @@ docs/
 2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/README.md`](Review_1/README.md) · [`Progress Report`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic. *Feedback Addressed: Added ESN Core Architecture Diagram & Customized 16:9 PPT.*
 3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
 4. **Hardware Acceleration & Commercial IP Block (`v2.4.1`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
-5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.04 MB).
+5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*

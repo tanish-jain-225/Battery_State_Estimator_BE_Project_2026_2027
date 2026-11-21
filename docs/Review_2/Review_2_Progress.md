@@ -305,9 +305,9 @@ The developmental journey from Review 2 evolves directly into commercial silicon
 
 2. **Phase 4 — Turnkey Academic Deliverables for `v2.4.1` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
    *(All 4 academic deliverables finalized, verified, and integrated on disk)*:
-   * **B.E. Final Thesis**: Official 41-page dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), 5.04 MB).
+   * **B.E. Final Thesis**: Official 41-page dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), 5.07 MB encrypted).
    * **Comprehensive Review Paper**: Camera-ready 12-page Elsevier / ScienceDirect review manuscript ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), 232 KB encrypted, 77 citations).
-   * **A3 Symposium Exhibition Poster**: Official 2-sheet presentation poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf), 535 KB, 11 panels).
+   * **A3 Symposium Exhibition Poster**: Official 2-sheet presentation poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf), 535 KB open / unencrypted, 11 panels).
    * **Experimental Research Paper**: Camera-ready 6-page IEEE manuscript ([`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf), 674 KB encrypted).
 
 ---

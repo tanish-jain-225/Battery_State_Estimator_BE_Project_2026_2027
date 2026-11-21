@@ -391,8 +391,8 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 ### 📦 Deliverable 7: Academic Deliverables (All 4 Academic Deliverables Completed in `v2.4.1`)
 * **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
 * **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 232 KB encrypted, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
-* **Presentation Poster (Completed & Integrated):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Official 2-sheet A3 exhibition poster, 535 KB, 11 panels)
-* **Final B.E. Thesis (Completed & Integrated in `v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (Official 41-page University of Mumbai / VESIT dissertation, 5.04 MB)
+* **Presentation Poster (Completed & Integrated):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Official 2-sheet A3 exhibition poster, open / unencrypted, 535 KB, 11 panels)
+* **Final B.E. Thesis (Completed & Integrated in `v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (Official 41-page University of Mumbai / VESIT dissertation, 5.07 MB encrypted)
 * **Portfolio Status:** With all 4 compiled PDFs integrated on disk, the repository is operating at **`v2.4.1` (10.0 / 10)**.
 
 ---
@@ -428,8 +428,8 @@ Modeled using verified 2026 Indian embedded/VLSI compensation & independent engi
 | **Academic & Certification Deliverables (All 4 PDFs Done)** | **₹13,50,000 INR** | 100% Turnkey Portfolio Integrated |
 | • *Camera-Ready Research Paper PDF (`Research_Paper.pdf`)* | ₹5,50,000 INR | Completed & Integrated (IEEE Camera-Ready) |
 | • *Comprehensive Review Paper PDF (`Review_Paper.pdf`)* | ₹2,00,000 INR | Completed & Integrated (Elsevier Camera-Ready) |
-| • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | ₹5,00,000 INR | Completed & Integrated (41 Pages, 5.04 MB) |
-| • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | ₹1,00,000 INR | Completed & Integrated (2 Sheets A3 Portrait) |
+| • *Final University B.E. Thesis PDF (`Final_Thesis.pdf`)* | ₹5,00,000 INR | Completed & Integrated (41 Pages, 5.07 MB Encrypted) |
+| • *High-Resolution Symposium Poster PDF (`Project_Poster.pdf`)* | ₹1,00,000 INR | Completed & Integrated (2 Sheets A3 Portrait, Open) |
 | **TOTAL MODELED REPOSITORY ASSET VALUE** | **`₹70,00,000 INR` (₹70.0 Lakhs)** | **Turnkey Capstone `v2.4.1` (10.0 / 10)** |
 
 * **IP Block Value Uplift (`v1.0` $\to$ `v1.2`):** Upgrading `hardware/IP_Block/` to `esn_ip_platform` v1.2 increased the hardware IP asset bucket from `₹17.0 Lakhs` to `₹21.0 Lakhs` (`+₹4.0 Lakhs` direct uplift) by adding the `310-cycle / 3.9 µs` sparse fast core (`esn_core_fast.v`), Rev 0.5 ESN-fused EKF (`ekf_core.v`), Verilator `5.028` dual-core `10/10` regression proofs, RV32I C-driver co-simulation (`307` cycles), and 29 held-out NASA PCoE pack + NARMA-10 validations.
