@@ -20,8 +20,8 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 * **Deliverable Asset:** [`docs/Poster/Project_Poster.pdf`](Project_Poster.pdf) (**535 KB / 522.65 KiB**, 2 Sheets, A3 Portrait Format, Vector PDF)
 
 > [!NOTE]
-> **Academic Portfolio Status (Deliverable 3 of 4 Finalized):**  
-> With the integration of [`Project_Poster.pdf`](Project_Poster.pdf), **3 out of 4** academic deliverables are now 100% complete, integrated, and verified alongside the entire software, firmware, C99 CSR acceleration, Artix-7 RTL silicon IP block (`esn_ip_platform` v1.2), and 125 automated regression tests. Only [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) remains as the final deliverable for the turnkey `v2.4.1` release.
+> **Academic Portfolio Status (All 4 Deliverables Finalized & Integrated):**  
+> Alongside [`Project_Poster.pdf`](Project_Poster.pdf), all **4 out of 4** academic deliverables are now 100% complete, integrated, and verified alongside the entire software, firmware, C99 CSR acceleration, Artix-7 RTL silicon IP block (`esn_ip_platform` v1.2), and 125 automated regression tests in the turnkey `v2.4.1` release.
 
 ---
 

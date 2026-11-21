@@ -58,22 +58,16 @@
 6. **200/200 Bit-Exact FPGA Parity on Xilinx Artix-7:**  
    Verified the 100-neuron Verilog RTL datapath on Xilinx Artix-7 with bit-exact parity against the Python golden model. Packaged the core as an **IEEE 1685 IP-XACT AXI4 IP Block** (`component.xml`) with a 3.7 MB bitstream (`esn_platform_top.bit`).
 7. **Automated Test Suite Expansion:**  
-   Expanded regression tests to 62 tests at Review 2 (and 119 tests today) with 100% pass rate.
+   Expanded regression tests to 62 tests at Review 2 (and 125 tests in v2.4.1 today) with 100% pass rate.
 
 ---
 
-## 🌟 Delivery Status & Final Capstone Roadmap (State A vs. State B)
+## 🌟 Delivery Status & Final Capstone Release (Turnkey `v2.4.1`)
 
-> ### 📊 Ground Truth Delivery Status (`v2.4.0` Synced)
-> * **State A (`v2.4.0` — Synced Today):** **`Production Core + Dual Research & Review Publications Verified`**  
->   *(All software microservices, 2-RC multi-chemistry physics, EKF/UKF/ESN/RLS estimators, C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL + 3.7 MB bitstream, camera-ready IEEE [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) [674 KB encrypted], camera-ready Elsevier [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) [12 pages, 231 KB], and 119 automated pytest tests in 21.60s are 100% complete and verified. For comprehensive industrial landscape and research analysis, see [`docs/Resources/WEB_RESEARCH.md`](../Resources/WEB_RESEARCH.md)).*
-> * **State B (`v2.4.1` — Final Turnkey Capstone):** **`Complete Turnkey Capstone`**  
->   *(Achieved upon compiling and dropping in ONLY the remaining 2 academic deliverables below).*
->
-> ### 📌 What is Left to be Updated for `v2.4.1` (Only 2 Pending Deliverables):
-> 1. [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) — Print-ready A1 exhibition poster (companion: [`docs/Poster/README.md`](../Poster/README.md)).
-> 2. [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) — University of Mumbai / VESIT Bachelor of Engineering dissertation capstone thesis (companion: [`docs/Thesis/README.md`](../Thesis/README.md)).
-> *(Note: Both [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) and [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) are completed and integrated).*
+> ### 📊 Ground Truth Delivery Status (`v2.4.1` Turnkey Capstone Complete)
+> * **State B (`v2.4.1` — Active Today):** **`Complete Turnkey Capstone Released`**  
+>   *(All software microservices, 2-RC multi-chemistry physics, EKF/UKF/ESN/RLS estimators, C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL + 3.7 MB bitstream, camera-ready IEEE [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) [674 KB encrypted], camera-ready Elsevier [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) [12 pages, 232 KB], official 2-sheet A3 [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) [535 KB], official 41-page [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) [5.04 MB], and 125 automated pytest tests are 100% complete and verified. For comprehensive industrial landscape and research analysis, see [`docs/Resources/WEB_RESEARCH.md`](../Resources/WEB_RESEARCH.md)).*
+> * **Zero Pending Deliverables**: All 4 of 4 academic deliverables are finalized and integrated on disk. Zero placeholder or shell files remain across the entire repository.
 
 ---
 

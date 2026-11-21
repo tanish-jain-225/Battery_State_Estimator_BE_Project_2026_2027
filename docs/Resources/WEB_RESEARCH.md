@@ -493,7 +493,7 @@ xychart-beta
     bar [10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
 ```
 
-| Evaluation Domain | `v2.4.0`: Current Repo *(2/4 PDFs Final)* | `v2.4.1`: Final Turnkey *(2 Pending Added)* | Analysis & Status |
+| Evaluation Domain | `v2.4.0`: Baseline Engineering *(Research Paper Final)* | `v2.4.1`: Active Turnkey Capstone *(All 4 Academic Deliverables Final)* | Analysis & Status |
 | :--- | :---: | :---: | :--- |
 | **1. Hardware RTL & FPGA IP (`v1.2`)** | **10 / 10** | **10 / 10** | `FPGA_Verifier` (`200/200` ESN, `512/512` EKF/UKF) + `IP_Block v1.2` (`310` cyc Fast ESN, Rev 0.5 EKF, `10/10` Verilator, 29 NASA packs, NARMA-10, pre-built `~3.7 MB` `v1.0` bitstream). |
 | **2. Software Architecture & ML** | **10 / 10** | **10 / 10** | 2-RC ECM simulator, multi-chemistry, EKF/UKF/ESN/RLS pipeline (`0.72%` sim RMSE; `0.067` MAE / `0.086` RMSE on 29 NASA cells), CSR `model_rc.pkl` (`~602 KB`). |
@@ -541,7 +541,7 @@ xychart-beta
 
 ## 12. Verification Audit & Quality Assurance Certification
 
-This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.0`:
+This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.1`:
 
 ```
 ============================= 125 passed in 24.67s =============================

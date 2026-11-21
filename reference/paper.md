@@ -1,4 +1,4 @@
-[← Back to README](../README.md) · [Camera-Ready IEEE Research Paper (Synced v2.4.0)](../docs/Publications/Research_Paper.pdf) · [Comprehensive Review Paper (Completed & Integrated)](../docs/Publications/Review_Paper.pdf)
+[← Back to README](../README.md) · [Camera-Ready IEEE Research Paper (Completed & Integrated)](../docs/Publications/Research_Paper.pdf) · [Comprehensive Review Paper (Completed & Integrated)](../docs/Publications/Review_Paper.pdf)
 
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 

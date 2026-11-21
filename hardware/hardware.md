@@ -344,7 +344,7 @@ To test the Verilog HDL FPGA RTL models against the Python golden reference:
    ```
 
 3. **Master End-to-End Validation**:
-   To execute C99 simulation, FPGA verification, and all 119 test cases simultaneously:
+   To execute C99 simulation, FPGA verification, and all 125 test cases simultaneously:
    ```bash
    .\run_all_validation.bat
    ```

@@ -57,7 +57,7 @@
 The engineering milestones validated in Review 1 served as the baseline foundation for the subsequent phases:
 * **Advance to Review 2 (November 2026):** Transitioned from static ESN inference to online Recursive Least Squares (RLS) adaptation, expanded the simulator to 10 drive cycles with NASA PCoE aging data, and verified 200/200 bit-exact FPGA RTL parity on Artix-7.
 * **Current Synced Release (`v2.4.1` — State B):** Production core, `esn_ip_platform` v1.2, camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6 pages, 674 KB encrypted), camera-ready [`Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12 pages, 232 KB, Elsevier format), official [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) (2 sheets A3 portrait, 535 KB), official [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (41 pages, 5.04 MB), and **125 passing tests** verified (`24.67s`).
-* **Final Capstone Goal (`v2.4.1` — State B):** Complete turnkey capstone upon dropping in only the **2 remaining** academic deliverables ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) and [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
+* **Final Capstone Status (`v2.4.1` — State B):** Complete turnkey capstone achieved with all 4 academic deliverables finalized, verified, and integrated on disk.
 
 ---
 

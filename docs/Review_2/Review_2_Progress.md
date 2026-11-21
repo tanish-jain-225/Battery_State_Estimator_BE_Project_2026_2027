@@ -23,7 +23,7 @@
 > Official institutional defense session conducted before Project Mentor Dr. Kadambari Sharma and Project Guide / Coordinator Mr. Gopalkrishnan Narayan at the Department of Automation & Robotics / Instrumentation. All Phase 2 deliverables—including the online RLS adaptive ESN, C99 embedded firmware, and 200/200 bit-exact FPGA RTL parity on Artix-7—were demonstrated live.  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 119 Tests in v2.4.0, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 125 Tests in v2.4.1, 200 / 200 FPGA Parity Stages)**
 
 ---
 
@@ -34,7 +34,7 @@
 4. [Multi-Model Comparative Estimation Benchmark (ESN vs. UKF vs. EKF vs. CC)](#4-multi-model-comparative-estimation-benchmark)
 5. [C99 Embedded Firmware Validation (Float32 vs. Fixed-Point Q15 & CSR SpMV)](#5-c99-embedded-firmware-validation)
 6. [Verilog HDL FPGA Hardware Verifier on Artix A7100T](#6-verilog-hdl-fpga-hardware-verifier-on-artix-a7100t)
-7. [Automated Verification Test Suite (119 Tests, 100% Pass)](#7-automated-verification-test-suite-119-tests-100-pass)
+7. [Automated Verification Test Suite (125 Tests, 100% Pass)](#7-automated-verification-test-suite-125-tests-100-pass)
 8. [Master End-to-End One-Click Validation Pipeline](#8-master-end-to-end-one-click-validation-pipeline)
 9. [Review 2 Demonstration Script & Talking Points](#9-review-2-demonstration-script-talking-points)
 10. [Phase 3 Roadmap Towards Final Defense](#10-phase-3-roadmap-towards-final-defense)
@@ -56,7 +56,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 2. **Unscented Kalman Filter (UKF)** implementation as a rigorous non-linear benchmark alongside EKF and Coulomb Counting.
 3. **Dual C99 Microcontroller Execution**: Floating-point (99.80% acc) and integer-only Q15 fixed-point (98.40% acc) with **6.7× CSR SpMV acceleration**.
 4. **Verilog HDL FPGA RTL Verification on Artix A7100T**: Bit-exact stage parity (200/200 stages verified) and multi-timestep temporal sequence processing.
-5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing at Review 2 milestone (expanded to 119 passing tests in v2.4.0).
+5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing at Review 2 milestone (expanded to 125 passing tests in v2.4.1).
 
 ---
 
@@ -70,7 +70,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 | **C99 Embedded Firmware** | Conceptual CSR code | **Fully Benchmarked Dual C99 Engine** | Float32 (99.80%) vs Q15 (98.40%), 0.0031 RMSE, 6.7× CSR SpMV speedup. |
 | **FPGA RTL Verification** | Single-pass 100-neuron test | **200/200 Stages Parity + Multi-Step Sequence** | Bit-exact matching in Vivado XSim and temporal sequence input indexing (`tb_esn_top_tiny.v`). |
 | **FPGA IP Block & Platform** | Conceptual / In Progress | **Plug-and-Play AXI4 IP (`esn_axi_ip`) + Arty A7 Platform** | IEEE 1685 IP-XACT catalog module with concurrent tri-observer execution (ESN + EKF + UKF in parallel). |
-| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass; 119 in v2.4.0)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
+| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass; 125 in v2.4.1)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
 | **One-Click Validation** | Separate build scripts | **Unified 8-Step Runner (`.bat` / `.sh`)** | Zero-configuration validation across hardware and software in under 45 seconds. |
 
 ---
@@ -189,10 +189,10 @@ u(t) ────►│ Win MAC ──► (+) ──► Bias ──► Saturatio
 
 ---
 
-## 7. Automated Verification Test Suite (119 Tests, 100% Pass)
+## 7. Automated Verification Test Suite (125 Tests, 100% Pass)
 
 > [!NOTE]
-> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current release, this test suite has expanded to **119 tests** across 15 modules, verifying plug-and-play FPGA IP block integration, IP-XACT component XML, advanced priming, multi-chemistry tracking, hardware CSR quantization, HTTP Keep-Alive, streaming queries, and FPGA EKF/UKF golden trace parity.
+> *Milestone Context*: At the Review 2 milestone defense, 62 automated tests passed with 100% pass rate. In the current release, this test suite has expanded to **125 tests** across 16 modules, verifying plug-and-play FPGA IP block integration, IP-XACT component XML, advanced priming, multi-chemistry tracking, hardware CSR quantization, HTTP Keep-Alive, streaming queries, MongoDB decoupled sync, and FPGA EKF/UKF golden trace parity.
 
 The repository includes a comprehensive, automated test suite in the [`tests/`](../../tests/) directory. All tests run via `pytest`:
 
@@ -248,7 +248,7 @@ To guarantee 100% reproducibility for examiners and evaluators, the repository f
            -> Bias Stage:     200/200 bit-exact matches (100%)
            -> Sum Stage:      200/200 bit-exact matches (100%)
            -> Tanh In/Out:    200/200 bit-exact matches (100%)
-[STEP 7/8] Running Complete Automated Test Suite (119 Tests via Pytest)... [OK]
+[STEP 7/8] Running Complete Automated Test Suite (125 Tests via Pytest)... [OK]
 [STEP 8/8] Performing Final Integrity Check... [OK]
 
 ========================================================================
@@ -289,11 +289,11 @@ The developmental journey from Review 2 evolves directly into commercial silicon
 
 ```
 [Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination (v2.4.1)]
-- 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis (Pending)
-- EKF & CC Baselines    - UKF Implementation    - Artix-7 v1.2 Bitstream  - Comprehensive Review (Pending)
-- C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL + 29 Packs     - A1 Exhibition Poster (Pending)
-- Verilog RTL Core      - 119 Automated Tests   - Camera-Ready Paper PDF  - Degree Viva Defense
-(Completed)             (Completed)             (Synced in v2.4.0)        (Only 3 Remaining)
+- 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis (Completed)
+- EKF & CC Baselines    - UKF Implementation    - Artix-7 v1.2 Bitstream  - Comprehensive Review (Completed)
+- C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL + 29 Packs     - A3 Exhibition Poster (Completed)
+- Verilog RTL Core      - 125 Automated Tests   - Camera-Ready Paper PDF  - Degree Viva Defense
+(Completed)             (Completed)             (Completed)               (Turnkey Capstone)
 ```
 
 1. **Phase 3 — Hardware IP Block & Acceleration ([`hardware/IP_Block/README.md`](../../hardware/IP_Block/README.md))**:
@@ -301,13 +301,14 @@ The developmental journey from Review 2 evolves directly into commercial silicon
    * **Concurrent Tri-Observer FPGA Platform (v1.2)**: Synthesized and implemented top-level RTL ([`hardware/IP_Block/rtl/esn_platform_top.v`](../../hardware/IP_Block/rtl/esn_platform_top.v)) running ESN (serial or `P=10` fast core [`rtl/esn_core_fast.v`](../../hardware/IP_Block/rtl/esn_core_fast.v)), EKF (Rev 0.5 optional ESN fusion), and UKF simultaneously.
    * **Pre-Compiled FPGA Bitstream**: Generated flash-ready 3.7 MB bitstream ([`hardware/IP_Block/esn_platform_top.bit`](../../hardware/IP_Block/esn_platform_top.bit)) for Digilent Arty A7-100T (`xc7a100tcsg324-1`).
    * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/host/esn_host.py`](../../hardware/IP_Block/host/esn_host.py)) with 29 held-out packs and `reproduce_paper.py` delivering real-time headroom over 115200-baud serial links.
-   * **Regression Suite**: Expanded to **119 passing tests** in `21.60s` (`88.60%` coverage on `software/shared`; `19.12s` without coverage).
+   * **Regression Suite**: Expanded to **125 passing tests** with **`88.60%`** coverage on `software/shared`.
 
-2. **Phase 4 — Remaining Deliverables for `v2.4.1` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
-   *(Only 3 deliverables remain pending after integrating camera-ready [`Research_Paper.pdf`](../Publications/Research_Paper.pdf) in `v2.4.0`)*:
-   * **B.E. Final Thesis**: Official 8-chapter dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)).
-   * **Comprehensive Review Paper**: Peer-review PDF for IEEE / Q3 Scopus review journal ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)).
-   * **A1 Symposium Exhibition Poster**: High-resolution vector defense poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).
+2. **Phase 4 — Turnkey Academic Deliverables for `v2.4.1` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
+   *(All 4 academic deliverables finalized, verified, and integrated on disk)*:
+   * **B.E. Final Thesis**: Official 41-page dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), 5.04 MB).
+   * **Comprehensive Review Paper**: Camera-ready 12-page Elsevier / ScienceDirect review manuscript ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), 232 KB encrypted, 77 citations).
+   * **A3 Symposium Exhibition Poster**: Official 2-sheet presentation poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf), 535 KB, 11 panels).
+   * **Experimental Research Paper**: Camera-ready 6-page IEEE manuscript ([`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf), 674 KB encrypted).
 
 ---
 
