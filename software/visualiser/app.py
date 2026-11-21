@@ -112,7 +112,10 @@ class _SimulatorResponseWrapper:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        try:
+            self._resp.close()
+        except Exception:
+            pass
 
 
 _sim_http_session = None
@@ -135,6 +138,8 @@ def get_sim_http_session():
 def make_simulator_request(path, method='GET', data=None, timeout=1.0):
     clean_path = "/" + path.lstrip("/")
     base_url = Config.SIMULATOR_URL.rstrip("/")
+    if "localhost" in base_url:
+        base_url = base_url.replace("localhost", "127.0.0.1")
     url = f"{base_url}{clean_path}"
     headers = {}
 
@@ -166,6 +171,7 @@ IS_SERVERLESS = os.environ.get('SERVERLESS') == '1'
 
 # Non-blocking async cache variables
 _simulator_port_online = False
+_simulator_http_online = False
 _simulator_port_data = None
 _mongodb_connected = False
 
@@ -191,43 +197,47 @@ def _handle_db_disconnect(error=None):
     db_client = None
     db = None
 
-def check_db_connected():
-    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time
+_db_index_created = False
+
+def check_db_connected(force=False):
+    global db_client, db, mongodb_connected, _mongodb_connected, _last_db_ping_time, _db_index_created
     # Fast non-blocking check when already connected
-    if _mongodb_connected and db is not None:
+    if not force and _mongodb_connected and db is not None:
         return True
 
     now = time.time()
     failure_cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 5.0
-    if now - _last_db_failure_time < failure_cooldown:
+    if not force and (now - _last_db_failure_time < failure_cooldown):
         return False
 
     timeout_ms = 20 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 2000
     if IS_SERVERLESS:
         try:
-            db_client = MongoClient(
-                mongodb_uri,
-                serverSelectionTimeoutMS=timeout_ms,
-                connectTimeoutMS=timeout_ms,
-                socketTimeoutMS=timeout_ms
-            )
+            if db_client is None:
+                db_client = MongoClient(
+                    mongodb_uri,
+                    serverSelectionTimeoutMS=timeout_ms,
+                    connectTimeoutMS=timeout_ms,
+                    socketTimeoutMS=timeout_ms
+                )
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
-            try:
-                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
-            except Exception:
-                pass
+            if not _db_index_created:
+                try:
+                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+                    _db_index_created = True
+                except Exception:
+                    pass
             _mongodb_connected = True
             mongodb_connected = True
             return True
         except Exception as e:
             _handle_db_disconnect(e)
-            print(f"Visualiser Database connection failed: {e}")
             return False
 
-    # Reconnect check paced by MONGODB_SYNC_INTERVAL (5.0s when online, 10.0s when offline)
+    # Periodic background reconnect check paced by interval
     sync_interval = 5.0 if _mongodb_connected else 10.0
-    if (now - _last_db_ping_time >= sync_interval):
+    if force or (now - _last_db_ping_time >= sync_interval):
         _last_db_ping_time = now
         try:
             if db_client is None:
@@ -239,16 +249,17 @@ def check_db_connected():
                 )
             db_client.admin.command('ping')
             db = db_client[Config.MONGODB_DB_NAME]
-            try:
-                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
-            except Exception:
-                pass
+            if not _db_index_created:
+                try:
+                    db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+                    _db_index_created = True
+                except Exception:
+                    pass
             _mongodb_connected = True
             mongodb_connected = True
             return True
         except Exception as e:
             _handle_db_disconnect(e)
-            print(f"Visualiser Database connection failed: {e}")
             return False
 
     return _mongodb_connected and db is not None
@@ -324,6 +335,7 @@ training_status = {
 
 # Incremental pipeline state cache for /api/telemetry
 # Avoids re-running the full estimator history on every poll (O(N) → O(new))
+_telemetry_lock = threading.Lock()
 _telemetry_cache = {
     'key':       None,   # cache_key string — invalidated on config change
     'pipeline':  None,   # EstimatorPipeline instance with warm state
@@ -421,7 +433,7 @@ def load_ml_model():
 _last_sim_port_check_time = 0.0
 
 def check_simulator_port(force=False):
-    global _simulator_port_online, _simulator_port_data, _last_sim_port_check_time
+    global _simulator_port_online, _simulator_port_data, _last_sim_port_check_time, _simulator_http_online
     now = time.time()
     check_interval = 20.0 if IS_SERVERLESS else getattr(Config, 'MONGODB_SYNC_INTERVAL', 1.0)
     if force or (now - _last_sim_port_check_time >= check_interval):
@@ -430,16 +442,18 @@ def check_simulator_port(force=False):
 
         # 1. Fast local HTTP probe (< 1ms when co-located on same host)
         try:
-            with make_simulator_request("/api/status", timeout=0.3) as response:
+            with make_simulator_request("/api/status", timeout=0.2) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode())
+                    _simulator_http_online = True
                     _simulator_port_online = True
                     _simulator_port_data = data
                     if not was_online:
-                        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+                        with _telemetry_lock:
+                            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
                     return True, data
         except Exception:
-            pass
+            _simulator_http_online = False
 
         # 2. Decoupled check via shared MongoDB Atlas sim_state (for cloud deployments)
         if check_db_connected():
@@ -452,7 +466,8 @@ def check_simulator_port(force=False):
                         _simulator_port_online = True
                         _simulator_port_data = doc
                         if not was_online:
-                            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+                            with _telemetry_lock:
+                                _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
                         return True, doc
             except Exception as e:
                 _handle_db_disconnect(e)
@@ -460,7 +475,8 @@ def check_simulator_port(force=False):
         _simulator_port_online = False
         _simulator_port_data = None
         if was_online:
-            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+            with _telemetry_lock:
+                _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
         return False, None
 
     return _simulator_port_online, _simulator_port_data
@@ -490,18 +506,25 @@ def load_sim_state(force_db_read=False):
             _handle_db_disconnect(e)
     return local_sim_state
 
-def save_sim_state(state):
-    global local_sim_state, _last_state_load_time
-    local_sim_state = state
-    _last_state_load_time = time.time()
+def _persist_vis_state_to_db(state_copy):
     if check_db_connected():
         try:
-            state_copy = state.copy()
             state_copy['_id'] = 'singleton'
             db[Config.MONGODB_STATE_COLLECTION].replace_one({'_id': 'singleton'}, state_copy, upsert=True)
         except Exception as e:
             print(f"Error saving state to MongoDB: {e}")
             _handle_db_disconnect(e)
+
+def save_sim_state(state, async_write=True):
+    global local_sim_state, _last_state_load_time
+    local_sim_state = state
+    _last_state_load_time = time.time()
+    state_copy = state.copy()
+    if async_write and not (app.config.get('TESTING') or os.environ.get('TESTING') == '1'):
+        t = threading.Thread(target=_persist_vis_state_to_db, args=(state_copy,), daemon=True)
+        t.start()
+    else:
+        _persist_vis_state_to_db(state_copy)
 
 def update_sim_progress(progress_dict):
     local_sim_state.update(progress_dict)
@@ -671,7 +694,7 @@ def status_checker_loop():
 
         # 2. Asynchronously check MongoDB Connection
         try:
-            check_db_connected()
+            check_db_connected(force=True)
         except Exception:
             pass
 
@@ -1172,11 +1195,12 @@ def get_status():
 
         port_online, port_data = check_simulator_port()
 
-        # If both simulator and database are offline, step the simulation locally in visualizer memory
-        if not port_online and not check_db_connected():
-            sync_simulation_locally()
-
-        state = load_sim_state()
+        if port_online and port_data:
+            state = port_data
+        else:
+            if not check_db_connected():
+                sync_simulation_locally()
+            state = load_sim_state()
 
         # Check simulator state fields
         sim_running = state.get('sim_running', False)
@@ -1283,7 +1307,7 @@ def get_status():
 def control_simulation():
     try:
         data = request.json or {}
-        state = load_sim_state()
+        state = local_sim_state.copy()
 
         # Save local parameter modifications (ignored under standard approach)
         pass
@@ -1350,31 +1374,41 @@ def control_simulation():
 
             # Clear local buffer
             local_telemetry_buffer.clear()
-            if check_db_connected():
-                try:
-                    db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
-                except Exception as db_err:
-                    print(f"Error purging database in visualizer: {db_err}")
+            def _async_vis_purge():
+                if check_db_connected():
+                    try:
+                        db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
+                    except Exception as db_err:
+                        print(f"Error purging database in visualizer: {db_err}")
 
-        save_sim_state(state)
+            if app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+                _async_vis_purge()
+            else:
+                threading.Thread(target=_async_vis_purge, daemon=True).start()
+
+        save_sim_state(state, async_write=True)
 
         # Invalidate telemetry cache whenever control state or command changes to ensure immediate UI sync
-        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+        with _telemetry_lock:
+            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
 
-        # Forward control payload to Config.SIMULATOR_URL if locally reachable (fast non-blocking notification)
+        # Forward control payload to Config.SIMULATOR_URL asynchronously if HTTP is online
         port_online, _ = check_simulator_port()
-        if port_online:
-            try:
-                sim_data = data.copy()
-                sim_data['soc'] = state['soc']
-                sim_data['soh'] = state['soh']
-                if 'active_cycle' in sim_data:
-                    sim_data['cycle_type'] = sim_data.pop('active_cycle')
+        if _simulator_http_online:
+            sim_data = data.copy()
+            sim_data['soc'] = state['soc']
+            sim_data['soh'] = state['soh']
+            if 'active_cycle' in sim_data:
+                sim_data['cycle_type'] = sim_data.pop('active_cycle')
 
-                with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=1.0):
+            def _async_forward_sim():
+                try:
+                    with make_simulator_request("/api/control", method='POST', data=sim_data, timeout=1.0):
+                        pass
+                except Exception:
                     pass
-            except Exception:
-                pass
+
+            threading.Thread(target=_async_forward_sim, daemon=True).start()
 
         # Invalidate visualizer status cache check time so next status poll triggers a fresh live query
         global _last_sim_check_time
@@ -1455,9 +1489,9 @@ def post_register_chemistry():
             n_cells=n_cells
         )
 
-        # Forward to simulator port if online
+        # Forward to simulator port if HTTP is online
         port_online, _ = check_simulator_port()
-        if port_online:
+        if _simulator_http_online:
             try:
                 with make_simulator_request("/api/chemistry/register", method='POST', data=data, timeout=1.0):
                     pass
@@ -1478,80 +1512,79 @@ def post_register_chemistry():
 
 @app.route('/api/telemetry', methods=['GET'])
 def get_telemetry():
-    try:
-        if not model_loaded:
-            load_ml_model()
+    with _telemetry_lock:
+        try:
+            if not model_loaded:
+                load_ml_model()
 
-        state = load_sim_state()
-        chemistry_name = state.get('chemistry', 'li_ion')
-        ekf_mismatch   = 1.0
-        quantize_mode  = 'float32'
+            state = load_sim_state()
+            chemistry_name = state.get('chemistry', 'li_ion')
+            ekf_mismatch   = 1.0
+            quantize_mode  = 'float32'
 
-        # Override with live port state if simulator is online
-        port_online, port_data = check_simulator_port()
-        if port_online and port_data:
-            chemistry_name = port_data.get('chemistry', chemistry_name)
+            # Override with live port state if simulator is online
+            port_online, port_data = check_simulator_port()
+            if port_online and port_data:
+                chemistry_name = port_data.get('chemistry', chemistry_name)
 
-        # ── Incremental pipeline cache ──────────────────────────────────────────
-        # Key that identifies the current estimator configuration
-        cache_key = f"{chemistry_name}_{ekf_mismatch}_{quantize_mode}"
-        cache      = _telemetry_cache
+            # ── Incremental pipeline cache ──────────────────────────────────────────
+            # Key that identifies the current estimator configuration
+            cache_key = f"{chemistry_name}_{ekf_mismatch}_{quantize_mode}"
+            cache      = _telemetry_cache
 
-        # Invalidate cache when chemistry / mismatch / mode changes
-        if cache['key'] != cache_key:
-            cache.update({
-                'key':       cache_key,
-                'pipeline':  EstimatorPipeline(
-                    chemistry_name=chemistry_name,
-                    mismatch=ekf_mismatch,
-                    esn_soc=esn_soc,
-                    esn_soh=esn_soh,
-                    input_means=input_means,
-                    input_stds=input_stds
-                ),
-                'processed': [],
-                'n_cached':  0
-            })
+            # Invalidate cache when chemistry / mismatch / mode changes
+            if cache['key'] != cache_key:
+                cache.update({
+                    'key':       cache_key,
+                    'pipeline':  EstimatorPipeline(
+                        chemistry_name=chemistry_name,
+                        mismatch=ekf_mismatch,
+                        esn_soc=esn_soc,
+                        esn_soh=esn_soh,
+                        input_means=input_means,
+                        input_stds=input_stds
+                    ),
+                    'processed': [],
+                    'n_cached':  0
+                })
 
-        pipeline         = cache['pipeline']
-        pipeline.load_model(esn_soc, esn_soh, input_means, input_stds)
+            pipeline         = cache['pipeline']
+            pipeline.load_model(esn_soc, esn_soh, input_means, input_stds)
 
-        ekf_q_soc = 1e-7
-        ekf_q_v1  = 1e-6
-        ekf_q_v2  = 1e-6
-        ekf_r_meas = 0.01
-        pipeline.update_ekf_noise(ekf_q_soc, ekf_q_v1, ekf_q_v2, ekf_r_meas)
+            ekf_q_soc = 1e-7
+            ekf_q_v1  = 1e-6
+            ekf_q_v2  = 1e-6
+            ekf_r_meas = 0.01
+            pipeline.update_ekf_noise(ekf_q_soc, ekf_q_v1, ekf_q_v2, ekf_r_meas)
 
-        already_cached   = cache['n_cached']
+            already_cached   = cache['n_cached']
 
-        new_readings = []
-        prev_time = None
-        if already_cached > 0 and len(cache['processed']) > 0:
-            prev_time = cache['processed'][-1]['time']
+            new_readings = None
+            prev_time = None
+            if already_cached > 0 and len(cache['processed']) > 0:
+                prev_time = cache['processed'][-1]['time']
 
-        if check_db_connected():
-            try:
-                if prev_time is not None:
-                    # Single fast indexed query: time > prev_time
-                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
-                    new_readings = list(cursor)
-                    # If empty, check if simulation was reset with zero latency
-                    if not new_readings and already_cached > 0:
-                        fresh_state = load_sim_state(force_db_read=True)
-                        sim_time = fresh_state.get('time', 0.0)
-                        if sim_time < prev_time:
-                            cache.update({
-                                'key':       None,
-                                'pipeline':  None,
-                                'processed': [],
-                                'n_cached':  0
-                            })
-                            already_cached = 0
-                            prev_time = None
-                        else:
-                            # Instant B-tree index check if readings collection was purged or reset
-                            latest_doc = db[Config.MONGODB_READINGS_COLLECTION].find_one({}, {'time': 1, '_id': 0}, sort=[('time', -1)])
-                            if latest_doc is None or latest_doc.get('time', 0.0) < prev_time:
+            if _simulator_http_online:
+                # Fast local HTTP streaming (< 1ms zero latency) via Keep-Alive session
+                try:
+                    req_path = f"/api/readings?since={prev_time}&limit=60" if prev_time is not None else "/api/readings?limit=60"
+                    with make_simulator_request(req_path, timeout=0.5) as response:
+                        if response.status == 200:
+                            new_readings = json.loads(response.read().decode())
+                except Exception:
+                    new_readings = None
+
+            if new_readings is None and check_db_connected():
+                try:
+                    if prev_time is not None:
+                        # Single fast indexed query: time > prev_time
+                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({'time': {'$gt': prev_time}}, {'_id': False}).sort('time', 1).limit(60)
+                        new_readings = list(cursor)
+                        # If empty, check if simulation was reset with zero latency
+                        if not new_readings and already_cached > 0:
+                            fresh_state = load_sim_state(force_db_read=True)
+                            sim_time = fresh_state.get('time', 0.0)
+                            if sim_time < prev_time:
                                 cache.update({
                                     'key':       None,
                                     'pipeline':  None,
@@ -1560,148 +1593,171 @@ def get_telemetry():
                                 })
                                 already_cached = 0
                                 prev_time = None
+                            else:
+                                # Instant B-tree index check if readings collection was purged or reset
+                                latest_doc = db[Config.MONGODB_READINGS_COLLECTION].find_one({}, {'time': 1, '_id': 0}, sort=[('time', -1)])
+                                if latest_doc is None or latest_doc.get('time', 0.0) < prev_time:
+                                    cache.update({
+                                        'key':       None,
+                                        'pipeline':  None,
+                                        'processed': [],
+                                        'n_cached':  0
+                                    })
+                                    already_cached = 0
+                                    prev_time = None
 
-                        # If reset detected, pull the fresh initial window immediately on this exact cycle
-                        if prev_time is None:
-                            limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
-                            cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
-                            new_readings = list(cursor)
-                            new_readings.reverse()
-                            already_cached = 0
-                else:
-                    # Cap initial fetch to the most recent window (60 records) for instantaneous UI load
-                    limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
-                    cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
-                    new_readings = list(cursor)
-                    new_readings.reverse() # Restore chronological order
-                    already_cached = 0
+                            # If reset detected, pull the fresh initial window immediately on this exact cycle
+                            if prev_time is None:
+                                limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
+                                cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
+                                new_readings = list(cursor)
+                                new_readings.reverse()
+                                already_cached = 0
+                    else:
+                        # Cap initial fetch to the most recent window (60 records) for instantaneous UI load
+                        limit_val = getattr(Config, 'TELEMETRY_RESPONSE_LIMIT', 60)
+                        cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'_id': False}).sort('time', -1).limit(limit_val)
+                        new_readings = list(cursor)
+                        new_readings.reverse()  # Restore chronological order
+                        already_cached = 0
 
-                cache['n_cached'] = already_cached + len(new_readings)
-            except Exception as db_err:
-                print(f"Error querying database in get_telemetry: {db_err}")
-                new_readings = []
-        else:
-            # Fallback when database is offline - query simulator via Keep-Alive session with delta stream
-            port_online, _ = check_simulator_port(force=True)
-            if port_online:
-                try:
-                    req_path = f"/api/readings?since={prev_time}&limit=60" if prev_time is not None else "/api/readings?limit=60"
-                    with make_simulator_request(req_path, timeout=1.0) as response:
-                        if response.status == 200:
-                            new_readings = json.loads(response.read().decode())
-                except Exception as e:
-                    print(f"Error fetching readings from simulator: {e}")
+                    cache['n_cached'] = already_cached + len(new_readings)
+                except Exception as db_err:
+                    print(f"Error querying database in get_telemetry: {db_err}")
                     new_readings = []
-            else:
+            elif new_readings is None:
+                # In-memory fallback mode
                 if prev_time is not None:
                     new_readings = [r for r in local_telemetry_buffer if r.get('time', 0.0) > prev_time]
                 else:
                     new_readings = list(local_telemetry_buffer[-60:])
 
-            # Detect simulation reset in fallback mode
-            if not new_readings and already_cached > 0:
-                sim_time = state.get('time', 0.0)
-                if sim_time < prev_time:
-                    cache.update({
-                        'key':       None,
-                        'pipeline':  None,
-                        'processed': [],
-                        'n_cached':  0
-                    })
-                    already_cached = 0
-                    prev_time = None
-            elif new_readings and prev_time is not None:
-                # If first new reading has time < prev_time, reset occurred
-                if new_readings[0].get('time', 0.0) < prev_time:
-                    cache.update({
-                        'key':       None,
-                        'pipeline':  None,
-                        'processed': [],
-                        'n_cached':  0
-                    })
-                    already_cached = 0
-                    prev_time = None
+                # Detect simulation reset in fallback mode
+                if not new_readings and already_cached > 0:
+                    sim_time = state.get('time', 0.0)
+                    if sim_time < prev_time:
+                        cache.update({
+                            'key':       None,
+                            'pipeline':  None,
+                            'processed': [],
+                            'n_cached':  0
+                        })
+                        already_cached = 0
+                        prev_time = None
+                elif new_readings and prev_time is not None:
+                    if new_readings[0].get('time', 0.0) < prev_time:
+                        cache.update({
+                            'key':       None,
+                            'pipeline':  None,
+                            'processed': [],
+                            'n_cached':  0
+                        })
+                        already_cached = 0
+                        prev_time = None
 
-            cache['n_cached'] = already_cached + len(new_readings)
-
-        cpu_usage, mem_usage = get_system_metrics()
-        prev_time = None
-
-        # Determine dt for the first new reading based on last cached entry
-        if already_cached > 0 and len(cache['processed']) > 0:
-            prev_time = cache['processed'][-1]['time']
-
-        for record in new_readings:
-            t_curr = record['time']
-            if prev_time is None:
-                dt = Config.SIMULATION_STEP_DELAY
+                cache['n_cached'] = already_cached + len(new_readings)
             else:
-                dt = max(0.01, t_curr - prev_time)
-            prev_time = t_curr
+                # Fast HTTP streaming mode
+                if not new_readings and already_cached > 0:
+                    sim_time = (port_data.get('time', 0.0) if (port_data and 'time' in port_data) else state.get('time', 0.0))
+                    if sim_time < prev_time:
+                        cache.update({
+                            'key':       None,
+                            'pipeline':  None,
+                            'processed': [],
+                            'n_cached':  0
+                        })
+                        already_cached = 0
+                        prev_time = None
+                elif new_readings and prev_time is not None:
+                    if new_readings[0].get('time', 0.0) < prev_time:
+                        cache.update({
+                            'key':       None,
+                            'pipeline':  None,
+                            'processed': [],
+                            'n_cached':  0
+                        })
+                        already_cached = 0
+                        prev_time = None
 
-            est_output = pipeline.step(
-                V_meas=float(record.get('voltage', 3.7)),
-                I_meas_discharge=float(record.get('current', 0.0)),
-                T_meas=float(record.get('temperature', 25.0)),
-                dt=dt,
-                quantize_mode=quantize_mode,
-                dataset_dt=Config.DATASET_TIME_STEP,
-                selected_indices=Config.ESN_SELECTED_FEATURE_INDICES,
-                fault_short=record.get('fault_short', False),
-                fault_thermal=record.get('fault_thermal', False),
-                fault_dropout=record.get('fault_dropout', False)
-            )
+                cache['n_cached'] = already_cached + len(new_readings)
 
-            processed_record = record.copy()
-            processed_record.update({
-                'ekf_soc':    est_output['ekf_soc'],
-                'esn_soc':    est_output['esn_soc'],
-                'ekf_soh':    est_output['trad_soh'],
-                'esn_soh':    est_output['esn_soh'],
-                'ekf_v1':     est_output['ekf_v1'],
-                'ekf_v2':     est_output['ekf_v2'],
-                'ekf_p_diag': est_output['ekf_p_diag'],
-                'esn_features': est_output['esn_features'],
-                'ekf_time':   est_output['ekf_time'],
-                'esn_time':   est_output['esn_time'],
-                'cpu_usage':  cpu_usage,
-                'mem_usage':  mem_usage,
-                'faults':     est_output.get('faults', []),
-                'sop_charge_curr': est_output.get('sop_charge_curr', 0.0),
-                'sop_discharge_curr': est_output.get('sop_discharge_curr', 0.0),
-                'sop_charge_pwr': est_output.get('sop_charge_pwr', 0.0),
-                'sop_discharge_pwr': est_output.get('sop_discharge_pwr', 0.0),
-                'ekf_soe': est_output.get('ekf_soe', 1.0),
-                'esn_soe': est_output.get('esn_soe', 1.0),
-                'ekf_rul_cycles': est_output.get('ekf_rul_cycles', 1000.0),
-                'esn_rul_cycles': est_output.get('esn_rul_cycles', 1000.0),
-                'energy_remaining_wh': est_output.get('energy_remaining_wh', 0.0),
-                'rls_r0':        est_output.get('rls_r0', 0.075),
-                'rls_r1':        est_output.get('rls_r1', 0.045),
-                'rls_c1':        est_output.get('rls_c1', 1000.0),
-                'rls_converged': est_output.get('rls_converged', False),
-                'innovation':    est_output.get('innovation', 0.0)
+            cpu_usage, mem_usage = get_system_metrics()
+            prev_time = None
+
+            # Determine dt for the first new reading based on last cached entry
+            if already_cached > 0 and len(cache['processed']) > 0:
+                prev_time = cache['processed'][-1]['time']
+
+            for record in new_readings:
+                t_curr = record['time']
+                if prev_time is None:
+                    dt = Config.SIMULATION_STEP_DELAY
+                else:
+                    dt = max(0.01, t_curr - prev_time)
+                prev_time = t_curr
+
+                est_output = pipeline.step(
+                    V_meas=float(record.get('voltage', 3.7)),
+                    I_meas_discharge=float(record.get('current', 0.0)),
+                    T_meas=float(record.get('temperature', 25.0)),
+                    dt=dt,
+                    quantize_mode=quantize_mode,
+                    dataset_dt=Config.DATASET_TIME_STEP,
+                    selected_indices=Config.ESN_SELECTED_FEATURE_INDICES,
+                    fault_short=record.get('fault_short', False),
+                    fault_thermal=record.get('fault_thermal', False),
+                    fault_dropout=record.get('fault_dropout', False)
+                )
+
+                processed_record = record.copy()
+                processed_record.update({
+                    'ekf_soc':    est_output['ekf_soc'],
+                    'esn_soc':    est_output['esn_soc'],
+                    'ekf_soh':    est_output['trad_soh'],
+                    'esn_soh':    est_output['esn_soh'],
+                    'ekf_v1':     est_output['ekf_v1'],
+                    'ekf_v2':     est_output['ekf_v2'],
+                    'ekf_p_diag': est_output['ekf_p_diag'],
+                    'esn_features': est_output['esn_features'],
+                    'ekf_time':   est_output['ekf_time'],
+                    'esn_time':   est_output['esn_time'],
+                    'cpu_usage':  cpu_usage,
+                    'mem_usage':  mem_usage,
+                    'faults':     est_output.get('faults', []),
+                    'sop_charge_curr': est_output.get('sop_charge_curr', 0.0),
+                    'sop_discharge_curr': est_output.get('sop_discharge_curr', 0.0),
+                    'sop_charge_pwr': est_output.get('sop_charge_pwr', 0.0),
+                    'sop_discharge_pwr': est_output.get('sop_discharge_pwr', 0.0),
+                    'ekf_soe': est_output.get('ekf_soe', 1.0),
+                    'esn_soe': est_output.get('esn_soe', 1.0),
+                    'ekf_rul_cycles': est_output.get('ekf_rul_cycles', 1000.0),
+                    'esn_rul_cycles': est_output.get('esn_rul_cycles', 1000.0),
+                    'energy_remaining_wh': est_output.get('energy_remaining_wh', 0.0),
+                    'rls_r0':        est_output.get('rls_r0', 0.075),
+                    'rls_r1':        est_output.get('rls_r1', 0.045),
+                    'rls_c1':        est_output.get('rls_c1', 1000.0),
+                    'rls_converged': est_output.get('rls_converged', False),
+                    'innovation':    est_output.get('innovation', 0.0)
+                })
+                cache['processed'].append(processed_record)
+
+            # Cap memory consumption during long multi-hour runs
+            if len(cache['processed']) > 300:
+                cache['processed'] = cache['processed'][-200:]
+
+            # Return the most-recent window only
+            limit = Config.TELEMETRY_RESPONSE_LIMIT
+            return jsonify({
+                'model_loaded': model_loaded,
+                'data': cache['processed'][-limit:]
             })
-            cache['processed'].append(processed_record)
 
-        # Cap memory consumption during long multi-hour runs
-        if len(cache['processed']) > 300:
-            cache['processed'] = cache['processed'][-200:]
-
-        # Update cache watermark is handled inside the fetch branches
-
-        # Return the most-recent window only
-        limit = Config.TELEMETRY_RESPONSE_LIMIT
-        return jsonify({
-            'model_loaded': model_loaded,
-            'data': cache['processed'][-limit:]
-        })
-
-    except Exception as e:
-        print(f"Error in /api/telemetry: {e}")
-        # Invalidate cache on unexpected error so next call starts fresh
-        _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        except Exception as e:
+            print(f"Error in /api/telemetry: {e}")
+            # Invalidate cache on unexpected error so next call starts fresh
+            _telemetry_cache.update({'key': None, 'pipeline': None, 'processed': [], 'n_cached': 0})
+            return jsonify({'status': 'error', 'message': str(e)}), 500
 
 # Battery State Estimator — load ESN model & initialize dataset at startup
 try:
@@ -1721,4 +1777,4 @@ if __name__ == '__main__':
     _start_background_threads()
     if not Config.FLASK_DEBUG or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         print(f"Visualizer Running on http://localhost:{Config.PORT}")
-    app.run(host='0.0.0.0', port=Config.PORT, debug=Config.FLASK_DEBUG)
+    app.run(host='0.0.0.0', port=Config.PORT, threaded=True, debug=Config.FLASK_DEBUG)

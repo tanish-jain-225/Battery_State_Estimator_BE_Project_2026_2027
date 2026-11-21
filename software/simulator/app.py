@@ -1,5 +1,6 @@
 import logging
 import os
+import queue
 import sys
 import threading
 import time
@@ -108,6 +109,35 @@ _mongodb_error = None
 _last_state_load_time = 0.0
 _last_db_connect_attempt = 0.0
 
+# Asynchronous Telemetry DB Queue for zero-latency physics stepping
+_telemetry_db_queue = queue.Queue(maxsize=2000)
+_db_writer_started = False
+
+def _db_telemetry_writer():
+    """Background worker that pulls generated readings from the queue and batches them into MongoDB Atlas."""
+    while True:
+        try:
+            batch = []
+            item = _telemetry_db_queue.get(timeout=1.0)
+            batch.append(item)
+            while len(batch) < 40:
+                try:
+                    batch.append(_telemetry_db_queue.get_nowait())
+                except queue.Empty:
+                    break
+
+            if batch and _ensure_db():
+                try:
+                    db[Config.MONGODB_READINGS_COLLECTION].insert_many(batch, ordered=False)
+                except Exception as ins_err:
+                    _handle_db_disconnect(ins_err)
+            for _ in batch:
+                _telemetry_db_queue.task_done()
+        except queue.Empty:
+            continue
+        except Exception:
+            time.sleep(0.5)
+
 def _handle_db_disconnect(error=None):
     """Gracefully handle MongoDB disconnection, closing broken pools and resetting state."""
     global _mongodb_connected, mongodb_connected, db_client, db, _mongodb_error, _last_db_connect_attempt
@@ -124,13 +154,15 @@ def _handle_db_disconnect(error=None):
     db_client = None
     db = None
 
-def _ensure_db():
-    global mongodb_connected, _mongodb_connected, db_client, db, _last_db_connect_attempt
-    if _mongodb_connected and db is not None:
+_db_index_created = False
+
+def _ensure_db(force=False):
+    global mongodb_connected, _mongodb_connected, db_client, db, _last_db_connect_attempt, _db_index_created
+    if not force and _mongodb_connected and db is not None:
         return True
     now = time.time()
     cooldown = 10.0 if (app.config.get('TESTING') or os.environ.get('TESTING') == '1' or os.environ.get('VALIDATION_PIPELINE') == '1') else 5.0
-    if now - _last_db_connect_attempt < cooldown:
+    if not force and (now - _last_db_connect_attempt < cooldown):
         return False
     _last_db_connect_attempt = now
     try:
@@ -146,11 +178,13 @@ def _ensure_db():
         db = db_client[Config.MONGODB_DB_NAME]
         _mongodb_connected = True
         mongodb_connected = True
-        try:
-            db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
-            db[Config.MONGODB_STATE_COLLECTION].delete_many({'_id': {'$ne': 'singleton'}})
-        except Exception:
-            pass
+        if not _db_index_created:
+            try:
+                db[Config.MONGODB_READINGS_COLLECTION].create_index([("time", 1)], background=True)
+                db[Config.MONGODB_STATE_COLLECTION].delete_many({'_id': {'$ne': 'singleton'}})
+                _db_index_created = True
+            except Exception:
+                pass
         return True
     except Exception as e:
         _handle_db_disconnect(e)
@@ -174,31 +208,46 @@ def load_sim_state(force_db_read=False):
             _handle_db_disconnect(e)
     return local_state
 
-def save_sim_state(state):
-    global local_state, _last_state_load_time
-    local_state = state
-    _last_state_load_time = time.time()
+def _persist_state_to_db(doc_copy):
     if _ensure_db():
         try:
-            doc_copy = state.copy()
             doc_copy['_id'] = 'singleton'
             db[Config.MONGODB_STATE_COLLECTION].replace_one({'_id': 'singleton'}, doc_copy, upsert=True)
         except Exception as e:
             print(f"Battery State Estimator — Error saving state to MongoDB: {e}")
             _handle_db_disconnect(e)
 
-def update_sim_progress(progress_dict):
-    local_state.update(progress_dict)
+def save_sim_state(state, async_write=True):
+    global local_state, _last_state_load_time
+    local_state = state
+    _last_state_load_time = time.time()
+    doc_copy = state.copy()
+    if async_write and not (app.config.get('TESTING') or os.environ.get('TESTING') == '1'):
+        t = threading.Thread(target=_persist_state_to_db, args=(doc_copy,), daemon=True)
+        t.start()
+    else:
+        _persist_state_to_db(doc_copy)
+
+def _persist_progress_to_db(prog_copy):
     if _ensure_db():
         try:
             db[Config.MONGODB_STATE_COLLECTION].update_one(
                 {'_id': 'singleton'},
-                {'$set': progress_dict},
+                {'$set': prog_copy},
                 upsert=True
             )
         except Exception as e:
             print(f"Battery State Estimator — Error updating simulation progress: {e}")
             _handle_db_disconnect(e)
+
+def update_sim_progress(progress_dict, async_write=True):
+    local_state.update(progress_dict)
+    prog_copy = progress_dict.copy()
+    if async_write:
+        t = threading.Thread(target=_persist_progress_to_db, args=(prog_copy,), daemon=True)
+        t.start()
+    else:
+        _persist_progress_to_db(prog_copy)
 
 # Spawns physics-based battery simulator
 simulator = BatterySimulator()
@@ -300,21 +349,6 @@ def generator_loop():
                     'true_current': -out['current']
                 }
 
-                # Push record to readings collection
-                if _ensure_db():
-                    try:
-                        db[Config.MONGODB_READINGS_COLLECTION].insert_one(dict(record))
-                        # Zero DB Load: prune older records periodically so DB stays small, fast, and light
-                        if int(simulator.time) % 30 == 0:
-                            oldest_cursor = db[Config.MONGODB_READINGS_COLLECTION].find({}, {'time': 1, '_id': 0}).sort('time', -1).skip(1000).limit(1)
-                            oldest_list = list(oldest_cursor)
-                            if oldest_list:
-                                cutoff_time = oldest_list[0]['time']
-                                db[Config.MONGODB_READINGS_COLLECTION].delete_many({'time': {'$lt': cutoff_time}})
-                    except Exception as ins_err:
-                        print(f"Error inserting reading into MongoDB: {ins_err}")
-                        _handle_db_disconnect(ins_err)
-
                 # Always maintain fast in-memory circular ring buffer for zero-latency direct HTTP streaming
                 clean_rec = dict(record)
                 clean_rec.pop('_id', None)
@@ -322,6 +356,12 @@ def generator_loop():
                 limit = getattr(Config, 'TELEMETRY_FALLBACK_LIMIT', 1000)
                 if len(local_telemetry_buffer) > limit:
                     local_telemetry_buffer.pop(0)
+
+                # Push record asynchronously to MongoDB via background batch queue (zero physics thread stall)
+                try:
+                    _telemetry_db_queue.put_nowait(clean_rec.copy())
+                except queue.Full:
+                    pass
 
                 # Update configuration document with live heartbeat every 3 seconds to eliminate redundant network roundtrips
                 now_wall = time.time()
@@ -339,7 +379,7 @@ def generator_loop():
                     'sim_running': True
                 })
                 # Update configuration document with live heartbeat on every step delay for lockstep MongoDB sync
-                if (now_wall - last_db_heartbeat >= step_delay) or (int(simulator.time) <= 1):
+                if (now_wall - last_db_heartbeat >= 1.0) or (int(simulator.time) <= 1):
                     last_db_heartbeat = now_wall
                     update_sim_progress({
                         'time': simulator.time,
@@ -353,7 +393,7 @@ def generator_loop():
                         'prev_voltage': V_meas,
                         'prev_current': -I_meas,
                         'sim_running': True
-                    })
+                    }, async_write=True)
 
                 # Drift-free monotonic sleep interval
                 now_mono = time.monotonic()
@@ -604,25 +644,17 @@ def post_register_chemistry():
 @app.route('/api/health', methods=['GET'])
 def get_health():
     sync_simulation_on_demand()
-    state = load_sim_state()
-    db_ready = False
-    points_count = 0
-    try:
-        db_ready = _ensure_db()
-        if db_ready:
-            points_count = db[Config.MONGODB_READINGS_COLLECTION].estimated_document_count()
-        else:
-            points_count = len(local_telemetry_buffer)
-    except Exception:
-        db_ready = False
-        points_count = len(local_telemetry_buffer)
+    state = local_state
+    points_count = len(local_telemetry_buffer)
+    if state.get('time', 0.0) > 0:
+        points_count = max(points_count, int(state.get('time', 0.0) / Config.SIMULATION_STEP_DELAY))
 
     return jsonify({
         'service': 'battery-simulator',
         'ready': True,
         'uptime_seconds': round(time.time() - app_start_time, 2),
         'database': {
-            'connected': db_ready,
+            'connected': _mongodb_connected,
             'readings_count': points_count
         },
         'status': {
@@ -646,15 +678,10 @@ def get_health():
 @app.route('/api/status', methods=['GET'])
 def get_status():
     sync_simulation_on_demand()
-    state = load_sim_state()
-    points_count = 0
-    if _ensure_db():
-        try:
-            points_count = db[Config.MONGODB_READINGS_COLLECTION].estimated_document_count()
-        except Exception:
-            pass
-    else:
-        points_count = len(local_telemetry_buffer)
+    state = local_state
+    points_count = len(local_telemetry_buffer)
+    if state.get('time', 0.0) > 0:
+        points_count = max(points_count, int(state.get('time', 0.0) / Config.SIMULATION_STEP_DELAY))
 
     return jsonify({
         'sim_running': state.get('sim_running', True),
@@ -672,7 +699,7 @@ def get_status():
         'current': state.get('prev_current', 0.0),
         'temperature': state.get('temperature', 25.0),
         'telemetry_count': points_count,
-        'mongodb_connected': _ensure_db()
+        'mongodb_connected': _mongodb_connected
     })
 
 @app.route('/api/control', methods=['POST'])
@@ -689,20 +716,30 @@ def post_control():
         fault_dropout = data.get('fault_dropout')
         fault_short = data.get('fault_short')
 
-        state = load_sim_state()
+        state = local_state.copy()
 
         if chemistry is not None:
             state['chemistry'] = chemistry
+            local_state['chemistry'] = chemistry
+            if state.get('time', 0.0) == 0.0:
+                simulator.reset(chemistry)
+            else:
+                simulator.change_chemistry(chemistry)
 
         if command == 'start':
             state['sim_running'] = True
+            local_state['sim_running'] = True
             state['last_real_time'] = time.time()
+            local_state['last_real_time'] = state['last_real_time']
         elif command == 'stop' or command == 'pause':
             state['sim_running'] = False
+            local_state['sim_running'] = False
         elif command == 'reset':
             state['sim_running'] = False
+            local_state['sim_running'] = False
             if chemistry is None:
                 state['chemistry'] = 'li_ion'
+                local_state['chemistry'] = 'li_ion'
             state['active_cycle'] = 'udds'
             state['accelerated_aging'] = False
             state['T_ambient'] = 25.0
@@ -723,13 +760,32 @@ def post_control():
             state['prev_voltage'] = chem_obj.lookup_ocv(state['soc'])
             state['prev_current'] = 0.0
 
+            # Immediately reset physical simulator state and flush memory buffers
+            simulator.reset(state['chemistry'])
+            simulator.time = 0.0
+            simulator.soc = state['soc']
+            simulator.soh = state['soh']
             local_telemetry_buffer.clear()
-            # Clear Battery State Estimator readings collection
-            if _ensure_db():
+
+            # Drain any pending DB write queue items
+            while not _telemetry_db_queue.empty():
                 try:
-                    db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
-                except Exception as db_err:
-                    print(f"Battery State Estimator — Error purging readings: {db_err}")
+                    _telemetry_db_queue.get_nowait()
+                    _telemetry_db_queue.task_done()
+                except Exception:
+                    break
+
+            def _async_purge_db():
+                if _ensure_db():
+                    try:
+                        db[Config.MONGODB_READINGS_COLLECTION].delete_many({})
+                    except Exception as db_err:
+                        print(f"Battery State Estimator — Error purging readings: {db_err}")
+
+            if app.config.get('TESTING') or os.environ.get('TESTING') == '1':
+                _async_purge_db()
+            else:
+                threading.Thread(target=_async_purge_db, daemon=True).start()
 
         if cycle_type is not None:
             state['active_cycle'] = cycle_type
@@ -763,7 +819,7 @@ def post_control():
             state['fault_thermal_runaway_mult'] = val
             Config.FAULT_THERMAL_RUNAWAY_MULT = val
 
-        save_sim_state(state)
+        save_sim_state(state, async_write=True)
         return jsonify({
             'status': 'ok',
             'sim_running': state['sim_running'],
@@ -883,9 +939,15 @@ _sim_thread_started = False
 _db_thread_started = False
 
 def _start_sim_thread():
-    global _sim_thread_started, _db_thread_started
+    global _sim_thread_started, _db_thread_started, _db_writer_started
     if IS_SERVERLESS or app.config.get('TESTING') or os.environ.get('TESTING') == '1':
         return
+
+    # Start DB telemetry writer worker
+    if not _db_writer_started:
+        _db_writer_started = True
+        writer_thread = threading.Thread(target=_db_telemetry_writer, daemon=True)
+        writer_thread.start()
 
     # Start DB checker thread for this process if not already started
     if not _db_thread_started:
@@ -944,4 +1006,4 @@ if __name__ == '__main__':
             print(f"  [-] Connection Error: {_mongodb_error}")
         print("  [-] Note: Check internet connection, credentials in .env, or MongoDB Atlas IP Access List whitelist.\n")
 
-    app.run(host='0.0.0.0', port=Config.PORT, debug=Config.FLASK_DEBUG)
+    app.run(host='0.0.0.0', port=Config.PORT, threaded=True, debug=Config.FLASK_DEBUG)

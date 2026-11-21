@@ -29,7 +29,10 @@ class Config:
     PORT = int(os.environ.get("VISUALISER_PORT") or os.environ.get("PORT") or 5000)
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1", "t", "yes")
     sim_port = os.environ.get("SIMULATOR_PORT", 8000)
-    SIMULATOR_URL = os.environ.get("SIMULATOR_URL", f"http://127.0.0.1:{sim_port}").rstrip("/")
+    _raw_sim_url = os.environ.get("SIMULATOR_URL", f"http://127.0.0.1:{sim_port}").rstrip("/")
+    if "localhost" in _raw_sim_url:
+        _raw_sim_url = _raw_sim_url.replace("localhost", "127.0.0.1")
+    SIMULATOR_URL = _raw_sim_url
 
     # -------------------------------------------------------------------------
     # File paths

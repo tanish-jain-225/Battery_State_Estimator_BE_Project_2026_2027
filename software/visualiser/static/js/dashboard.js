@@ -430,20 +430,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let prevSimPortOnline = null;
+    let isStatusFetching = false;
 
     // Refresh status and configuration parameters
     async function refreshStatus() {
-        const status = await apiRequest('/api/status');
-        if (!status) return;
+        if (isStatusFetching) return;
+        isStatusFetching = true;
+        try {
+            const status = await apiRequest('/api/status');
+            if (!status) return;
 
-        if (prevSimPortOnline !== null && prevSimPortOnline !== status.simulator_port_online) {
-            telemetryHistory = [];
-        }
-        prevSimPortOnline = status.simulator_port_online;
+            if (prevSimPortOnline !== null && prevSimPortOnline !== status.simulator_port_online) {
+                telemetryHistory = [];
+            }
+            prevSimPortOnline = status.simulator_port_online;
 
-        if (status.graph_slice_limit !== undefined) {
-            graphSliceLimit = status.graph_slice_limit;
-        }
+            if (status.graph_slice_limit !== undefined) {
+                graphSliceLimit = status.graph_slice_limit;
+            }
 
         const valMismatchLabel = document.getElementById('val-ekf-mismatch');
         if (valMismatchLabel && status.ekf_mismatch !== undefined) {
@@ -688,6 +692,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        } finally {
+            isStatusFetching = false;
+        }
     }
 
     // Helper to render numerical readouts
@@ -861,85 +868,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let lastRenderedTime = null;
     let lastRenderedLen = 0;
+    let isTelemetryFetching = false;
 
     // Refresh telemetry and plot data
     async function refreshTelemetry() {
-        const telemetry = await apiRequest('/api/telemetry');
-        if (!telemetry || !telemetry.data) return;
+        if (isTelemetryFetching) return;
+        isTelemetryFetching = true;
+        try {
+            const telemetry = await apiRequest('/api/telemetry');
+            if (!telemetry || !telemetry.data) return;
 
-        telemetryHistory = telemetry.data;
-        const data = telemetryHistory;
-        
-        // Handle database reset or truncation safety
-        if (data.length === 0) {
-            isLocked = false;
-            lockedIndex = -1;
-            lastRenderedTime = null;
-            lastRenderedLen = 0;
-            updateBadge();
-        } else if (isLocked && lockedIndex >= data.length) {
-            isLocked = false;
-            lockedIndex = -1;
-            updateBadge();
-        }
-
-        // Fast-path: Check if new data has actually arrived to prevent redundant chart repaints & DOM churn
-        const currentLen = data.length;
-        const currentTime = currentLen > 0 ? data[currentLen - 1].time : null;
-        if (currentTime === lastRenderedTime && currentLen === lastRenderedLen && !isLocked) {
-            return;
-        }
-        lastRenderedTime = currentTime;
-        lastRenderedLen = currentLen;
-        
-        // Update numerical readouts only if we are in Live Mode (not locked)
-        if (!isLocked) {
-            if (data.length > 0) {
-                updateNumericalReadouts(data[data.length - 1]);
-            } else {
-                updateNumericalReadouts(null);
+            telemetryHistory = telemetry.data;
+            const data = telemetryHistory;
+            
+            // Handle database reset or truncation safety
+            if (data.length === 0) {
+                isLocked = false;
+                lockedIndex = -1;
+                lastRenderedTime = null;
+                lastRenderedLen = 0;
+                updateBadge();
+            } else if (isLocked && lockedIndex >= data.length) {
+                isLocked = false;
+                lockedIndex = -1;
+                updateBadge();
             }
-        }
 
-        // Limit the graphs to the latest rolling slice to avoid clutter
-        const graphData = data.slice(-graphSliceLimit);
-
-        // Scale X-axis bounds to cover the full graph width
-        if (graphData.length > 0) {
-            const minTime = graphData[0].time;
-            const maxTime = graphData[graphData.length - 1].time;
+            // Fast-path: Check if new data has actually arrived to prevent redundant chart repaints & DOM churn
+            const currentLen = data.length;
+            const currentTime = currentLen > 0 ? data[currentLen - 1].time : null;
+            if (currentTime === lastRenderedTime && currentLen === lastRenderedLen && !isLocked) {
+                return;
+            }
+            lastRenderedTime = currentTime;
+            lastRenderedLen = currentLen;
             
-            chartSOC.options.scales.x.min = minTime;
-            chartSOC.options.scales.x.max = maxTime;
+            // Update numerical readouts only if we are in Live Mode (not locked)
+            if (!isLocked) {
+                if (data.length > 0) {
+                    updateNumericalReadouts(data[data.length - 1]);
+                } else {
+                    updateNumericalReadouts(null);
+                }
+            }
+
+            // Limit the graphs to the latest rolling slice to avoid clutter
+            const graphData = data.slice(-graphSliceLimit);
+
+            // Scale X-axis bounds to cover the full graph width
+            if (graphData.length > 0) {
+                const minTime = graphData[0].time;
+                const maxTime = graphData[graphData.length - 1].time;
+                
+                chartSOC.options.scales.x.min = minTime;
+                chartSOC.options.scales.x.max = maxTime;
+                
+                chartSOH.options.scales.x.min = minTime;
+                chartSOH.options.scales.x.max = maxTime;
+            } else {
+                delete chartSOC.options.scales.x.min;
+                delete chartSOC.options.scales.x.max;
+                delete chartSOH.options.scales.x.min;
+                delete chartSOH.options.scales.x.max;
+            }
+
+            // Map data arrays for graphs
+            const socTrueData = graphData.map(r => ({ x: r.time, y: r.true_soc !== undefined ? r.true_soc : r.cc_soc }));
+            const socEkfData = graphData.map(r => ({ x: r.time, y: r.ekf_soc }));
+            const socEsnData = graphData.map(r => ({ x: r.time, y: r.esn_soc }));
             
-            chartSOH.options.scales.x.min = minTime;
-            chartSOH.options.scales.x.max = maxTime;
-        } else {
-            delete chartSOC.options.scales.x.min;
-            delete chartSOC.options.scales.x.max;
-            delete chartSOH.options.scales.x.min;
-            delete chartSOH.options.scales.x.max;
+            const sohTrueData = graphData.map(r => ({ x: r.time, y: r.true_soh !== undefined ? r.true_soh : r.trad_soh }));
+            const sohEkfData = graphData.map(r => ({ x: r.time, y: r.ekf_soh }));
+            const sohEsnData = graphData.map(r => ({ x: r.time, y: r.esn_soh }));
+
+            // Update graph datasets
+            chartSOC.data.datasets[0].data = socTrueData;
+            chartSOC.data.datasets[1].data = socEkfData;
+            chartSOC.data.datasets[2].data = socEsnData;
+            chartSOC.update('none');
+
+            chartSOH.data.datasets[0].data = sohTrueData;
+            chartSOH.data.datasets[1].data = sohEkfData;
+            chartSOH.data.datasets[2].data = sohEsnData;
+            chartSOH.update('none');
+        } finally {
+            isTelemetryFetching = false;
         }
-
-        // Map data arrays for graphs
-        const socTrueData = graphData.map(r => ({ x: r.time, y: r.true_soc !== undefined ? r.true_soc : r.cc_soc }));
-        const socEkfData = graphData.map(r => ({ x: r.time, y: r.ekf_soc }));
-        const socEsnData = graphData.map(r => ({ x: r.time, y: r.esn_soc }));
-        
-        const sohTrueData = graphData.map(r => ({ x: r.time, y: r.true_soh !== undefined ? r.true_soh : r.trad_soh }));
-        const sohEkfData = graphData.map(r => ({ x: r.time, y: r.ekf_soh }));
-        const sohEsnData = graphData.map(r => ({ x: r.time, y: r.esn_soh }));
-
-        // Update graph datasets
-        chartSOC.data.datasets[0].data = socTrueData;
-        chartSOC.data.datasets[1].data = socEkfData;
-        chartSOC.data.datasets[2].data = socEsnData;
-        chartSOC.update('none');
-
-        chartSOH.data.datasets[0].data = sohTrueData;
-        chartSOH.data.datasets[1].data = sohEkfData;
-        chartSOH.data.datasets[2].data = sohEsnData;
-        chartSOH.update('none');
     }
 
     if (btnResumeLive) {

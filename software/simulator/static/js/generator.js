@@ -52,108 +52,153 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let isUpdating = false;
+
     // Refresh UI configurations and states
     async function updateStatus() {
-        const res = await apiRequest('/api/status');
-        if (!res) {
-            // Simulator API offline
-            genStatus.querySelector('.dot').className = 'dot pulse-red';
-            genStatus.querySelector('.label').textContent = 'Simulator: Disconnected';
-            return;
-        }
-
-        // Toggle playback button disabled states
-        btnStart.disabled = res.sim_running;
-        btnPause.disabled = !res.sim_running;
-        btnStop.disabled = !res.sim_running;
-
-        // Synchronize select inputs
-        chemSelect.value = res.chemistry;
-        cycleSelect.value = res.active_cycle;
-        agingToggle.checked = res.accelerated_aging;
-
-        // Sync Environment and Fault Inputs
-        if (tempSlider && document.activeElement !== tempSlider) {
-            tempSlider.value = res.T_ambient;
-            if (valAmbientTemp) valAmbientTemp.textContent = res.T_ambient;
-        }
-        if (faultShortToggle) faultShortToggle.checked = res.fault_short;
-        if (faultThermalToggle) faultThermalToggle.checked = res.fault_thermal;
-        if (faultDropoutToggle) faultDropoutToggle.checked = res.fault_dropout;
-
-        // Update counts
-        valCount.textContent = res.telemetry_count;
-
-        // Sync main generator indicator
-        if (res.sim_running) {
-            genStatus.querySelector('.dot').className = 'dot pulse-green';
-            let cycleStr = res.active_cycle.toUpperCase();
-            if (res.accelerated_aging) cycleStr += ' (AGING)';
-            if (res.fault_short || res.fault_thermal || res.fault_dropout) cycleStr += ' (FAULT)';
-            genStatus.querySelector('.label').textContent = `Simulator: Generating (${cycleStr})`;
-
-            linkBadge.textContent = 'Transmitting';
-            linkBadge.className = 'badge green';
-        } else {
-            if (res.time > 0.0) {
-                genStatus.querySelector('.dot').className = 'dot pulse-amber';
-                genStatus.querySelector('.label').textContent = 'Simulator: Paused';
-
-                linkBadge.textContent = 'Link Paused';
-                linkBadge.className = 'badge amber';
-            } else {
+        if (isUpdating) return;
+        isUpdating = true;
+        try {
+            const res = await apiRequest('/api/status');
+            if (!res) {
+                // Simulator API offline
                 genStatus.querySelector('.dot').className = 'dot pulse-red';
-                genStatus.querySelector('.label').textContent = 'Simulator: Idle';
-
-                linkBadge.textContent = 'Idle';
-                linkBadge.className = 'badge';
+                genStatus.querySelector('.label').textContent = 'Simulator: Disconnected';
+                return;
             }
+
+            // Toggle playback button disabled states
+            btnStart.disabled = res.sim_running;
+            btnPause.disabled = !res.sim_running;
+            btnStop.disabled = !res.sim_running;
+
+            // Synchronize select inputs
+            chemSelect.value = res.chemistry;
+            cycleSelect.value = res.active_cycle;
+            agingToggle.checked = res.accelerated_aging;
+
+            // Sync Environment and Fault Inputs
+            if (tempSlider && document.activeElement !== tempSlider) {
+                tempSlider.value = res.T_ambient;
+                if (valAmbientTemp) valAmbientTemp.textContent = res.T_ambient;
+            }
+            if (faultShortToggle) faultShortToggle.checked = res.fault_short;
+            if (faultThermalToggle) faultThermalToggle.checked = res.fault_thermal;
+            if (faultDropoutToggle) faultDropoutToggle.checked = res.fault_dropout;
+
+            // Update counts
+            valCount.textContent = res.telemetry_count;
+
+            // Sync main generator indicator
+            if (res.sim_running) {
+                genStatus.querySelector('.dot').className = 'dot pulse-green';
+                let cycleStr = res.active_cycle.toUpperCase();
+                if (res.accelerated_aging) cycleStr += ' (AGING)';
+                if (res.fault_short || res.fault_thermal || res.fault_dropout) cycleStr += ' (FAULT)';
+                genStatus.querySelector('.label').textContent = `Simulator: Generating (${cycleStr})`;
+
+                linkBadge.textContent = 'Transmitting';
+                linkBadge.className = 'badge green';
+            } else {
+                if (res.time > 0.0) {
+                    genStatus.querySelector('.dot').className = 'dot pulse-amber';
+                    genStatus.querySelector('.label').textContent = 'Simulator: Paused';
+
+                    linkBadge.textContent = 'Link Paused';
+                    linkBadge.className = 'badge amber';
+                } else {
+                    genStatus.querySelector('.dot').className = 'dot pulse-red';
+                    genStatus.querySelector('.label').textContent = 'Simulator: Idle';
+
+                    linkBadge.textContent = 'Idle';
+                    linkBadge.className = 'badge';
+                }
+            }
+
+            // Sync MongoDB database indicator
+            if (res.mongodb_connected) {
+                dbStatus.querySelector('.dot').className = 'dot pulse-green';
+                dbStatus.querySelector('.label').textContent = 'MongoDB: Connected';
+            } else {
+                dbStatus.querySelector('.dot').className = 'dot pulse-red';
+                dbStatus.querySelector('.label').textContent = 'MongoDB: Connection Failed';
+            }
+
+            // Sync Telemetry numeric displays
+            valTime.textContent = Math.round(res.time);
+            valVoltage.textContent = res.voltage.toFixed(2);
+            valCurrent.textContent = res.current.toFixed(2);
+            valTemp.textContent = res.temperature.toFixed(1);
+
+            // Sync Progress wavefronts
+            const socPercent = (res.soc * 100.0).toFixed(1);
+            const sohPercent = (res.soh * 100.0).toFixed(1);
+
+            valSoc.textContent = socPercent + '%';
+            valSoh.textContent = sohPercent + '%';
+
+            if (barSoc) barSoc.style.width = socPercent + '%';
+            if (barSoh) barSoh.style.width = sohPercent + '%';
+        } finally {
+            isUpdating = false;
         }
-
-        // Sync MongoDB database indicator
-        if (res.mongodb_connected) {
-            dbStatus.querySelector('.dot').className = 'dot pulse-green';
-            dbStatus.querySelector('.label').textContent = 'MongoDB: Connected';
-        } else {
-            dbStatus.querySelector('.dot').className = 'dot pulse-red';
-            dbStatus.querySelector('.label').textContent = 'MongoDB: Connection Failed';
-        }
-
-        // Sync Telemetry numeric displays
-        valTime.textContent = Math.round(res.time);
-        valVoltage.textContent = res.voltage.toFixed(2);
-        valCurrent.textContent = res.current.toFixed(2);
-        valTemp.textContent = res.temperature.toFixed(1);
-
-        // Sync Progress wavefronts
-        const socPercent = (res.soc * 100.0).toFixed(1);
-        const sohPercent = (res.soh * 100.0).toFixed(1);
-
-        valSoc.textContent = socPercent + '%';
-        valSoh.textContent = sohPercent + '%';
-
-        if (barSoc) barSoc.style.width = socPercent + '%';
-        if (barSoh) barSoh.style.width = sohPercent + '%';
     }
 
-    // Button Click Listeners
+    // Button Click Listeners with Optimistic UI Feedback
     btnStart.addEventListener('click', async () => {
+        btnStart.disabled = true;
+        btnPause.disabled = false;
+        btnStop.disabled = false;
+        genStatus.querySelector('.dot').className = 'dot pulse-green';
+        genStatus.querySelector('.label').textContent = 'Simulator: Generating...';
+        linkBadge.textContent = 'Transmitting';
+        linkBadge.className = 'badge green';
         await apiRequest('/api/control', 'POST', { command: 'start' });
         updateStatus();
     });
 
     btnPause.addEventListener('click', async () => {
+        btnStart.disabled = false;
+        btnPause.disabled = true;
+        btnStop.disabled = false;
+        genStatus.querySelector('.dot').className = 'dot pulse-amber';
+        genStatus.querySelector('.label').textContent = 'Simulator: Paused';
+        linkBadge.textContent = 'Link Paused';
+        linkBadge.className = 'badge amber';
         await apiRequest('/api/control', 'POST', { command: 'pause' });
         updateStatus();
     });
 
     btnStop.addEventListener('click', async () => {
+        btnStart.disabled = false;
+        btnPause.disabled = true;
+        btnStop.disabled = true;
+        genStatus.querySelector('.dot').className = 'dot pulse-red';
+        genStatus.querySelector('.label').textContent = 'Simulator: Idle';
+        linkBadge.textContent = 'Idle';
+        linkBadge.className = 'badge';
         await apiRequest('/api/control', 'POST', { command: 'stop' });
         updateStatus();
     });
 
     btnReset.addEventListener('click', async () => {
         if (confirm('Are you sure you want to reset the simulation? This clears all telemetry stored in MongoDB.')) {
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnStop.disabled = true;
+            genStatus.querySelector('.dot').className = 'dot pulse-red';
+            genStatus.querySelector('.label').textContent = 'Simulator: Idle';
+            linkBadge.textContent = 'Idle';
+            linkBadge.className = 'badge';
+            valTime.textContent = '0';
+            valVoltage.textContent = '12.60';
+            valCurrent.textContent = '0.00';
+            valTemp.textContent = '25.0';
+            valSoc.textContent = '100.0%';
+            valSoh.textContent = '100.0%';
+            if (barSoc) barSoc.style.width = '100%';
+            if (barSoh) barSoh.style.width = '100%';
+            valCount.textContent = '0';
             await apiRequest('/api/control', 'POST', { command: 'reset' });
             updateStatus();
         }
