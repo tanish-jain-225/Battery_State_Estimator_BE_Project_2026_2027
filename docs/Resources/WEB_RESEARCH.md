@@ -399,6 +399,10 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 
 ## 9. Comprehensive 4-Tier Valuation in INR (`v2.4.0` Synced vs. `v2.4.1` Final)
 
+> [!NOTE]
+> **Methodological Disclaimer & Ground-Truth Positioning:**  
+> The 4-tier financial valuations, commercial licensing estimates, venture multiples, and quality ratings detailed in Sections 9 and 10 represent **illustrative market research and forward-looking economic models** authored for national startup competitions (e.g. KPIT Sparkle, SIH), MeitY DLI grant applications, and industrial spin-out scoping. The core repository itself remains an **academic engineering research demonstrator** released under the open-source MIT License, validated against empirical 2-RC physics, laboratory NASA PCoE cell datasets, and bit-exact FPGA hardware-in-the-loop benchmarks.
+
 Modeled using verified 2026 Indian embedded/VLSI compensation & independent engineering consulting benchmarks (`160 hrs/man-month`; freelance/consulting range `₹1,200–₹4,500+/hr` for specialized FPGA/VLSI, embedded firmware, and control systems), semiconductor IP benchmarks, and deep-tech venture frameworks:
 
 ```

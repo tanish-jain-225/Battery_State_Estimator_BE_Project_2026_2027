@@ -158,7 +158,7 @@ Full evaluation executed via [`hardware/FPGA_Verifier/eval_fpga_outcomes.py`](FP
 
 ### 3.5 Plug-and-Play FPGA ESN IP Block & Multi-Observer Platform (`hardware/IP_Block/`)
 
-The [`hardware/IP_Block/`](IP_Block/README.md) directory delivers our **v1.2 commercial-grade, plug-and-play FPGA IP Block and Multi-Observer Hardware Platform** targeting the Xilinx Artix-7 FPGA (Digilent Arty A7-100T):
+The [`hardware/IP_Block/`](IP_Block/README.md) directory delivers our **v1.2 synthesizable, plug-and-play FPGA IP Block and Multi-Observer Hardware Platform** targeting the Xilinx Artix-7 FPGA (Digilent Arty A7-100T):
 
 1. **Reusable AXI4 IP Block (`rtl/esn_axi_ip.v`)**:
    - **Dual Reservoir Architectures (`FAST=0` vs. `FAST=1`):** Supports both the compact serial core ([`rtl/esn_core.v`](IP_Block/rtl/esn_core.v): 42,902 cycles / 536 µs @ 80 MHz; IP OOC 1,868 LUTs, 4 DSP, 0.131 W estimate) and the pipelined parallel sparse ELL core ([`rtl/esn_core_fast.v`](IP_Block/rtl/esn_core_fast.v), `P=10, K=24`: **307 cycles / 3.84 µs** @ 80 MHz; IP OOC 4,877 LUTs, 22 DSP, 0.156 W / 0.60 µJ per update).

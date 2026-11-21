@@ -187,7 +187,7 @@ This repository tells a complete, end-to-end engineering and scientific story: *
 │  • Final B.E. Thesis      │ ◄─── │  • Artix-7 100-neuron RTL │ ◄─── │  • C99 Cortex-M firmware  │
 │  • IEEE Research Paper    │      │  • IEEE 1685 IP-XACT AXI4 │      │  • CSR SpMV (6.7× speed)  │
 │  • 29-Page Review Survey  │      │  • Bitstream (3.7 MB Bit) │      │  • Q12/Q15 Fixed-Point    │
-│  • A1 Exhibition Poster   │      │  • 200/200 Bit-Exact Twin │      │  • 82.4% RAM savings      │
+│  • A3 Exhibition Poster   │      │  • 200/200 Bit-Exact Twin │      │  • 82.4% RAM savings      │
 └───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
 ```
 
@@ -196,8 +196,8 @@ This repository tells a complete, end-to-end engineering and scientific story: *
 3. **Act III — Reservoir Computing & Dynamic Adaptation**: We deployed an Echo State Network (ESN) with 100 recurrent leaky-integrator neurons ($\rho = 0.90–0.95$). By fixing randomized internal reservoir weights and solving only the output layer via single-shot Ridge regression, backpropagation through time is completely avoided. To track battery aging, an online Recursive Least Squares (RLS) adaptive readout was formulated, maintaining sub-1.0% SOC error across 32 battery aging cycles.
 4. **Act IV — Dual Silicon Realization (Hardware-Software Co-Design)**:
    * **Microcontroller Tier (STM32 / ARM Cortex-M)**: Standalone C99 firmware utilizing Compressed Sparse Row (CSR) matrix representation, integer-only Q12/Q15 arithmetic, and a hardware $\tanh$ LUT, achieving a **6.7× speedup** and **82.4% RAM reduction**.
-   * **FPGA Accelerator Tier (Xilinx Artix-7 `xc7a100tcsg324-1`)**: 100-neuron Verilog RTL datapath with BRAM state arrays, verified **200/200 bit-exactly** against a Python golden model. Packaged into a commercial-grade **IEEE 1685 IP-XACT AXI4 IP Block** (`component.xml`) and pre-compiled 3.7 MB bitstream (`esn_platform_top.bit`) with a real-time 115200-baud UART HIL interface running ESN, EKF, and UKF in parallel with a **23× real-time BMS execution margin**.
-5. **Act V — Academic Dissemination & Capstone Culmination**: The verified algorithms and silicon designs culminated in an IEEE-targeted original research paper, a 29-page comprehensive review survey, an A1 exhibition defense poster, and the official University of Mumbai / VESIT Bachelor of Engineering dissertation thesis.
+   * **FPGA Accelerator Tier (Xilinx Artix-7 `xc7a100tcsg324-1`)**: 100-neuron Verilog RTL datapath with BRAM state arrays, verified **200/200 bit-exactly** against a Python golden model. Packaged into an **IEEE 1685 IP-XACT AXI4 IP Block** (`component.xml`) and pre-compiled 3.7 MB bitstream (`esn_platform_top.bit`) with a real-time 115200-baud UART HIL interface running ESN, EKF, and UKF in parallel with a **23× real-time BMS execution margin**.
+5. **Act V — Academic Dissemination & Capstone Culmination**: The verified algorithms and silicon designs culminated in an IEEE camera-ready original research paper, an Elsevier camera-ready review manuscript, an official 2-sheet A3 exhibition defense poster, and the official University of Mumbai / VESIT Bachelor of Engineering dissertation thesis.
 
 ---
 
@@ -282,8 +282,8 @@ Navigate the repository according to your area of interest:
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.1) | Full version history, milestone audit trail, and release changelog | **v2.4.1 Active Today (Turnkey Capstone)** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
-| **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **10/10 Ready (Reference)** |
-| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and 4-tier INR valuation (100% Turnkey Capstone) | **10/10 Ready (Reference)** |
+| **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **Verified (Local & Cloud Runbook)** |
+| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and 4-tier INR valuation model | **Complete (Market & IP Analysis)** |
 
 ---
 

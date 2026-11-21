@@ -73,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v2.3.0] - 2026-11-03 (Plug-and-Play FPGA ESN IP Block & Real Research Paper Release)
 
 ### 🚀 Highlights (v2.3.0)
-- **Plug-and-Play FPGA ESN IP Block**: Added the complete commercial-grade [`hardware/IP_Block/`](hardware/IP_Block/) package featuring:
+- **Plug-and-Play FPGA ESN IP Block**: Added the complete synthesizable [`hardware/IP_Block/`](hardware/IP_Block/) package featuring:
   - **Reusable AXI4 IP Module (`esn_axi_ip.v`)**: Packaged compliant with IEEE 1685 IP-XACT standard in [`component.xml`](hardware/IP_Block/component.xml) under taxonomy `/UserIP` (`vesit.ac.in:user:esn_axi_ip:1.0`), supporting AXI4-Lite memory-mapped control and AXI4-Stream data streaming.
   - **Concurrent Tri-Observer FPGA Platform (`esn_platform_top.v`)**: Concurrently executes 100-neuron ESN, 512-point Fixed-Point EKF, and 512-point Fixed-Point UKF in parallel on incoming UART telemetry (115200 baud).
   - **Runtime Weight & Table Reconfigurability**: Supports arbitrary cell chemistries and ESN models without resynthesizing bitstreams.

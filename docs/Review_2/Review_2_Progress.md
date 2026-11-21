@@ -262,7 +262,7 @@ To guarantee 100% reproducibility for examiners and evaluators, the repository f
 
 When presenting to the review panel, follow this structured demonstration flow:
 
-### Step 1: Run Master Validation (Proof of Flawless Build)
+### Step 1: Run Master Validation (Proof of Clean Verification)
 ```powershell
 .\run_all_validation.bat
 ```
@@ -285,7 +285,7 @@ python hardware/FPGA_Verifier/compare_results.py
 
 ## 10. Development Continuity: Phase 3 Silicon IP & Phase 4 Capstone Culmination
 
-The developmental journey from Review 2 evolves directly into commercial silicon packaging and final academic degree defense:
+The developmental journey from Review 2 evolves directly into synthesizable silicon IP core packaging and final academic degree defense:
 
 ```
 [Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination (v2.4.1)]
