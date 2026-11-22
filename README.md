@@ -32,7 +32,7 @@
   <a href="docs/Final_Review/Final_Review_PPT.pdf" target="_blank">
     <img src="https://img.shields.io/badge/Final%20Review-Defense%20Slide%20Deck-1E3A8A?style=for-the-badge&logo=adobeacrobatreader" alt="Final Review Slide Deck PDF" />
   </a>
-  <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
+  <a href="https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Defense%20Video-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Video" />
   </a>
   <a href="https://battery-visualizer.onrender.com" target="_blank">
@@ -97,6 +97,7 @@ flowchart LR
 
 * **Milestone Report:** [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)
 * **Presentation Deck:** [`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf)
+* **Phase 1 Demonstration Video (YouTube):** [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
 * **Defense Venue:** Department of Automation and Robotics / Instrumentation, VESIT Chembur
 
 #### 📸 Review 1 Defense Presentation Screenshot
@@ -174,7 +175,7 @@ flowchart LR
 * **Delivered Report:** [`docs/Final_Review/Final_Review_Delivered.md`](docs/Final_Review/Final_Review_Delivered.md)
 * **Presentation Deck (PDF):** [`docs/Final_Review/Final_Review_PPT.pdf`](docs/Final_Review/Final_Review_PPT.pdf) *(also available as [`docs/Final_Review/FInal_Review_PPT.pdf`](docs/Final_Review/FInal_Review_PPT.pdf))*
 * **Milestone Hub:** [`docs/Final_Review/README.md`](docs/Final_Review/README.md)
-* **Live Final Presentation (YouTube):** [Watch Live Defense Video](https://youtu.be/fXS4TLaXGGw)
+* **Live Final Presentation (YouTube):** [Watch Live Defense Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK)
 * **Defense Venue:** Department of Automation and Robotics / Instrumentation, VESIT Chembur (University of Mumbai)
 
 #### 📸 Final Review Defense & Institutional Evaluation (Geotagged Record)
@@ -312,7 +313,7 @@ Navigate the repository according to your area of interest:
 | :--- | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
 | **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
-| **Final Review** | [Final Review Delivered Report](docs/Final_Review/Final_Review_Delivered.md) · [Slide Deck](docs/Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/fXS4TLaXGGw) · [Hub](docs/Final_Review/README.md) | Official University of Mumbai external viva defense, Grade O (Outstanding / 100M), all 4 deliverables accepted, live YouTube walkthrough | **Completed / Grade O (Outstanding)** |
+| **Final Review** | [Final Review Delivered Report](docs/Final_Review/Final_Review_Delivered.md) · [Slide Deck](docs/Final_Review/Final_Review_PPT.pdf) · [Live Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) · [Hub](docs/Final_Review/README.md) | Official University of Mumbai external viva defense, Grade O (Outstanding / 100M), all 4 deliverables accepted, live YouTube walkthrough | **Completed / Grade O (Outstanding)** |
 | **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.1 Turnkey)** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (2-sheet A3 portrait, open / unencrypted, 318-LUT RTL, Vivado schematic & NASA benchmarks) | **Completed & Integrated (Open)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Hardware architectures for learned battery SOC estimation: recurrent & reservoir accelerators review (Elsevier, 12 pages, 232 KB encrypted, 77 citations) | **Completed & Integrated (Camera-Ready)** |
@@ -487,9 +488,9 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 | :--- | :---: | :---: | :--- |
 | **Proposal of Project** | 12/08/2026 | Online | **Submitted / Approved** ([`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)) |
 | **Acceptance / Modification** | 17/08/2026 | Online | **Approved / Completed** |
-| **First Review** | 21/09/2026 – 24/09/2026 | Offline | **Completed** ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md)) |
+| **First Review** | 21/09/2026 – 24/09/2026 | Offline | **Completed** ([`docs/Review_1/Review_1_PPT.pdf`](docs/Review_1/Review_1_PPT.pdf), [`docs/Review_1/Review_1_Progress.md`](docs/Review_1/Review_1_Progress.md), [`Phase 1 Video`](https://youtu.be/fXS4TLaXGGw)) |
 | **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **Completed** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md), [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf), [`Outcomes PDF`](docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)) |
-| **Final External Review** | 21/11/2026 | Offline | **Completed** ([`Final Review Report`](docs/Final_Review/Final_Review_Delivered.md), [`Final_Review_PPT.pdf`](docs/Final_Review/Final_Review_PPT.pdf), [`Live Video`](https://youtu.be/fXS4TLaXGGw), [`Hub`](docs/Final_Review/README.md)) |
+| **Final External Review** | 21/11/2026 | Offline | **Completed** ([`Final Review Report`](docs/Final_Review/Final_Review_Delivered.md), [`Final_Review_PPT.pdf`](docs/Final_Review/Final_Review_PPT.pdf), [`Live Video (Placeholder)`](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK), [`Hub`](docs/Final_Review/README.md)) |
 
 ### Marks Allocation & Evaluation Policy
 * **10 Marks — GitHub Log Book:** Weekly progress updates maintained directly in `README.md`.

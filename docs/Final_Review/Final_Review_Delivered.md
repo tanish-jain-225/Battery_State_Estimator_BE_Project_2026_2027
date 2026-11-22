@@ -37,12 +37,12 @@
 ## 🎥 Live Final Phase Presentation Video Walkthrough
 
 <p align="center">
-  <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
+  <a href="https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Final%20Presentation%20%26%20Defense-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Defense" />
   </a>
 </p>
 
-* **Presentation Recording Link:** [Watch Live Presentation on YouTube](https://youtu.be/fXS4TLaXGGw)
+* **Presentation Recording Link:** [Watch Live Presentation on YouTube (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
 * **Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) (8 widescreen 16:9 narrative slides covering Problem Formulation, 2-RC Electro-Thermal Digital Twin, Neuromorphic ESN, Dual-Silicon Realization, NASA PCoE 29-Cell Benchmarks, and Final Handoff).
 
 ---

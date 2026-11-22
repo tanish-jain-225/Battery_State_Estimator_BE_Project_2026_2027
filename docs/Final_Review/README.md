@@ -37,12 +37,12 @@
 ## 🎥 Live Final Phase Presentation Video Walkthrough
 
 <p align="center">
-  <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
+  <a href="https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Final%20Presentation%20%26%20Defense-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Defense" />
   </a>
 </p>
 
-* **YouTube Defense Video Link:** [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
+* **YouTube Defense Video Link:** [https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
 * **Presentation Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) (8 widescreen 16:9 slides)
 
 ---
@@ -90,5 +90,5 @@
 * 📄 **Final Delivered Report:** [`Final_Review_Delivered.md`](Final_Review_Delivered.md)
 * 📊 **Presentation Slides (PDF):** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))*
 * 🖼️ **Institutional Geotag Record:** [`Final_Review_Geotag_Photo.png`](Final_Review_Geotag_Photo.png)
-* 🎥 **Live Presentation Walkthrough:** [YouTube Defense Video](https://youtu.be/fXS4TLaXGGw)
+* 🎥 **Live Presentation Walkthrough:** [YouTube Defense Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK)
 * 🎓 **Capstone Thesis Monograph:** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)

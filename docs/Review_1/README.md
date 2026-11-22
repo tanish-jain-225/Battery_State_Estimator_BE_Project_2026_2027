@@ -65,6 +65,7 @@ The engineering milestones validated in Review 1 served as the baseline foundati
 * 📄 **Progress Report:** [`Review_1_Progress.md`](Review_1_Progress.md)
 * 📊 **Presentation Slides:** [`Review_1_PPT.pdf`](Review_1_PPT.pdf)
 * 🖼️ **Defense Slide Screenshot:** [`Review_1_Presentation_Title.png`](Review_1_Presentation_Title.png)
+* 🎥 **Phase 1 Demonstration Video (YouTube):** [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
 
 ---
 
