@@ -22,7 +22,7 @@ docs/
 │   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed in v2.4.1)
 │   ├── Review_Paper.pdf           # Comprehensive Review Paper (12 Pages, Camera-Ready Integrated)
 │   └── README.md                  # Publication abstracts, authorship, and scopes
-├── Paper_Proof/                   # 20 Marks Evaluation Submission/Acceptance Records
+├── Paper_Proof/                   # Evaluation Submission & Acceptance Records Registry
 │   └── README.md                  # Proof logging registry & mark criteria checklist
 ├── Review_1/                      # Review 1 Milestone Documentation
 │   ├── README.md                  # Milestone narrative, screenshot, evaluator feedback & fixes
@@ -84,12 +84,12 @@ docs/
 6. **FPGA RTL Verifier & Subsystems:** [`hardware/FPGA_Verifier/README.md`](../hardware/FPGA_Verifier/README.md) — Bit-exact Verilog RTL for 100-neuron ESN, fixed-point EKF, and fixed-point UKF.
 7. **Automated Regression Suite (125 Tests):** [`tests/README.md`](../tests/README.md) — 16 specialized test modules with 88.60% coverage on `software/shared` (`125 passed in 24.67s`).
 
-### 4. 🎓 The Defense & Academic Marks Stream
+### 4. 🎓 The Defense & Academic Evaluation Stream
 *Exhibition, presentation, and university evaluation criteria:*
-1. **Academic Publications Hub (20 Marks):** [`docs/Publications/README.md`](Publications/README.md)
+1. **Academic Publications Hub:** [`docs/Publications/README.md`](Publications/README.md)
    * **Experimental Research Paper (`Completed & Integrated`):** [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf) (Camera-Ready 6-Page IEEE PDF, 674 KB encrypted)
    * **Comprehensive Review Paper (`Completed & Integrated`):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 232 KB encrypted, 77 Citations)
-2. **Publication Proofs & Evaluation Registry (20 Marks):** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — 10 Marks submission receipt + 10 Marks acceptance letter tracking.
+2. **Publication Proofs & Evaluation Registry:** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — Official submission receipt and acceptance letter tracking.
 3. **Academic Exhibition Poster (`Completed & Integrated`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official 2-sheet A3 symposium poster (535 KB, 11 panels, VESIT 2026–27).
 4. **Final Review External Viva Voce Defense (`Completed & Integrated`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) — Capstone defense proceedings, examination Q&A transcript, and institutional handoff.
 5. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.

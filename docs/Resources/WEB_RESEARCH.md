@@ -153,6 +153,7 @@ This repository addresses nine major engineering and commercial fields across th
 │ 7. Indian Fleet Cloud IoT      ──► High-throughput NavIC/GPS telematics & MongoDB streaming │
 │ 8. Indian Grid BESS & Solar    ──► SECI 1000 MWh tenders, Tata Power Solar, NTPC microgrids │
 │ 9. Defense & Drone Ecosystem   ──► DRDO UAVs, iDEX defense challenges, Indian drone PLI     │
+│ 10. Automated Testing & QA     ──► Cyclers (BioLogic, Arbin, Chroma) & EOL Factory Screening│
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -174,6 +175,9 @@ This repository addresses nine major engineering and commercial fields across th
    - Megawatt-scale BESS installations backed by Solar Energy Corporation of India (SECI) tenders, where round-the-clock cycling prevents open-circuit voltage relaxation.
 9. **Indian Defense & Aerospace Drone Industry:**
    - High-reliability, deterministic state estimation on FPGA silicon for tactical drones under the Make in India / iDEX defense initiatives.
+10. **Automated Battery Testing Kits, Laboratory Cyclers & EOL Factory QA:**
+    - High-throughput integration with laboratory cyclers and production line End-of-Line (EOL) testers (BioLogic, Arbin Instruments, Chroma ATE, Bitrode, Neware, Maccor).
+    - Enables high-speed multi-channel SOH classification, capacity determination, and internal impedance sorting during cell manufacturing and pack formation.
 
 ---
 
@@ -237,6 +241,16 @@ This repository addresses nine major engineering and commercial fields across th
   - Formula Student Electric single-seater racecars with $5\text{C} - 10\text{C}$ burst discharge during the 22 km endurance event.
   - Strict compliance with Formula Bharat Rulebook EV4 (BMS requirements) and EV5 (Overcurrent and thermal shutdown).
 * **Repository Solution:** Real-time dynamic SOP limits discharge current dynamically to protect cells from crossing critical safety boundaries without cutting motor torque prematurely.
+
+### Case 8: Automated Battery Testing Kits, Cell Cyclers & End-of-Line (EOL) Manufacturing Diagnostics
+* **Equipment & Platforms:** Multi-channel laboratory cyclers (BioLogic, Arbin Instruments, Chroma ATE, Maccor, Neware, Bitrode) and End-of-Line (EOL) battery testing fixtures in Indian Gigafactories (Exide Energy, Amara Raja, Ola Gigafactory Krishnagiri, Tata Agratas).
+* **Industrial Bottleneck & Challenge:**
+  - Standard factory SOH and capacity determination requires a full $100\%$ Depth-of-Discharge (DoD) charge/discharge cycle (4 to 8 hours per pack/cell).
+  - In high-speed cell manufacturing producing thousands of cylindrical (21700/46800) or prismatic cells per hour, 8-hour cycling creates an enormous capital expenditure and inventory holding bottleneck.
+* **Repository Solution:**
+  - **Dynamic Pulse Response Estimation:** The cycler injects a short 30- to 60-second dynamic current pulse (e.g., HPPC or multi-step load).
+  - **Reservoir Mapping:** The ESN reservoir maps the non-linear voltage relaxation and electrochemical impedance growth ($R_0, R_1, C_1, R_2, C_2$), estimating capacity and true SOH in **under 1.0 second** with **$R^2 = 0.922$**.
+  - **100% Inline EOL Inspection:** Reduces test cycle times by **> 90%**, enabling 100% inline cell grading, precision matching into packs, and direct MES (Manufacturing Execution System) barcode tagging.
 
 ---
 
@@ -308,6 +322,20 @@ All three computing tiers—Python Software, Embedded C99 Firmware, and Verilog 
 | **Activation Non-Linearity** | Native `np.tanh()` | **33-Point Linear Interpolated LUT** (Q15) | **5,121-Entry Hardware LUT** (`tanh_lut.v`) + IP Block piecewise LUT | **Functionally Equivalent** |
 | **Data Representation & Filters** | 64-bit Float ESN + RLS + EKF/UKF | Dual-Mode: Float32 and Fixed-Point Q15 | Q6.10 / Q2.14 Fixed-Point + `ekf_core.v` (Rev 0.5 Fused `477` cyc) & UKF (`662` cyc) | **Silicon Tailored** |
 | **Verification Benchmark** | `0.72%` 2-RC Simulator RMSE; `0.067` MAE / `0.086` RMSE (29 NASA cells) | **98.40%–99.80% Float32/Q15 Thermal Parity (`7.5 KB` RAM)** | **200/200 ESN & 512/512 EKF/UKF (`FPGA_Verifier`); 10/10 Verilator + 29 NASA Packs & NARMA-10 (`IP_Block v1.2`)** | **100% Certified** |
+
+### 6.1 2024–2026 Academic & Industrial Frontier in Reservoir Computing for Battery Systems
+
+Recent literature across 2024 to 2026 reinforces the distinct structural advantages of Echo State Networks over deep neural networks (LSTMs, GRUs, Transformers) for automotive and industrial battery diagnostics:
+
+1. **Elimination of Backpropagation Through Time (BPTT):**
+   * Traditional RNNs require unfolding across time steps, causing vanishing/exploding gradients and demanding huge SRAM footprints for weight storage and gradient backpropagation.
+   * ESNs hold the internal recurrent reservoir ($W_{\text{res}}$) fixed with $\rho < 1$, mapping non-linear electrochemical dynamics into a high-dimensional feature space without iterative gradient descent.
+2. **Deterministic, Convex Readout Optimization:**
+   * Training is reduced to single-shot linear/Ridge regression: $W_{\text{out}} = Y \cdot X^T (X \cdot X^T + \alpha I)^{-1}$.
+   * Under dynamic battery aging, an online Recursive Least Squares (RLS) filter updates $W_{\text{out}}$ with a Variable Forgetting Factor ($\lambda$), eliminating parameter divergence while tracking capacity fade ($R^2 = 0.922$).
+3. **Emergence of Gated & Multi-Reservoir Architectures (2025–2026):**
+   * Recent developments such as Liquid-Gated ESNs (LG-ESN) and dual-reservoir frameworks separate fast transient diffusion dynamics from slow thermal/aging time constants.
+   * Our 2-RC fused architecture mirrors this multi-time-scale paradigm: the 2-RC physical ECM tracks voltage transients, while the sparse ESN reservoir ($N=100$) models non-linear hysteresis and electro-thermal degradation in real time.
 
 ---
 

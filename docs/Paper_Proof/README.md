@@ -4,14 +4,14 @@
 
 ---
 
-## 🎯 Purpose & Evaluation Weightage (20 Marks)
+## 🎯 Purpose & Academic Evaluation Records
 
-This directory is designated for archiving all official correspondence, tracking receipts, and verification documentation required for the **20 Marks** academic capstone evaluation:
+This directory is designated for archiving all official correspondence, tracking receipts, and verification documentation required for academic capstone evaluation:
 
-| Evaluation Milestone | Marks Allocated | Required Verification Asset | Status |
+| Evaluation Milestone | Scope | Required Verification Asset | Status |
 | :--- | :---: | :--- | :---: |
-| **Proof of Paper Submission** | **10 Marks** | Official submission confirmation PDF, tracking Paper ID, and editorial receipt. | *Pending Submission Logging* |
-| **Proof of Paper Acceptance** | **10 Marks** | Official acceptance letter, camera-ready notification, or DOI indexing link. | *Under Review Scope* |
+| **Proof of Paper Submission** | Submission Verification | Official submission confirmation PDF, tracking Paper ID, and editorial receipt. | *Pending Submission Logging* |
+| **Proof of Paper Acceptance** | Publication Verification | Official acceptance letter, camera-ready notification, or DOI indexing link. | *Under Review Scope* |
 
 ---
 

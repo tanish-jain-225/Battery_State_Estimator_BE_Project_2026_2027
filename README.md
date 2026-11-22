@@ -323,7 +323,7 @@ Navigate the repository according to your area of interest:
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Hardware architectures for learned battery SOC estimation: recurrent & reservoir accelerators review (Elsevier, 12 pages, 232 KB encrypted, 77 citations) | **Completed & Integrated (Camera-Ready)** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6 pages, 674 KB encrypted, IEEE camera-ready) | **Completed & Integrated (Camera-Ready)** |
 | **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.1) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT, 41 pages, 5.07 MB encrypted) | **Completed & Integrated (Turnkey v2.4.1)** |
-| **Paper Proof (20M)** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | 20 Marks evaluation tracking: 10 Marks submission receipt + 10 Marks official acceptance letter | **Fully Verified (Registry Active)** |
+| **Paper Proofs** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | Academic verification tracking: official submission receipt + formal acceptance letter tracking | **Fully Verified (Registry Active)** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
 | **Changelog** | [Changelog](CHANGELOG.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.1) | Full version history, milestone audit trail, and release changelog | **v2.4.1 Active Today (Turnkey Capstone)** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
@@ -496,17 +496,17 @@ As per department notice from Mr. Gopalkrishnan Narayan (Instrumentation Departm
 | **Second Review** | 05/11/2026 & 06/11/2026 | Offline | **Completed** ([`docs/Review_2/Review_2_Progress.md`](docs/Review_2/Review_2_Progress.md), [`docs/Review_2/Review_2_PPT.pdf`](docs/Review_2/Review_2_PPT.pdf), [`Outcomes PDF`](docs/Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf)) |
 | **Final External Review** | 21/11/2026 | Offline | **Completed** ([`Final Review Report`](docs/Final_Review/Final_Review_Delivered.md), [`Final_Review_PPT.pdf`](docs/Final_Review/Final_Review_PPT.pdf), [`Live Video (Placeholder)`](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK), [`Hub`](docs/Final_Review/README.md)) |
 
-### Marks Allocation & Evaluation Policy
-* **10 Marks — GitHub Log Book:** Weekly progress updates maintained directly in `README.md`.
-* **20 Marks — Paper Publication:**
-  * **10 Marks:** Proof of paper publication submission.
-  * **10 Marks:** Proof of paper publication acceptance.
+### Department Evaluation Policy & Milestones
+* **GitHub Log Book:** Weekly progress updates maintained directly in `README.md`.
+* **Paper Publication:**
+  * Proof of paper publication submission.
+  * Proof of paper publication acceptance.
 
 ---
 
 ## Weekly Progress Updates
 
-### GitHub Log Book & Weekly Progress Updates (10 Marks Allocated)
+### GitHub Log Book & Weekly Progress Updates
 
 > 📌 **Note:** As per department policy, this GitHub Log Book is maintained directly in `README.md` and updated weekly to track project milestones, task distribution, hardware/software implementations, and challenges.  
 > 📑 **Project Proposal Document:** [`docs/Resources/PROJECT_PROPOSAL.md`](docs/Resources/PROJECT_PROPOSAL.md)
@@ -644,7 +644,7 @@ BE-Capstone-Project/
 │   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (Completed in v2.4.1)
 │   │   └── README.md                      # Publication abstracts, authorship, and scopes
 │   │
-│   ├── Paper_Proof/                       # 20 Marks Evaluation Submission/Acceptance Records
+│   ├── Paper_Proof/                       # Evaluation Submission & Acceptance Records Registry
 │   │   └── README.md                      # Proof logging registry & mark criteria checklist
 │   │
 │   ├── Review_1/                          # Review 1 Milestone Documentation
@@ -927,10 +927,22 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 ## Applications
 
-1. **Electric Vehicle Battery Management Systems (EV-BMS):** Real-time SOC/SOH estimation and safety fault detection.
-2. **Battery Energy Storage Systems (BESS):** Renewable grid storage health tracking and thermal protection.
-3. **Embedded Microcontroller Diagnostics:** Low-power edge neural network inference on ARM Cortex-M targets.
-4. **Hardware-in-the-Loop (HIL) Research:** Platform for benchmarking ML state observers against EKF.
+1. **Automated Battery Testing Kits, Laboratory Cyclers & End-of-Line (EOL) QA:**
+   * Ultra-fast (< 1s) non-destructive SOH and internal resistance ($R_0$) evaluation on laboratory cyclers (BioLogic, Arbin Instruments, Chroma ATE, Maccor, Bitrode).
+   * Replaces 4- to 8-hour full discharge cycles with short 30–60s dynamic pulses, shortening cell inspection time by over 90% for high-throughput Gigafactory cell grading.
+2. **Electric Vehicle Battery Management Systems (EV-BMS):**
+   * Real-time SOC/SOH estimation and dynamic Safe Operating Power (SOP) calculation on passenger EVs, 2W/3W fleets, and electric commercial buses.
+   * Drift-free tracking across flat-OCV LFP plateaus and AIS-156 Amendment 3 Phase 2 thermal runaway early detection.
+3. **Second-Life Battery Grading & Circular Economy:**
+   * Rapid screening, health classification, and sorting of retired EV battery packs (70–80% capacity) for stationary energy storage under Battery Waste Management Rules.
+4. **Grid-Scale Battery Energy Storage Systems (BESS) & Solar Microgrids:**
+   * Continuous multi-rack SOC balancing and capacity fade monitoring for megawatt-hour solar/wind storage facilities without requiring cell relaxation.
+5. **Drones, Robotics & Aerospace Avionics:**
+   * Deterministic, sub-millisecond execution on resource-constrained airborne flight controllers with minimal SWaP (Size, Weight, and Power: 318 LUTs, 2 DSPs, < 50 mW).
+6. **Embedded Edge Microcontroller Diagnostics:**
+   * Low-cost MCU deployment (ARM Cortex-M0+/M4 targets) utilizing Compressed Sparse Row (CSR) matrix multiplication (6.7× speedup, 82.4% RAM reduction).
+7. **Semiconductor & Fabless IP Licensing:**
+   * Reusable IEEE 1685 IP-XACT compliant AXI4-Lite/Stream accelerator core (`esn_axi_ip`) ready for integration into custom automotive BMS coprocessor ASICs.
 
 ---
 
@@ -955,18 +967,18 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 
 ## Future Scope
 
-1. Physical Hardware-in-the-Loop (HIL) benchtop testing with physical lithium-ion cells, programmable electronic loads, and live CAN bus streaming.
-2. Direct flashing of C99 firmware onto physical STM32 Nucleo boards with CAN bus transceiver interfacing.
-3. Multi-cell series-parallel battery pack SOC/SOH state estimation with active cell balancing.
-4. On-board FPGA rail power telemetry (extending current Vivado vectorless estimates) and turnkey academic finalization (**`v2.4.1`**: Poster, Review Paper, and Thesis).
+1. **Testing on Physical Battery Cells & Live Packs:** Conducting live Hardware-in-the-Loop (HIL) benchtop testing with physical lithium-ion cells, multi-channel battery cyclers (e.g., BioLogic, Arbin, Chroma), and programmable electronic loads—as specifically recommended by our external review committee during final defense.
+2. **Physical STM32 CAN Bus Bench:** Direct deployment of the C99 firmware onto physical automotive microcontroller boards (STM32 Nucleo / NXP S32K) with isolated CAN bus transceiver interfacing.
+3. **Multi-Cell Pack Balancing:** Extension from single-cell / dual-cell telemetry to full series-parallel battery packs with active/passive cell balancing.
+4. **On-Board FPGA Dynamic Rail Power Telemetry:** Measuring actual physical current shunt telemetry across FPGA voltage rails (extending Vivado vectorless power estimates).
 
 ---
 
 ## Research Paper / Publication
 
-### Academic Publications & Capstone Poster (20 Marks Allocated)
+### Academic Publications & Capstone Poster
 
-> 🎓 **Evaluation Policy:** 10 Marks for submission proof + 10 Marks for acceptance proof. Both official documentations strictly target peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**. All publications and exhibition deliverables are cataloged in [`docs/Publications/`](docs/Publications/README.md) and [`docs/Poster/`](docs/Poster/README.md).
+> 🎓 **Academic Policy:** Verified tracking for manuscript submission and formal acceptance. Both official documentations strictly target peer-reviewed **IEEE / Q3 Scopus-Indexed Journals**. All publications and exhibition deliverables are cataloged in [`docs/Publications/`](docs/Publications/README.md) and [`docs/Poster/`](docs/Poster/README.md).
 
 ### Target Paper 1: Comprehensive Review Paper (Elsevier / ScienceDirect Format — Completed)
 | Item | Details |
@@ -979,7 +991,7 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | **Formatted Deliverable** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) (12 Pages, 232 KB Encrypted, 77 References) |
 | **Authoritative Manuscript** | [`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) & companion review draft [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) |
 | **Review Scope** | Examines hardware architectures for learned battery SOC estimation against BMS requirements, bridging data-driven SOC estimation, FPGA recurrent accelerators, and reservoir computing across 8 embedded/hardware SOC and 6 FPGA recurrent network implementations |
-| **Submission Proof (10 Marks)** | Submission tracking logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) (portal upload ready) |
+| **Submission Proof** | Submission tracking logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) (portal upload ready) |
 
 ### Target Paper 2: Original Experimental Research Paper (IEEE Camera-Ready — Completed in `v2.4.0`)
 | Item | Details |
@@ -990,7 +1002,7 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | **Formatted Deliverable** | [`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) |
 | **Authoritative Manuscript** | [`reference/paper.md`](reference/paper.md) (Hardware/Software Co-Design & Experimental Benchmarks) |
 | **Experimental Scope** | 100-neuron Q6.10 FPGA ESN on Artix-7 (`318 LUTs, 2 DSPs, 80 MHz`), bit-exact 200/200 & 6,400-step verification, 29-cell NASA PCoE cross-validation (`2,201 windows`, `140,864` held-out steps) |
-| **Submission Proof (10 Marks)** | Official submission confirmation PDF and tracking ID logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) |
+| **Submission Proof** | Official submission confirmation PDF and tracking ID logged in [`docs/Paper_Proof/`](docs/Paper_Proof/README.md) |
 
 ### Capstone Presentation Poster (Academic Exhibition & Viva Defense)
 | Item | Details |

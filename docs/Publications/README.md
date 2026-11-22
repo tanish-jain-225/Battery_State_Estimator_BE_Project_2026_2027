@@ -1,6 +1,6 @@
 # Academic Publications & Manuscripts
 
-[← Back to Main Repository](../../README.md) · [← Capstone Thesis](../Thesis/README.md) · [Submission Proofs (20 Marks)](../Paper_Proof/README.md) · [Project Poster](../Poster/README.md)
+[← Back to Main Repository](../../README.md) · [← Capstone Thesis](../Thesis/README.md) · [Submission Proofs](../Paper_Proof/README.md) · [Project Poster](../Poster/README.md)
 
 ---
 
@@ -14,11 +14,11 @@
 
 ---
 
-## 🎓 Overview & Evaluation Policy
+## 🎓 Overview & Academic Policy
 
-As part of the BE Capstone project evaluation criteria, **20 Marks** are strictly allocated to peer-reviewed publication deliverables:
-* **10 Marks:** Verified proof of manuscript submission (submission receipt and tracking Paper ID).
-* **10 Marks:** Official proof of paper publication acceptance.
+As part of the BE Capstone project evaluation criteria, official peer-reviewed publication deliverables are tracked:
+* **Submission Tracking:** Verified proof of manuscript submission (submission receipt and tracking Paper ID).
+* **Acceptance Tracking:** Official proof of paper publication acceptance.
 
 Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals** and **Elsevier / ScienceDirect Review Journals**.
 
@@ -26,10 +26,10 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 
 ## 📑 Tracked Manuscripts & Deliverables
 
-| Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Marks | Deliverable Status |
+| Target Paper | Focus / Scope | PDF Deliverable | Markdown Manuscript | Target Venue | Evaluation Scope | Deliverable Status |
 | :--- | :--- | :---: | :---: | :--- | :---: | :---: |
-| **Paper 1: Comprehensive Review** | Hardware architectures for learned battery SOC estimation: recurrent & reservoir computing accelerators vs BMS requirements (8 SOC & 6 FPGA implementations, 77 citations) | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | Elsevier / ScienceDirect / Q3 Scopus Review Journal | 10 Marks (Submission) + 10 Marks (Acceptance) | **Completed & Camera-Ready Integrated (Deliverable 2 of 4)** |
-| **Paper 2: Original Experimental Research** | Bit-exact fixed-point FPGA ESN reservoir (Q6.10), 2,201 NASA PCoE windows, 29-cell cross validation, Artix-7 RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | 10 Marks (Submission) + 10 Marks (Acceptance) | **Completed & Camera-Ready Integrated (Deliverable 1 of 4)** |
+| **Paper 1: Comprehensive Review** | Hardware architectures for learned battery SOC estimation: recurrent & reservoir computing accelerators vs BMS requirements (8 SOC & 6 FPGA implementations, 77 citations) | [`Review_Paper.pdf`](Review_Paper.pdf) | [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) | Elsevier / ScienceDirect / Q3 Scopus Review Journal | Submission & Acceptance Tracking | **Completed & Camera-Ready Integrated (Deliverable 2 of 4)** |
+| **Paper 2: Original Experimental Research** | Bit-exact fixed-point FPGA ESN reservoir (Q6.10), 2,201 NASA PCoE windows, 29-cell cross validation, Artix-7 RTL | [`Research_Paper.pdf`](Research_Paper.pdf) | [`reference/paper.md`](../../reference/paper.md) | IEEE / Q3 Scopus Journal on Industrial Electronics / CPS | Submission & Acceptance Tracking | **Completed & Camera-Ready Integrated (Deliverable 1 of 4)** |
 
 ---
 

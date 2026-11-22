@@ -126,10 +126,10 @@ Our publications explicitly build upon and cite:
 - **Li et al. [1] ([`paper_ekf_soc_soh.pdf`](paper_ekf_soc_soh.pdf))** as the analytical gold standard for multi-timescale EKF decoupled state observation.
 - **Rigutini et al. [5]** and **Kamarudin et al. [2] ([`paper_rc_soc_soh.pdf`](paper_rc_soc_soh.pdf))** as the empirical justification for reservoir computing and spiking architectures in battery diagnostics.
 
-### C. Evaluation Policy & Submission Tracking (20 Marks)
-As part of our Bachelor of Engineering evaluation criteria at VESIT, 20 Marks are strictly allocated to peer-reviewed publication deliverables:
-- **10 Marks:** Verified proof of manuscript submission (submission receipt and tracking Paper ID logged in [`docs/Paper_Proof/`](../docs/Paper_Proof/README.md)).
-- **10 Marks:** Official peer-reviewed paper acceptance letter.
+### C. Academic Verification Policy & Submission Tracking
+As part of our Bachelor of Engineering evaluation criteria at VESIT, official peer-reviewed publication deliverables are tracked:
+- **Submission Tracking:** Verified proof of manuscript submission (submission receipt and tracking Paper ID logged in [`docs/Paper_Proof/`](../docs/Paper_Proof/README.md)).
+- **Acceptance Tracking:** Official peer-reviewed paper acceptance letter.
 
 ---
 
