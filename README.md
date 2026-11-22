@@ -328,7 +328,7 @@ Navigate the repository according to your area of interest:
 | **Changelog** | [Changelog](CHANGELOG.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.1) | Full version history, milestone audit trail, and release changelog | **v2.4.1 Active Today (Turnkey Capstone)** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **Verified (Local & Cloud Runbook)** |
-| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and 4-tier INR valuation model | **Complete (Market & IP Analysis)** |
+| **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and techno-economic edge BOM analysis | **Complete (Market & IP Analysis)** |
 
 ---
 
@@ -672,7 +672,7 @@ BE-Capstone-Project/
 │       ├── DEMO_CHECKLIST.md              # 10-minute presentation & viva defense checklist
 │       ├── ARTIFACTS.md                   # Model parameters and dataset versioning policy
 │       ├── PRESENTATION.md                # Slide-by-slide defense talking points & script
-│       └── WEB_RESEARCH.md                # Indian EV/BMS market, AIS/BIS/2025 CRI audit, v1.2 specs & 4-tier valuation
+│       └── WEB_RESEARCH.md                # Indian EV/BMS market, AIS/BIS/2025 CRI audit, v1.2 specs & techno-economic BOM analysis
 │
 ├── hardware/
 │   ├── hardware.md                        # Consolidated hardware subsystem guide
