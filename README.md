@@ -35,9 +35,6 @@
   <a href="https://youtu.be/fXS4TLaXGGw" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Defense%20Video-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Video" />
   </a>
-  <a href="docs/Final_Review/Final_Review_Delivered.md" target="_blank">
-    <img src="https://img.shields.io/badge/Final%20Review-Delivered%20Handoff-0D9488?style=for-the-badge" alt="Final Review Delivered Report" />
-  </a>
   <a href="https://battery-visualizer.onrender.com" target="_blank">
     <img src="https://img.shields.io/badge/Live%20Demo-Visualiser%20Dashboard-4B0082?style=for-the-badge&logo=render" alt="Visualiser Dashboard" />
   </a>
