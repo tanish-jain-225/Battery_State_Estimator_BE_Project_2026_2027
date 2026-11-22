@@ -626,7 +626,6 @@ BE-Capstone-Project/
 ├── CITATION.cff                           # Machine-readable BibTeX / APA citation metadata
 ├── SECURITY.md                            # Security policy & vulnerability reporting
 ├── CODE_OF_CONDUCT.md                     # Contributor Covenant scientific code of conduct
-├── REPAIR_PROGRESS.md                     # Master system audit, defect repair & benchmark log
 │
 ├── docs/
 │   ├── README.md                          # Master documentation hub & 4-stream guide

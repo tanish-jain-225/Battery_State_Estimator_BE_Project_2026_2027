@@ -85,7 +85,6 @@ docs/
 5. **STM32 Embedded C99 Verifier:** [`hardware/STM_Verifier/README.md`](../hardware/STM_Verifier/README.md) — CSR SpMV 6.7× speedup, Q12/Q15 integer arithmetic, and LUT Tanh.
 6. **FPGA RTL Verifier & Subsystems:** [`hardware/FPGA_Verifier/README.md`](../hardware/FPGA_Verifier/README.md) — Bit-exact Verilog RTL for 100-neuron ESN, fixed-point EKF, and fixed-point UKF.
 7. **Automated Regression Suite (125 Tests):** [`tests/README.md`](../tests/README.md) — 16 specialized test modules with 88.60% coverage on `software/shared` (`125 passed in 24.67s`).
-8. **Master System Audit & Repair Progress:** [`REPAIR_PROGRESS.md`](../REPAIR_PROGRESS.md) — Exhaustive system audit, defect repair register, and subsystem benchmark records.
 
 ### 4. 🎓 The Defense & Academic Evaluation Stream
 *Exhibition, presentation, and university evaluation criteria:*
