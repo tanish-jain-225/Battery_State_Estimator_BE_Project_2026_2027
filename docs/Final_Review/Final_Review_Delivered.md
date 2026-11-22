@@ -27,10 +27,9 @@
 </p>
 
 > **Official Institutional Defense Geotag Record:**  
-> **Venue:** Vivekanand Education Society's Institute of Technology (VESIT), Chembur, Mumbai, Maharashtra 400074  
-> **GPS Coordinates:** `19.0490° N, 72.8890° E` | **Altitude:** `18.4 m ASL` | **Accuracy:** `± 2.1 m`  
-> **Date:** November 2026 | **Milestone:** Final External Review & Capstone Viva Voce  
-> **Evaluation Outcome:** **100% Unanimous Acceptance — Turnkey Capstone Handoff Complete**
+> **Venue:** Hashu Advani Memorial Complex, Collector Colony, Chembur, Mumbai, Maharashtra 400071, India (VESIT)  
+> **GPS Coordinates:** `Lat 19.045278° Long 72.889039°` | **Timestamp:** Saturday, 21/11/2026 11:59 AM GMT +05:30  
+> **Evaluation Outcome:** **Successful External Defense — Turnkey Capstone Handoff Complete**
 
 ---
 
@@ -43,7 +42,7 @@
 </p>
 
 * **Presentation Recording Link:** [Watch Live Presentation on YouTube (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
-* **Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) (8 widescreen 16:9 narrative slides covering Problem Formulation, 2-RC Electro-Thermal Digital Twin, Neuromorphic ESN, Dual-Silicon Realization, NASA PCoE 29-Cell Benchmarks, and Final Handoff).
+* **Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))* (6 widescreen 16:9 slides covering Hardware ESN IP Block & Bit-Exact Verification, Software 2-RC Estimation Pipeline, and NASA PCoE Experimental Results).
 
 ---
 
@@ -125,6 +124,10 @@ During the final examination, the external examiner panel evaluated the candidat
 > *"Bit-exactness was achieved through strict fixed-point quantization matching. We designed a 16-bit Q6.10 fixed-point arithmetic specification (6 integer bits including sign, 10 fractional bits). In Python, we implemented a bit-accurate emulator that replicates fixed-point multiplication, accumulator bit-growth, two's-complement overflow saturation, and piecewise-linear $\tanh$ interpolation exactly as synthesized in our Verilog RTL (`esn_core_fast.v`).  
 > During automated regression testing (`hardware/FPGA_Verifier/compare_results.py`), the testbench runs 200 consecutive input vectors through both the Xilinx XSim RTL simulator and the Python golden model, verifying that every internal state variable and output readout bit matches identically (200/200 bit-exact stages)."*
 
+### 4.1 External Reviewer Recommendation & Repository Conclusion
+> **Official External Reviewer Advisory & Concluding Guidance:**  
+> *"During the final defense, the external reviewer conducted a detailed evaluation of our cyber-physical implementation—encompassing the 2-RC electro-thermal model, online adaptive ESN, C99 CSR firmware, and synthesized Xilinx Artix-7 FPGA IP block. The examiner commended the end-to-end rigor and bit-exact hardware validation, and solely advised us to test and validate this system on real physical battery cells and live packs (under physical cyclers and live vehicle hardware-in-the-loop fixtures) as our future scope. With this single constructive recommendation, the examination concluded successfully, unanimous final acceptance was achieved, and with this, we formally concluded this repository on an accomplished and positive note."*
+
 ---
 
 ## 5. Live System Demonstration Transcript
@@ -138,18 +141,18 @@ The viva included an end-to-end live demonstration before the examination panel:
 
 ---
 
-## 6. University Rubric & Marks Distribution Sign-Off
+## 6. University Rubric & Comprehensive Evaluation Assessment
 
 The evaluation panel assessed the capstone project against the University of Mumbai Final Year B.E. Examination Rubrics:
 
-| Evaluation Criteria | Maximum Marks | Marks Awarded | Comments by Examination Panel |
+| Evaluation Criteria | Scope Assessed | Panel Assessment | Comments by Examination Panel |
 | :--- | :---: | :---: | :--- |
-| **Literature Survey & Problem Formulation** | 20 | **20** | Outstanding depth; 77 citations reviewed in camera-ready Elsevier paper; thorough ISO 26262 & AIS-156 regulatory audit. |
-| **Methodology & Mathematical Modeling** | 20 | **20** | Rigorous 2-RC electro-thermal formulation; mathematically proven Echo State Property; online RLS adaptation with variable forgetting factor. |
-| **Hardware & Software Implementation** | 20 | **20** | Complete dual-silicon realization: C99 MISRA-C firmware (6.7× CSR speedup) and Vivado-synthesized Artix-7 FPGA IP core (318 LUTs, 2 DSPs). |
-| **Experimental Results & Verification** | 20 | **20** | 125/125 automated tests passed; bit-exact FPGA parity (200/200); 29-cell NASA PCoE evaluation ($p=0.011$ Wilcoxon significance). |
-| **Publications, Poster & Viva Voce** | 20 | **20** | Both papers camera-ready (IEEE & Elsevier); official A3 exhibition poster; 41-page dissertation monograph; exemplary oral defense. |
-| **Total Marks** | **100** | **100 / 100** | **Unanimous Grade: Outstanding (Grade O) — Recommended for Institutional Best Project Award** |
+| **Literature Survey & Problem Formulation** | Theoretical Foundation | **Satisfied & Commended** | Outstanding depth; 77 citations reviewed in camera-ready Elsevier paper; thorough ISO 26262 & AIS-156 regulatory audit. |
+| **Methodology & Mathematical Modeling** | Algorithmic Formulation | **Satisfied & Commended** | Rigorous 2-RC electro-thermal formulation; mathematically proven Echo State Property; online RLS adaptation with variable forgetting factor. |
+| **Hardware & Software Implementation** | Silicon & Code Realization | **Satisfied & Commended** | Complete dual-silicon realization: C99 MISRA-C firmware (6.7× CSR speedup) and Vivado-synthesized Artix-7 FPGA IP core (318 LUTs, 2 DSPs). |
+| **Experimental Results & Verification** | Empirical Validation | **Satisfied & Commended** | 125/125 automated tests passed; bit-exact FPGA parity (200/200); 29-cell NASA PCoE evaluation ($p=0.011$ Wilcoxon significance). |
+| **Publications, Poster & Viva Voce** | Deliverables & Defense | **Satisfied & Commended** | Both papers camera-ready (IEEE & Elsevier); official A3 exhibition poster; 41-page dissertation monograph; exemplary oral defense. |
+| **Overall Defense Outcome** | Final Handoff | **Unanimously Accepted** | **Successful Defense Conclusion — All Deliverables Accepted & Concluded on an Accomplished Note** |
 
 ---
 
@@ -208,6 +211,8 @@ The evaluation panel assessed the capstone project against the University of Mum
 ## 8. Conclusion & Institutional Sign-Off
 
 The **Battery State Estimator** project has achieved 100% of its initial objectives and exceeded the technical requirements set forth by the Department of Automation and Robotics and the University of Mumbai. 
+
+During the final review, our external reviewer evaluated the complete pipeline and specifically advised that our sole future scope is to test and validate this system on physical, real-world battery cells and live packs. With this constructive recommendation, the examination was concluded with **unanimous final acceptance**, and with this, we formally conclude this repository on an accomplished, positive note.
 
 With zero shell files, zero failing tests, complete dual-silicon hardware validation, and all four peer-reviewed academic deliverables finalized and verified on disk, this repository stands as a **turnkey, production-grade, and academically rigorous benchmark** for edge neuromorphic Battery Management Systems.
 

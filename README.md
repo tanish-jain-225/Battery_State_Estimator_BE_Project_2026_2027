@@ -76,7 +76,7 @@ flowchart LR
     P1 -->|"Evaluator Feedback:<br/>Add Architecture & Customise PPT"| P1_Fix["<b>Review 1 Changes</b><br/>• Added ESN Core Diagram<br/>• Redesigned 16:9 Deck<br/>• Fixed-Point Datapath"]
     P1_Fix --> P2["<b>Phase 2: Review 2 Defense</b><br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/><i>(Nov 2026)</i>"]
     P2 -->|"Evaluator Feedback:<br/>Simplify Presentation & Add Datasets"| P2_Fix["<b>Review 2 Changes</b><br/>• 5-Act Presentation Story<br/>• 10 Drive Cycles + NASA Aging<br/>• 1.0s Multi-Chemistry Simulator"]
-    P2_Fix --> P3["<b>Phase 3: Final Review Defense</b><br/>• External Viva Voce Defense<br/>• 100/100 Marks (Grade O)<br/>• Best Project Recommendation<br/><i>(Nov 2026)</i>"]
+    P2_Fix --> P3["<b>Phase 3: Final Review Defense</b><br/>• External Viva Voce Defense<br/>• All 4 Deliverables Accepted<br/>• Real-Cell Testing Future Scope<br/><i>(Nov 2026)</i>"]
     P3 --> P4["<b>Turnkey Release v2.4.1</b><br/>• All 4 Academic Deliverables Integrated<br/>• Thesis, Review Paper, Poster, Paper<br/>• Live YouTube Presentation<br/><i>(100% Turnkey Capstone)</i>"]
 ```
 
@@ -183,9 +183,10 @@ flowchart LR
   <img src="docs/Final_Review/Final_Review_Geotag_Photo.png" alt="Final Review Project Defense Geotag Record" width="85%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
 </p>
 
-> **Official Institutional External Defense Geotag Record (VESIT Chembur, November 2026):**  
+> **Official Institutional External Defense Geotag Record (VESIT Chembur, Saturday 21/11/2026):**  
 > Defense session conducted before the University of Mumbai External Examiner Panel, Project Mentor **Dr. Kadambari Sharma**, and Project Guide / Coordinator **Mr. Gopalkrishnan Narayan**. The presentation showcased the live 2-RC multi-chemistry physics simulator, multi-observer dashboard telemetry, C99 CSR firmware execution, and 200/200 bit-exact FPGA RTL parity on the Xilinx Artix-7 platform.  
-> **GPS Coordinates:** `19.0490° N, 72.8890° E` | **Altitude:** `18.4 m ASL` | **Accuracy:** `± 2.1 m`
+> **Venue:** Hashu Advani Memorial Complex, Collector Colony, Chembur, Mumbai, Maharashtra 400071, India (VESIT)  
+> **GPS Coordinates:** `Lat 19.045278° Long 72.889039°` | **Timestamp:** Saturday, 21/11/2026 11:59 AM GMT +05:30 (Captured by GPS Map Camera)
 
 #### 🗣️ External Examination Committee Feedback & Evaluation
 > **External Examiner & Committee Commendation:**  
@@ -194,7 +195,10 @@ flowchart LR
 > *Committee Evaluation Highlights:*  
 > 1. **Complete Turnkey Deliverables:** Evaluated and accepted all 4 official academic deliverables on disk (41-page Capstone Thesis monograph, 6-page IEEE camera-ready research paper, 12-page Elsevier camera-ready review paper, and 2-sheet A3 exhibition poster).  
 > 2. **Hardware & Silicon Parity:** Validated bit-exact FPGA hardware execution (`esn_ip_platform` v1.2, 318 LUTs, 2 DSPs, 307 cycles at 80 MHz) and MISRA-C compliant C99 firmware with 6.7× CSR SpMV speedup.  
-> 3. **Unanimous Sign-Off:** Awarded **Grade O (Outstanding / 100 Marks)** and formally recommended the project for the Institutional Best Capstone Project Award.
+> 3. **Unanimous Panel Sign-Off:** Unanimous final acceptance across all committee members, officially concluding the undergraduate B.E. Capstone defense.  
+>  
+> **External Reviewer Recommendation & Repository Conclusion:**  
+> *"During our final review, our external reviewer evaluated the comprehensive theoretical modeling, simulation pipeline, C99 firmware, and FPGA RTL verification. The reviewer commended the end-to-end cyber-physical architecture and specifically advised that having validated the mathematical formulation and bit-exact FPGA hardware, the sole future scope is to test and validate this system on real physical battery cells and live packs. With this constructive recommendation, the examination concluded successfully, all academic deliverables were unanimously accepted, and with this, we concluded this repository on an accomplished and positive note."*
 
 #### 🛠️ Technical Changes Implemented in Response (Final Review & v2.4.1 Handoff)
 1. **Turnkey Integration of All 4 Academic Deliverables:**  
@@ -247,7 +251,7 @@ This repository tells a complete, end-to-end engineering and scientific story: *
 flowchart LR
     M0["<b>Phase 0: Inception</b><br/>• Problem Scoping<br/>• Literature Survey<br/>• Proposal Submission<br/><i>(Aug 2026)</i>"] --> M1["<b>Phase 1: Baseline</b><br/>• Review 1 Defense<br/>• 2-RC ECM Engine<br/>• EKF & CC Baselines<br/>• C99 CSR Logic<br/><i>(Sep 2026)</i>"]
     M1 --> M2["<b>Phase 2: Maturity</b><br/>• Review 2 Defense<br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/>• 16:9 Deck & Report<br/><i>(Nov 2026)</i>"]
-    M2 --> M3["<b>Phase 3: Final Defense</b><br/>• External Viva Voce<br/>• 100/100 Marks (Grade O)<br/>• Live Defense Video<br/><i>(Nov 2026)</i>"]
+    M2 --> M3["<b>Phase 3: Final Defense</b><br/>• External Viva Voce<br/>• Unanimous Acceptance<br/>• Live Defense Video<br/><i>(Nov 2026)</i>"]
     M3 --> M4["<b>Turnkey Release (v2.4.1)</b><br/>• 100% Turnkey Capstone Active<br/>• All 4 Academic Deliverables<br/>• Thesis, Papers, Poster & Bitstream<br/><i>(Fully Verified & Handed Off)</i>"]
 ```
 
@@ -313,7 +317,7 @@ Navigate the repository according to your area of interest:
 | :--- | :--- | :--- | :---: |
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
 | **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
-| **Final Review** | [Final Review Delivered Report](docs/Final_Review/Final_Review_Delivered.md) · [Slide Deck](docs/Final_Review/Final_Review_PPT.pdf) · [Live Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) · [Hub](docs/Final_Review/README.md) | Official University of Mumbai external viva defense, Grade O (Outstanding / 100M), all 4 deliverables accepted, live YouTube walkthrough | **Completed / Grade O (Outstanding)** |
+| **Final Review** | [Final Review Delivered Report](docs/Final_Review/Final_Review_Delivered.md) · [Slide Deck](docs/Final_Review/Final_Review_PPT.pdf) · [Live Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) · [Hub](docs/Final_Review/README.md) | Official University of Mumbai external viva defense, all 4 deliverables accepted, external reviewer advised real battery testing as future scope; repository concluded on an accomplished note | **Completed / Defense Concluded** |
 | **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.1 Turnkey)** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (2-sheet A3 portrait, open / unencrypted, 318-LUT RTL, Vivado schematic & NASA benchmarks) | **Completed & Integrated (Open)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Hardware architectures for learned battery SOC estimation: recurrent & reservoir accelerators review (Elsevier, 12 pages, 232 KB encrypted, 77 citations) | **Completed & Integrated (Camera-Ready)** |

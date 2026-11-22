@@ -27,10 +27,9 @@
 </p>
 
 > **Official Institutional Defense Geotag Record:**  
-> **Venue:** Vivekanand Education Society's Institute of Technology (VESIT), Chembur, Mumbai, Maharashtra 400074  
-> **GPS Coordinates:** `19.0490° N, 72.8890° E` | **Altitude:** `18.4 m ASL` | **Accuracy:** `± 2.1 m`  
-> **Timestamp:** November 2026 | **Milestone:** Final External Review & Capstone Viva Voce  
-> *(Note: High-fidelity institutional audit graphic; to be swapped with final high-resolution camera photograph).*
+> **Venue:** Hashu Advani Memorial Complex, Collector Colony, Chembur, Mumbai, Maharashtra 400071, India (VESIT)  
+> **GPS Coordinates:** `Lat 19.045278° Long 72.889039°` | **Timestamp:** Saturday, 21/11/2026 11:59 AM GMT +05:30 (Captured by GPS Map Camera)  
+> **Evaluation Outcome:** **Successful External Defense — Turnkey Capstone Handoff Complete**
 
 ---
 
@@ -43,7 +42,7 @@
 </p>
 
 * **YouTube Defense Video Link:** [https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
-* **Presentation Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) (8 widescreen 16:9 slides)
+* **Presentation Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))* (6 widescreen 16:9 slides covering Hardware ESN IP Block & Bit-Exact Verification, Software 2-RC Estimation Pipeline, and NASA PCoE Experimental Results)
 
 ---
 
@@ -55,7 +54,10 @@
 > **Key Observations by the Committee:**  
 > 1. **Complete 4-of-4 Deliverable Integration:** The committee commended the team for submitting all four required academic assets in camera-ready and final form: the 41-page dissertation monograph ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)), the IEEE camera-ready research paper ([`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)), the Elsevier camera-ready review paper ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)), and the official 2-sheet A3 symposium exhibition poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).  
 > 2. **Silicon-Validated Hardware Verification:** The team demonstrated **200/200 bit-exact stage verification** between Python golden models and Xilinx Artix-7 Verilog HDL RTL (`esn_ip_platform` v1.2), running with positive timing slack (+0.023 ns at 80 MHz) and minimal silicon footprint (318 LUTs, 2 DSPs).  
-> 3. **Industrial Relevance & Regulatory Audit:** The project adheres to Indian automotive e-mobility standards (AIS-156 Amendment 3 Phase 2 thermal runaway 5-minute warning) and provides an open, reproducible test harness with **125 / 125 automated passing tests**.
+> 3. **Industrial Relevance & Regulatory Audit:** The project adheres to Indian automotive e-mobility standards (AIS-156 Amendment 3 Phase 2 thermal runaway 5-minute warning) and provides an open, reproducible test harness with **125 / 125 automated passing tests**.  
+>  
+> **External Reviewer Advice & Concluding Recommendation:**  
+> *"During our final review, our external reviewer evaluated the comprehensive theoretical modeling, simulation pipeline, C99 firmware, and FPGA RTL verification. The reviewer commended the end-to-end cyber-physical architecture and specifically advised that having achieved 200/200 bit-exact FPGA parity and rigorous NASA dataset validation, the sole future scope is to test and validate this system on real physical battery cells and live battery packs under practical cycling conditions. With this constructive recommendation, the examination concluded successfully, all academic deliverables were unanimously accepted, and with this, we concluded this repository on an accomplished and positive note."*
 
 ---
 
@@ -81,7 +83,7 @@
 | **Project Inception** | Aug 2026 | Problem formulation, ESN feasibility, and departmental proposal. | Initial scoping approved by Department of Automation and Robotics. | [`docs/Resources/PROJECT_PROPOSAL.md`](../Resources/PROJECT_PROPOSAL.md) |
 | **Review 1 (Phase 1)** | Sep 2026 | Baseline 2-RC physics, initial Coulomb Counting & EKF benchmarks. | Feedback: *Add ESN Core Architecture Diagram and customise PPT.* Action: Created [`images/esn_architecture.png`](../../images/esn_architecture.png), built 16:9 [`Review_1_PPT.pdf`](../Review_1/Review_1_PPT.pdf). | [`docs/Review_1/README.md`](../Review_1/README.md) |
 | **Review 2 (Phase 2)** | Nov 2026 | Online RLS adaptation, 10 drive cycles, NASA aging datasets, 200/200 bit-exact FPGA parity. | Feedback: *Structure presentation into narrative flow and add realistic battery degradation.* Action: Created 5-Act [`Review_2_PPT.pdf`](../Review_2/Review_2_PPT.pdf), integrated NASA 32-cycle data. | [`docs/Review_2/README.md`](../Review_2/README.md) |
-| **Final Review (Phase 3)** | Nov 2026 | Final capstone defense before external university panel, turnkey handoff. | Outcome: **100/100 marks awarded**, recommended for Best Project Award. All 4 academic deliverables integrated. | [`Final_Review_Delivered.md`](Final_Review_Delivered.md) · [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) |
+| **Final Review (Phase 3)** | Nov 2026 | Final capstone defense before external university panel, turnkey handoff. | Feedback: *Advised testing system on real physical battery cells/packs as future scope.* Outcome: **Unanimous committee acceptance**, all 4 academic deliverables accepted; repository concluded on an accomplished note. | [`Final_Review_Delivered.md`](Final_Review_Delivered.md) · [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) |
 
 ---
 
