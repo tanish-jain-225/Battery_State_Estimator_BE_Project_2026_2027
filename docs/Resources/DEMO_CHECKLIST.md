@@ -1,10 +1,10 @@
-[← Back to Main Repository](../../README.md) · [Presentation Speaker Notes](PRESENTATION.md) · [Review 2 Progress](../Review_2/Review_2_Progress.md) · [Documentation Hub](../README.md)
+[← Back to Main Repository](../../README.md) · [Final Review Deck](../Final_Review/Final_Review_PPT.pdf) · [Presentation Speaker Notes](PRESENTATION.md) · [Final Review Report](../Final_Review/Final_Review_Delivered.md) · [Documentation Hub](../README.md)
 
 # Demo Checklist
 
 Use this interactive checklist to prepare for a review, viva, project exhibition, or pull request verification.
 
-▶️ **YouTube Video Walkthrough**: [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
+▶️ **Live Final Phase Presentation & Video Walkthrough**: [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
 
 ---
 

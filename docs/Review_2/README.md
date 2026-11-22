@@ -1,6 +1,6 @@
 # Review 2 Milestone: Maturity, Parity & Institutional Defense
 
-[← Back to Main Repository](../../README.md) · [Documentation Hub](../README.md) · [Review 1](../Review_1/README.md) · [Progress Report](Review_2_Progress.md) · [Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes (PDF)](Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) · [Next: Capstone Thesis →](../Thesis/README.md)
+[← Back to Main Repository](../../README.md) · [Documentation Hub](../README.md) · [Review 1](../Review_1/README.md) · [Progress Report](Review_2_Progress.md) · [Slide Deck (PDF)](Review_2_PPT.pdf) · [FPGA Outcomes (PDF)](Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) · [Next: Final Review →](../Final_Review/README.md) · [Capstone Thesis →](../Thesis/README.md)
 
 ---
 

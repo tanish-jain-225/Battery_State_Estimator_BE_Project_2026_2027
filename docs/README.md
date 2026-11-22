@@ -1,6 +1,6 @@
 # Master Documentation Hub
 
-[← Back to Main Repository](../README.md) · [Review 1](Review_1/Review_1_Progress.md) · [Review 2](Review_2/Review_2_Progress.md) · [FPGA IP Block](../hardware/IP_Block/README.md) · [Capstone Thesis](Thesis/README.md) · [Publications](Publications/README.md)
+[← Back to Main Repository](../README.md) · [Review 1](Review_1/Review_1_Progress.md) · [Review 2](Review_2/Review_2_Progress.md) · [Final Review](Final_Review/Final_Review_Delivered.md) · [FPGA IP Block](../hardware/IP_Block/README.md) · [Capstone Thesis](Thesis/README.md) · [Publications](Publications/README.md)
 
 ---
 
@@ -37,6 +37,11 @@ docs/
 │   └── Outcomes/                  # Validated deliverables and evaluation reports
 │       ├── FPGA-Based-Echo-State-Network-...pdf
 │       └── Neuromorphic-BMS-Review-Paper-Draft.pdf
+├── Final_Review/                  # Final Capstone External Review & Viva Voce Defense
+│   ├── Final_Review_Delivered.md  # Comprehensive defense proceedings, Q&A & handoff audit
+│   ├── Final_Review_PPT.pdf       # Official 16:9 widescreen final defense slide deck
+│   ├── Final_Review_Geotag_Photo.png # Official institutional defense geotag photographic record
+│   └── README.md                  # Milestone hub, committee commendations & video walkthrough
 ├── Resources/                     # Engineering Guides & Technical References
 │   ├── ARTIFACTS.md               # Model parameters and dataset versioning policy
 │   ├── DEMO_CHECKLIST.md          # 10-minute presentation & viva defense checklist
@@ -67,6 +72,7 @@ docs/
 3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
 4. **Hardware Acceleration & Silicon IP Core (`v2.4.1`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
 5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
+6. **Final External Review & Viva Voce Defense (`Completed in v2.4.1`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/fXS4TLaXGGw) — Official University of Mumbai external viva voce examination, Grade O (Outstanding / 100 Marks), and turnkey repository handoff.
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*
@@ -85,8 +91,9 @@ docs/
    * **Comprehensive Review Paper (`Completed & Integrated`):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 232 KB encrypted, 77 Citations)
 2. **Publication Proofs & Evaluation Registry (20 Marks):** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — 10 Marks submission receipt + 10 Marks acceptance letter tracking.
 3. **Academic Exhibition Poster (`Completed & Integrated`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official 2-sheet A3 symposium poster (535 KB, 11 panels, VESIT 2026–27).
-4. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.
-5. **Speaker Notes & Defense Talking Points:** [`docs/Resources/PRESENTATION.md`](Resources/PRESENTATION.md) — Comprehensive slide-by-slide script for Review viva.
+4. **Final Review External Viva Voce Defense (`Completed & Integrated`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/fXS4TLaXGGw) — Capstone defense proceedings, examination Q&A transcript, and institutional handoff.
+5. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.
+6. **Speaker Notes & Defense Talking Points:** [`docs/Resources/PRESENTATION.md`](Resources/PRESENTATION.md) — Comprehensive slide-by-slide script for Review viva.
 
 ---
 
