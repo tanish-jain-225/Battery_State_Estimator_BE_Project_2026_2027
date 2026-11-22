@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary & Current State (`v2.4.1`)
 
-As of `v2.4.1` (commit [`4a376cd`](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/commit/4a376cd)), the repository is **100% complete, verified, and grounded in empirical truth**:
+As of **[`v2.4.1`](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.1)** (Active Release), the repository is **100% complete, verified, and grounded in empirical truth**:
 
 - **All 4 Academic Deliverables Finalized & Integrated on Disk:**
   - Original Research Paper (6-page IEEE manuscript): [`docs/Publications/Research_Paper.pdf`](Publications/Research_Paper.pdf)
