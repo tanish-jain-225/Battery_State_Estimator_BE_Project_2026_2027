@@ -51,6 +51,7 @@ docs/
 │   ├── PROJECT_PROPOSAL.md        # Official BE project proposal & methodology
 │   ├── SYSTEM_SPECIFICATION.md    # Circuit parameters, sensor noise & observer math
 │   └── WEB_RESEARCH.md            # Automotive BMS landscape & ISO 26262 audit
+├── TRANSITION_PLAN_v2.4.2.md      # Step-by-step transition runbook for v2.4.2 closure
 └── literature_survey.md           # Detailed literature survey & academic taxonomy
 ```
 
@@ -73,6 +74,7 @@ docs/
 4. **Hardware Acceleration & Silicon IP Core (`v2.4.1`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
 5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
 6. **Final External Review & Viva Voce Defense (`Completed in v2.4.1`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) — Official University of Mumbai external viva voce examination, unanimous committee acceptance, and turnkey repository handoff.
+7. **Transition Plan to v2.4.2 (`Active Transition Runbook`):** [`docs/TRANSITION_PLAN_v2.4.2.md`](TRANSITION_PLAN_v2.4.2.md) — Operational runbook for final defense YouTube link swap, automated verification, and permanent repository closure.
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*
@@ -83,6 +85,7 @@ docs/
 5. **STM32 Embedded C99 Verifier:** [`hardware/STM_Verifier/README.md`](../hardware/STM_Verifier/README.md) — CSR SpMV 6.7× speedup, Q12/Q15 integer arithmetic, and LUT Tanh.
 6. **FPGA RTL Verifier & Subsystems:** [`hardware/FPGA_Verifier/README.md`](../hardware/FPGA_Verifier/README.md) — Bit-exact Verilog RTL for 100-neuron ESN, fixed-point EKF, and fixed-point UKF.
 7. **Automated Regression Suite (125 Tests):** [`tests/README.md`](../tests/README.md) — 16 specialized test modules with 88.60% coverage on `software/shared` (`125 passed in 24.67s`).
+8. **Master System Audit & Repair Progress:** [`REPAIR_PROGRESS.md`](../REPAIR_PROGRESS.md) — Exhaustive system audit, defect repair register, and subsystem benchmark records.
 
 ### 4. 🎓 The Defense & Academic Evaluation Stream
 *Exhibition, presentation, and university evaluation criteria:*

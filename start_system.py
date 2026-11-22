@@ -18,6 +18,26 @@ from typing import Optional
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def find_repo_root() -> str:
+    """Locate the repository root directory regardless of current working directory."""
+    candidate = os.path.dirname(os.path.abspath(__file__))
+    if os.path.isfile(os.path.join(candidate, "software", "simulator", "app.py")):
+        return candidate
+    cwd = os.getcwd()
+    if os.path.isfile(os.path.join(cwd, "software", "simulator", "app.py")):
+        return cwd
+    curr = candidate
+    for _ in range(5):
+        parent = os.path.dirname(curr)
+        if os.path.isfile(os.path.join(parent, "software", "simulator", "app.py")):
+            return parent
+        if parent == curr:
+            break
+        curr = parent
+    return candidate
+
+ROOT_DIR = find_repo_root()
+
 try:
     from dotenv import load_dotenv
     load_dotenv(os.path.join(ROOT_DIR, '.env'))
@@ -30,6 +50,16 @@ def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
         s.settimeout(0.5)
         return s.connect_ex((host, port)) == 0
 
+def find_available_port(preferred_port: int, host: str = "127.0.0.1", avoid: Optional[set] = None, max_attempts: int = 100) -> int:
+    """Find the preferred port or next free non-conflicting port."""
+    avoid = avoid or set()
+    port = preferred_port
+    while port in avoid or is_port_in_use(port, host):
+        port += 1
+        if port - preferred_port > max_attempts:
+            return preferred_port
+    return port
+
 def wait_for_port(port: int, timeout: float = 15.0, host: str = "127.0.0.1") -> bool:
     """Wait until a local port opens and accepts TCP connections."""
     start_time = time.time()
@@ -40,21 +70,33 @@ def wait_for_port(port: int, timeout: float = 15.0, host: str = "127.0.0.1") -> 
     return False
 
 def check_dependencies() -> bool:
-    """Verify that core runtime dependencies are installed."""
+    """Verify that core runtime dependencies are installed, offering auto-install if pip is available."""
+    required = ("flask", "numpy", "scipy", "pandas", "requests")
     missing = []
-    for pkg in ("flask", "numpy", "scipy"):
+    for pkg in required:
         try:
             __import__(pkg)
         except ImportError:
             missing.append(pkg)
-    if missing:
-        print("\n[ERROR] Missing required Python packages:")
-        for m in missing:
-            print(f"  - {m}")
-        print("\nPlease run the following command to install dependencies:")
-        print(f"  {sys.executable} -m pip install -r requirements.txt\n")
-        return False
-    return True
+
+    if not missing:
+        return True
+
+    print(f"\n[DIAGNOSTIC] Missing runtime packages: {', '.join(missing)}")
+    req_file = os.path.join(ROOT_DIR, "requirements.txt")
+    if os.path.isfile(req_file):
+        print("[AUTO-SETUP] Installing missing packages from requirements.txt...")
+        try:
+            res = subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_file], check=False)
+            if res.returncode == 0:
+                print("[SUCCESS] Dependencies installed successfully.\n")
+                return True
+        except Exception as e:
+            print(f"[WARNING] Automatic installation failed ({e}).")
+
+    print("\nPlease run the following command to install dependencies:")
+    print(f"  {sys.executable} -m pip install -r requirements.txt\n")
+    return False
 
 def print_banner():
     banner = r"""
@@ -72,18 +114,22 @@ def main():
     if not check_dependencies():
         sys.exit(1)
 
-    sim_port = int(os.environ.get("SIMULATOR_PORT", 8000))
-    vis_port = int(os.environ.get("VISUALISER_PORT", 5000))
+    sim_port_pref = int(os.environ.get("SIMULATOR_PORT", 8000))
+    vis_port_pref = int(os.environ.get("VISUALISER_PORT", 5000))
 
-    if sim_port == vis_port:
-        print(f"\n[ERROR] Port collision detected: Simulator and Visualiser are both configured on port {sim_port}.")
+    if sim_port_pref == vis_port_pref:
+        print(f"\n[ERROR] Port collision: Simulator and Visualiser are both configured on port {sim_port_pref}.")
         print("Please configure distinct ports (e.g. SIMULATOR_PORT=8000 and VISUALISER_PORT=5000) in .env.\n")
         sys.exit(1)
 
-    if is_port_in_use(sim_port):
-        print(f"[WARNING] Port {sim_port} is already in use. A simulator instance may already be running.")
-    if is_port_in_use(vis_port):
-        print(f"[WARNING] Port {vis_port} is already in use. A visualiser instance may already be running.")
+    # Graceful handling of occupied ports: auto-allocate next free port if occupied
+    sim_port = find_available_port(sim_port_pref, avoid={vis_port_pref})
+    if sim_port != sim_port_pref:
+        print(f"[PORT AUTO-RECOVERY] Preferred simulator port {sim_port_pref} is occupied. Reallocated to port {sim_port}.")
+
+    vis_port = find_available_port(vis_port_pref, avoid={sim_port})
+    if vis_port != vis_port_pref:
+        print(f"[PORT AUTO-RECOVERY] Preferred visualiser port {vis_port_pref} is occupied. Reallocated to port {vis_port}.")
 
     sim_script = os.path.join(ROOT_DIR, "software", "simulator", "app.py")
     vis_script = os.path.join(ROOT_DIR, "software", "visualiser", "app.py")
@@ -99,6 +145,7 @@ def main():
     env["PYTHONUNBUFFERED"] = "1"
     env["SIMULATOR_PORT"] = str(sim_port)
     env["VISUALISER_PORT"] = str(vis_port)
+    env["SIMULATOR_URL"] = f"http://127.0.0.1:{sim_port}"
 
     sim_proc: Optional[subprocess.Popen] = None
     vis_proc: Optional[subprocess.Popen] = None
@@ -160,13 +207,15 @@ def main():
         print("=" * 71)
         print("Press Ctrl+C at any time to stop all services.\n")
 
-        # Automatically open browser
-        dashboard_url = f"http://localhost:{vis_port}"
-        try:
-            time.sleep(1.0)
-            webbrowser.open(dashboard_url)
-        except Exception:
-            pass
+        # Automatically open browser unless headless/non-interactive mode is requested
+        headless = "--no-browser" in sys.argv or os.environ.get("HEADLESS") == "1" or os.environ.get("NON_INTERACTIVE") == "1"
+        if not headless:
+            dashboard_url = f"http://localhost:{vis_port}"
+            try:
+                time.sleep(1.0)
+                webbrowser.open(dashboard_url)
+            except Exception:
+                pass
 
         # Monitor processes
         while True:

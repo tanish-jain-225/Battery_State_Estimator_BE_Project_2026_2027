@@ -626,9 +626,11 @@ BE-Capstone-Project/
 ├── CITATION.cff                           # Machine-readable BibTeX / APA citation metadata
 ├── SECURITY.md                            # Security policy & vulnerability reporting
 ├── CODE_OF_CONDUCT.md                     # Contributor Covenant scientific code of conduct
+├── REPAIR_PROGRESS.md                     # Master system audit, defect repair & benchmark log
 │
 ├── docs/
 │   ├── README.md                          # Master documentation hub & 4-stream guide
+│   ├── TRANSITION_PLAN_v2.4.2.md          # Step-by-step transition plan & runbook for final v2.4.2 closure
 │   ├── literature_survey.md               # 29-page survey on SNNs, ESNs & Neuromorphic BMS
 │   │
 │   ├── Thesis/                            # B.E. Capstone Final Dissertation (Completed in v2.4.1)
