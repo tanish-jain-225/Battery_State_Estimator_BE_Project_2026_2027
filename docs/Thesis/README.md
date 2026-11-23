@@ -34,7 +34,7 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 | **File Size** | **5,314,078 bytes (5.07 MB)** |
 | **Page Count** | **41 Pages** (Full academic monograph with Certificate, Declarations, 8 Chapters, 3 Appendices & Literature Cited) |
 | **Encryption Status** | **Encrypted** (Official institutional submission format with password security permissions) |
-| **Status** | **Completed & Integrated (Turnkey v2.4.1 Capstone)** |
+| **Status** | **Completed & Integrated (Turnkey v2.4.2 Capstone)** |
 
 ---
 
@@ -189,7 +189,7 @@ The dissertation report has been authored and compiled in strict accordance with
 VESIT B.E. CAPSTONE DISSERTATION VERIFICATION:
 • File: docs/Thesis/Final_Thesis.pdf (5,314,078 bytes / 5.07 MB encrypted)
 • Status: 100% COMPLETE & VERIFIED (Deliverable 4 of 4)
-• Turnkey Release: v2.4.1 Turnkey Capstone Reached
+• Turnkey Release: v2.4.2 Turnkey Capstone Reached
 ================================================================================
 ```
 

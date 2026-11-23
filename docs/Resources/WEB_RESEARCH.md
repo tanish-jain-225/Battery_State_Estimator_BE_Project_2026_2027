@@ -416,12 +416,12 @@ Your project delivers **7 tangible engineering and academic deliverables**:
 * **Mentor Feedback Addressed:** 5-Act presentation narrative arc, 10 dynamic drive cycles with NASA PCoE aging data, and 1.0s multi-chemistry simulator pacing.
 * **Function:** Comprehensive academic evaluation reports, slide deck, and defense materials for Viva committee presentation.
 
-### 📦 Deliverable 7: Academic Deliverables (All 4 Academic Deliverables Completed in `v2.4.1`)
-* **Target Paper 1 (Original Research — Completed `v2.4.0`):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
+### 📦 Deliverable 7: Academic Deliverables (All 4 Academic Deliverables Completed & Integrated)
+* **Target Paper 1 (Original Research — Completed):** [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (6-Page Camera-Ready IEEE PDF, 674 KB encrypted) / [`reference/paper.md`](../../reference/paper.md) (Authored IEEE manuscript)
 * **Target Paper 2 (Comprehensive Review — Completed):** [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (12-Page Camera-Ready Elsevier/ScienceDirect PDF, 232 KB encrypted, 77 references) / [`docs/Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf`](../Review_2/Outcomes/Neuromorphic-BMS-Review-Paper-Draft.pdf) (Companion review draft)
 * **Presentation Poster (Completed & Integrated):** [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (Official 2-sheet A3 exhibition poster, open / unencrypted, 535 KB, 11 panels)
-* **Final B.E. Thesis (Completed & Integrated in `v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (Official 41-page University of Mumbai / VESIT dissertation, 5.07 MB encrypted)
-* **Portfolio Status:** With all 4 compiled PDFs integrated on disk, the repository is operating at **`v2.4.1` (Turnkey Capstone Release)**.
+* **Final B.E. Thesis (Completed & Integrated):** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (Official 41-page University of Mumbai / VESIT dissertation, 5.07 MB encrypted)
+* **Portfolio Status:** With all 4 compiled PDFs integrated on disk, the repository is operating at **`v2.4.2` (Turnkey Capstone Release)**.
 
 ---
 
@@ -501,7 +501,7 @@ The entire system has been verified through automated hardware-in-the-loop, cycl
 
 ## 12. Verification Audit & Quality Assurance Certification
 
-This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.1`:
+This repository has completed a comprehensive, automated verification audit confirming zero technical debt across `v2.4.2`:
 
 ```
 ============================= 125 passed in 24.67s =============================
@@ -513,7 +513,7 @@ This repository has completed a comprehensive, automated verification audit conf
 - **Storage & Link Hygiene Audit:** **0 empty files** and **0 untracked files** across **483 tracked repository files (`85.45 MiB`)**, plus **0 broken links** across all **43 Markdown files**.
 - **Hardware-Software Parity:** **200 / 200 bit-exact ESN (`FPGA_Verifier`)**, **512 / 512 bit-exact EKF & UKF (`FPGA_Verifier`)**, **10 / 10 Verilator `5.028` serial & fast core regressions (`IP_Block v1.2`)**, and **29 held-out NASA PCoE pack checks**.
 - **Departmental BE Capstone Template:** **34 / 34 sections aligned** with Department of Automation & Robotics / Instrumentation, VESIT Mumbai.
-- **Turnkey Capstone Status:** **`v2.4.1` Turnkey Capstone Active — Engineering Complete + All 4 Academic Deliverables Finalized & Integrated**.
+- **Turnkey Capstone Status:** **`v2.4.2` Turnkey Capstone Active — Engineering Complete + All 4 Academic Deliverables Finalized & Integrated**.
 
 ---
 

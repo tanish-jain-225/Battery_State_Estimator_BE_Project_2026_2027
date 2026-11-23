@@ -15,11 +15,11 @@ docs/
 ├── Poster/                        # Academic Exhibition & Defense Poster (Completed & Integrated)
 │   ├── Project_Poster.pdf         # Official 2-Sheet A3 Presentation Poster (535 KB, Open / Unencrypted, 11 Panels)
 │   └── README.md                  # Layout specifications, 11-panel transcription & metrics
-├── Thesis/                        # B.E. Capstone Final Dissertation (Completed in v2.4.1)
+├── Thesis/                        # B.E. Capstone Final Dissertation (Completed & Integrated)
 │   ├── Final_Thesis.pdf           # Official B.E. Capstone Dissertation Report (41 Pages, 5.07 MB Encrypted)
 │   └── README.md                  # Complete 8-chapter monograph breakdown & verification
 ├── Publications/                  # Official Academic Paper Deliverables
-│   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed in v2.4.1)
+│   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed & Integrated)
 │   ├── Review_Paper.pdf           # Comprehensive Review Paper (12 Pages, Camera-Ready Integrated)
 │   └── README.md                  # Publication abstracts, authorship, and scopes
 ├── Paper_Proof/                   # Evaluation Submission & Acceptance Records Registry
@@ -51,7 +51,6 @@ docs/
 │   ├── PROJECT_PROPOSAL.md        # Official BE project proposal & methodology
 │   ├── SYSTEM_SPECIFICATION.md    # Circuit parameters, sensor noise & observer math
 │   └── WEB_RESEARCH.md            # Automotive BMS landscape & ISO 26262 audit
-├── TRANSITION_PLAN_v2.4.2.md      # Step-by-step transition runbook for v2.4.2 closure
 └── literature_survey.md           # Detailed literature survey & academic taxonomy
 ```
 
@@ -71,10 +70,9 @@ docs/
 1. **Project Proposal (Aug 2026):** [`docs/Resources/PROJECT_PROPOSAL.md`](Resources/PROJECT_PROPOSAL.md) — Initial problem scoping, ESN feasibility formulation, and departmental submission.
 2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/README.md`](Review_1/README.md) · [`Progress Report`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) · [Phase 1 Video](https://youtu.be/fXS4TLaXGGw) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic. *Feedback Addressed: Added ESN Core Architecture Diagram & Customized 16:9 PPT.*
 3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
-4. **Hardware Acceleration & Silicon IP Core (`v2.4.1`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
-5. **Final B.E. Capstone Dissertation (`Completed in v2.4.1`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
-6. **Final External Review & Viva Voce Defense (`Completed in v2.4.1`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Official University of Mumbai external viva voce examination, unanimous committee acceptance, and turnkey repository handoff.
-7. **Transition Plan to v2.4.2 (`Active Transition Runbook`):** [`docs/TRANSITION_PLAN_v2.4.2.md`](TRANSITION_PLAN_v2.4.2.md) — Operational runbook for final defense YouTube link swap, automated verification, and permanent repository closure.
+4. **Hardware Acceleration & Silicon IP Core (`v2.4.2`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
+5. **Final B.E. Capstone Dissertation (`Completed & Integrated`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
+6. **Final External Review & Viva Voce Defense (`Completed & Concluded`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Official University of Mumbai external viva voce examination, unanimous committee acceptance, and turnkey repository handoff.
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*

@@ -23,7 +23,7 @@
 > Official institutional defense session conducted before Project Mentor Dr. Kadambari Sharma and Project Guide / Coordinator Mr. Gopalkrishnan Narayan at the Department of Automation & Robotics / Instrumentation. All Phase 2 deliverables—including the online RLS adaptive ESN, C99 embedded firmware, and 200/200 bit-exact FPGA RTL parity on Artix-7—were demonstrated live.  
 
 **Document Reference:** [`docs/Review_2/Review_2_Progress.md`](Review_2_Progress.md)  
-**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 125 Tests in v2.4.1, 200 / 200 FPGA Parity Stages)**
+**Verification Status:** **100% Passed (62 / 62 Automated Tests at Review 2 Milestone; expanded to 125 Tests in v2.4.2, 200 / 200 FPGA Parity Stages)**
 
 ---
 
@@ -56,7 +56,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 2. **Unscented Kalman Filter (UKF)** implementation as a rigorous non-linear benchmark alongside EKF and Coulomb Counting.
 3. **Dual C99 Microcontroller Execution**: Floating-point (99.80% acc) and integer-only Q15 fixed-point (98.40% acc) with **6.7× CSR SpMV acceleration**.
 4. **Verilog HDL FPGA RTL Verification on Artix A7100T**: Bit-exact stage parity (200/200 stages verified) and multi-timestep temporal sequence processing.
-5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing at Review 2 milestone (expanded to 125 passing tests in v2.4.1).
+5. **Comprehensive Automated Test Suite**: 62 automated unit and integration tests passing at Review 2 milestone (expanded to 125 passing tests in v2.4.2).
 
 ---
 
@@ -70,7 +70,7 @@ Reservoir Computing via **Echo State Networks (ESNs)** provides recurrent dynami
 | **C99 Embedded Firmware** | Conceptual CSR code | **Fully Benchmarked Dual C99 Engine** | Float32 (99.80%) vs Q15 (98.40%), 0.0031 RMSE, 6.7× CSR SpMV speedup. |
 | **FPGA RTL Verification** | Single-pass 100-neuron test | **200/200 Stages Parity + Multi-Step Sequence** | Bit-exact matching in Vivado XSim and temporal sequence input indexing (`tb_esn_top_tiny.v`). |
 | **FPGA IP Block & Platform** | Conceptual / In Progress | **Plug-and-Play AXI4 IP (`esn_axi_ip`) + Arty A7 Platform** | IEEE 1685 IP-XACT catalog module with concurrent tri-observer execution (ESN + EKF + UKF in parallel). |
-| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass; 125 in v2.4.1)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
+| **Automated Testing Suite** | Partial ad-hoc tests | **62 Automated Tests (100% Pass; 125 in v2.4.2)** | Regression tested across physics, ML, firmware, state serialization, and RTL parity. |
 | **One-Click Validation** | Separate build scripts | **Unified 8-Step Runner (`.bat` / `.sh`)** | Zero-configuration validation across hardware and software in under 45 seconds. |
 
 ---
@@ -288,7 +288,7 @@ python hardware/FPGA_Verifier/compare_results.py
 The developmental journey from Review 2 evolves directly into synthesizable silicon IP core packaging and final academic degree defense:
 
 ```
-[Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination (v2.4.1)]
+[Phase 1: Baseline] ──► [Phase 2: Maturity] ──► [Phase 3: Silicon IP] ──► [Phase 4: Culmination (v2.4.2)]
 - 2-RC Physics          - Online RLS ESN        - IEEE 1685 IP-XACT AXI4  - Final B.E. Thesis (Completed)
 - EKF & CC Baselines    - UKF Implementation    - Artix-7 v1.2 Bitstream  - Comprehensive Review (Completed)
 - C99 CSR & Q15         - 200/200 FPGA Parity   - UART HIL + 29 Packs     - A3 Exhibition Poster (Completed)
@@ -303,7 +303,7 @@ The developmental journey from Review 2 evolves directly into synthesizable sili
    * **UART HIL Host Streaming**: Automated Python testbench CLI ([`hardware/IP_Block/host/esn_host.py`](../../hardware/IP_Block/host/esn_host.py)) with 29 held-out packs and `reproduce_paper.py` delivering real-time headroom over 115200-baud serial links.
    * **Regression Suite**: Expanded to **125 passing tests** with **`88.60%`** coverage on `software/shared`.
 
-2. **Phase 4 — Turnkey Academic Deliverables for `v2.4.1` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
+2. **Phase 4 — Turnkey Academic Deliverables for `v2.4.2` ([`docs/Thesis/README.md`](../Thesis/README.md))**:
    *(All 4 academic deliverables finalized, verified, and integrated on disk)*:
    * **B.E. Final Thesis**: Official 41-page dissertation report adhering to University of Mumbai guidelines ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), 5.07 MB encrypted).
    * **Comprehensive Review Paper**: Camera-ready 12-page Elsevier / ScienceDirect review manuscript ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf), 232 KB encrypted, 77 citations).

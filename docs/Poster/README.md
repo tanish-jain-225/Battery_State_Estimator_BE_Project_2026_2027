@@ -21,7 +21,7 @@ This directory contains the official **Academic Exhibition & Defense Presentatio
 
 > [!NOTE]
 > **Academic Portfolio Status (All 4 Deliverables Finalized & Integrated):**  
-> Alongside [`Project_Poster.pdf`](Project_Poster.pdf), all **4 out of 4** academic deliverables are now 100% complete, integrated, and verified alongside the entire software, firmware, C99 CSR acceleration, Artix-7 RTL silicon IP block (`esn_ip_platform` v1.2), and 125 automated regression tests in the turnkey `v2.4.1` release.
+> Alongside [`Project_Poster.pdf`](Project_Poster.pdf), all **4 out of 4** academic deliverables are now 100% complete, integrated, and verified alongside the entire software, firmware, C99 CSR acceleration, Artix-7 RTL silicon IP block (`esn_ip_platform` v1.2), and 125 automated regression tests in the turnkey `v2.4.2` release.
 > 
 > *Encryption Policy Across Deliverables:*  
 > * [`Project_Poster.pdf`](Project_Poster.pdf) is intentionally **Open / Unencrypted** for unrestricted public exhibition, seminar display, and defense presentation.  

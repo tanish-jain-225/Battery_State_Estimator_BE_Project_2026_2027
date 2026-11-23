@@ -6,7 +6,7 @@
 
 <p align="left">
   <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.2" target="_blank">
-    <img src="https://img.shields.io/badge/Release-v2.4.2-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.4.1" />
+    <img src="https://img.shields.io/badge/Release-v2.4.2-007acc?style=for-the-badge&logo=github" alt="GitHub Release v2.4.2" />
   </a>
   <a href="https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/actions/workflows/ci.yml" target="_blank">
     <img src="https://img.shields.io/badge/CI%20Pipeline-Passing-2ea44f?style=for-the-badge&logo=githubactions" alt="CI Pipeline Passing" />
@@ -77,7 +77,7 @@ flowchart LR
     P1_Fix --> P2["<b>Phase 2: Review 2 Defense</b><br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/><i>(Nov 2026)</i>"]
     P2 -->|"Evaluator Feedback:<br/>Simplify Presentation & Add Datasets"| P2_Fix["<b>Review 2 Changes</b><br/>• 5-Act Presentation Story<br/>• 10 Drive Cycles + NASA Aging<br/>• 1.0s Multi-Chemistry Simulator"]
     P2_Fix --> P3["<b>Phase 3: Final Review Defense</b><br/>• External Viva Voce Defense<br/>• All 4 Deliverables Accepted<br/>• Real-Cell Testing Future Scope<br/><i>(Nov 2026)</i>"]
-    P3 --> P4["<b>Turnkey Release v2.4.1</b><br/>• All 4 Academic Deliverables Integrated<br/>• Thesis, Review Paper, Poster, Paper<br/>• Live YouTube Presentation<br/><i>(100% Turnkey Capstone)</i>"]
+    P3 --> P4["<b>Turnkey Release v2.4.2</b><br/>• All 4 Academic Deliverables Integrated<br/>• Thesis, Review Paper, Poster, Paper<br/>• Live YouTube Defense Video<br/><i>(100% Turnkey Capstone Closure)</i>"]
 ```
 
 ---
@@ -200,7 +200,7 @@ flowchart LR
 > **External Reviewer Recommendation & Repository Conclusion:**  
 > *"During our final review, our external reviewer evaluated the comprehensive theoretical modeling, simulation pipeline, C99 firmware, and FPGA RTL verification. The reviewer commended the end-to-end cyber-physical architecture and specifically advised that having validated the mathematical formulation and bit-exact FPGA hardware, the sole future scope is to test and validate this system on real physical battery cells and live packs. With this constructive recommendation, the examination concluded successfully, all academic deliverables were unanimously accepted, and with this, we concluded this repository on an accomplished and positive note."*
 
-#### 🛠️ Technical Changes Implemented in Response (Final Review & v2.4.1 Handoff)
+#### 🛠️ Technical Changes Implemented in Response (Final Review & v2.4.2 Capstone Closure)
 1. **Turnkey Integration of All 4 Academic Deliverables:**  
    Finalized and verified the complete 41-page dissertation ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf)), IEEE research paper ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf)), Elsevier review paper ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf)), and exhibition poster ([`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf)).
 2. **Simulator & Visualiser Ultra-Low Latency Optimization:**  
@@ -252,7 +252,7 @@ flowchart LR
     M0["<b>Phase 0: Inception</b><br/>• Problem Scoping<br/>• Literature Survey<br/>• Proposal Submission<br/><i>(Aug 2026)</i>"] --> M1["<b>Phase 1: Baseline</b><br/>• Review 1 Defense<br/>• 2-RC ECM Engine<br/>• EKF & CC Baselines<br/>• C99 CSR Logic<br/><i>(Sep 2026)</i>"]
     M1 --> M2["<b>Phase 2: Maturity</b><br/>• Review 2 Defense<br/>• Online RLS ESN<br/>• UKF Benchmark<br/>• 200/200 FPGA Parity<br/>• 16:9 Deck & Report<br/><i>(Nov 2026)</i>"]
     M2 --> M3["<b>Phase 3: Final Defense</b><br/>• External Viva Voce<br/>• Unanimous Acceptance<br/>• Live Defense Video<br/><i>(Nov 2026)</i>"]
-    M3 --> M4["<b>Turnkey Release (v2.4.1)</b><br/>• 100% Turnkey Capstone Active<br/>• All 4 Academic Deliverables<br/>• Thesis, Papers, Poster & Bitstream<br/><i>(Fully Verified & Handed Off)</i>"]
+    M3 --> M4["<b>Turnkey Release (v2.4.2)</b><br/>• 100% Turnkey Capstone Active<br/>• All 4 Academic Deliverables<br/>• Thesis, Papers, Poster & Bitstream<br/><i>(Fully Verified & Handed Off)</i>"]
 ```
 
 ---
@@ -308,9 +308,9 @@ Navigate the repository according to your area of interest:
 
 ## 📑 Project Milestones & Deliverables Roadmap
 
-> ### 🌟 Master Repository Delivery Status & Ground Truth Readiness (`v2.4.1` — Turnkey Capstone Complete)
-> * **Active State B (`v2.4.1` — 100% Turnkey Capstone Released):** **`Complete Turnkey Capstone`**  
->   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) [674 KB encrypted], camera-ready Elsevier [`Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) [12 pages, 232 KB encrypted], official 2-sheet A3 [`Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) [535 KB open / unencrypted], official 41-page B.E. Capstone [`Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) [5.07 MB encrypted], and 125 automated pytest tests with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
+> ### 🌟 Master Repository Delivery Status & Ground Truth Readiness (`v2.4.2` — Turnkey Capstone Concluded)
+> * **Active Release (`v2.4.2` — 100% Turnkey Capstone Concluded):** **`Complete Turnkey Capstone`**  
+>   *(All software, 2-RC multi-chemistry simulator, visualiser dashboard, compressed CSR ESN (`model_rc.pkl`), C99 firmware, Artix-7 `esn_ip_platform` v1.2 RTL/bitstream, camera-ready IEEE [`Research_Paper.pdf`](docs/Publications/Research_Paper.pdf) [674 KB encrypted], camera-ready Elsevier [`Review_Paper.pdf`](docs/Publications/Review_Paper.pdf) [12 pages, 232 KB encrypted], official 2-sheet A3 [`Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) [535 KB open / unencrypted], official 41-page B.E. Capstone [`Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) [5.07 MB encrypted], live final defense video, and 125 automated pytest tests with 88.60% shared-core coverage are 100% complete, optimized, and verified).*
 > * **Zero Pending Deliverables**: All 4 of 4 academic deliverables are finalized and integrated on disk. Zero placeholder or shell files remain across the entire repository.
 
 | Review Stage | Milestone Document | Scope & Deliverables | Verification Status |
@@ -318,14 +318,14 @@ Navigate the repository according to your area of interest:
 | **Review 1** | [Review 1 Progress Report](docs/Review_1/Review_1_Progress.md) · [Slide Deck](docs/Review_1/Review_1_PPT.pdf) · [Hub](docs/Review_1/README.md) | 2-RC physics, baseline EKF & Coulomb Counting, C99 CSR logic, initial FPGA RTL | **Completed / Fully Verified** |
 | **Review 2** | [Review 2 Progress Report](docs/Review_2/Review_2_Progress.md) · [Slide Deck](docs/Review_2/Review_2_PPT.pdf) · [Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0) · [Hub](docs/Review_2/README.md) | Online RLS ESN adaptation, UKF benchmark, 200/200 FPGA parity, 119-test suite, 32-cycle NASA outcomes | **Completed / Fully Verified** |
 | **Final Review** | [Final Review Delivered Report](docs/Final_Review/Final_Review_Delivered.md) · [Slide Deck](docs/Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) · [Hub](docs/Final_Review/README.md) | Official University of Mumbai external viva defense, all 4 deliverables accepted, external reviewer advised real battery testing as future scope; repository concluded on an accomplished note | **Completed / Defense Concluded** |
-| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.1 Turnkey)** |
+| **FPGA IP Block** | [IP Block Guide](hardware/IP_Block/README.md) · [Bitstream](hardware/IP_Block/esn_platform_top.bit) · [Register Map](hardware/IP_Block/docs/register_map.md) | v1.2 scalable fast core (307 cycles / 3.84 µs), Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT, UART HIL & 29 held-out packs | **Completed / Fully Verified (v2.4.2 Turnkey)** |
 | **Presentation Poster** | [Project Poster PDF](docs/Poster/Project_Poster.pdf) · [Poster Specs](docs/Poster/README.md) | Official BE Capstone Academic Exhibition & Defense Poster (2-sheet A3 portrait, open / unencrypted, 318-LUT RTL, Vivado schematic & NASA benchmarks) | **Completed & Integrated (Open)** |
 | **Review Paper** | [Review Paper PDF](docs/Publications/Review_Paper.pdf) · [Hub](docs/Publications/README.md) | Hardware architectures for learned battery SOC estimation: recurrent & reservoir accelerators review (Elsevier, 12 pages, 232 KB encrypted, 77 citations) | **Completed & Integrated (Camera-Ready)** |
 | **Research Paper** | [Research Paper PDF](docs/Publications/Research_Paper.pdf) · [Manuscript](reference/paper.md) · [Hub](docs/Publications/README.md) | Original edge-optimized ESN & FPGA RTL experimental paper (6 pages, 674 KB encrypted, IEEE camera-ready) | **Completed & Integrated (Camera-Ready)** |
-| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.2) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT, 41 pages, 5.07 MB encrypted) | **Completed & Integrated (Turnkey v2.4.1)** |
+| **Final Thesis** | [Final Thesis PDF](docs/Thesis/Final_Thesis.pdf) · [Thesis Guide](docs/Thesis/README.md) · [Release v2.4.2](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.2) | Official B.E. Capstone Dissertation Report (University of Mumbai / VESIT, 41 pages, 5.07 MB encrypted) | **Completed & Integrated (Turnkey v2.4.2)** |
 | **Paper Proofs** | [Paper Proofs & Receipts](docs/Paper_Proof/README.md) | Academic verification tracking: official submission receipt + formal acceptance letter tracking | **Fully Verified (Registry Active)** |
 | **Doc Hub** | [Master Documentation Index](docs/README.md) | Centralized table of contents indexing all milestones, deliverables, publications, and specs | **Fully Verified (Master Index)** |
-| **Changelog** | [Changelog](CHANGELOG.md) · [Release v2.4.1](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.2) | Full version history, milestone audit trail, and release changelog | **v2.4.1 Active Today (Turnkey Capstone)** |
+| **Changelog** | [Changelog](CHANGELOG.md) · [Release v2.4.2](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.4.2) | Full version history, milestone audit trail, and release changelog | **v2.4.2 Active (Turnkey Capstone)** |
 | **System Spec** | [System Specification](docs/Resources/SYSTEM_SPECIFICATION.md) | Comprehensive electrical parameters, sensor noise models, and observer formulas | **Fully Verified (Reference)** |
 | **Operations** | [Operations Manual](docs/Resources/OPERATIONS.md) | Step-by-step local setup runbook, cloud deployment guides, and troubleshooting | **Verified (Local & Cloud Runbook)** |
 | **Web Research** | [Industrial Audit & Research Synthesis](docs/Resources/WEB_RESEARCH.md) | Indian EV/BMS market & AIS-156/038/BIS/2025 CRI audit, v1.2 RTL synthesis specs, and techno-economic edge BOM analysis | **Complete (Market & IP Analysis)** |
@@ -629,20 +629,19 @@ BE-Capstone-Project/
 │
 ├── docs/
 │   ├── README.md                          # Master documentation hub & 4-stream guide
-│   ├── TRANSITION_PLAN_v2.4.2.md          # Step-by-step transition plan & runbook for final v2.4.2 closure
 │   ├── literature_survey.md               # 29-page survey on SNNs, ESNs & Neuromorphic BMS
 │   │
-│   ├── Thesis/                            # B.E. Capstone Final Dissertation (Completed in v2.4.1)
+│   ├── Thesis/                            # B.E. Capstone Final Dissertation (Completed & Integrated)
 │   │   ├── Final_Thesis.pdf               # Official B.E. Capstone Dissertation Report (41 Pages, 5.07 MB Encrypted)
 │   │   └── README.md                      # Complete 8-chapter monograph breakdown & verification
 │   │
-│   ├── Poster/                            # Academic Exhibition & Defense Poster (Completed in v2.4.1)
+│   ├── Poster/                            # Academic Exhibition & Defense Poster (Completed & Integrated)
 │   │   ├── Project_Poster.pdf             # Official Academic Exhibition Poster PDF (2 Sheets, A3 Portrait, 535 KB Open)
 │   │   └── README.md                      # Print specs, 11-panel layout & hardware benchmarks
 │   │
 │   ├── Publications/                      # Official Academic Paper Deliverables
-│   │   ├── Research_Paper.pdf             # Camera-Ready IEEE Research Paper (Completed in v2.4.1)
-│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (Completed in v2.4.1)
+│   │   ├── Research_Paper.pdf             # Camera-Ready IEEE Research Paper (Completed & Integrated)
+│   │   ├── Review_Paper.pdf               # Comprehensive Review Paper (Completed & Integrated)
 │   │   └── README.md                      # Publication abstracts, authorship, and scopes
 │   │
 │   ├── Paper_Proof/                       # Evaluation Submission & Acceptance Records Registry
@@ -1009,7 +1008,7 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | Item | Details |
 | :--- | :--- |
 | **Deliverable Title** | *Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation (2-Sheet A3 Presentation Poster)* |
-| **Poster Status** | **Completed & Integrated in `v2.4.1` (Deliverable 3 of 4 Finalized)** |
+| **Poster Status** | **Completed & Integrated (Deliverable 3 of 4 Finalized)** |
 | **Poster Deliverable** | [`docs/Poster/Project_Poster.pdf`](docs/Poster/Project_Poster.pdf) (535 KB, 2 Sheets A3 Portrait) |
 | **Specifications & Specs** | [`docs/Poster/README.md`](docs/Poster/README.md) (2 Sheets A3 Portrait, 11-panel layout, Vivado schematics, Wilcoxon validation) |
 
@@ -1017,7 +1016,7 @@ Execute the complete end-to-end verification pipeline (Unit tests, ESN training,
 | Item | Details |
 | :--- | :--- |
 | **Deliverable Title** | *Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation (B.E. Final Dissertation)* |
-| **Thesis Status** | **Completed & Fully Integrated in `v2.4.1` (Deliverable 4 of 4 Finalized — Turnkey Capstone Reached)** |
+| **Thesis Status** | **Completed & Fully Integrated (Deliverable 4 of 4 Finalized — Turnkey Capstone Reached)** |
 | **Thesis Deliverable** | [`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf) (41 Pages, 5.07 MB Encrypted PDF) |
 | **Specifications & Specs** | [`docs/Thesis/README.md`](docs/Thesis/README.md) (8 Chapters, University of Mumbai Format, Complete Monograph Breakdown) |
 
@@ -1076,7 +1075,7 @@ This project is licensed under the **[MIT License](LICENSE)** with an academic a
 * **Security & Vulnerability Policy:** [`SECURITY.md`](SECURITY.md)
 
 ### Academic Citation
-When citing this repository or using its code, telemetry datasets, C99 firmware, or Verilog HDL IP block (`v2.4.1`), please cite:
+When citing this repository or using its code, telemetry datasets, C99 firmware, or Verilog HDL IP block (`v2.4.2`), please cite:
 ```bibtex
 @article{nambiar2026bitexact,
   author      = {Nambiar, Akshay and Patankar, Sanjna and Verma, Satvik and Sanghvi, Tanish and Sharma, Kadambari and Warke, Nilima},
@@ -1084,6 +1083,6 @@ When citing this repository or using its code, telemetry datasets, C99 firmware,
   journal     = {BE Capstone Experimental Manuscript \& IEEE / Q3 Scopus Submission (`docs/Publications/Research_Paper.pdf`)},
   institution = {Vivekanand Education Society's Institute of Technology (VESIT)},
   year        = {2026},
-  version     = {2.4.1}
+  version     = {2.4.2}
 }
 ```

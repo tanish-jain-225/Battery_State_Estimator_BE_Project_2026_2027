@@ -10,7 +10,7 @@
 
 > [!IMPORTANT]
 > **Active Deliverables Status (All 4 Academic Deliverables Finalized & Integrated):**  
-> While the codebase, models, firmware, RTL, bitstream, and 125 automated tests are **100% complete and passing**, all 4 academic deliverables have been **fully finalized, compiled, and integrated on disk**: [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted, IEEE camera-ready), [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 232 KB encrypted, 77 references, Elsevier camera-ready), [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) (2 sheets, 535 KB, open / unencrypted, 11 panels, A3 portrait), and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (41 pages, 5.07 MB encrypted, University of Mumbai B.E. dissertation). The repository has achieved **100% turnkey academic completion (`v2.4.1`)**.  
+> While the codebase, models, firmware, RTL, bitstream, and 125 automated tests are **100% complete and passing**, all 4 academic deliverables have been **fully finalized, compiled, and integrated on disk**: [`Research_Paper.pdf`](Research_Paper.pdf) (6 pages, 674 KB encrypted, IEEE camera-ready), [`Review_Paper.pdf`](Review_Paper.pdf) (12 pages, 232 KB encrypted, 77 references, Elsevier camera-ready), [`Project_Poster.pdf`](../Poster/Project_Poster.pdf) (2 sheets, 535 KB, open / unencrypted, 11 panels, A3 portrait), and [`Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (41 pages, 5.07 MB encrypted, University of Mumbai B.E. dissertation). The repository has achieved **100% turnkey academic completion (`v2.4.2`)**.  
 
 ---
 
