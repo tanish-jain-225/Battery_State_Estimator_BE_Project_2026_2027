@@ -2,7 +2,7 @@
 
 **Document Reference:** [`docs/TRANSITION_PLAN_v2.4.2.md`](TRANSITION_PLAN_v2.4.2.md)  
 **Current Repository Status:** `v2.4.1` (100% Engineering & Academic Complete, Live on GitHub)  
-**Target Release:** `v2.4.2` (Permanent Turnkey Capstone Closure — All Media Live)  
+**Status:** Completed & Concluded under Release `v2.4.2` (All Media Live)  
 **Creation Date:** 22 November 2026  
 **Purpose:** Serves as the temporary operational runbook and checklist until the final presentation/defense video is uploaded to YouTube, enabling a seamless one-step transition to `v2.4.2`.
 
@@ -29,14 +29,14 @@ As of **[`v2.4.1`](https://github.com/tanish-jain-225/Battery_State_Estimator_BE
 - **Ground Truth Alignment:**
   - All speculative financial valuations (₹70L–₹11.8Cr) and self-awarded ratings (10/10) have been replaced with empirical techno-economic BOM and verification benchmarks.
 - **The Single Remaining Action:**
-  - The final defense video link currently uses a placeholder (`https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK`).
+  - The final defense video link currently uses a placeholder (`https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r`).
   - Once the real YouTube video is uploaded, replacing this placeholder will trigger the final `v2.4.2` release and officially conclude the repository.
 
 ---
 
 ## 2. The 12 Exact Placeholder Link Locations
 
-When the live YouTube link is provided (`https://youtu.be/<YOUR_VIDEO_ID>`), it will replace `https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK` across the following **12 isolated locations**:
+When the live YouTube link is provided (`https://youtu.be/<YOUR_VIDEO_ID>`), it will replace `https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r` across the following **12 isolated locations**:
 
 | # | File Path | Line Range | Context |
 | :-: | :--- | :---: | :--- |
@@ -98,7 +98,7 @@ files = [
     'docs/Resources/WEB_RESEARCH.md'
 ]
 
-old_url = 'https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK'
+old_url = 'https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r'
 new_url = '<YOUR_ACTUAL_YOUTUBE_URL>'
 
 for fpath in files:

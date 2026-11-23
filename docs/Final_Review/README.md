@@ -16,7 +16,7 @@
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan (Assistant Professor, Dept. of Instrumentation)
 * **External Examiner Panel:** Appointed by University of Mumbai
 * **Presenting Candidates:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
-* **Milestone Status:** **100% Turnkey Capstone Defense Complete (Release v2.4.1)**
+* **Milestone Status:** **100% Turnkey Capstone Defense Complete (Release v2.4.2)**
 
 ---
 
@@ -36,12 +36,12 @@
 ## 🎥 Live Final Phase Presentation Video Walkthrough
 
 <p align="center">
-  <a href="https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK" target="_blank">
+  <a href="https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Final%20Presentation%20%26%20Defense-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Defense" />
   </a>
 </p>
 
-* **YouTube Defense Video Link:** [https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
+* **YouTube Defense Video Link:** [https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) *(Official Presentation Recording)*
 * **Presentation Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))* (6 widescreen 16:9 slides covering Hardware ESN IP Block & Bit-Exact Verification, Software 2-RC Estimation Pipeline, and NASA PCoE Experimental Results)
 
 ---
@@ -92,5 +92,5 @@
 * 📄 **Final Delivered Report:** [`Final_Review_Delivered.md`](Final_Review_Delivered.md)
 * 📊 **Presentation Slides (PDF):** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))*
 * 🖼️ **Institutional Geotag Record:** [`Final_Review_Geotag_Photo.png`](Final_Review_Geotag_Photo.png)
-* 🎥 **Live Presentation Walkthrough:** [YouTube Defense Video (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK)
+* 🎥 **Live Presentation Walkthrough:** [YouTube Defense Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r)
 * 🎓 **Capstone Thesis Monograph:** [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)

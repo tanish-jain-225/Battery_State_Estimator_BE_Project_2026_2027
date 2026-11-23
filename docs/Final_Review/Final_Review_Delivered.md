@@ -36,12 +36,12 @@
 ## 🎥 Live Final Phase Presentation Video Walkthrough
 
 <p align="center">
-  <a href="https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK" target="_blank">
+  <a href="https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r" target="_blank">
     <img src="https://img.shields.io/badge/YouTube-Watch%20Live%20Final%20Presentation%20%26%20Defense-red?style=for-the-badge&logo=youtube" alt="Live Final Phase Presentation Defense" />
   </a>
 </p>
 
-* **Presentation Recording Link:** [Watch Live Presentation on YouTube (Placeholder)](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Note: Link placeholder to be updated with final defense video)*
+* **Presentation Recording Link:** [Watch Live Presentation on YouTube](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) *(Official Presentation Recording)*
 * **Slide Deck:** [`Final_Review_PPT.pdf`](Final_Review_PPT.pdf) *(also available as [`FInal_Review_PPT.pdf`](FInal_Review_PPT.pdf))* (6 widescreen 16:9 slides covering Hardware ESN IP Block & Bit-Exact Verification, Software 2-RC Estimation Pipeline, and NASA PCoE Experimental Results).
 
 ---
@@ -192,7 +192,7 @@ The evaluation panel assessed the capstone project against the University of Mum
                                                            │
                                                            ▼
 ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 4. Final Review & Capstone Culmination: Turnkey Academic & Silicon Handoff (v2.4.1 — November 2026)                   │
+│ 4. Final Review & Capstone Culmination: Turnkey Academic & Silicon Handoff (v2.4.2 — November 2026)                   │
 │    • Finalized and integrated all 4 academic deliverables:                                                            │
 │        1. 41-page B.E. Capstone Dissertation Report (docs/Thesis/Final_Thesis.pdf)                                    │
 │        2. IEEE Camera-Ready Research Paper (docs/Publications/Research_Paper.pdf)                                     │

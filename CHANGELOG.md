@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.4.2] - 2026-11-23 (Final Capstone Release: Permanent Live Defense Video Linked — 100% Turnkey Multimedia Closure)
+
+### 🚀 Highlights (v2.4.2)
+- **Official Final Defense Video Recording Linked on YouTube**:
+  - Integrated the official live B.E. Capstone viva voce examination defense presentation video on YouTube: [`https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r`](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r).
+  - Populated all 12 isolated video placeholders across `README.md`, `docs/Final_Review/Final_Review_Delivered.md`, `docs/Final_Review/README.md`, `docs/README.md`, and `docs/Resources/DEMO_CHECKLIST.md`.
+  - Review 1 Phase 1 demonstration video ([`https://youtu.be/fXS4TLaXGGw`](https://youtu.be/fXS4TLaXGGw)) remains cleanly isolated under Review 1 sections.
+- **Permanent Multimodal Turnkey Capstone Closure**:
+  - Achieved complete, flawless public verifiability: all 4 compiled academic PDFs (Thesis, 2 Papers, Exhibition Poster), institutional presentation deck, authentic geotag record, and full live audiovisual presentation walkthrough are permanently unified.
+  - Zero pending placeholders or shell links remaining across the entire repository.
+  - Formally concluded the project lifecycle and archived the repository under release tag `v2.4.2`.
+- **Automated Validation Pass**:
+  - Full automated regression suite verified: **125 / 125 passed** (`pytest -q` in 19.22s) with zero regressions.
+  - Clean linter status: **0 errors** on `ruff check .`.
+  - Link integrity audit: **723 / 723 relative links** verified valid (0 broken).
+
+---
+
 ## [v2.4.1] - 2026-11-21 (Active Today - 100% Turnkey Capstone Release: All 4 Academic Deliverables Finalized & Integrated)
 
 ### 🚀 Highlights (v2.4.1)

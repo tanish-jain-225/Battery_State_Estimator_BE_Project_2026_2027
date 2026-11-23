@@ -4,7 +4,7 @@
 
 Use this interactive checklist to prepare for a review, viva, project exhibition, or pull request verification.
 
-▶️ **Live Final Phase Presentation & Video Walkthrough**: [https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK](https://youtu.be/FINAL_PRESENTATION_VIDEO_LINK) *(Placeholder)*  
+▶️ **Live Final Phase Presentation & Video Walkthrough**: [https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) *(Live Recording)*  
 ▶️ **Phase 1 Walkthrough Video**: [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)
 
 ---

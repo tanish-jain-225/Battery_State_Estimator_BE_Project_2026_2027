@@ -14,8 +14,8 @@
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
 **Document Reference:** [`docs/Resources/WEB_RESEARCH.md`](WEB_RESEARCH.md)  
-**Active Release Version:** `v2.4.1` (Turnkey Capstone Active — All 4 Deliverables Finalized & Integrated)  
-**Turnkey Capstone Release:** `v2.4.1` (Final Capstone — 100% Complete & Verified)  
+**Active Release Version:** `v2.4.2` (Turnkey Capstone Active — All 4 Deliverables Finalized & Integrated)  
+**Turnkey Capstone Release:** `v2.4.2` (Final Capstone — 100% Complete & Verified)  
 **Verification Date:** November 2026 (Audited via Industry/Statutory Standards & Full Repo Verification)
 
 ---
