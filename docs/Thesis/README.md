@@ -14,10 +14,10 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 * **Affiliation:** University of Mumbai
 * **Academic Year:** 2026–2027
 * **Project Team & Authors:**
+  * **Akshay Nambiar** — Roll No. 17
+  * **Sanjna Patankar** — Roll No. 19
   * **Satvik Verma** — Roll No. 32
   * **Tanish Sanghvi** — Roll No. 61
-  * **Sanjna Patankar** — Roll No. 19
-  * **Akshay Nambiar** — Roll No. 17
 * **Supervisor / Project Guide:** Dr. Kadambari Sharma
 * **Head of Department:** Dr. Sangeeta Prasannaram
 * **Principal:** Dr. (Mrs.) J. M. Nair
@@ -34,7 +34,19 @@ This directory hosts the official **Final Year Bachelor of Engineering (B.E.) Ca
 | **File Size** | **5,314,078 bytes (5.07 MB)** |
 | **Page Count** | **41 Pages** (Full academic monograph with Certificate, Declarations, 8 Chapters, 3 Appendices & Literature Cited) |
 | **Encryption Status** | **Encrypted** (Official institutional submission format with password security permissions) |
-| **Status** | **Completed & Integrated (Turnkey v2.4.2 Capstone)** |
+| **Status** | **Completed, Bound & Departmentally Approved (Turnkey v2.4.2 Capstone)** |
+
+---
+
+## 📸 Official Black Book Thesis Submission & Departmental Approval Record
+
+<p align="center">
+  <img src="Thesis_Submission_Black_Book_Photo.png" alt="Official Hardbound Black Book Thesis Submission and Department Approval at VESIT" width="90%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
+</p>
+
+> **Official Departmental Approval & Degree Milestone Sign-Off (VESIT Mumbai, November 2026):**  
+> The student team—**Akshay Nambiar** (Roll No. 17), **Sanjna Patankar** (Roll No. 19), **Satvik Verma** (Roll No. 32), and **Tanish Sanghvi** (Roll No. 61)—alongside Project Guide / Mentor **Dr. Kadambari Sharma** (Associate Professor, Dept. of Automation and Robotics), presenting the official hardbound "Black Book" Bachelor of Engineering capstone dissertations with gold embossed lettering and departmental seal.  
+> With the formal submission and unanimous departmental approval of the Black Book, the Major Project requirement for the Bachelor of Engineering degree under the University of Mumbai is officially fulfilled, accepted, and concluded.
 
 ---
 

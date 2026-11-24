@@ -13,20 +13,25 @@
 **Principal:** Dr. (Mrs.) J. M. Nair  
 
 **Presenting Candidates / Team Members:**
-* **Sanjna Patankar** (Roll No. 19 / `2023.sanjna.patankar@ves.ac.in`)
 * **Akshay Nambiar** (Roll No. 17 / `2023.akshay.nambiar@ves.ac.in`)
+* **Sanjna Patankar** (Roll No. 19 / `2023.sanjna.patankar@ves.ac.in`)
 * **Satvik Verma** (Roll No. 32 / `2023.satvik.verma@ves.ac.in`)
 * **Tanish Sanghvi** (Roll No. 61 / `2023.tanish.sanghvi@ves.ac.in`)
 
 ---
 
-## 📸 Final Institutional Defense Session (Geotagged Photographic Audit)
+## 📸 Final Institutional Defense Session & Live Presentation Slide Deck
+
+<p align="center">
+  <img src="Final_Review_Presentation_Title.png" alt="Final Review Project Defense Live Presentation Slide" width="90%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
+</p>
 
 <p align="center">
   <img src="Final_Review_Geotag_Photo.png" alt="Final Review Project Defense Geotagged Presentation Record" width="90%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
 </p>
 
-> **Official Institutional Defense Geotag Record:**  
+> **Official Institutional Defense Geotag Record & Live Presentation Outcome:**  
+> **Live Presentation Outcome:** Delivered live 16:9 defense slide deck ([`Final_Review_PPT.pdf`](Final_Review_PPT.pdf)) and physical Artix-7 FPGA HIL hardware demonstration before the University of Mumbai External Examiner Panel.  
 > **Venue:** Hashu Advani Memorial Complex, Collector Colony, Chembur, Mumbai, Maharashtra 400071, India (VESIT)  
 > **GPS Coordinates:** `Lat 19.045278° Long 72.889039°` | **Timestamp:** Saturday, 21/11/2026 11:59 AM GMT +05:30  
 > **Evaluation Outcome:** **Successful External Defense — Turnkey Capstone Handoff Complete**
@@ -79,7 +84,7 @@ All four academic deliverables required by University of Mumbai, departmental gu
 
 | Deliverable | Title & Scope | Specifications | Location on Disk |
 | :--- | :--- | :--- | :--- |
-| **1. Capstone Dissertation Report** | *Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation* | 41 pages, 8 chapters, 17 citations, complete mathematical & silicon appendices | [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (5.07 MB Encrypted) |
+| **1. Capstone Dissertation Report** | *Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation* | 41 pages, 8 chapters, 17 citations, complete mathematical & silicon appendices; hardbound Black Book submitted and approved by department ([`photo`](../Thesis/Thesis_Submission_Black_Book_Photo.png)) | [`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf) (5.07 MB Encrypted) |
 | **2. Experimental Research Paper** | *A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout* | 6 pages, IEEE camera-ready format, Artix-7 RTL synthesis & 29-cell NASA PCoE cross-validation | [`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf) (674 KB Encrypted) |
 | **3. Comprehensive Review Paper** | *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements* | 12 pages, Elsevier / ScienceDirect camera-ready format, 77 citations, cross-silicon comparative survey | [`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf) (232 KB Encrypted) |
 | **4. Academic Exhibition Poster** | *Neuromorphic Battery State Estimator: Edge-Deployable Reservoir Computing for Electric Vehicle BMS* | 2 sheets A3 portrait, 11 numbered panels, Vivado schematics, board photos & Wilcoxon statistics | [`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf) (535 KB Open Exhibition) |
@@ -105,7 +110,7 @@ During the final examination, the external examiner panel evaluated the candidat
 ### Question 1 (External Examiner):
 > *"Why did you select Echo State Networks over modern deep learning architectures such as LSTMs or GRUs, which are prevalent in contemporary literature for state-of-charge estimation?"*
 
-**Candidate Response (Tanish Sanghvi & Satvik Verma):**
+**Candidate Response (Satvik Verma & Tanish Sanghvi):**
 > *"While LSTMs and GRUs achieve high empirical accuracy, their computational complexity poses insurmountable barriers for automotive microcontroller deployment. An LSTM requires training 4 internal weight matrices ($W_f, W_i, W_c, W_o$) with thousands of parameters using Backpropagation Through Time (BPTT), which incurs gradient vanishing issues, high floating-point FLOPs, and substantial SRAM usage.  
 > Conversely, in an Echo State Network, the recurrent reservoir weights ($W_{\text{res}}$) are generated randomly and held fixed, satisfying the Echo State Property ($\rho < 1$). Only the linear readout weights ($W_{\text{out}}$) are trained using single-shot convex Ridge regression. This eliminates iterative training entirely, reduces the runtime memory footprint to under 2 KB via Compressed Sparse Row (CSR) matrix compression, and enables sub-50 microsecond execution on standard ARM Cortex-M microcontrollers and 3.84 microsecond parallel execution on FPGA silicon."*
 
@@ -214,11 +219,11 @@ The **Battery State Estimator** project has achieved 100% of its initial objecti
 
 During the final review, our external reviewer evaluated the complete pipeline and specifically advised that our sole future scope is to test and validate this system on physical, real-world battery cells and live packs. With this constructive recommendation, the examination was concluded with **unanimous final acceptance**, and with this, we formally conclude this repository on an accomplished, positive note.
 
-With zero shell files, zero failing tests, complete dual-silicon hardware validation, and all four peer-reviewed academic deliverables finalized and verified on disk, this repository stands as a **turnkey, production-grade, and academically rigorous benchmark** for edge neuromorphic Battery Management Systems.
+With zero shell files, zero failing tests, complete dual-silicon hardware validation, and all four peer-reviewed academic deliverables finalized and verified on disk, this repository stands as a **turnkey, peer-reviewed, and empirically validated research benchmark** for edge neuromorphic Battery Management Systems.
 
 **Official Endorsement & Sign-Off:**
 
-* **Candidate Signatures:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
+* **Candidate Signatures:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi  
 * **Project Mentor:** Dr. Kadambari Sharma  
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 * **Head of Department:** Dr. Sangeeta Prasannaram  

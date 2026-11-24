@@ -17,6 +17,7 @@ docs/
 │   └── README.md                  # Layout specifications, 11-panel transcription & metrics
 ├── Thesis/                        # B.E. Capstone Final Dissertation (Completed & Integrated)
 │   ├── Final_Thesis.pdf           # Official B.E. Capstone Dissertation Report (41 Pages, 5.07 MB Encrypted)
+│   ├── Thesis_Submission_Black_Book_Photo.png # Departmental Black Book submission & approval photo
 │   └── README.md                  # Complete 8-chapter monograph breakdown & verification
 ├── Publications/                  # Official Academic Paper Deliverables
 │   ├── Research_Paper.pdf         # Camera-Ready IEEE Research Paper (Completed & Integrated)
@@ -39,7 +40,8 @@ docs/
 │       └── Neuromorphic-BMS-Review-Paper-Draft.pdf
 ├── Final_Review/                  # Final Capstone External Review & Viva Voce Defense
 │   ├── Final_Review_Delivered.md  # Comprehensive defense proceedings, Q&A & handoff audit
-│   ├── Final_Review_PPT.pdf       # Official 16:9 widescreen final defense slide deck
+│   ├── Final_Review_PPT.pdf       # Official 16:9 widescreen final defense slide deck (Live PPT Presented)
+│   ├── Final_Review_Presentation_Title.png # Live presentation slide defense screenshot
 │   ├── Final_Review_Geotag_Photo.png # Official institutional defense geotag photographic record
 │   └── README.md                  # Milestone hub, committee commendations & video walkthrough
 ├── Resources/                     # Engineering Guides & Technical References
@@ -71,8 +73,8 @@ docs/
 2. **Review 1 Defense (Sep 2026):** [`docs/Review_1/README.md`](Review_1/README.md) · [`Progress Report`](Review_1/Review_1_Progress.md) · [Slide Deck](Review_1/Review_1_PPT.pdf) · [Phase 1 Video](https://youtu.be/fXS4TLaXGGw) — Baseline 2-RC physics, initial EKF & Coulomb Counting, C99 CSR logic. *Feedback Addressed: Added ESN Core Architecture Diagram & Customized 16:9 PPT.*
 3. **Review 2 Defense (Nov 2026):** [`docs/Review_2/README.md`](Review_2/README.md) · [`Progress Report`](Review_2/Review_2_Progress.md) · [16:9 Deck](Review_2/Review_2_PPT.pdf) · [FPGA Outcomes Report](Review_2/Outcomes/FPGA-Based-Echo-State-Network-for-Battery-SOC-SOH-Estimation-Outcomes.pdf) — Online RLS adaptation, UKF benchmark, 200/200 bit-exact FPGA parity, and NASA 32-cycle evaluation. *Feedback Addressed: 5-Act narrative presentation flow & 10 dynamic drive cycles with NASA aging datasets.*
 4. **Hardware Acceleration & Silicon IP Core (`v2.4.2`):** [`hardware/IP_Block/README.md`](../hardware/IP_Block/README.md) — `esn_ip_platform` v1.2 (307-cycle fast core, Rev 0.5 ESN-fused EKF, IEEE 1685 IP-XACT AXI4 IP block, ready-to-flash 3.7 MB bitstream, and 115200-baud UART HIL interface).
-5. **Final B.E. Capstone Dissertation (`Completed & Integrated`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted).
-6. **Final External Review & Viva Voce Defense (`Completed & Concluded`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Official University of Mumbai external viva voce examination, unanimous committee acceptance, and turnkey repository handoff.
+5. **Final B.E. Capstone Dissertation & Black Book Approval (`Completed & Approved`):** [`docs/Thesis/Final_Thesis.pdf`](Thesis/Final_Thesis.pdf) · [Thesis Guide](Thesis/README.md) · [`docs/Thesis/Thesis_Submission_Black_Book_Photo.png`](Thesis/Thesis_Submission_Black_Book_Photo.png) — Official University of Mumbai / VESIT 8-chapter capstone thesis (41 pages, 5.07 MB encrypted); hardbound Black Book formally submitted and approved by department.
+6. **Final External Review & Viva Voce Defense (`Completed & Concluded`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Milestone Hub](Final_Review/README.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Official University of Mumbai external viva voce examination; presented live 16:9 defense PPT and physical FPGA demo, unanimous committee acceptance, and turnkey repository handoff.
 
 ### 3. ⚙️ The Engineering & Software Stream
 *Implementation, algorithms, and verification harnesses:*
@@ -91,7 +93,7 @@ docs/
    * **Comprehensive Review Paper (`Completed & Integrated`):** [`docs/Publications/Review_Paper.pdf`](Publications/Review_Paper.pdf) (Camera-Ready 12-Page Elsevier PDF, 232 KB encrypted, 77 Citations)
 2. **Publication Proofs & Evaluation Registry:** [`docs/Paper_Proof/README.md`](Paper_Proof/README.md) — Official submission receipt and acceptance letter tracking.
 3. **Academic Exhibition Poster (`Completed & Integrated`):** [`docs/Poster/Project_Poster.pdf`](Poster/Project_Poster.pdf) · [Poster Guide](Poster/README.md) — Official 2-sheet A3 symposium poster (535 KB, 11 panels, VESIT 2026–27).
-4. **Final Review External Viva Voce Defense (`Completed & Integrated`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Capstone defense proceedings, examination Q&A transcript, and institutional handoff.
+4. **Final Review External Viva Voce Defense (`Completed & Integrated`):** [`docs/Final_Review/Final_Review_Delivered.md`](Final_Review/Final_Review_Delivered.md) · [Slide Deck](Final_Review/Final_Review_PPT.pdf) · [Live Video](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r) — Capstone defense proceedings, live 16:9 presentation deck delivered, examination Q&A transcript, and institutional handoff.
 5. **Live Viva Demo Checklist:** [`docs/Resources/DEMO_CHECKLIST.md`](Resources/DEMO_CHECKLIST.md) — 10-minute presentation and demonstration walkthrough.
 6. **Speaker Notes & Defense Talking Points:** [`docs/Resources/PRESENTATION.md`](Resources/PRESENTATION.md) — Comprehensive slide-by-slide script for Review viva.
 

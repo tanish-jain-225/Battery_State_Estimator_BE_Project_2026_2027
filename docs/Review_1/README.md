@@ -13,7 +13,7 @@
 * **Department:** Department of Automation and Robotics / Instrumentation
 * **Project Mentor:** Dr. Kadambari Sharma
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan
-* **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
+* **Team Members:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi
 
 ---
 

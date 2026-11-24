@@ -14,8 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Integrated the official live B.E. Capstone viva voce examination defense presentation video on YouTube: [`https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r`](https://youtu.be/ms1XQnyitNQ?si=-5dyDHMAvSogJu0r).
   - Populated all 12 isolated video placeholders across `README.md`, `docs/Final_Review/Final_Review_Delivered.md`, `docs/Final_Review/README.md`, `docs/README.md`, and `docs/Resources/DEMO_CHECKLIST.md`.
   - Review 1 Phase 1 demonstration video ([`https://youtu.be/fXS4TLaXGGw`](https://youtu.be/fXS4TLaXGGw)) remains cleanly isolated under Review 1 sections.
+- **Official Hardbound Black Book Thesis Submission & Departmental Approval**:
+  - Integrated the official photographic evidence ([`docs/Thesis/Thesis_Submission_Black_Book_Photo.png`](docs/Thesis/Thesis_Submission_Black_Book_Photo.png)) capturing the student team (Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi) and Project Guide / Mentor Dr. Kadambari Sharma presenting the gold-embossed hardbound Black Books at VESIT Chembur.
+  - Formally documents departmental approval and sign-off, concluding the Bachelor of Engineering Major Project requirement under the University of Mumbai.
 - **Permanent Multimodal Turnkey Capstone Closure**:
-  - Achieved complete, flawless public verifiability: all 4 compiled academic PDFs (Thesis, 2 Papers, Exhibition Poster), institutional presentation deck, authentic geotag record, and full live audiovisual presentation walkthrough are permanently unified.
+  - Achieved complete, end-to-end public verifiability: all 4 compiled academic PDFs (Thesis, 2 Papers, Exhibition Poster), delivered 16:9 widescreen presentation slide deck ([`docs/Final_Review/Final_Review_PPT.pdf`](docs/Final_Review/Final_Review_PPT.pdf)), presentation title slide record ([`docs/Final_Review/Final_Review_Presentation_Title.png`](docs/Final_Review/Final_Review_Presentation_Title.png)), authentic geotag record, and full live audiovisual presentation walkthrough are permanently unified.
   - Zero pending placeholders or shell links remaining across the entire repository.
   - Formally concluded the project lifecycle and archived the repository under release tag `v2.4.2`.
 - **Automated Validation Pass**:
@@ -30,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Highlights (v2.4.1)
 - **Integrated Official Final Year Capstone Dissertation (Deliverable 4 of 4 Finalized)**:
   - Integrated the official 41-page Bachelor of Engineering dissertation report: *"Battery State Estimator: An Echo State Network-Based Approach to Battery State Estimation"* ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf), 5.07 MB encrypted PDF, University of Mumbai / VESIT, Academic Year 2026–2027).
-  - Authors: Satvik Verma (Roll No. 32), Tanish Sanghvi (Roll No. 61), Sanjna Patankar (Roll No. 19), Akshay Nambiar (Roll No. 17).
+  - Authors: Akshay Nambiar (Roll No. 17), Sanjna Patankar (Roll No. 19), Satvik Verma (Roll No. 32), Tanish Sanghvi (Roll No. 61).
   - Project Supervisor: Dr. Kadambari Sharma; Head of Department: Dr. Sangeeta Prasannaram; Principal: Dr. (Mrs.) J. M. Nair.
   - Complete 8-chapter monograph: Chapter 1 (Introduction & Motivation), Chapter 2 (Literature Review), Chapter 3 (Problem Analysis & Requirements), Chapter 4 (2-RC Modeling, ESN Mathematics & AXI4 IP Block Architecture), Chapter 5 (Microservices, C99 Firmware & Verilog RTL Implementation), Chapter 6 (Testing & Bit-Exact Verification), Chapter 7 (NASA PCoE 29-Cell Cross-Validation, Artix-7 Synthesis & Wilcoxon Statistics), Chapter 8 (Conclusions, Limitations & Future Roadmap), Appendices I–III (reproducibility notes, evidence inventory, AXI4-Lite register map), and 17 academic citations.
   - Detailed chapter transcription and verification records documented in [`docs/Thesis/README.md`](docs/Thesis/README.md).
@@ -77,7 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Leaves **ONLY 1 single academic deliverable remaining** for `v2.4.1` ([`docs/Thesis/Final_Thesis.pdf`](docs/Thesis/Final_Thesis.pdf)).
 - **Integrated Camera-Ready Review Paper (Deliverable 2 of 4 Finalized)**:
   - Integrated official 12-page camera-ready review manuscript: *"Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements"* ([`docs/Publications/Review_Paper.pdf`](docs/Publications/Review_Paper.pdf), 232 KB encrypted, 77 citations, Elsevier / ScienceDirect format).
-  - Authors: Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, Sangeetha Prasanna Ram (Department of Automation & Robotics, VESIT).
+  - Authors: Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi, Kadambari Sharma, Sangeetha Prasanna Ram (Department of Automation & Robotics, VESIT).
   - Side-by-side comparison of 8 embedded/hardware SOC implementations and 6 FPGA recurrent network accelerators, detailing cost per sample, fixed-point error, and hardware reporting guidelines.
 - **Integrated Camera-Ready IEEE Research Paper (Deliverable 1 of 4 Finalized)**:
   - Replaced preprint draft with the official 6-page camera-ready manuscript: *"A Bit-Exact Fixed-Point FPGA Echo State Network for Lithium-Ion Battery SOC Estimation with an Exploratory SOH Readout"* ([`docs/Publications/Research_Paper.pdf`](docs/Publications/Research_Paper.pdf), 674 KB encrypted).

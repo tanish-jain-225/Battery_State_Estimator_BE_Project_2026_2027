@@ -21,8 +21,8 @@
 
 | Sr. No. | Student Name | Roll No. | Branch | Email ID |
 | :---: | :--- | :---: | :---: | :--- |
-| 1 | Sanjna Patankar | 2023.sanjna.patankar | Automation and Robotics | 2023.sanjna.patankar@ves.ac.in |
-| 2 | Akshay Nambiar | 2023.akshay.nambiar | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in |
+| 1 | Akshay Nambiar | 2023.akshay.nambiar | Automation and Robotics | 2023.akshay.nambiar@ves.ac.in |
+| 2 | Sanjna Patankar | 2023.sanjna.patankar | Automation and Robotics | 2023.sanjna.patankar@ves.ac.in |
 | 3 | Satvik Verma | 2023.satvik.verma | Automation and Robotics | 2023.satvik.verma@ves.ac.in |
 | 4 | Tanish Sanghvi | 2023.tanish.sanghvi | Automation and Robotics | 2023.tanish.sanghvi@ves.ac.in |
 

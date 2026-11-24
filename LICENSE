@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
+Copyright (c) 2026 Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi
 Vivekanand Education Society's Institute of Technology (VESIT), Mumbai, India.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,8 +29,8 @@ This software, embedded firmware, and FPGA RTL repository was designed and engin
 
 * **Project Title:** Battery State Estimator: An ESN-Based Alternative to EKF and Coulomb Counting
 * **Student Authors:** 
-  - Sanjna Patankar (2023.sanjna.patankar@ves.ac.in)
   - Akshay Nambiar (2023.akshay.nambiar@ves.ac.in)
+  - Sanjna Patankar (2023.sanjna.patankar@ves.ac.in)
   - Satvik Verma (2023.satvik.verma@ves.ac.in)
   - Tanish Sanghvi (2023.tanish.sanghvi@ves.ac.in)
 * **Project Mentor:** Dr. Kadambari Sharma

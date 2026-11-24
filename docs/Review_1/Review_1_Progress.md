@@ -6,7 +6,7 @@
 **Institute:** Vivekanand Education Society's Institute of Technology (VESIT), Mumbai  
 **Project Mentor:** Dr. Kadambari Sharma  
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
-**Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi  
+**Team Members:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi  
 **Document Path:** [`docs/Review_1/Review_1_Progress.md`](Review_1_Progress.md)  
 **Phase 1 Video Walkthrough (YouTube):** [https://youtu.be/fXS4TLaXGGw](https://youtu.be/fXS4TLaXGGw)  
 

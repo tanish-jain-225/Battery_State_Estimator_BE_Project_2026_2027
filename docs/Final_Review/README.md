@@ -15,18 +15,23 @@
 * **Project Mentor:** Dr. Kadambari Sharma (Associate Professor, Dept. of Automation & Robotics)
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan (Assistant Professor, Dept. of Instrumentation)
 * **External Examiner Panel:** Appointed by University of Mumbai
-* **Presenting Candidates:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
+* **Presenting Candidates:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi
 * **Milestone Status:** **100% Turnkey Capstone Defense Complete (Release v2.4.2)**
 
 ---
 
-## 📸 Final Institutional Defense Session (Geotagged Photographic Audit)
+## 📸 Final Institutional Defense Session & Live Presentation Slide Deck
+
+<p align="center">
+  <img src="Final_Review_Presentation_Title.png" alt="Final Review Project Defense Live Presentation Slide" width="90%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
+</p>
 
 <p align="center">
   <img src="Final_Review_Geotag_Photo.png" alt="Final Review Project Defense Geotagged Presentation Record" width="90%" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
 </p>
 
-> **Official Institutional Defense Geotag Record:**  
+> **Official Institutional Defense Geotag Record & Live Presentation Outcome:**  
+> **Live Presentation Outcome:** Delivered live 16:9 defense slide deck ([`Final_Review_PPT.pdf`](Final_Review_PPT.pdf)) and physical Artix-7 FPGA HIL hardware demonstration before the examiner panel.  
 > **Venue:** Hashu Advani Memorial Complex, Collector Colony, Chembur, Mumbai, Maharashtra 400071, India (VESIT)  
 > **GPS Coordinates:** `Lat 19.045278° Long 72.889039°` | **Timestamp:** Saturday, 21/11/2026 11:59 AM GMT +05:30 (Captured by GPS Map Camera)  
 > **Evaluation Outcome:** **Successful External Defense — Turnkey Capstone Handoff Complete**
@@ -52,7 +57,7 @@
 > *"Exemplary end-to-end cyber-physical implementation. The combination of neuromorphic Echo State Networks, online RLS adaptation, and dual-silicon verification on ARM Cortex-M and Xilinx Artix-7 FPGA sets a high academic standard for undergraduate B.E. Capstone engineering projects."*  
 >  
 > **Key Observations by the Committee:**  
-> 1. **Complete 4-of-4 Deliverable Integration:** The committee commended the team for submitting all four required academic assets in camera-ready and final form: the 41-page dissertation monograph ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf)), the IEEE camera-ready research paper ([`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)), the Elsevier camera-ready review paper ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)), and the official 2-sheet A3 symposium exhibition poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).  
+> 1. **Complete 4-of-4 Deliverable Integration & Black Book Submission:** The committee commended the team for submitting all four required academic assets in camera-ready and final form: the 41-page dissertation monograph ([`docs/Thesis/Final_Thesis.pdf`](../Thesis/Final_Thesis.pdf), hardbound Black Book submitted and approved by department [`docs/Thesis/Thesis_Submission_Black_Book_Photo.png`](../Thesis/Thesis_Submission_Black_Book_Photo.png)), the IEEE camera-ready research paper ([`docs/Publications/Research_Paper.pdf`](../Publications/Research_Paper.pdf)), the Elsevier camera-ready review paper ([`docs/Publications/Review_Paper.pdf`](../Publications/Review_Paper.pdf)), and the official 2-sheet A3 symposium exhibition poster ([`docs/Poster/Project_Poster.pdf`](../Poster/Project_Poster.pdf)).  
 > 2. **Silicon-Validated Hardware Verification:** The team demonstrated **200/200 bit-exact stage verification** between Python golden models and Xilinx Artix-7 Verilog HDL RTL (`esn_ip_platform` v1.2), running with positive timing slack (+0.023 ns at 80 MHz) and minimal silicon footprint (318 LUTs, 2 DSPs).  
 > 3. **Industrial Relevance & Regulatory Audit:** The project adheres to Indian automotive e-mobility standards (AIS-156 Amendment 3 Phase 2 thermal runaway 5-minute warning) and provides an open, reproducible test harness with **125 / 125 automated passing tests**.  
 >  

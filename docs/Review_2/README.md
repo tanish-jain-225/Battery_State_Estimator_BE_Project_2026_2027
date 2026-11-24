@@ -13,7 +13,7 @@
 * **Department:** Department of Automation and Robotics / Instrumentation
 * **Project Mentor:** Dr. Kadambari Sharma
 * **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan
-* **Team Members:** Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi
+* **Team Members:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi
 * **Milestone Release:** [GitHub Release v2.3.0](https://github.com/tanish-jain-225/Battery_State_Estimator_BE_Project_2026_2027/releases/tag/v2.3.0)
 
 ---

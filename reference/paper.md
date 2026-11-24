@@ -2,9 +2,9 @@
 
 # Edge-Based Sparse Reservoir Computing and State Observers for Real-Time Battery Diagnostics in Cyber-Physical Systems
 
-**Sanjna Patankar, Akshay Nambiar, Satvik Verma, Tanish Sanghvi, and Kadambari Sharma**  
+**Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi, and Kadambari Sharma**  
 *Department of Automation and Robotics / Instrumentation, VESIT, Mumbai, India*  
-*Emails: {2023.sanjna.patankar, 2023.akshay.nambiar, 2023.satvik.verma, 2023.tanish.sanghvi}@ves.ac.in*  
+*Emails: {2023.akshay.nambiar, 2023.sanjna.patankar, 2023.satvik.verma, 2023.tanish.sanghvi}@ves.ac.in*  
 **Target Publication Venues:** IEEE Transactions on Industrial Electronics / IEEE Access / IEEE Potentials (Student Journal) / Q3 Scopus-Indexed CPS Journals
 
 ---

@@ -8,8 +8,8 @@
 **Project Mentor:** Dr. Kadambari Sharma  
 **Project Guide / Coordinator:** Mr. Gopalkrishnan Narayan  
 **Team Members:**  
-- Sanjna Patankar  
 - Akshay Nambiar  
+- Sanjna Patankar  
 - Satvik Verma  
 - Tanish Sanghvi  
 

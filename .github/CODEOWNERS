@@ -5,25 +5,25 @@
 # Learn more: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Default maintainers for the entire repository
-* @tanish-jain-225 @Clothflow13 @RoyalMaddy08 @ABKmaster
+* @RoyalMaddy08 @Clothflow13 @ABKmaster @tanish-jain-225
 
 # Software Subsystem (Simulator, Visualiser, Shared Physics)
-/software/simulator/ @Clothflow13 @RoyalMaddy08
-/software/visualiser/ @tanish-jain-225 @RoyalMaddy08
-/software/shared/ @Clothflow13 @tanish-jain-225
+/software/simulator/ @RoyalMaddy08 @Clothflow13
+/software/visualiser/ @RoyalMaddy08 @tanish-jain-225
+/software/shared/ @RoyalMaddy08 @Clothflow13 @tanish-jain-225
 
 # Hardware Subsystem (C99 Microcontroller Firmware & FPGA RTL)
 /hardware/STM_Verifier/ @ABKmaster @tanish-jain-225
-/hardware/FPGA_Verifier/ @tanish-jain-225 @ABKmaster
+/hardware/FPGA_Verifier/ @RoyalMaddy08 @ABKmaster @tanish-jain-225
 /hardware/IP_Block/ @tanish-jain-225
 
 # Automated Regression Test Suite
-/tests/ @tanish-jain-225 @RoyalMaddy08 @Clothflow13 @ABKmaster
+/tests/ @RoyalMaddy08 @Clothflow13 @ABKmaster @tanish-jain-225
 
 # Documentation Hub & Academic Publications
-/docs/ @Clothflow13 @tanish-jain-225 @RoyalMaddy08 @ABKmaster
-/docs/Publications/ @tanish-jain-225 @Clothflow13
-/docs/Thesis/ @tanish-jain-225 @Clothflow13 @RoyalMaddy08 @ABKmaster
+/docs/ @RoyalMaddy08 @Clothflow13 @ABKmaster @tanish-jain-225
+/docs/Publications/ @RoyalMaddy08 @Clothflow13 @tanish-jain-225
+/docs/Thesis/ @RoyalMaddy08 @Clothflow13 @ABKmaster @tanish-jain-225
 
 # Continuous Integration & GitHub Automation Workflows
 /.github/ @tanish-jain-225

@@ -30,10 +30,10 @@ This document serves as an end-to-end slide-by-slide blueprint for your first ca
   * **Title**: **ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation**
   * **Subtitle**: Software Estimator + Embedded / FPGA Hardware Validation
   * **Team**:
-    1. Sanjna Patankar
-    2. Akshay Nambiar
-    3. Satvik Verma
-    4. Tanish Sanghvi
+    1. Akshay Nambiar (Roll No. 17)
+    2. Sanjna Patankar (Roll No. 19)
+    3. Satvik Verma (Roll No. 32)
+    4. Tanish Sanghvi (Roll No. 61)
   * **Mentor**: Dr. Kadambari Sharma
   * **Project Guide / Coordinator**: Mr. Gopalkrishnan Narayan
   * **Department**: Automation and Robotics / Instrumentation
@@ -41,7 +41,7 @@ This document serves as an end-to-end slide-by-slide blueprint for your first ca
 * **Visual Layout & Aesthetics**:
   * Modern dark slate background with cyan and teal accent cards.
   * Right panel highlighting Mentor, Guide, Department, and Institute metadata.
-* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Sanjna Patankar, Akshay Nambiar, Satvik Verma, and Tanish Sanghvi from the Department of Automation and Robotics at VESIT. Our project is titled 'ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation', mentored by Dr. Kadambari Sharma and guided by Mr. Gopalkrishnan Narayan. Today we will present our progress review."
+* **Speaker Delivery Notes**: "Good morning respected evaluators. We are team members Akshay Nambiar, Sanjna Patankar, Satvik Verma, and Tanish Sanghvi from the Department of Automation and Robotics at VESIT. Our project is titled 'ESN-Based Battery SOC/SOH Estimation with Embedded Hardware Validation', mentored by Dr. Kadambari Sharma and guided by Mr. Gopalkrishnan Narayan. Today we will present our progress review."
 
 ---
 

@@ -36,7 +36,7 @@ Target venues are peer-reviewed **IEEE Transactions / Q3 Scopus-Indexed Journals
 ## 📄 Target Paper 1: Comprehensive Review Paper
 
 * **Title:** *Hardware architectures for learned battery state-of-charge estimation: A review of recurrent and reservoir computing accelerators against battery management requirements*
-* **Authors:** Akshay Nambiar, Satvik Verma, Tanish Sanghvi, Sanjna Patankar, Kadambari Sharma, and Sangeetha Prasanna Ram
+* **Authors:** Akshay Nambiar, Sanjna Patankar, Satvik Verma, Tanish Sanghvi, Kadambari Sharma, and Sangeetha Prasanna Ram
 * **Affiliation:** Department of Automation and Robotics, VES Institute of Technology, Mumbai, India
 * **Format:** Elsevier / ScienceDirect 2-Column Camera-Ready PDF (12 Pages, 232 KB Encrypted, 77 References)
 * **Status:** **Completed & Integrated (Deliverable 2 of 4 Finalized)**
